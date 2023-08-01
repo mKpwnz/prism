@@ -1,8 +1,8 @@
 {
-  "name": "dctest",
+  "name": "prismdcbot",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "Bot.ts",
   "scripts": {
     "start": "tsc && node ./dist/Bot.js"
   },
