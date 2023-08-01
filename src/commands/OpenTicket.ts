@@ -1,4 +1,3 @@
-import { Modal, SelectMenuComponent, TextInputComponent, showModal } from 'discord-modals'
 import { CommandInteraction, Interaction, ModalBuilder, SlashCommandBuilder } from 'discord.js'
 import { ICommand } from '../interfaces/ICommand'
 

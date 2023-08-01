@@ -52,6 +52,16 @@ async function fetchMessage(channel: TextChannel, limit: number, before: any) {
                 imageid++
             })
         }
+        if(message.embeds.length > 0){
+            message.embeds.forEach((embed) => {
+                if(embed.image){
+                    //console.log(embed.image.url)
+                    downloadPicture(embed.image.url, imageid)
+                    imageid++
+                }
+            })
+        }
+        
     })
     console.log('Message-Size: ' + messages.size)
     console.log('Last Message: ' + lastMessage)
