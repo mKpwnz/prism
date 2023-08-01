@@ -10,8 +10,6 @@ export const message: ICommand = {
     run: async (interaction: CommandInteraction) => {
         const { channel, options } = interaction
 
-        const time = Date.now() - 1000 * 60 * 60 * 24 * 14
-
         if (channel instanceof TextChannel) {
             let hasMessages = true
             let before = null
@@ -41,13 +39,11 @@ async function fetchMessage(channel: TextChannel, limit: number, before: any) {
         messages = await channel.messages.fetch({ limit: limit })
     }
     let lastMessage = messages.last()?.id
-    //log messages in console
+    
     messages.forEach((message) => {
-        //console.log(message.content)
         if (message.attachments.size > 0) {
             size += message.attachments.size
             message.attachments.forEach((attachment) => {
-                //console.log(attachment.url)
                 downloadPicture(attachment.url, imageid)
                 imageid++
             })
@@ -55,7 +51,6 @@ async function fetchMessage(channel: TextChannel, limit: number, before: any) {
         if(message.embeds.length > 0){
             message.embeds.forEach((embed) => {
                 if(embed.image){
-                    //console.log(embed.image.url)
                     downloadPicture(embed.image.url, imageid)
                     imageid++
                 }

@@ -1,15 +1,3 @@
-/*import { Client } from 'discord.js'
-
-export default (client: Client): void => {
-    client.on('ready', async () => {
-        if (!client.user || !client.application) {
-            return
-        }
-
-        console.log(`${client.user.username} is online`)
-    })
-}*/
-
 import { REST } from '@discordjs/rest'
 import { Routes } from 'discord-api-types/v9'
 import { Client } from 'discord.js'
