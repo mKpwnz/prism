@@ -18,7 +18,6 @@ const client = new Client({
         IntentsBitField.Flags.GuildIntegrations,
         IntentsBitField.Flags.MessageContent,
         IntentsBitField.Flags.DirectMessages,
-        //Add Interaction Create
     ],
 })
 

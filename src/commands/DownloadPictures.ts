@@ -10,7 +10,7 @@ export const downloadPictures: ICommand = {
         .setName('downloadpictures')
         .setDescription('Downloads all pictures in this Textchannel'),
     run: async (interaction: CommandInteraction) => {
-        const { channel, options } = interaction
+        const { channel } = interaction
 
         if (channel instanceof TextChannel) {
             let hasMessages = true

@@ -39,7 +39,7 @@ export class Ticket {
                 ],
             })
             .then((channel) => {
-                this.channel = channel as TextChannel
+                this.channel = channel
                 this.id = channel.id
             })
             .catch(console.error)

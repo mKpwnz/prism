@@ -1,6 +1,6 @@
-import { Client, Guild, Interaction } from 'discord.js'
+import { Guild, Interaction } from 'discord.js'
 import { Ticket } from '../classes/Ticket'
-import { CommandList } from '../commands/_CommandList'
+
 export const onOpenTicket = async (interaction: Interaction) => {
     if (!interaction.isModalSubmit()) return
     if (interaction.customId === 'ticket') {

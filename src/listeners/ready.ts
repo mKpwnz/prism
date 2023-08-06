@@ -10,7 +10,7 @@ export const onReady = async (client: Client) => {
 
     await rest.put(
         Routes.applicationGuildCommands(
-            client.user?.id || 'missing id',
+            client.user?.id ?? 'missing id',
             process.env.GUILD_ID as string,
         ),
         { body: commandData },
