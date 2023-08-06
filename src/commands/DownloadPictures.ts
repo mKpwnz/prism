@@ -5,8 +5,10 @@ import { ICommand } from '../interfaces/ICommand'
 let imageid = 0
 const fs = require('fs')
 
-export const message: ICommand = {
-    data: new SlashCommandBuilder().setName('scanmessages').setDescription('Grab all messages'),
+export const downloadPictures: ICommand = {
+    data: new SlashCommandBuilder()
+        .setName('downloadpictures')
+        .setDescription('Downloads all pictures in this Textchannel'),
     run: async (interaction: CommandInteraction) => {
         const { channel, options } = interaction
 
@@ -39,7 +41,7 @@ async function fetchMessage(channel: TextChannel, limit: number, before: any) {
         messages = await channel.messages.fetch({ limit: limit })
     }
     let lastMessage = messages.last()?.id
-    
+
     messages.forEach((message) => {
         if (message.attachments.size > 0) {
             size += message.attachments.size
@@ -48,15 +50,14 @@ async function fetchMessage(channel: TextChannel, limit: number, before: any) {
                 imageid++
             })
         }
-        if(message.embeds.length > 0){
+        if (message.embeds.length > 0) {
             message.embeds.forEach((embed) => {
-                if(embed.image){
+                if (embed.image) {
                     downloadPicture(embed.image.url, imageid)
                     imageid++
                 }
             })
         }
-        
     })
     console.log('Message-Size: ' + messages.size)
     console.log('Last Message: ' + lastMessage)
