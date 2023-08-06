@@ -1,15 +1,6 @@
-import {
-    ChannelType,
-    Client,
-    ClientOptions,
-    Events,
-    Guild,
-    IntentsBitField,
-    TextChannel,
-} from 'discord.js'
-import { on } from 'events'
-import { Ticket } from './classes/Ticket'
+import { Client, Events, IntentsBitField } from 'discord.js'
 import { onInteraction } from './listeners/CommandHandler'
+import { onOpenTicket } from './listeners/TicketHandler'
 import { onReady } from './listeners/ready'
 
 const dotenv = require('dotenv')
@@ -33,18 +24,5 @@ const client = new Client({
 
 client.on('ready', async () => await onReady(client))
 client.on('interactionCreate', async (interaction) => await onInteraction(interaction))
-client.on(Events.InteractionCreate, async (interaction) => {
-    if (!interaction.isModalSubmit()) return
-    if (interaction.customId === 'ticket') {
-        let ticket: Ticket = new Ticket(
-            'ticket-' + interaction.member?.user.username,
-            'BeispielTicket',
-            interaction.guild as Guild,
-        )
-
-        await interaction.reply({
-            content: 'Ticket created!',
-        })
-    }
-})
+client.on(Events.InteractionCreate, async (interaction) => await onOpenTicket(interaction))
 client.login(token)
