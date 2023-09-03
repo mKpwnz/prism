@@ -8,6 +8,7 @@ dotenv.config()
 
 const token = process.env.DISCORD_TOKEN
 
+// Test
 console.log('Bot is starting...')
 
 const client = new Client({
