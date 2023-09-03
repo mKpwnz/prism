@@ -8,8 +8,6 @@ dotenv.config()
 
 const token = process.env.DISCORD_TOKEN
 
-// LAK SHU
-
 console.log('Bot is starting...')
 
 const client = new Client({
