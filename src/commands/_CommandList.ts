@@ -1,5 +1,4 @@
 import { ICommand } from '../interfaces/ICommand'
-import { downloadPictures } from './DownloadPictures'
-import { openTicket } from './OpenTicket'
+import { Ping } from './Ping'
 
-export const CommandList: ICommand[] = [openTicket, downloadPictures]
+export const CommandList: ICommand[] = [Ping]
