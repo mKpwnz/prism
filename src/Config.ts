@@ -1,7 +1,6 @@
 const Config = {
     Discord: {
-        // ServerID: '1121465132984320190', // IMMO Logs
-        ServerID: '1121465132984320190', // PRISM Logs
+        ServerID: '1121465132984320190', // IMMO Logs
         Channel: {
             WHOIS_UNLIMITED: '989667371113386054',
             WHOIS_LIMITED: '999274240366886962',
@@ -17,8 +16,7 @@ const Config = {
         },
         Users: {},
         Groups: {
-            // DEV_SERVERENGINEER: '996094054867673189',
-            DEV_SERVERENGINEER: '1121469073902018640',
+            DEV_SERVERENGINEER: '996094054867673189',
 
             IC_FRAKTIONSVERWALTUNG: '1118190151311573022',
             IC_EVENTVERWALTUNG: '1118194767877111828',
