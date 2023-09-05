@@ -19,30 +19,30 @@ export interface IUser extends RowDataPacket {
     dateofbirth: string // need to be casted to Date
     sex: string // m | f // need to be casted to 'Male' | 'Female'
     height: string // need to be casted to a number
-    phone_number: string // TODO: Delete
-    last_property: string
+    phone_number_HUND: string // TODO: Delete
+    last_property: string // TODO: Delete
     status: string // JSON Object need to be casted
-    ped: string
-    pin_bank: number
+    ped: string // TODO: Delete
+    pin_bank: number // TODO: Delete
     last_selected_char: number
-    house: string
-    last_house: number
-    bought_furniture: string
+    house: string // TODO: Delete
+    last_house: number // TODO: Delete
+    bought_furniture: string // TODO: Delete
     iban: number // BigInt
     PedArmour: number
     fblock: string
     apps: string // TODO: Delete
     widget: string // TODO: Delete
-    bt: string
+    bt: string // TODO: Delete
     charinfo: string
     metadata: string
-    cryptocurrency: string
-    phonePos: string
-    spotify: string
+    cryptocurrency: string // TODO: Delete
+    phonePos: string // TODO: Delete
+    spotify: string // TODO: Delete
     animations: string
     fraksperre: Date
     crafting_level: number
-    jail: number
+    jail: number // TODO: Delete
     crafting_bonus: number
     wheel: string
     inside: string
