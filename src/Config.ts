@@ -12,7 +12,8 @@ const Config = {
             WHOIS_TESTI: '998968111569063956',
             WHOIS_NOTICE: '1080340780520058900',
 
-            PRISM_TEST: '1124053849242599575',
+            PRISM_TEST: '1148608451006701608',
+            PRISM_TEST2: '1148608567092449360',
         },
         Users: {},
         Groups: {
