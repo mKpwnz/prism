@@ -119,15 +119,15 @@ export const WhoIs: ICommand = {
                         description: `Hier sind ${fields.length} Suchergebnisse für "${identifierValue}":`, // Beschreibung des Embeds
                         fields: fields,
                         author: {
-                            name: 'PRISM Discord Bot',
-                            icon_url:
-                                'https://cdn.discordapp.com/attachments/1157038126884200659/1157038661980921896/icon.png?ex=651727b9&is=6515d639&hm=a7a0dd3c1a0ea4c9254f0de19bf9bb3ccfba3ae6e3de2ab1acfe0f43c606f2ff&',
+                            name: Config.Discord.BOT_NAME,
+                            icon_url: Config.Pictures.Prism.LOGO_BLUE,
                         },
                     }
                     if (fields.length > 20) {
                         embed.footer = {
                             text: `${fields.length - 20} weitere Ergebnisse sind ausgeblendet!`,
                         }
+                        embed.description = `Hier sind 20/${fields.length} Suchergebnisse für "${identifierValue}":`
                     }
 
                     channel?.send({ content: `${interaction.user.toString()}`, embeds: [embed] })

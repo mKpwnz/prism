@@ -11,6 +11,8 @@ const Config = {
             WHOIS_FRAKTIONEN: '1037375087403347979',
             WHOIS_TESTI: '998968111569063956',
             WHOIS_NOTICE: '1080340780520058900',
+            IMAGE_UPLOAD: '1157038126884200659',
+            CUSTOM_PICS: '1157055084543361084',
 
             PRISM_TEST: '1148608451006701608',
             PRISM_TEST2: '1148608567092449360',
@@ -26,6 +28,13 @@ const Config = {
             IC_HADMIN: '1118186337573556254',
             IC_ADMIN: '1118186443504898068',
             IC_MOD: '1118186467395653682',
+        },
+        BOT_NAME: 'PRISM Discord Bot',
+    },
+    Pictures: {
+        Prism: {
+            LOGO_BLUE:
+                'https://cdn.discordapp.com/attachments/1157038126884200659/1157083951186317312/icon.png',
         },
     },
 }

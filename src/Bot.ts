@@ -1,6 +1,7 @@
 import { Client, Events, IntentsBitField } from 'discord.js'
 import { Pool, createPool } from 'mysql2/promise'
 import { onInteraction } from './listeners/CommandHandler'
+import { onMessage } from './listeners/MessageHandler'
 import { onReady } from './listeners/ready'
 
 const dotenv = require('dotenv')
@@ -21,13 +22,7 @@ const client = new Client({
         IntentsBitField.Flags.DirectMessages,
     ],
 })
-/*
-SQL_HOST=db01.immortaldev.eu
-SQL_PORT=3306
-SQL_USER=fivem
-SQL_PASS=1xxqSPoFueSXeAsLC1xR9Gp_E_hAuyWd
-SQL_DATABASE=immortalfivem
-*/
+
 const db = createPool({
     host: process.env.SQL_HOST,
     database: process.env.SQL_DATABASE,
@@ -39,4 +34,6 @@ export default db
 
 client.on('ready', async () => await onReady(client))
 client.on('interactionCreate', async (interaction) => await onInteraction(interaction))
+client.on('messageCreate', async (message) => await onMessage(message))
+
 client.login(token)
