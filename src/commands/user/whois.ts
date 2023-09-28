@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from 'discord.js'
+import { APIEmbed, SlashCommandBuilder } from 'discord.js'
 import { RowDataPacket } from 'mysql2'
 import db from '../../Bot'
 import Config from '../../Config'
@@ -101,23 +101,41 @@ export const WhoIs: ICommand = {
                                     '' +
                                     fraksperrestring +
                                     levelString,
-                                inline: true,
+                                inline: false,
                             })
                         }
                     }
                 }
 
-                const embed = {
-                    color: 0x0099ff, // Farbe des Embeds
-                    title: 'Suchergebnisse', // Titel des Embeds
-                    description: `Hier sind die Suchergebnisse für "${identifierValue}":`, // Beschreibung des Embeds
-                    fields: fields,
+                if (fields.length === 0) {
+                    await interaction.reply({
+                        content: `Keine Daten für "${identifierValue}"gefunden!`,
+                        ephemeral: true,
+                    })
+                } else {
+                    const embed: APIEmbed = {
+                        color: 0x0099ff, // Farbe des Embeds
+                        title: 'Suchergebnisse', // Titel des Embeds
+                        description: `Hier sind ${fields.length} Suchergebnisse für "${identifierValue}":`, // Beschreibung des Embeds
+                        fields: fields,
+                        author: {
+                            name: 'PRISM Discord Bot',
+                            icon_url:
+                                'https://cdn.discordapp.com/attachments/1157038126884200659/1157038661980921896/icon.png?ex=651727b9&is=6515d639&hm=a7a0dd3c1a0ea4c9254f0de19bf9bb3ccfba3ae6e3de2ab1acfe0f43c606f2ff&',
+                        },
+                    }
+                    if (fields.length > 20) {
+                        embed.footer = {
+                            text: `${fields.length - 20} weitere Ergebnisse sind ausgeblendet!`,
+                        }
+                    }
+
+                    channel?.send({ content: `${interaction.user.toString()}`, embeds: [embed] })
+                    await interaction.reply({
+                        content: 'Daten gefunden und im Chat hinterlegt!',
+                        ephemeral: true,
+                    })
                 }
-                channel?.send({ content: `${interaction.user.toString()}`, embeds: [embed] })
-                await interaction.reply({
-                    content: 'Daten gefunden und im Chat hinterlegt!',
-                    ephemeral: true,
-                })
             }
             // Verarbeiten Sie finduser hier weiter
         } else {
@@ -149,25 +167,25 @@ interface IFindUser {
 async function searchUsers(searchText: string): Promise<IFindUser[]> {
     let query =
         'SELECT ' +
-        'u.identifier, ' +
-        'u.`group`, ' +
-        'u.`name`, ' +
-        'u.job, ' +
-        'u.fraksperre, ' +
-        'u.job_grade, ' +
-        'u.firstname, ' +
-        'u.lastname, ' +
-        'u.crafting_level, ' +
+        'users.identifier, ' +
+        'users.`group`, ' +
+        'users.`name`, ' +
+        'users.job, ' +
+        'users.fraksperre, ' +
+        'users.job_grade, ' +
+        'users.firstname, ' +
+        'users.lastname, ' +
+        'users.crafting_level, ' +
         "CONCAT(users.firstname, ' ', users.lastname) as fullname, " +
         "cast( json_extract( `users`.`accounts`, '$.bank' ) AS signed ) AS bank, " +
         "cast( json_extract( `users`.`accounts`, '$.money' ) AS signed ) AS money, " +
         "cast( json_extract( `users`.`accounts`, '$.black_money' ) AS signed ) AS black_money, " +
-        'b.discord, ' +
-        'b.playername, ' +
-        'p.phone_number ' +
-        'FROM users u' +
-        'LEFT JOIN baninfo b ON u.identifier = baninfo.identifier ' +
-        'JOIN phone_phones p ON u.identifier = p.id ' +
+        'baninfo.discord, ' +
+        'baninfo.playername, ' +
+        'phone_phones.phone_number ' +
+        'FROM users ' +
+        'LEFT JOIN baninfo ON users.identifier = baninfo.identifier ' +
+        'JOIN phone_phones ON users.identifier = phone_phones.id ' +
         'WHERE ' +
         'LOWER( users.`identifier` ) LIKE (SELECT owned_vehicles.`owner` FROM owned_vehicles WHERE LOWER(owned_vehicles.`plate`) LIKE LOWER("%' +
         searchText +
