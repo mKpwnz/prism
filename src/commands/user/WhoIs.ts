@@ -1,6 +1,6 @@
 import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
-import db from '@proot/Bot'
+import { Database } from '@sql/Database'
 import Config from '@proot/Config'
 import { IFindUser } from '@sql/schema/FindUser.schema'
 import { Helper } from '@utils/Helper'
@@ -223,7 +223,7 @@ export class WhoIs extends Command {
             '%"'
 
         try {
-            const [rows] = await db.execute(query) // Verwenden Sie await und die execute-Funktion
+            const [rows] = await Database.execute(query) // Verwenden Sie await und die execute-Funktion
             return rows as IFindUser[] // Casten Sie das Ergebnis in das gewünschte Format
         } catch (error) {
             console.error(error)

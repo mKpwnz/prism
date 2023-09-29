@@ -22,15 +22,6 @@ const client = new Client({
     ],
 })
 
-const db = createPool({
-    host: process.env.SQL_HOST,
-    database: process.env.SQL_DATABASE,
-    password: process.env.SQL_PASS,
-    user: process.env.SQL_USER,
-})
-
-export default db
-
 client.on('ready', async () => await onReady(client))
 client.on('interactionCreate', async (interaction) => await CommandHandler.onInteraction(interaction))
 client.on('messageCreate', async (message) => await onMessage(message))

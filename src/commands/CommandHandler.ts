@@ -1,5 +1,5 @@
 import { Command } from '@class/Command'
-import { CommandInteraction, Interaction, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js'
+import { Interaction, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js'
 import { Ping } from './system/Ping'
 import { Birthday } from './user/Birthday'
 import { WhoIs } from './user/WhoIs'

@@ -1,7 +1,7 @@
 import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
-import db from '@proot/Bot'
 import Config from '@proot/Config'
+import { Database } from '@sql/Database'
 import { CommandInteraction, SlashCommandBuilder } from 'discord.js'
 import { RowDataPacket } from 'mysql2'
 
@@ -43,11 +43,11 @@ export class Birthday extends Command {
                 query += `'${steam}' LIMIT 1`
             }
             try {
-                let result = await db.query(query)
+                let result = await Database.query(query)
                 let datarow = result[0] as RowDataPacket[]
                 if (datarow.length > 0) {
                     query = 'UPDATE users SET dateofbirth = ' + `'${birthday}' WHERE identifier = '${steam}'`
-                    result = await db.execute(query)
+                    result = await Database.execute(query)
                     if (result) {
                         await interaction.reply('Geburtstag erfolgreich geändert')
                     } else {
