@@ -1,6 +1,8 @@
 import { Command } from '@class/Command'
 import { CommandInteraction, Interaction, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js'
 import { Ping } from './system/Ping'
+import { Birthday } from './user/Birthday'
+import { WhoIs } from './user/WhoIs'
 
 // NEW CONCEPT
 export class CommandHandler {
@@ -17,7 +19,12 @@ export class CommandHandler {
 
     static initAll() {
         console.log('Init all Commands')
+        // System Commands
         new Ping()
+
+        // User Commands
+        new Birthday()
+        new WhoIs()
     }
 }
 

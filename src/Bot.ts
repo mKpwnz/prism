@@ -1,9 +1,10 @@
 import 'dotenv/config'
-import { Client, Events, IntentsBitField } from 'discord.js'
-import { Pool, createPool } from 'mysql2/promise'
-import { onReady } from '@listeners/ready'
+
 import { CommandHandler } from '@commands/CommandHandler'
 import { onMessage } from '@listeners/MessageHandler'
+import { onReady } from '@listeners/ready'
+import { Client, IntentsBitField } from 'discord.js'
+import { createPool } from 'mysql2/promise'
 
 const token = process.env.DISCORD_TOKEN
 

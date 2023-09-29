@@ -1,28 +1,35 @@
-import { ICommand } from '@interfaces/ICommand'
+import { Command } from '@class/Command'
+import { RegisterCommand } from '@commands/CommandHandler'
 import db from '@proot/Bot'
 import Config from '@proot/Config'
-import { APIEmbed, SlashCommandBuilder } from 'discord.js'
-import { RowDataPacket } from 'mysql2'
-const AllowedChannels = [Config.Discord.Channel.PRISM_TEST]
-const AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER]
+import { IFindUser } from '@sql/schema/FindUser.schema'
+import { Helper } from '@utils/Helper'
+import { APIEmbed, CommandInteraction, SlashCommandBuilder } from 'discord.js'
 
-export const WhoIs: ICommand = {
-    data: new SlashCommandBuilder()
-        .setName('whois')
-        .setDescription('Suche nach Spielern')
-        //add string option
-        .setDMPermission(true)
-        .addStringOption((option) =>
-            option.setName('input').setDescription('Identifier des Spielers').setRequired(true),
-        ) as SlashCommandBuilder,
+export class WhoIs extends Command {
+    constructor() {
+        super(false)
+        this.AllowedChannels = [Config.Discord.Channel.PRISM_TEST]
+        this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER]
+        RegisterCommand(
+            new SlashCommandBuilder()
+                .setName('whois')
+                .setDescription('Suche nach Spielern')
+                //add string option
+                .setDMPermission(true)
+                .addStringOption((option) =>
+                    option.setName('input').setDescription('Identifier des Spielers').setRequired(true),
+                ) as SlashCommandBuilder,
+            this,
+        )
+    }
 
-    run: async (interaction) => {
+    async execute(interaction: CommandInteraction): Promise<void> {
         const { channel, user, guild } = interaction
-        //if ((await IsUserAllowed(interaction, AllowedChannels, AllowedGroups)) === false) return
         const identifierValue = interaction.options.get('input')?.value?.toString()
         if (identifierValue) {
             console.log(identifierValue)
-            const finduser: IFindUser[] = await searchUsers(identifierValue)
+            const finduser: IFindUser[] = await this.searchUsers(identifierValue)
             if (finduser === null) {
                 await interaction.reply({ content: 'User nicht gefunden', ephemeral: true })
             } else {
@@ -53,7 +60,10 @@ export const WhoIs: ICommand = {
                                 let expiration = new Date(finduser[i].fraksperre).getTime() / 1000
                                 let diff = expiration - now
                                 if (diff > 0) {
-                                    fraksperrestring = fraksperrestring + '\nFraksperre Verbleibend: ' + countdown(diff)
+                                    fraksperrestring =
+                                        fraksperrestring +
+                                        '\nFraksperre Verbleibend: ' +
+                                        Helper.secondsToTimeString(diff)
                                 }
                             }
                             let levelString = ''
@@ -135,147 +145,89 @@ export const WhoIs: ICommand = {
             // Wenn identifierValue null oder undefined ist
             await interaction.reply('Die Option "identifier" enthält keinen gültigen Wert.')
         }
-    },
-}
-
-// TODO: Auslagern in eigene Datei. GGF im "user" ordner einen "whois" ordner erstellen, da es nur bezogen auf den einen Command ist.
-interface IFindUser {
-    identifier: string
-    group: string
-    name: string
-    job: string
-    fraksperre: Date
-    job_grade: number
-    firstname: string
-    lastname: string
-    crafting_level: number
-    fullname: string
-    bank: number
-    money: number
-    black_money: number
-    discord: string
-    playername: string
-    phone_number: string
-}
-
-// TODO: Wenn es einen error im tryCatch block gibt, sollte für den User nicht nur ein leeres ergebnis zurückgegeben werden, sondern eine Fehlermeldung
-async function searchUsers(searchText: string): Promise<IFindUser[]> {
-    let query =
-        'SELECT ' +
-        'users.identifier, ' +
-        'users.`group`, ' +
-        'users.`name`, ' +
-        'users.job, ' +
-        'users.fraksperre, ' +
-        'users.job_grade, ' +
-        'users.firstname, ' +
-        'users.lastname, ' +
-        'users.crafting_level, ' +
-        "CONCAT(users.firstname, ' ', users.lastname) as fullname, " +
-        "cast( json_extract( `users`.`accounts`, '$.bank' ) AS signed ) AS bank, " +
-        "cast( json_extract( `users`.`accounts`, '$.money' ) AS signed ) AS money, " +
-        "cast( json_extract( `users`.`accounts`, '$.black_money' ) AS signed ) AS black_money, " +
-        'baninfo.discord, ' +
-        'baninfo.playername, ' +
-        'phone_phones.phone_number ' +
-        'FROM users ' +
-        'LEFT JOIN baninfo ON users.identifier = baninfo.identifier ' +
-        'JOIN phone_phones ON users.identifier = phone_phones.id ' +
-        'WHERE ' +
-        'LOWER( users.`identifier` ) LIKE (SELECT owned_vehicles.`owner` FROM owned_vehicles WHERE LOWER(owned_vehicles.`plate`) LIKE LOWER("%' +
-        searchText +
-        '%") LIMIT 1) OR ' +
-        'LOWER( users.`steamId` ) LIKE (SELECT owned_vehicles.`owner` FROM owned_vehicles WHERE LOWER(owned_vehicles.`plate`) LIKE LOWER("%' +
-        searchText +
-        '%") LIMIT 1) OR ' +
-        'LOWER( baninfo.`license` ) LIKE LOWER( "%' +
-        searchText +
-        '%" ) OR ' +
-        'LOWER( baninfo.`liveid` ) LIKE LOWER( "%' +
-        searchText +
-        '%" ) OR ' +
-        'LOWER( baninfo.`xblid` ) LIKE LOWER( "%' +
-        searchText +
-        '%" ) OR ' +
-        'LOWER( baninfo.`discord` ) LIKE LOWER( "%' +
-        searchText +
-        '%" ) OR ' +
-        'LOWER( baninfo.`playerip` ) LIKE LOWER( "%' +
-        searchText +
-        '%" ) OR ' +
-        'LOWER( users.`name` ) LIKE LOWER( "%' +
-        searchText +
-        '%" ) OR ' +
-        'LOWER( baninfo.playername) LIKE LOWER("%' +
-        searchText +
-        '%") OR ' +
-        'LOWER( users.identifier ) LIKE LOWER( "%' +
-        searchText +
-        '%" ) OR ' +
-        'LOWER( users.steamId ) LIKE LOWER( "%' +
-        searchText +
-        '%" ) OR ' +
-        'LOWER( users.`firstname` ) LIKE LOWER( "%' +
-        searchText +
-        '%" ) OR ' +
-        'LOWER( users.`lastname` ) LIKE LOWER( "%' +
-        searchText +
-        '%" ) OR ' +
-        'LOWER( users.`job` ) LIKE LOWER( "%' +
-        searchText +
-        '%" ) OR ' +
-        'LOWER( users.`group` ) LIKE LOWER( "%' +
-        searchText +
-        '%" ) OR ' +
-        "LOWER( CONCAT(users.firstname, ' ', users.lastname) ) LIKE LOWER ( \"%" +
-        searchText +
-        '%" ) OR ' +
-        "JSON_EXTRACT(users.charinfo, '$.phone') LIKE \"%" +
-        searchText +
-        '%"'
-
-    try {
-        const [rows] = await db.execute(query) // Verwenden Sie await und die execute-Funktion
-        return rows as IFindUser[] // Casten Sie das Ergebnis in das gewünschte Format
-    } catch (error) {
-        console.error(error)
-        return []
-    }
-}
-
-// TODO: Auslagern in "Helper.ts"
-// TODO: Return Type einfügen
-function numberWithCommas(x: number) {
-    if (x.toString()) {
-        return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, '.')
-    } else {
-        return x
-    }
-}
-
-// TODO: Auslagern in "Helper.ts"
-// TODO: Return Type einfügen
-function decimalToHexString(number: number) {
-    if (number < 0) {
-        number = 0xffffffff + number + 1
     }
 
-    return number.toString(16)
-}
+    async searchUsers(searchText: string): Promise<IFindUser[]> {
+        let query =
+            'SELECT ' +
+            'users.identifier, ' +
+            'users.`group`, ' +
+            'users.`name`, ' +
+            'users.job, ' +
+            'users.fraksperre, ' +
+            'users.job_grade, ' +
+            'users.firstname, ' +
+            'users.lastname, ' +
+            'users.crafting_level, ' +
+            "CONCAT(users.firstname, ' ', users.lastname) as fullname, " +
+            "cast( json_extract( `users`.`accounts`, '$.bank' ) AS signed ) AS bank, " +
+            "cast( json_extract( `users`.`accounts`, '$.money' ) AS signed ) AS money, " +
+            "cast( json_extract( `users`.`accounts`, '$.black_money' ) AS signed ) AS black_money, " +
+            'baninfo.discord, ' +
+            'baninfo.playername, ' +
+            'phone_phones.phone_number ' +
+            'FROM users ' +
+            'LEFT JOIN baninfo ON users.identifier = baninfo.identifier ' +
+            'JOIN phone_phones ON users.identifier = phone_phones.id ' +
+            'WHERE ' +
+            'LOWER( users.`identifier` ) LIKE (SELECT owned_vehicles.`owner` FROM owned_vehicles WHERE LOWER(owned_vehicles.`plate`) LIKE LOWER("%' +
+            searchText +
+            '%") LIMIT 1) OR ' +
+            'LOWER( users.`steamId` ) LIKE (SELECT owned_vehicles.`owner` FROM owned_vehicles WHERE LOWER(owned_vehicles.`plate`) LIKE LOWER("%' +
+            searchText +
+            '%") LIMIT 1) OR ' +
+            'LOWER( baninfo.`license` ) LIKE LOWER( "%' +
+            searchText +
+            '%" ) OR ' +
+            'LOWER( baninfo.`liveid` ) LIKE LOWER( "%' +
+            searchText +
+            '%" ) OR ' +
+            'LOWER( baninfo.`xblid` ) LIKE LOWER( "%' +
+            searchText +
+            '%" ) OR ' +
+            'LOWER( baninfo.`discord` ) LIKE LOWER( "%' +
+            searchText +
+            '%" ) OR ' +
+            'LOWER( baninfo.`playerip` ) LIKE LOWER( "%' +
+            searchText +
+            '%" ) OR ' +
+            'LOWER( users.`name` ) LIKE LOWER( "%' +
+            searchText +
+            '%" ) OR ' +
+            'LOWER( baninfo.playername) LIKE LOWER("%' +
+            searchText +
+            '%") OR ' +
+            'LOWER( users.identifier ) LIKE LOWER( "%' +
+            searchText +
+            '%" ) OR ' +
+            'LOWER( users.steamId ) LIKE LOWER( "%' +
+            searchText +
+            '%" ) OR ' +
+            'LOWER( users.`firstname` ) LIKE LOWER( "%' +
+            searchText +
+            '%" ) OR ' +
+            'LOWER( users.`lastname` ) LIKE LOWER( "%' +
+            searchText +
+            '%" ) OR ' +
+            'LOWER( users.`job` ) LIKE LOWER( "%' +
+            searchText +
+            '%" ) OR ' +
+            'LOWER( users.`group` ) LIKE LOWER( "%' +
+            searchText +
+            '%" ) OR ' +
+            "LOWER( CONCAT(users.firstname, ' ', users.lastname) ) LIKE LOWER ( \"%" +
+            searchText +
+            '%" ) OR ' +
+            "JSON_EXTRACT(users.charinfo, '$.phone') LIKE \"%" +
+            searchText +
+            '%"'
 
-// TODO: Auslagern in "Helper.ts"
-// TODO: Return Type einfügen
-function countdown(s: any) {
-    const d = Math.floor(s / (3600 * 24))
-    s -= d * 3600 * 24
-    const h = Math.floor(s / 3600)
-    s -= h * 3600
-    const m = Math.floor(s / 60)
-    s -= m * 60
-    const tmp = []
-    d && tmp.push(d + 'd')
-    ;(d || h) && tmp.push(h + 'h')
-    ;(d || h || m) && tmp.push(m + 'm')
-    tmp.push(s + 's')
-    return tmp.join(' ')
+        try {
+            const [rows] = await db.execute(query) // Verwenden Sie await und die execute-Funktion
+            return rows as IFindUser[] // Casten Sie das Ergebnis in das gewünschte Format
+        } catch (error) {
+            console.error(error)
+            return []
+        }
+    }
 }

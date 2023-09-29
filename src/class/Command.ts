@@ -1,4 +1,4 @@
-import { IsUserAllowed } from '@proot/Helper'
+import { Helper } from '@utils/Helper'
 import { CommandInteraction } from 'discord.js'
 
 export abstract class Command {
@@ -11,7 +11,7 @@ export abstract class Command {
     abstract execute(interaction: CommandInteraction): Promise<void>
     async run(interaction: CommandInteraction): Promise<void> {
         if (this.CheckPermissions) {
-            if ((await IsUserAllowed(interaction, this.AllowedChannels, this.AllowedGroups)) === false) return
+            if ((await Helper.IsUserAllowed(interaction, this.AllowedChannels, this.AllowedGroups)) === false) return
         }
 
         await this.execute(interaction)

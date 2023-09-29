@@ -5,7 +5,7 @@ import { CommandInteraction, SlashCommandBuilder } from 'discord.js'
 
 export class Ping extends Command {
     constructor() {
-        super(false)
+        super(true)
         this.AllowedChannels = [Config.Discord.Channel.PRISM_DISCORDBOT]
         this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER, Config.Discord.Groups.DEV_PRISM]
         RegisterCommand(new SlashCommandBuilder().setName('ping').setDescription('Pong!'), this)
