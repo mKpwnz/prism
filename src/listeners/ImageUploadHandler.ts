@@ -14,7 +14,7 @@ export const onImageUpload = async (message: Message) => {
     if (message.author.bot) return
     const attachment = message.attachments.first()
     const userMessage = message.content
-    const numberCheck = new RegExp(/^01726\d{0,5}$/)
+    const numberCheck = new RegExp(/^01726\d{5}$/)
     const validnumber = numberCheck.test(userMessage)
 
     if (attachment && validnumber) {
