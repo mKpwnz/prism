@@ -5,9 +5,39 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
-    "moduleResolution": "NodeNext"
+    "moduleResolution": "NodeNext",
+    "experimentalDecorators": true,
+    "paths": {
+      "@class/*": [
+        "./src/class/*"
+      ],
+      "@commands/*": [
+        "./src/commands/*"
+      ],
+      "@interfaces/*": [
+        "./src/interfaces/*"
+      ],
+      "@utils/*": [
+        "./src/utils/*"
+      ],
+      "@listeners/*": [
+        "./src/listeners/*"
+      ],
+      "@events/*": [
+        "./src/events/*"
+      ],
+      "@types/*": [
+        "./src/types/*"
+      ],
+      "@sql/*": [
+        "./src/sql/*"
+      ],
+      "@proot/*": [
+        "./src/*"
+      ],
+    }
   },
   "include": [
     "src"
-  ]
+  ],
 }

@@ -16,9 +16,13 @@ const Config = {
 
             PRISM_TEST: '1148608451006701608',
             PRISM_TEST2: '1148608567092449360',
+            PRISM_DISCORDBOT: '1155060610497794048',
+            PRISM_IMAGES: '1157038126884200659',
+            PRISM_CUSTOMPICS: '1157055084543361084',
         },
         Users: {},
         Groups: {
+            DEV_PRISM: '1121469073902018640',
             DEV_SERVERENGINEER: '996094054867673189',
 
             IC_FRAKTIONSVERWALTUNG: '1118190151311573022',
@@ -33,8 +37,7 @@ const Config = {
     },
     Pictures: {
         Prism: {
-            LOGO_BLUE:
-                'https://cdn.discordapp.com/attachments/1157038126884200659/1157083951186317312/icon.png',
+            LOGO_BLUE: 'https://cdn.discordapp.com/attachments/1157038126884200659/1157083951186317312/icon.png',
         },
     },
 }

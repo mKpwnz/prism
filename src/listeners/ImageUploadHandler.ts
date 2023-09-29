@@ -1,8 +1,8 @@
+import db from '@proot/Bot'
+import Config from '@proot/Config'
 import axios from 'axios'
 import { channel } from 'diagnostics_channel'
 import { Client, Message, TextChannel } from 'discord.js'
-import db from '../Bot'
-import Config from '../Config'
 
 const getUniqueId = () => {
     let dateStr = Date.now().toString(36)
@@ -80,9 +80,7 @@ async function reupload(attachmentUrl: string, client: Client): Promise<string> 
         const newFilename = `${randomFilename}.${fileFormat}`
 
         // Hochladen des umbenannten Bildes in den Zielkanal
-        const customPicsChannel = client.channels.cache.get(
-            Config.Discord.Channel.CUSTOM_PICS,
-        ) as TextChannel
+        const customPicsChannel = client.channels.cache.get(Config.Discord.Channel.CUSTOM_PICS) as TextChannel
 
         if (customPicsChannel) {
             let newMessage = await customPicsChannel.send({
@@ -102,13 +100,7 @@ async function reupload(attachmentUrl: string, client: Client): Promise<string> 
 async function uploadDB(url: string, phone: string, size: number): Promise<boolean> {
     try {
         let query =
-            'INSERT INTO phone_photos (phone_number, link, size) VALUES ("' +
-            phone +
-            '", "' +
-            url +
-            '", ' +
-            size +
-            ')'
+            'INSERT INTO phone_photos (phone_number, link, size) VALUES ("' + phone + '", "' + url + '", ' + size + ')'
         const response = await db.query(query)
         if (response) {
             return true

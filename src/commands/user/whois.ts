@@ -1,8 +1,8 @@
+import { ICommand } from '@interfaces/ICommand'
+import db from '@proot/Bot'
+import Config from '@proot/Config'
 import { APIEmbed, SlashCommandBuilder } from 'discord.js'
 import { RowDataPacket } from 'mysql2'
-import db from '../../Bot'
-import Config from '../../Config'
-import { ICommand } from '../../interfaces/ICommand'
 const AllowedChannels = [Config.Discord.Channel.PRISM_TEST]
 const AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER]
 
@@ -30,9 +30,7 @@ export const WhoIs: ICommand = {
                 if (finduser.length > 0) {
                     for (let i = 0; i < finduser.length; i++) {
                         console.log(finduser[i])
-                        let identifier = finduser[i].identifier
-                            ? finduser[i].identifier
-                            : 'Unbekannt'
+                        let identifier = finduser[i].identifier ? finduser[i].identifier : 'Unbekannt'
 
                         let steamId
                         if (finduser[i].identifier) {
@@ -55,19 +53,14 @@ export const WhoIs: ICommand = {
                                 let expiration = new Date(finduser[i].fraksperre).getTime() / 1000
                                 let diff = expiration - now
                                 if (diff > 0) {
-                                    fraksperrestring =
-                                        fraksperrestring +
-                                        '\nFraksperre Verbleibend: ' +
-                                        countdown(diff)
+                                    fraksperrestring = fraksperrestring + '\nFraksperre Verbleibend: ' + countdown(diff)
                                 }
                             }
                             let levelString = ''
                             if (finduser[i].crafting_level) {
                                 levelString =
                                     '\nCrafting Level: ' +
-                                    (finduser[i].crafting_level -
-                                        (finduser[i].crafting_level % 100)) /
-                                        100
+                                    (finduser[i].crafting_level - (finduser[i].crafting_level % 100)) / 100
                             }
                             fields.push({
                                 name: finduser[i].playername + ' (' + finduser[i].name + ')',
@@ -145,6 +138,7 @@ export const WhoIs: ICommand = {
     },
 }
 
+// TODO: Auslagern in eigene Datei. GGF im "user" ordner einen "whois" ordner erstellen, da es nur bezogen auf den einen Command ist.
 interface IFindUser {
     identifier: string
     group: string
@@ -164,6 +158,7 @@ interface IFindUser {
     phone_number: string
 }
 
+// TODO: Wenn es einen error im tryCatch block gibt, sollte für den User nicht nur ein leeres ergebnis zurückgegeben werden, sondern eine Fehlermeldung
 async function searchUsers(searchText: string): Promise<IFindUser[]> {
     let query =
         'SELECT ' +
@@ -248,6 +243,8 @@ async function searchUsers(searchText: string): Promise<IFindUser[]> {
     }
 }
 
+// TODO: Auslagern in "Helper.ts"
+// TODO: Return Type einfügen
 function numberWithCommas(x: number) {
     if (x.toString()) {
         return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, '.')
@@ -256,6 +253,8 @@ function numberWithCommas(x: number) {
     }
 }
 
+// TODO: Auslagern in "Helper.ts"
+// TODO: Return Type einfügen
 function decimalToHexString(number: number) {
     if (number < 0) {
         number = 0xffffffff + number + 1
@@ -264,6 +263,8 @@ function decimalToHexString(number: number) {
     return number.toString(16)
 }
 
+// TODO: Auslagern in "Helper.ts"
+// TODO: Return Type einfügen
 function countdown(s: any) {
     const d = Math.floor(s / (3600 * 24))
     s -= d * 3600 * 24

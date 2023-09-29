@@ -1,7 +1,7 @@
+import { ICommand } from '@interfaces/ICommand'
+import db from '@proot/Bot'
 import { SlashCommandBuilder } from 'discord.js'
 import { RowDataPacket } from 'mysql2'
-import db from '../../Bot'
-import { ICommand } from '../../interfaces/ICommand'
 
 //TODO: Add permission check
 //TODO: Testen, da es ein write Befehl ist
@@ -12,14 +12,9 @@ export const Birthday: ICommand = {
         .setDescription('Suche nach Spielern')
         //add string option
         .setDMPermission(true)
+        .addStringOption((option) => option.setName('steam').setDescription('Steam ID des Nutzers').setRequired(true))
         .addStringOption((option) =>
-            option.setName('steam').setDescription('Steam ID des Nutzers').setRequired(true),
-        )
-        .addStringOption((option) =>
-            option
-                .setName('datum')
-                .setDescription('Neuer Geburtstag des Spielers (dd.mm.yyyy)')
-                .setRequired(true),
+            option.setName('datum').setDescription('Neuer Geburtstag des Spielers (dd.mm.yyyy)').setRequired(true),
         ) as SlashCommandBuilder,
     run: async (interaction) => {
         const { channel, user, guild } = interaction
@@ -39,9 +34,7 @@ export const Birthday: ICommand = {
                 let result = await db.query(query)
                 let datarow = result[0] as RowDataPacket[]
                 if (datarow.length > 0) {
-                    query =
-                        'UPDATE users SET dateofbirth = ' +
-                        `'${birthday}' WHERE identifier = '${steam}'`
+                    query = 'UPDATE users SET dateofbirth = ' + `'${birthday}' WHERE identifier = '${steam}'`
                     result = await db.execute(query)
                     if (result) {
                         await interaction.reply('Geburtstag erfolgreich geändert')

@@ -1,11 +1,9 @@
+import 'dotenv/config'
 import { Client, Events, IntentsBitField } from 'discord.js'
 import { Pool, createPool } from 'mysql2/promise'
-import { onInteraction } from './listeners/CommandHandler'
-import { onMessage } from './listeners/MessageHandler'
-import { onReady } from './listeners/ready'
-
-const dotenv = require('dotenv')
-dotenv.config()
+import { onReady } from '@listeners/ready'
+import { CommandHandler } from '@commands/CommandHandler'
+import { onMessage } from '@listeners/MessageHandler'
 
 const token = process.env.DISCORD_TOKEN
 
@@ -33,7 +31,7 @@ const db = createPool({
 export default db
 
 client.on('ready', async () => await onReady(client))
-client.on('interactionCreate', async (interaction) => await onInteraction(interaction))
+client.on('interactionCreate', async (interaction) => await CommandHandler.onInteraction(interaction))
 client.on('messageCreate', async (message) => await onMessage(message))
 
 client.login(token)
