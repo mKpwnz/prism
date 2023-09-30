@@ -1,4 +1,4 @@
-import { DCEvent } from '@class/Event'
+import { DCEvent } from '@class/DCEvent'
 import { CommandHandler } from '@commands/CommandHandler'
 import { REST } from '@discordjs/rest'
 import Config from '@proot/Config'
