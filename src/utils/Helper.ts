@@ -104,4 +104,18 @@ export class Helper {
         tmp.push(seconds + 's')
         return tmp.join(' ')
     }
+
+    /**
+     * @description Generates a unique ID based on the current timestamp and a random string
+     * @author mKpwnz
+     * @date 30.09.2023
+     * @static
+     * @returns {*}  {string}
+     * @memberof Helper
+     */
+    static getUniqueId(): string {
+        let dateStr = Date.now().toString(36)
+        let randomStr = Math.random().toString(36).substring(2, 8)
+        return `${dateStr}-${randomStr}`
+    }
 }

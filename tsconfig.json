@@ -32,6 +32,9 @@
       "@sql/*": [
         "./src/sql/*"
       ],
+      "@features/*": [
+        "./src/features/*"
+      ],
       "@proot/*": [
         "./src/*"
       ],

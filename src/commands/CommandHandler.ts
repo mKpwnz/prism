@@ -4,7 +4,6 @@ import { Ping } from './system/Ping'
 import { Birthday } from './user/Birthday'
 import { WhoIs } from './user/WhoIs'
 
-// NEW CONCEPT
 export class CommandHandler {
     static commands: { cmd: Command; scb: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder }[] = []
 
