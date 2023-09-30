@@ -1,6 +1,7 @@
 import Config from '@proot/Config'
 import { Database } from '@sql/Database'
 import { Helper } from '@utils/Helper'
+import LogManager from '@utils/Logger'
 import axios from 'axios'
 import { Client, Message, TextChannel } from 'discord.js'
 
@@ -91,11 +92,11 @@ export class CustomImmageUpload {
                 })
                 return newMessage.attachments.first()?.url.split('?')[0] ?? ''
             } else {
-                console.log('no channel found')
+                LogManager.log('no channel found')
                 return ''
             }
         } catch (error) {
-            console.error(error)
+            LogManager.error(error)
             return ''
         }
     }
@@ -128,7 +129,7 @@ export class CustomImmageUpload {
                 return false
             }
         } catch (error) {
-            console.error(error)
+            LogManager.error(error)
             return false
         }
     }

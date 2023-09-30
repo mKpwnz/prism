@@ -5,6 +5,7 @@ import Config from '@proot/Config'
 import { IFindUser } from '@sql/schema/FindUser.schema'
 import { Helper } from '@utils/Helper'
 import { APIEmbed, CommandInteraction, SlashCommandBuilder } from 'discord.js'
+import LogManager from '@utils/Logger'
 
 export class WhoIs extends Command {
     constructor() {
@@ -28,7 +29,7 @@ export class WhoIs extends Command {
         const { channel, user, guild } = interaction
         const identifierValue = interaction.options.get('input')?.value?.toString()
         if (identifierValue) {
-            console.log(identifierValue)
+            LogManager.log(identifierValue)
             const finduser: IFindUser[] = await this.searchUsers(identifierValue)
             if (finduser === null) {
                 await interaction.reply({ content: 'User nicht gefunden', ephemeral: true })
@@ -36,7 +37,7 @@ export class WhoIs extends Command {
                 let fields = []
                 if (finduser.length > 0) {
                     for (let i = 0; i < finduser.length; i++) {
-                        console.log(finduser[i])
+                        LogManager.log(finduser[i])
                         let identifier = finduser[i].identifier ? finduser[i].identifier : 'Unbekannt'
 
                         let steamId
@@ -226,7 +227,7 @@ export class WhoIs extends Command {
             const [rows] = await Database.execute(query) // Verwenden Sie await und die execute-Funktion
             return rows as IFindUser[] // Casten Sie das Ergebnis in das gewünschte Format
         } catch (error) {
-            console.error(error)
+            LogManager.error(error)
             return []
         }
     }

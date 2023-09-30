@@ -1,12 +1,12 @@
 import 'dotenv/config'
-
 import { EventHandler } from '@events/EventHandler'
 import { Client, IntentsBitField } from 'discord.js'
+import LogManager from '@utils/Logger'
+LogManager.configure()
 
 const token = process.env.DISCORD_TOKEN
 
-// Test
-console.log('Bot is starting...')
+LogManager.log('Bot is starting...')
 
 const client = new Client({
     intents: [
@@ -20,5 +20,4 @@ const client = new Client({
 })
 
 EventHandler.init(client)
-
 client.login(token)

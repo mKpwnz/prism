@@ -3,6 +3,7 @@ import { Interaction, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } 
 import { Ping } from './system/Ping'
 import { Birthday } from './user/Birthday'
 import { WhoIs } from './user/WhoIs'
+import LogManager from '@utils/Logger'
 
 export class CommandHandler {
     static commands: { cmd: Command; scb: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder }[] = []
@@ -17,7 +18,7 @@ export class CommandHandler {
     }
 
     static initAll() {
-        console.log('Init all Commands')
+        LogManager.log('Init all Commands')
         // System Commands
         new Ping()
 
@@ -32,7 +33,9 @@ export const RegisterCommand = (scb: SlashCommandBuilder | SlashCommandSubcomman
         cmd: cmd,
         scb: scb,
     })
-    console.log(`Registered Command: ${scb.name}`, {
+    LogManager.debug({
+        command: scb.name,
+        description: scb.description,
         usePermissions: cmd.CheckPermissions,
         allowedChannels: cmd.AllowedChannels,
         allowedGroups: cmd.AllowedGroups,

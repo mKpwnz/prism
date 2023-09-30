@@ -6,7 +6,6 @@
     "rootDir": "./src",
     "strict": true,
     "moduleResolution": "NodeNext",
-    "experimentalDecorators": true,
     "paths": {
       "@class/*": [
         "./src/class/*"
