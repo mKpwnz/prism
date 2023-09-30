@@ -1,6 +1,7 @@
 import chalk from 'chalk'
 import colorize from 'json-colorizer'
 import winston, { createLogger, format, transports } from 'winston'
+import LokiTransport from 'winston-loki'
 
 /**
  * @description Logger class for logging to console and loki
@@ -60,7 +61,7 @@ export default class LogManager {
 
     public static async configure() {
         this.logger = createLogger({
-            level: 'warn',
+            level: process.env.NODE_ENV !== 'production' ? 'debug' : 'warn',
             format: format.combine(
                 format.timestamp({
                     format: 'YYYY-MM-DD HH:mm:ss',
@@ -73,11 +74,18 @@ export default class LogManager {
                     )}: ${this.formatMessage(info.message, info.level)}`
                 }),
             ),
-            transports: [new transports.Console()],
+            transports: [
+                new LokiTransport({
+                    host: 'https://logs.immortaldev.eu',
+                    labels: { app: 'prism_bot', env: process.env.NODE_ENV },
+                    replaceTimestamp: true,
+                    json: true,
+                    format: format.json(),
+                    onConnectionError: (err) => this.error(err),
+                }),
+                new transports.Console(),
+            ],
         })
-        if (process.env.NODE_ENV !== 'production') {
-            this.logger.level = 'debug'
-        }
     }
 
     public static log(...args: any[]) {

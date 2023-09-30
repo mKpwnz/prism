@@ -19,7 +19,8 @@
         "json-colorizer": "^2.2.2",
         "mysql2": "^3.6.1",
         "typescript": "^5.2.2",
-        "winston": "^3.10.0"
+        "winston": "^3.10.0",
+        "winston-loki": "^6.0.7"
     },
     "devDependencies": {
         "cross-env": "^7.0.3",
