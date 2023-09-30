@@ -60,8 +60,23 @@ export default class LogManager {
     }
 
     public static async configure() {
+        var logTransports: winston.transport[] = [new transports.Console()]
+
+        if (process.env.NODE_ENV === 'production') {
+            logTransports.push(
+                new LokiTransport({
+                    host: 'https://logs.immortaldev.eu',
+                    labels: { app: 'prism_bot', env: process.env.NODE_ENV },
+                    replaceTimestamp: true,
+                    json: true,
+                    format: format.json(),
+                    onConnectionError: (err) => this.error(err),
+                }),
+            )
+        }
+
         this.logger = createLogger({
-            level: process.env.NODE_ENV !== 'production' ? 'debug' : 'warn',
+            level: process.env.NODE_ENV !== 'production' ? 'debug' : 'info',
             format: format.combine(
                 format.timestamp({
                     format: 'YYYY-MM-DD HH:mm:ss',
@@ -74,23 +89,13 @@ export default class LogManager {
                     )}: ${this.formatMessage(info.message, info.level)}`
                 }),
             ),
-            transports: [
-                new LokiTransport({
-                    host: 'https://logs.immortaldev.eu',
-                    labels: { app: 'prism_bot', env: process.env.NODE_ENV },
-                    replaceTimestamp: true,
-                    json: true,
-                    format: format.json(),
-                    onConnectionError: (err) => this.error(err),
-                }),
-                new transports.Console(),
-            ],
+            transports: logTransports,
         })
     }
 
     public static log(...args: any[]) {
         args.forEach((arg) => {
-            this.logger.info(arg)
+            this.logger.debug(arg)
         })
     }
 

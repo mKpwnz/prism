@@ -6,7 +6,7 @@ LogManager.configure()
 
 const token = process.env.DISCORD_TOKEN
 
-LogManager.log('Bot is starting...')
+LogManager.info('Bot is starting...')
 
 const client = new Client({
     intents: [

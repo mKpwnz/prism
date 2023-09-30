@@ -14,6 +14,6 @@ export class onReady extends DCEvent {
         await rest.put(Routes.applicationGuildCommands(client.user?.id ?? 'missing id', Config.Discord.ServerID), {
             body: commandData,
         })
-        LogManager.log('Discord ready!')
+        LogManager.info('Discord ready!')
     }
 }

@@ -18,13 +18,14 @@ export class CommandHandler {
     }
 
     static initAll() {
-        LogManager.log('Init all Commands')
+        LogManager.info('CommandManager: Initializing all commands...')
         // System Commands
         new Ping()
 
         // User Commands
         new Birthday()
         new WhoIs()
+        LogManager.info('CommandManager: All commands initialized!')
     }
 }
 
