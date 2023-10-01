@@ -4,9 +4,19 @@ import { BotClient } from '@proot/Bot'
 import Config from '@proot/Config'
 import { Database } from '@sql/Database'
 import LogManager from '@utils/Logger'
-import { CommandInteraction, Interaction, SlashCommandBuilder, User } from 'discord.js'
+import {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    CommandInteraction,
+    EmbedBuilder,
+    Interaction,
+    SlashCommandBuilder,
+    User,
+} from 'discord.js'
 import { RowDataPacket } from 'mysql2'
 import { WhoIs } from './WhoIs'
+import { ITeamNote } from '@sql/schema/TeamNote.schema'
 
 export class TeamNote extends Command {
     constructor() {
@@ -49,28 +59,109 @@ export class TeamNote extends Command {
             return
         }
         if (!action) {
-            await interaction.reply('Du musst eine Aktion angeben!')
+            await interaction.reply({ content: 'Du musst eine Aktion angeben!', ephemeral: true })
             return
         }
         if (!steamid) {
-            await interaction.reply('Du musst eine SteamID angeben!')
+            await interaction.reply({ content: 'Du musst eine SteamID angeben!', ephemeral: true })
             return
         }
         const player = await WhoIs.validateUser(steamid)
         if (!player) {
-            await interaction.reply('Die SteamID ist nicht gültig!')
+            await interaction.reply({ content: 'Die SteamID ist nicht gültig!', ephemeral: true })
             return
         }
 
         if (action === 'add') {
-            await this.addNote(steamid, user, 'Test')
-            await channel.send('Diese Funktion ist noch nicht verfügbar!')
+            await interaction.reply({
+                content: `Notiz für **${player.firstname} ${player.lastname}** | **${player.identifier}**`,
+                components: [
+                    new ActionRowBuilder<ButtonBuilder>().addComponents(
+                        new ButtonBuilder()
+                            .setLabel('Notiz erstellen')
+                            .setStyle(ButtonStyle.Primary)
+                            .setCustomId('teamnode_add_note'),
+                    ),
+                ],
+                ephemeral: true,
+            })
         } else if (action === 'delete') {
             if (!noteid) {
-                await channel.send('Du musst eine NotizID angeben!')
+                await interaction.reply({ content: 'Du musst eine Notiz ID angeben!', ephemeral: true })
                 return
             }
-            await channel.send('Diese Funktion ist noch nicht verfügbar!')
+            const note = await this.getNote(steamid, noteid)
+            if (!note) {
+                await interaction.reply({
+                    content: `Die Notiz ID konnte bei dem Spieler ${player.identifier} nicht gefunden werden!`,
+                    ephemeral: true,
+                })
+                return
+            }
+            LogManager.debug(note)
+            await interaction.reply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setColor(0xe91916)
+                        .setTitle('Teamnote löschen')
+                        .setAuthor({
+                            name: Config.Discord.BOT_NAME,
+                            iconURL: Config.Pictures.Prism.LOGO_BLUE,
+                        })
+                        .addFields(
+                            {
+                                name: 'Teamnote ID',
+                                value: `${note.id}`,
+                                inline: true,
+                            },
+                            {
+                                name: 'Erstellt von',
+                                value: `${note.teamler_discordname}`,
+                                inline: true,
+                            },
+                            {
+                                name: 'Erstellt von (DC)',
+                                value: `<@${note.teamler_discordid}>`,
+                                inline: true,
+                            },
+                            {
+                                name: 'Spieler (IC Name)',
+                                value: `${player.firstname} ${player.lastname}`,
+                                inline: true,
+                            },
+                            {
+                                name: 'Spieler (SteamID)',
+                                value: `${player.identifier}`,
+                                inline: true,
+                            },
+                            {
+                                name: 'Spieler (Job)',
+                                value: `${player.job} (${player.job_grade})`,
+                                inline: true,
+                            },
+                            {
+                                name: 'Notiz',
+                                value: `${note.note}`,
+                                inline: false,
+                            },
+                        )
+                        .setImage('https://i.imgur.com/pdkIDFc.png')
+                        .setTimestamp(),
+                ],
+                components: [
+                    new ActionRowBuilder<ButtonBuilder>().addComponents(
+                        new ButtonBuilder()
+                            .setLabel('Abbrechen')
+                            .setStyle(ButtonStyle.Danger)
+                            .setCustomId('teamnode_delete_confirm_no'),
+                        new ButtonBuilder()
+                            .setLabel('Notiz löschen')
+                            .setStyle(ButtonStyle.Success)
+                            .setCustomId('teamnode_delete_confirm_yes'),
+                    ),
+                ],
+                ephemeral: true,
+            })
             return
         } else if (action === 'view') {
             const notes = await this.getNotes(steamid)
@@ -101,12 +192,26 @@ export class TeamNote extends Command {
             return false
         }
     }
-    async getNotes(user_steamid: string) {
+    async getNotes(user_steamid: string): Promise<ITeamNote[] | false> {
         try {
             let query = 'SELECT * FROM `team_notes` WHERE `user_steamid` = ?;'
-            const response = await Database.query(query, [user_steamid])
-            if (response) {
-                return response[0] as RowDataPacket[]
+            const [notes] = await Database.query<ITeamNote[]>(query, [user_steamid])
+            if (notes && notes.length > 0) {
+                return notes
+            } else {
+                return false
+            }
+        } catch (error) {
+            LogManager.error(error)
+            return false
+        }
+    }
+    async getNote(user_steamid: string, noteid: number): Promise<ITeamNote | false> {
+        try {
+            let query = 'SELECT * FROM `team_notes` WHERE `user_steamid` = ? AND `id` = ?;'
+            const [notes] = await Database.query<ITeamNote[]>(query, [user_steamid, noteid])
+            if (notes && notes.length == 1) {
+                return notes[0]
             } else {
                 return false
             }
