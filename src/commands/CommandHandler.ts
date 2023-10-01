@@ -4,6 +4,7 @@ import { Ping } from './system/Ping'
 import { Birthday } from './user/Birthday'
 import { WhoIs } from './user/WhoIs'
 import LogManager from '@utils/Logger'
+import { CheckImageOwner } from './phone/CheckImageOwner'
 import { SchufaCheck } from './housing/SchufaCheck'
 
 export class CommandHandler {
@@ -22,6 +23,9 @@ export class CommandHandler {
         LogManager.info('CommandManager: Initializing all commands...')
         // System Commands
         new Ping()
+
+        // Phone Commands
+        new CheckImageOwner()
 
         // Housing Commands
         new SchufaCheck()
