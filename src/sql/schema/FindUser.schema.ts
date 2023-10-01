@@ -1,20 +1,20 @@
 import { RowDataPacket } from 'mysql2'
 
 export interface IFindUser extends RowDataPacket {
-    identifier: string
-    group: string
+    playername: string
+    discord: string
     name: string
-    job: string
-    fraksperre: Date
-    job_grade: number
+    identifier: string
+    fullname: string
     firstname: string
     lastname: string
-    crafting_level: number
-    fullname: string
+    group: string
+    job: string
+    job_grade: number
+    phone_number: string
     bank: number
     money: number
     black_money: number
-    discord: string
-    playername: string
-    phone_number: string
+    fraksperre: Date
+    crafting_level: number
 }
