@@ -21,3 +21,5 @@ const client = new Client({
 
 EventHandler.init(client)
 client.login(token)
+
+export const BotClient = client

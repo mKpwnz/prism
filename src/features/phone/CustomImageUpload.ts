@@ -20,7 +20,6 @@ import {
 
 export class CustomImmageUpload {
     private client: Client | null
-
     private input_phoneNumber: string = ''
     private input_reason: string = ''
     private input_imageUrl: string = ''
@@ -59,7 +58,7 @@ export class CustomImmageUpload {
             this.image_attachment = message.attachments.first() || null
             await message.reply({
                 content:
-                    'Bitte weise das Bild in den nächsten 30 Sekunden zu. Nach den 30 Sekunden wird das Bild automatisch gelöscht.',
+                    'Bitte weise das Bild in den nächsten 60 Sekunden zu. Nach den 60 Sekunden wird das Bild automatisch gelöscht.',
                 components: [
                     new ActionRowBuilder<ButtonBuilder>().addComponents(
                         new ButtonBuilder()
@@ -104,7 +103,7 @@ export class CustomImmageUpload {
                     if (img) await img.delete()
                 } catch (e) {}
                 this.resetValues()
-            }, 30000)
+            }, 60000)
         }
         if (interaction.isButton() && interaction.customId === 'phone_ciu_assign_conf_no') {
             if (interaction.message) await interaction.message.delete()

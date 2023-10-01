@@ -6,6 +6,7 @@ import { WhoIs } from './user/WhoIs'
 import LogManager from '@utils/Logger'
 import { CheckImageOwner } from './phone/CheckImageOwner'
 import { SchufaCheck } from './housing/SchufaCheck'
+import { TeamNote } from './user/TeamNote'
 
 export class CommandHandler {
     static commands: { cmd: Command; scb: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder }[] = []
@@ -33,6 +34,7 @@ export class CommandHandler {
         // User Commands
         new Birthday()
         new WhoIs()
+        new TeamNote()
         LogManager.info('CommandManager: All commands initialized!')
     }
 }

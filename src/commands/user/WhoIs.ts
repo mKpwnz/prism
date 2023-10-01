@@ -19,14 +19,9 @@ export class WhoIs extends Command {
                 //add string option
                 .setDMPermission(true)
                 .addStringOption((option) =>
-                    option
-                        .setName('input')
-                        .setDescription('Identifier des Spielers')
-                        .setRequired(true),
+                    option.setName('input').setDescription('Identifier des Spielers').setRequired(true),
                 )
-                .addBooleanOption((option) =>
-                    option.setName('export').setDescription('Gibt eine JSON Datei aus'),
-                )
+                .addBooleanOption((option) => option.setName('export').setDescription('Gibt eine JSON Datei aus'))
                 .addIntegerOption((option) => option.setName('page').setDescription('Seitenzahl'))
                 .addStringOption((option) =>
                     option
@@ -66,7 +61,7 @@ export class WhoIs extends Command {
             } else {
                 filter = filter + spalte
             }
-            const finduser: IFindUser[] = await this.searchUsers(identifierValue, spalte)
+            const finduser: IFindUser[] = await WhoIs.searchUsers(identifierValue, spalte)
             if (finduser === null) {
                 await interaction.reply({ content: 'User nicht gefunden', ephemeral: true })
             } else {
@@ -76,9 +71,7 @@ export class WhoIs extends Command {
                 let fields = []
                 if (finduser.length > 0) {
                     for (let i = 20 * (page - 1); i < finduser.length; i++) {
-                        let identifier = finduser[i].identifier
-                            ? finduser[i].identifier
-                            : 'Unbekannt'
+                        let identifier = finduser[i].identifier ? finduser[i].identifier : 'Unbekannt'
 
                         let steamId
                         if (finduser[i].identifier) {
@@ -111,9 +104,7 @@ export class WhoIs extends Command {
                             if (finduser[i].crafting_level) {
                                 levelString =
                                     '\nCrafting Level: ' +
-                                    (finduser[i].crafting_level -
-                                        (finduser[i].crafting_level % 100)) /
-                                        100
+                                    (finduser[i].crafting_level - (finduser[i].crafting_level % 100)) / 100
                             }
                             fields.push({
                                 name: finduser[i].playername + ' (' + finduser[i].name + ')',
@@ -194,9 +185,7 @@ export class WhoIs extends Command {
                         }
                         if (fields.length == 20 || page > 1) {
                             embed.footer = {
-                                text: `${
-                                    finduser.length - fields.length
-                                } weitere Ergebnisse sind ausgeblendet!`,
+                                text: `${finduser.length - fields.length} weitere Ergebnisse sind ausgeblendet!`,
                             }
                             embed.description = `Hier sind ${fields.length}/${finduser.length} Suchergebnisse für "${identifierValue}":`
                         }
@@ -219,7 +208,7 @@ export class WhoIs extends Command {
         }
     }
 
-    async searchUsers(searchText: string, column: string): Promise<IFindUser[]> {
+    private static async searchUsers(searchText: string, column: string): Promise<IFindUser[]> {
         let columns = {
             identifier: 'LOWER( users.identifier ) LIKE LOWER( "%' + searchText + '%" )',
             steamid: 'LOWER( users.steamid ) LIKE LOWER( "%' + searchText + '%" )',
@@ -324,5 +313,12 @@ export class WhoIs extends Command {
             LogManager.error(error)
             return []
         }
+    }
+
+    public static async validateUser(steamID: string): Promise<IFindUser | null> {
+        const user = await WhoIs.searchUsers(steamID, 'steamid')
+        if (user === null) return null
+        if (user.length === 0) return null
+        return user[0]
     }
 }
