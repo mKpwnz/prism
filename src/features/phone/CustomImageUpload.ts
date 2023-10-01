@@ -10,7 +10,6 @@ import {
     ButtonStyle,
     Client,
     EmbedBuilder,
-    Events,
     Interaction,
     Message,
     ModalBuilder,

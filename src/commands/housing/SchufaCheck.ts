@@ -3,7 +3,7 @@ import { RegisterCommand } from '@commands/CommandHandler'
 import Config from '@proot/Config'
 import { Database } from '@sql/Database'
 import LogManager from '@utils/Logger'
-import { CommandInteraction, CacheType, SlashCommandBuilder } from 'discord.js'
+import { CommandInteraction, SlashCommandBuilder } from 'discord.js'
 
 export class SchufaCheck extends Command {
     constructor() {
