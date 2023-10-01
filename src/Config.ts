@@ -22,6 +22,7 @@ const Config = {
         },
         Users: {},
         Groups: {
+            DEV_PRISM_TEST: '1157763877405208657',
             DEV_PRISM: '1121469073902018640',
             DEV_SERVERENGINEER: '996094054867673189',
 

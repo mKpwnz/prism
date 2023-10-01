@@ -4,6 +4,7 @@ import { Ping } from './system/Ping'
 import { Birthday } from './user/Birthday'
 import { WhoIs } from './user/WhoIs'
 import LogManager from '@utils/Logger'
+import { SchufaCheck } from './housing/SchufaCheck'
 
 export class CommandHandler {
     static commands: { cmd: Command; scb: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder }[] = []
@@ -21,6 +22,9 @@ export class CommandHandler {
         LogManager.info('CommandManager: Initializing all commands...')
         // System Commands
         new Ping()
+
+        // Housing Commands
+        new SchufaCheck()
 
         // User Commands
         new Birthday()

@@ -1,90 +1,238 @@
+import { ButtonBuilder } from '@discordjs/builders'
 import Config from '@proot/Config'
 import { Database } from '@sql/Database'
 import { Helper } from '@utils/Helper'
 import LogManager from '@utils/Logger'
 import axios from 'axios'
-import { Client, Message, TextChannel } from 'discord.js'
+import {
+    ActionRowBuilder,
+    Attachment,
+    ButtonStyle,
+    Client,
+    EmbedBuilder,
+    Events,
+    Interaction,
+    Message,
+    ModalBuilder,
+    TextChannel,
+    TextInputBuilder,
+    TextInputStyle,
+} from 'discord.js'
 
 export class CustomImmageUpload {
-    static async onImageUpload(message: Message) {
-        if (message.author.bot) return
-        const attachment = message.attachments.first()
-        const userMessage = message.content
-        const numberCheck = new RegExp(/^01726\d{5}$/)
-        const validnumber = numberCheck.test(userMessage)
+    private client: Client | null
 
-        if (attachment && validnumber) {
-            const { height, width, size } = attachment
-            let reply = 'Dein Bild verstößt gegen unsere Regeln.'
-            const url = attachment.url.split('?')[0]
-            let regexp = new RegExp('(.*?)\\.(jpg|webp|png)')
-            let formatMatch = regexp.test(url)
-            if (height && width && size && formatMatch) {
-                const isValid = height <= 1280 && width <= 1280 && size <= 800000
-
-                if (height > 1280) {
-                    reply += ' Dein Bild ist zu hoch.'
-                }
-                if (width > 1280) {
-                    reply += ' Dein Bild ist zu breit.'
-                }
-                if (size > 800000) {
-                    reply += ' Dein Bild ist zu groß.'
-                }
-
-                if (!isValid) {
-                    await message.reply({
-                        content: reply,
-                        allowedMentions: { repliedUser: true },
-                    })
-                    await message.delete()
-                } else {
-                    let newURL = await CustomImmageUpload.reupload(url, message.client)
-                    if (newURL.length > 0) {
-                        let uploaded = await CustomImmageUpload.uploadDB(newURL, userMessage, size)
-                        if (uploaded) {
-                            await message.react('✅')
-                        } else {
-                            await message.react('❌')
-                            await message.reply('Es konnte nicht in der Datenbank gespeichert werden')
-                        }
-                    } else {
-                        await message.reply('Es konnte keine URL generiert werden.')
-                    }
-                }
-            }
-        } else {
-            if (!validnumber) {
-                //react to message and delete
-                await message.reply('Bitte gib eine gültige Telefonnummer an.')
-            } else if (!attachment) {
-                await message.reply('Bitte füge ein Bild an.')
-            } else {
-                await message.reply('Unbekannter Fehler')
-            }
-            await message.delete()
-        }
+    private input_phoneNumber: string = ''
+    private input_reason: string = ''
+    private input_imageUrl: string = ''
+    private image_attachment: Attachment | null = null
+    private message_image_upload: Message | null = null
+    private imageLimitations: { height: number; width: number; size: number } = {
+        height: 1280,
+        width: 1280,
+        size: 1024 * 800,
     }
 
-    /**
-     * @description Reuploads the image to the target channel and returns the new url
-     * @author sirsxsh
-     * @date 30.09.2023
-     * @static
-     * @param {string} attachmentUrl
-     * @param {Client} client
-     * @returns {*}  {Promise<string>}
-     * @memberof CustomImmageUpload
-     */
-    static async reupload(attachmentUrl: string, client: Client): Promise<string> {
-        try {
-            const response = await axios.get(attachmentUrl, { responseType: 'arraybuffer' })
-            const formatMatch = attachmentUrl.match(/\.(png|webp|jpg)$/i)
+    constructor(client: Client) {
+        this.client = client
+        client.on('messageCreate', async (message: Message) => {
+            if (message.channelId === Config.Discord.Channel.IMAGE_UPLOAD) {
+                this.onMessage(message)
+            }
+        })
+        client.on('interactionCreate', async (interaction: Interaction) => {
+            this.onInteract(interaction)
+        })
+    }
+    resetValues() {
+        this.input_phoneNumber = ''
+        this.input_reason = ''
+        this.input_imageUrl = ''
+        this.image_attachment = null
+        this.message_image_upload = null
+    }
+    async onMessage(message: Message) {
+        if (message.author.bot) return
+
+        if (message.attachments.size > 0) {
+            this.message_image_upload = message
+            this.input_imageUrl = message.attachments.first()?.url || ''
+            this.image_attachment = message.attachments.first() || null
+            await message.reply({
+                content:
+                    'Bitte weise das Bild in den nächsten 30 Sekunden zu. Nach den 30 Sekunden wird das Bild automatisch gelöscht.',
+                components: [
+                    new ActionRowBuilder<ButtonBuilder>().addComponents(
+                        new ButtonBuilder()
+                            .setLabel('Bild zuweisen')
+                            .setStyle(ButtonStyle.Primary)
+                            .setCustomId('phone_ciu_assign_image'),
+                    ),
+                ],
+            })
+        } else {
+            message.delete()
+        }
+    }
+    async onInteract(interaction: Interaction) {
+        const phone_ciu_modal = new ModalBuilder().setCustomId('phone_ciu_modal').setTitle('Bild an Spieler zuweisen')
+        const phone_ciu_in_phoneNumber = new TextInputBuilder()
+            .setCustomId('phone_ciu_in_phoneNumber')
+            .setLabel('Telefonnummer des Spielers')
+            .setStyle(TextInputStyle.Short)
+            .setValue('')
+            .setRequired(true)
+
+        const phone_ciu_in_reason = new TextInputBuilder()
+            .setCustomId('phone_ciu_in_reason')
+            .setLabel('Begründung')
+            .setStyle(TextInputStyle.Paragraph)
+            .setValue('')
+            .setRequired(true)
+
+        phone_ciu_modal.addComponents(
+            new ActionRowBuilder<TextInputBuilder>().addComponents(phone_ciu_in_phoneNumber),
+            new ActionRowBuilder<TextInputBuilder>().addComponents(phone_ciu_in_reason),
+        )
+
+        if (interaction.isButton() && interaction.customId === 'phone_ciu_assign_image') {
+            await interaction.message.delete()
+            await interaction.showModal(phone_ciu_modal)
+            const img = this.message_image_upload
+
+            setTimeout(async () => {
+                try {
+                    if (img) await img.delete()
+                } catch (e) {}
+                this.resetValues()
+            }, 30000)
+        }
+        if (interaction.isButton() && interaction.customId === 'phone_ciu_assign_conf_no') {
+            if (interaction.message) await interaction.message.delete()
+            if (this.message_image_upload) await this.message_image_upload?.delete()
+            this.resetValues()
+        }
+        if (interaction.isButton() && interaction.customId === 'phone_ciu_assign_conf_yes') {
+            if (interaction.message) await interaction.message.delete()
+            const { success, messages } = this.validateInput()
+            if (!success) {
+                await interaction.reply({
+                    content: `Es sind Fehler aufgetreten: \`\`\`${messages.join('\n')}\`\`\``,
+                    ephemeral: true,
+                })
+                await this.message_image_upload?.delete()
+                this.resetValues()
+                return
+            }
+
+            const newImageUrl = await this.reuploadImage()
+            const result = await this.assignImageToPlayer(
+                newImageUrl,
+                this.input_phoneNumber,
+                this.image_attachment?.size || 0,
+            )
+            if (result) {
+                await this.message_image_upload?.channel.send({
+                    embeds: [
+                        new EmbedBuilder()
+                            .setColor(0x0792f1)
+                            .setTitle('Custom Image Upload')
+                            .setAuthor({
+                                name: Config.Discord.BOT_NAME,
+                                iconURL: Config.Pictures.Prism.LOGO_BLUE,
+                            })
+                            .addFields(
+                                {
+                                    name: 'Freigegeben durch',
+                                    value: `${interaction.user.displayName}`,
+                                    inline: true,
+                                },
+                                {
+                                    name: 'Freigegeben durch (Discord)',
+                                    value: `<@${interaction.user.id}>`,
+                                    inline: true,
+                                },
+                                { name: 'Hochgeladen auf Handy', value: this.input_phoneNumber, inline: true },
+                                { name: 'Begründung', value: this.input_reason },
+                            )
+                            .setImage(newImageUrl)
+                            .setTimestamp()
+                            .setFooter({ text: 'Upload by PRISM BOT' }),
+                    ],
+                })
+            } else {
+                await interaction.reply({
+                    content: `Es ist ein Fehler aufgetreten. Bitte versuche es erneut.`,
+                    ephemeral: true,
+                })
+                await this.message_image_upload?.delete()
+                this.resetValues()
+                return
+            }
+
+            if (this.message_image_upload) await this.message_image_upload.delete()
+        }
+        if (interaction.isModalSubmit() && interaction.customId === 'phone_ciu_modal') {
+            console.log('Submit modal')
+            this.input_phoneNumber = interaction.fields.getTextInputValue('phone_ciu_in_phoneNumber')
+            this.input_reason = interaction.fields.getTextInputValue('phone_ciu_in_reason')
+            await interaction.reply({
+                content: `Möchte du das Bild wirklich an ${this.input_phoneNumber} zuweisen?`,
+                components: [
+                    new ActionRowBuilder<ButtonBuilder>().addComponents(
+                        new ButtonBuilder()
+                            .setLabel('Abbrechen')
+                            .setStyle(ButtonStyle.Danger)
+                            .setCustomId('phone_ciu_assign_conf_no'),
+                        new ButtonBuilder()
+                            .setLabel('Zuweisen')
+                            .setStyle(ButtonStyle.Success)
+                            .setCustomId('phone_ciu_assign_conf_yes'),
+                    ),
+                ],
+            })
+        }
+    }
+    validateInput(): { success: boolean; messages: string[] } {
+        const response: { success: boolean; messages: string[] } = {
+            success: false,
+            messages: [],
+        }
+
+        if (!new RegExp(/^01726\d{5}$/).test(this.input_phoneNumber))
+            response.messages.push('Die Telefonnummer ist ungültig.')
+
+        if (this.image_attachment) {
+            const { height, width, size } = this.image_attachment
+            const url = this.image_attachment.url.split('?')[0]
+            if (!new RegExp('(.*?)\\.(jpg|webp|png)').test(url)) {
+                response.messages.push('Das Bild muss eine .jpg, .webp oder .png Datei sein.')
+            }
+            if (!height) response.messages.push('Die Höhe des Bildes konnte nicht ermittelt werden.')
+            if (!width) response.messages.push('Die Breite des Bildes konnte nicht ermittelt werden.')
+            if (!size) response.messages.push('Die Dateigröße des Bildes konnte nicht ermittelt werden.')
+
+            if (size > this.imageLimitations.size) response.messages.push('Das Bild darf nicht größer als 800kb sein.')
+
+            if (width && width > this.imageLimitations.width)
+                response.messages.push(`Das Bild darf nicht breiter als ${this.imageLimitations.width} Pixel sein.`)
+            if (height && height > this.imageLimitations.height)
+                response.messages.push(`Das Bild darf nicht höher als ${this.imageLimitations.height} Pixel sein.`)
+        } else {
+            response.messages.push('Es wurde kein Bild angehängt.')
+        }
+
+        if (response.messages.length === 0) response.success = true
+        return response
+    }
+    async reuploadImage(): Promise<string> {
+        if (this.input_imageUrl && this.client) {
+            const response = await axios.get(this.input_imageUrl, { responseType: 'arraybuffer' })
+            const formatMatch = this.input_imageUrl.match(/\.(png|webp|jpg)$/i)
             const fileFormat = formatMatch ? formatMatch[1] : 'jpg'
             const newFilename = `${Helper.getUniqueId()}.${fileFormat}`
 
-            // Hochladen des umbenannten Bildes in den Zielkanal
-            const customPicsChannel = client.channels.cache.get(Config.Discord.Channel.CUSTOM_PICS) as TextChannel
+            const customPicsChannel = this.client.channels.cache.get(Config.Discord.Channel.CUSTOM_PICS) as TextChannel
 
             if (customPicsChannel) {
                 let newMessage = await customPicsChannel.send({
@@ -95,24 +243,11 @@ export class CustomImmageUpload {
                 LogManager.log('no channel found')
                 return ''
             }
-        } catch (error) {
-            LogManager.error(error)
+        } else {
             return ''
         }
     }
-
-    /**
-     * @description Uploads the image to the database and returns true if successful, false if not successful or error occured. (Error will be logged to console.)
-     * @author sirsxsh
-     * @date 30.09.2023
-     * @static
-     * @param {string} url
-     * @param {string} phone
-     * @param {number} size
-     * @returns {*}  {Promise<boolean>}
-     * @memberof CustomImmageUpload
-     */
-    static async uploadDB(url: string, phone: string, size: number): Promise<boolean> {
+    async assignImageToPlayer(url: string, phone: string, size: number): Promise<boolean> {
         try {
             let query =
                 'INSERT INTO phone_photos (phone_number, link, size) VALUES ("' +
@@ -120,7 +255,7 @@ export class CustomImmageUpload {
                 '", "' +
                 url +
                 '", ' +
-                size +
+                size / 1000 +
                 ')'
             const response = await Database.query(query)
             if (response) {
