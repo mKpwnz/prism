@@ -5,6 +5,7 @@ import { Birthday } from './user/Birthday'
 import { WhoIs } from './user/WhoIs'
 import LogManager from '@utils/Logger'
 import { CheckImageOwner } from './phone/CheckImageOwner'
+import { SchufaCheck } from './housing/SchufaCheck'
 
 export class CommandHandler {
     static commands: { cmd: Command; scb: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder }[] = []
@@ -25,6 +26,9 @@ export class CommandHandler {
 
         // Phone Commands
         new CheckImageOwner()
+
+        // Housing Commands
+        new SchufaCheck()
 
         // User Commands
         new Birthday()
