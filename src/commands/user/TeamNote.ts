@@ -22,7 +22,11 @@ export class TeamNote extends Command {
     constructor() {
         super(true)
         this.AllowedChannels = [Config.Discord.Channel.PRISM_DISCORDBOT]
-        this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER, Config.Discord.Groups.DEV_PRISM]
+        this.AllowedGroups = [
+            Config.Discord.Groups.DEV_SERVERENGINEER,
+            Config.Discord.Groups.DEV_PRISM,
+            Config.Discord.Groups.DEV_PRISM_TEST,
+        ]
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('teamnote')
@@ -166,13 +170,57 @@ export class TeamNote extends Command {
         } else if (action === 'view') {
             const notes = await this.getNotes(steamid)
             if (notes) {
-                let message = `Alle Notizen (${notes.length}) zu ${player.name} (${player.steamid})`
+                let message = `Alle Notizen (${notes.length}) zu ${player.name} (${player.identifier})`
+                var embeds = []
                 for (const note of notes) {
-                    message += `\`\`\`ID: ${note.id}\nTeamler: ${note.teamler_discordname} (${note.teamler_discordid})\nNotiz: ###########################\n${note.note}\`\`\``
+                    embeds.push(
+                        new EmbedBuilder()
+                            .setColor(0x0792f1)
+                            .setTitle(`Teamnote ${note.id}`)
+                            .addFields(
+                                {
+                                    name: 'Teamnote ID',
+                                    value: `${note.id}`,
+                                    inline: true,
+                                },
+                                {
+                                    name: 'Erstellt von',
+                                    value: `${note.teamler_discordname}`,
+                                    inline: true,
+                                },
+                                {
+                                    name: 'Erstellt von (DC)',
+                                    value: `<@${note.teamler_discordid}>`,
+                                    inline: true,
+                                },
+                                {
+                                    name: 'Spieler (IC Name)',
+                                    value: `${player.firstname} ${player.lastname}`,
+                                    inline: true,
+                                },
+                                {
+                                    name: 'Spieler (SteamID)',
+                                    value: `${player.identifier}`,
+                                    inline: true,
+                                },
+                                {
+                                    name: 'Spieler (Job)',
+                                    value: `${player.job} (${player.job_grade})`,
+                                    inline: true,
+                                },
+                                {
+                                    name: 'Notiz',
+                                    value: `${note.note}`,
+                                    inline: false,
+                                },
+                            )
+                            .setImage('https://i.imgur.com/pdkIDFc.png')
+                            .setTimestamp(),
+                    )
                 }
-                await channel.send(message)
+                await interaction.reply({ content: message, embeds: embeds })
             } else {
-                await channel.send('Es ist ein Fehler aufgetreten!')
+                await interaction.reply('Es ist ein Fehler aufgetreten!')
             }
         }
     }
