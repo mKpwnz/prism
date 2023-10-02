@@ -35,7 +35,7 @@ export class CustomImmageUpload {
     constructor(client: Client) {
         this.client = client
         client.on('messageCreate', async (message: Message) => {
-            if (message.channelId === Config.Discord.Channel.IMAGE_UPLOAD) {
+            if (message.channelId === Config.Discord.Channel.WHOIS_IMAGEUPLOAD) {
                 this.onMessage(message)
             }
         })
@@ -231,7 +231,9 @@ export class CustomImmageUpload {
             const fileFormat = formatMatch ? formatMatch[1] : 'jpg'
             const newFilename = `${Helper.getUniqueId()}.${fileFormat}`
 
-            const customPicsChannel = this.client.channels.cache.get(Config.Discord.Channel.CUSTOM_PICS) as TextChannel
+            const customPicsChannel = this.client.channels.cache.get(
+                Config.Discord.Channel.WHOIS_CUSTOMPICS_DATASTORE,
+            ) as TextChannel
 
             if (customPicsChannel) {
                 let newMessage = await customPicsChannel.send({

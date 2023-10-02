@@ -10,8 +10,8 @@ import LogManager from '@utils/Logger'
 export class WhoIs extends Command {
     constructor() {
         super(false)
-        this.AllowedChannels = [Config.Discord.Channel.PRISM_TEST]
-        this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER]
+        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
+        this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER, Config.Discord.Groups.DEV_BOTTESTER]
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('whois')
@@ -19,14 +19,9 @@ export class WhoIs extends Command {
                 //add string option
                 .setDMPermission(true)
                 .addStringOption((option) =>
-                    option
-                        .setName('input')
-                        .setDescription('Identifier des Spielers')
-                        .setRequired(true),
+                    option.setName('input').setDescription('Identifier des Spielers').setRequired(true),
                 )
-                .addBooleanOption((option) =>
-                    option.setName('export').setDescription('Gibt eine JSON Datei aus'),
-                )
+                .addBooleanOption((option) => option.setName('export').setDescription('Gibt eine JSON Datei aus'))
                 .addIntegerOption((option) => option.setName('page').setDescription('Seitenzahl'))
                 .addStringOption((option) =>
                     option
@@ -76,9 +71,7 @@ export class WhoIs extends Command {
                 let fields = []
                 if (finduser.length > 0) {
                     for (let i = 20 * (page - 1); i < finduser.length; i++) {
-                        let identifier = finduser[i].identifier
-                            ? finduser[i].identifier
-                            : 'Unbekannt'
+                        let identifier = finduser[i].identifier ? finduser[i].identifier : 'Unbekannt'
 
                         let steamId
                         if (finduser[i].identifier) {
@@ -111,9 +104,7 @@ export class WhoIs extends Command {
                             if (finduser[i].crafting_level) {
                                 levelString =
                                     '\nCrafting Level: ' +
-                                    (finduser[i].crafting_level -
-                                        (finduser[i].crafting_level % 100)) /
-                                        100
+                                    (finduser[i].crafting_level - (finduser[i].crafting_level % 100)) / 100
                             }
                             fields.push({
                                 name: finduser[i].playername + ' (' + finduser[i].name + ')',
@@ -194,9 +185,7 @@ export class WhoIs extends Command {
                         }
                         if (fields.length == 20 || page > 1) {
                             embed.footer = {
-                                text: `${
-                                    finduser.length - fields.length
-                                } weitere Ergebnisse sind ausgeblendet!`,
+                                text: `${finduser.length - fields.length} weitere Ergebnisse sind ausgeblendet!`,
                             }
                             embed.description = `Hier sind ${fields.length}/${finduser.length} Suchergebnisse für "${identifierValue}":`
                         }
