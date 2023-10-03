@@ -1,4 +1,5 @@
 import { Helper } from '@utils/Helper'
+import LogManager from '@utils/Logger'
 import { CommandInteraction } from 'discord.js'
 
 /**
@@ -21,6 +22,11 @@ export abstract class Command {
         if (this.CheckPermissions) {
             if ((await Helper.IsUserAllowed(interaction, this.AllowedChannels, this.AllowedGroups)) === false) return
         }
+        LogManager.discordActionLog(
+            `<@${interaction.user.id}> hat im Kanal <#${interaction.channelId}> den Befehl \`${
+                interaction.commandName
+            }\` ausgeführt.\`\`\`${JSON.stringify(interaction.options)}\`\`\``,
+        )
 
         await this.execute(interaction)
     }

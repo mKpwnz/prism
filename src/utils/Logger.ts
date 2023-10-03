@@ -2,6 +2,8 @@ import chalk from 'chalk'
 import colorize from 'json-colorizer'
 import winston, { createLogger, format, transports } from 'winston'
 import LokiTransport from 'winston-loki'
+import { BotClient } from '@proot/Bot'
+import Config from '@proot/Config'
 
 /**
  * @description Logger class for logging to console and loki
@@ -58,7 +60,6 @@ export default class LogManager {
             return message
         }
     }
-
     public static async configure() {
         var logTransports: winston.transport[] = [new transports.Console()]
 
@@ -92,34 +93,35 @@ export default class LogManager {
             transports: logTransports,
         })
     }
-
     public static log(...args: any[]) {
         args.forEach((arg) => {
             this.logger.debug(arg)
         })
     }
-
     public static error(...args: any[]) {
         args.forEach((arg) => {
             this.logger.error(arg)
         })
     }
-
     public static warn(...args: any[]) {
         args.forEach((arg) => {
             this.logger.warn(arg)
         })
     }
-
     public static info(...args: any[]) {
         args.forEach((arg) => {
             this.logger.info(arg)
         })
     }
-
     public static debug(...args: any[]) {
         args.forEach((arg) => {
             this.logger.debug(arg)
         })
+    }
+    public static discordActionLog(message: string) {
+        var channel = BotClient.channels.cache.get(Config.Discord.Channel.BOT_LOG)
+        if (channel && channel.isTextBased()) {
+            channel.send(message)
+        }
     }
 }

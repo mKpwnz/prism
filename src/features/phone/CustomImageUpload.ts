@@ -18,6 +18,12 @@ import {
     TextInputStyle,
 } from 'discord.js'
 
+/**
+ * Permissions für:
+    Eventverwaltung
+    Fraktionsverwaltung
+    Serverleitung
+ */
 export class CustomImmageUpload {
     private client: Client | null
 
@@ -204,8 +210,8 @@ export class CustomImmageUpload {
         if (this.image_attachment) {
             const { height, width, size } = this.image_attachment
             const url = this.image_attachment.url.split('?')[0]
-            if (!new RegExp('(.*?)\\.(jpg|webp|png)').test(url)) {
-                response.messages.push('Das Bild muss eine .jpg, .webp oder .png Datei sein.')
+            if (!new RegExp('(.*?)\\.(jpg|jpeg|webp|png)').test(url)) {
+                response.messages.push('Das Bild muss eine .jpg, .jpeg, .webp oder .png Datei sein.')
             }
             if (!height) response.messages.push('Die Höhe des Bildes konnte nicht ermittelt werden.')
             if (!width) response.messages.push('Die Breite des Bildes konnte nicht ermittelt werden.')
@@ -227,7 +233,7 @@ export class CustomImmageUpload {
     async reuploadImage(): Promise<string> {
         if (this.input_imageUrl && this.client) {
             const response = await axios.get(this.input_imageUrl, { responseType: 'arraybuffer' })
-            const formatMatch = this.input_imageUrl.match(/\.(png|webp|jpg)$/i)
+            const formatMatch = this.input_imageUrl.match(/\.(png|webp|jpg|jpeg)$/i)
             const fileFormat = formatMatch ? formatMatch[1] : 'jpg'
             const newFilename = `${Helper.getUniqueId()}.${fileFormat}`
 
