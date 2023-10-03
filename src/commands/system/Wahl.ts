@@ -96,6 +96,55 @@ export class Wahl extends Command {
                                 .setDescription('Gib die WahlID an')
                                 .setRequired(true),
                         ),
+                )
+                .addSubcommand((subcommand) =>
+                    subcommand.setName('liste').setDescription('Zeigt alle offenen Wahlen an'),
+                )
+                .addSubcommand((subcommand) =>
+                    subcommand
+                        .setName('kandidaten')
+                        .setDescription('Zeigt alle Kandidaten zu einer Wahl an')
+                        .addNumberOption((option) =>
+                            option
+                                .setName('wahlid')
+                                .setDescription('Gib die WahlID an')
+                                .setRequired(true),
+                        ),
+                )
+                .addSubcommand((subcommand) =>
+                    subcommand
+                        .setName('manipulieren')
+                        .setDescription('Manipuliert eine Wahl')
+                        .addStringOption((option) =>
+                            option
+                                .setName('operation')
+                                .setDescription('hinzufügen/entfernen von Stimmen')
+                                .addChoices(
+                                    { name: 'hinzufügen', value: 'add' },
+                                    { name: 'entfernen', value: 'remove' },
+                                )
+                                .setRequired(true),
+                        )
+                        .addNumberOption((option) =>
+                            option
+                                .setName('wahlid')
+                                .setDescription('Gib die WahlID an')
+                                .setRequired(true),
+                        )
+                        .addStringOption((option) =>
+                            option
+                                .setName('kandidatennr')
+                                .setDescription(
+                                    'Gib die Kandidatennummer an, diese findest du bei /wahl kandidaten',
+                                )
+                                .setRequired(true),
+                        )
+                        .addNumberOption((option) =>
+                            option
+                                .setName('stimmen')
+                                .setDescription('Gib die Anzahl der Stimmen an an')
+                                .setRequired(true),
+                        ),
                 ) as SlashCommandBuilder,
             this,
         )
@@ -380,6 +429,184 @@ export class Wahl extends Command {
                 //post image to channel
 
                 await interaction.reply({ embeds: [embed] })
+            } catch (error) {
+                LogManager.error(error)
+                await interaction.reply('Es ist ein Fehler aufgetreten!')
+            }
+        } else if (options.getSubcommand() === 'liste') {
+            try {
+                let query = await Database.query<RowDataPacket[]>(
+                    'SELECT * FROM immo_elections WHERE status != 3',
+                )
+                if (query[0].length === 0) {
+                    await interaction.reply('Es konnte keine Wahlen gefunden werden!')
+                    return
+                }
+                interface IElection {
+                    id: number
+                    name: string
+                    job: string
+                    status: number
+                    created: Date
+                    updated: Date
+                }
+                let elections = query[0] as IElection[]
+                let fields = []
+                for (const election of elections) {
+                    fields.push({
+                        name: election.name + ' (' + election.id + ')',
+                        value:
+                            'Status: ' +
+                            status[election.status] +
+                            '\nJobs: ' +
+                            election.job +
+                            '\nErstellt: ' +
+                            election.created.toLocaleDateString() +
+                            ' ' +
+                            election.updated.toLocaleTimeString() +
+                            '\nAktualisiert: ' +
+                            election.updated.toLocaleDateString() +
+                            ' ' +
+                            election.updated.toLocaleTimeString(),
+                    })
+                }
+                embed.title = 'Verfügbare Wahlen'
+                embed.description = 'Liste aller verfügbaren Wahlen'
+                embed.fields = fields
+                await interaction.reply({ embeds: [embed] })
+            } catch (error) {
+                LogManager.error(error)
+                await interaction.reply('Es ist ein Fehler aufgetreten!')
+            }
+        } else if (options.getSubcommand() === 'kandidaten') {
+            try {
+                let query = await Database.query<RowDataPacket[]>(
+                    'SELECT id, name FROM immo_elections WHERE id = ?',
+                    [options.getNumber('wahlid')],
+                )
+                if (query[0].length === 0) {
+                    await interaction.reply('Es konnte keine Wahl mit dieser ID gefunden werden!')
+                    return
+                }
+                const { id, name } = query[0][0] as {
+                    id: string
+                    name: string
+                }
+                interface IParticipant {
+                    id: number
+                    name: string
+                    identifier: string
+                }
+                let [rows] = await Database.query(
+                    'SELECT id, name, identifier FROM immo_elections_participants WHERE electionid = ?',
+                    [options.getNumber('wahlid')],
+                )
+                let participants = rows as IParticipant[]
+                let fields = []
+                for (const participant of participants) {
+                    fields.push({
+                        name: participant.name + ' (' + participant.id + ')',
+                        value:
+                            'ID: ' + participant.id + '\nSteamID: `' + participant.identifier + '`',
+                    })
+                }
+                embed.title = 'Kandidaten'
+                embed.description = 'Liste aller Kandidaten für ' + name + ' (' + id + ')'
+                embed.fields = fields
+                await interaction.reply({ embeds: [embed] })
+            } catch (error) {
+                LogManager.error(error)
+                await interaction.reply('Es ist ein Fehler aufgetreten!')
+            }
+        } else if (options.getSubcommand() === 'manipulieren') {
+            try {
+                if (
+                    options.getNumber('wahlid') === 0 ||
+                    options.getString('kandidatennr') === '' ||
+                    options.getNumber('stimmen') === 0 ||
+                    options.getString('operation') === ''
+                ) {
+                    await interaction.reply('Bitte gib eine WahlID an!')
+                    return
+                }
+                let query = await Database.query<RowDataPacket[]>(
+                    'SELECT id, name FROM immo_elections WHERE id = ?',
+                    [options.getNumber('wahlid')],
+                )
+                if (query[0].length === 0) {
+                    await interaction.reply('Es konnte keine Wahl mit dieser ID gefunden werden!')
+                    return
+                }
+                const { id, name } = query[0][0] as {
+                    id: string
+                    name: string
+                }
+                let participant = await Database.query<RowDataPacket[]>(
+                    'SELECT id, name FROM immo_elections_participants WHERE id = ?',
+                    [options.getString('kandidatennr')],
+                )
+                if (participant[0].length === 0) {
+                    await interaction.reply(
+                        'Es konnte kein Kandidat mit dieser ID gefunden werden!',
+                    )
+                    return
+                }
+                const { name: participantName } = participant[0][0] as {
+                    name: string
+                }
+                if (options.getString('operation') === 'add') {
+                    let querystring =
+                        'INSERT INTO immo_elections_votes (electionid, identifier, participantid) VALUES '
+                    let anzahl = options.getNumber('stimmen') ?? 0
+                    for (let i = 0; i < anzahl; i++) {
+                        querystring +=
+                            '(' +
+                            options.getNumber('wahlid') +
+                            ', "Manipulation", ' +
+                            options.getString('kandidatennr') +
+                            '),'
+                    }
+                    await Database.query<RowDataPacket[][]>(querystring.slice(0, -1))
+                    embed.title = 'Wahl manipuliert!'
+                    embed.description =
+                        anzahl +
+                        ' Stimmen für ' +
+                        participantName +
+                        ' zur Wahl ' +
+                        name +
+                        ' (' +
+                        id +
+                        ') hinzugefügt!'
+                    const channel = (await interaction.guild?.channels.fetch(
+                        Config.Discord.Channel.S1_WAHLEN,
+                    )) as TextChannel
+                    await channel?.send({ embeds: [embed] })
+                    await interaction.reply({ embeds: [embed] })
+                } else if (options.getString('operation') === 'remove') {
+                    await Database.query<RowDataPacket[][]>(
+                        'DELETE FROM immo_elections_votes WHERE electionid = ? AND participantid = ? LIMIT ?',
+                        [
+                            options.getNumber('wahlid'),
+                            options.getString('kandidatennr'),
+                            options.getNumber('stimmen'),
+                        ],
+                    )
+                    embed.title = 'Wahl manipuliert!'
+                    embed.description =
+                        options.getNumber('stimmen') +
+                        ' Stimmen für ' +
+                        participantName +
+                        ' von Wahl ' +
+                        name +
+                        ' (' +
+                        id +
+                        ') entfernt!'
+                    const channel = (await interaction.guild?.channels.fetch(
+                        Config.Discord.Channel.S1_WAHLEN,
+                    )) as TextChannel
+                    await channel?.send({ embeds: [embed] })
+                    await interaction.reply({ embeds: [embed] })
+                }
             } catch (error) {
                 LogManager.error(error)
                 await interaction.reply('Es ist ein Fehler aufgetreten!')
