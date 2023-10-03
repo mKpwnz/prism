@@ -1,14 +1,18 @@
 import { Command } from '@class/Command'
+import LogManager from '@utils/Logger'
 import { Interaction, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js'
+import { SchufaCheck } from './housing/SchufaCheck'
+import { CheckImageOwner } from './phone/CheckImageOwner'
 import { Ping } from './system/Ping'
+import { Wahl } from './system/Wahl'
 import { Birthday } from './user/Birthday'
 import { WhoIs } from './user/WhoIs'
-import LogManager from '@utils/Logger'
-import { CheckImageOwner } from './phone/CheckImageOwner'
-import { SchufaCheck } from './housing/SchufaCheck'
 
 export class CommandHandler {
-    static commands: { cmd: Command; scb: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder }[] = []
+    static commands: {
+        cmd: Command
+        scb: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder
+    }[] = []
 
     static async onInteraction(interaction: Interaction) {
         if (!interaction.isCommand()) return
@@ -23,6 +27,7 @@ export class CommandHandler {
         LogManager.info('CommandManager: Initializing all commands...')
         // System Commands
         new Ping()
+        new Wahl()
 
         // Phone Commands
         new CheckImageOwner()
@@ -37,7 +42,10 @@ export class CommandHandler {
     }
 }
 
-export const RegisterCommand = (scb: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder, cmd: Command) => {
+export const RegisterCommand = (
+    scb: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder,
+    cmd: Command,
+) => {
     CommandHandler.commands.push({
         cmd: cmd,
         scb: scb,
