@@ -34,7 +34,21 @@ export class Wahl extends Command {
                 .setName('wahl')
                 .setDescription('Wahlverwaltung!')
                 .addSubcommand((subcommand) =>
-                    subcommand.setName('erstellen').setDescription('Erstellt eine Wahl'),
+                    subcommand
+                        .setName('erstellen')
+                        .setDescription('Erstellt eine Wahl')
+                        .addStringOption((option) =>
+                            option
+                                .setName('name')
+                                .setDescription('Gib der Wahl einen Namen')
+                                .setRequired(true),
+                        )
+                        .addStringOption((option) =>
+                            option.setName('job').setDescription('Gib den Job an'),
+                        )
+                        .addBooleanOption((option) =>
+                            option.setName('enthaltung').setDescription('Enthaltung aktivieren'),
+                        ),
                 )
                 .addSubcommand((subcommand) =>
                     subcommand
@@ -167,7 +181,36 @@ export class Wahl extends Command {
         const options = interaction.options as CommandInteractionOptionResolver
         LogManager.log(options)
         if (options.getSubcommand() === 'erstellen') {
-            await interaction.reply('Wahl erstellen')
+            if (options.getString('name') === '') {
+                await interaction.reply('Bitte gib einen Namen an!')
+                return
+            }
+            try {
+                await Database.query<RowDataPacket[][]>(
+                    'INSERT INTO immo_elections (name, job, status, created, updated) VALUES (?, ?, ?, NOW(), NOW())',
+                    [
+                        options.getString('name'),
+                        options.getString('job') ?? null,
+                        options.getBoolean('enthaltung') ? 1 : 0,
+                    ],
+                )
+                embed.title = 'Wahl erstellt'
+                embed.description =
+                    'Wahl ' +
+                    options.getString('name') +
+                    ' erstellt!\nJob: ' +
+                    options.getString('job') +
+                    '\nEnthaltung: ' +
+                    options.getBoolean('enthaltung')
+                const channel = (await interaction.guild?.channels.fetch(
+                    Config.Discord.Channel.S1_WAHLEN,
+                )) as TextChannel
+                await channel?.send({ embeds: [embed] })
+                await interaction.reply({ embeds: [embed] })
+            } catch (error) {
+                LogManager.error(error)
+                await interaction.reply('Es ist ein Fehler aufgetreten!')
+            }
         } else if (options.getSubcommand() === 'status') {
             try {
                 if (options.getNumber('wahlid') === 0) {
@@ -215,7 +258,7 @@ export class Wahl extends Command {
                 options.getString('steamid') === '' ||
                 options.getString('operation') === ''
             ) {
-                await interaction.reply('Bitte gib eine WahlID an!')
+                await interaction.reply('Bitte gib eine WahlID/SteamID/Operation an!')
                 return
             }
             let query = await Database.query<RowDataPacket[]>(
@@ -230,9 +273,11 @@ export class Wahl extends Command {
                 id: string
                 name: string
             }
+            let steamid = options.getString('steamid') ?? ''
+            if (!steamid.startsWith('steam:')) steamid = 'steam:' + steamid
             const fullname = await Database.query<RowDataPacket[]>(
                 'SELECT firstname, lastname FROM users WHERE identifier = ?',
-                [options.getString('steamid')],
+                [steamid],
             )
             if (fullname[0].length === 0) {
                 await interaction.reply(
@@ -247,11 +292,7 @@ export class Wahl extends Command {
             if (options.getString('operation') === 'add') {
                 await Database.query<RowDataPacket[][]>(
                     'INSERT INTO immo_elections_participants (electionid, identifier, name) VALUES (?, ?, ?)',
-                    [
-                        options.getNumber('wahlid'),
-                        options.getString('steamid'),
-                        firstname + ' ' + lastname,
-                    ],
+                    [options.getNumber('wahlid'), steamid, firstname + ' ' + lastname],
                 )
                 embed.title = 'Nutzer hinzugefügt'
                 embed.description =
@@ -263,7 +304,9 @@ export class Wahl extends Command {
                     name +
                     ' (' +
                     id +
-                    ') hinzugefügt!'
+                    ') hinzugefügt!\nSteamID: `' +
+                    steamid +
+                    '`'
                 const channel = (await interaction.guild?.channels.fetch(
                     Config.Discord.Channel.S1_WAHLEN,
                 )) as TextChannel
@@ -271,9 +314,11 @@ export class Wahl extends Command {
                 await interaction.reply({ embeds: [embed] })
             } else if (options.getString('operation') === 'remove') {
                 try {
+                    let steamid = options.getString('steamid') ?? ''
+                    if (!steamid.startsWith('steam:')) steamid = 'steam:' + steamid
                     await Database.query<RowDataPacket[][]>(
                         'DELETE FROM immo_elections_participants WHERE electionid = ? AND identifier = ?',
-                        [options.getNumber('wahlid'), options.getString('steamid')],
+                        [options.getNumber('wahlid'), steamid],
                     )
                     embed.title = 'Nutzer hinzugefügt'
                     embed.description =
@@ -285,7 +330,9 @@ export class Wahl extends Command {
                         name +
                         ' (' +
                         id +
-                        ') entfernt!'
+                        ') entfernt!\nSteamID: `' +
+                        steamid +
+                        '`'
                     const channel = (await interaction.guild?.channels.fetch(
                         Config.Discord.Channel.S1_WAHLEN,
                     )) as TextChannel
