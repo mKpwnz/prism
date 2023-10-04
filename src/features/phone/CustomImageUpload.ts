@@ -178,7 +178,6 @@ export class CustomImmageUpload {
             if (this.message_image_upload) await this.message_image_upload.delete()
         }
         if (interaction.isModalSubmit() && interaction.customId === 'phone_ciu_modal') {
-            console.log('Submit modal')
             this.input_phoneNumber = interaction.fields.getTextInputValue('phone_ciu_in_phoneNumber')
             this.input_reason = interaction.fields.getTextInputValue('phone_ciu_in_reason')
             await interaction.reply({

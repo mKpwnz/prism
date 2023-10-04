@@ -22,7 +22,6 @@ export class SchufaCheck extends Command {
             const response = await Database.query(
                 `SELECT firstname, lastname, steamId, accounts FROM users u JOIN player_houses ph ON u.identifier = ph.identifier WHERE JSON_EXTRACT(u.accounts, '$.bank') < 0;`,
             )
-            console.log(response)
             interaction.reply({
                 content: `**${
                     response.length - 1

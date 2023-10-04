@@ -52,7 +52,6 @@ export class CheckImageOwner extends Command {
 			`,
                 [`%${n_link}%`],
             )
-            console.log(response)
             interaction.reply({
                 content: `\`\`\`json\n${JSON.stringify(response[0], null, 4)}\`\`\``,
             })
