@@ -1,6 +1,7 @@
 import { Command } from '@class/Command'
 import LogManager from '@utils/Logger'
 import { Interaction, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js'
+import { Versicherung } from './cars/Versicherung'
 import { SchufaCheck } from './housing/SchufaCheck'
 import { CheckImageOwner } from './phone/CheckImageOwner'
 import { Ping } from './system/Ping'
@@ -38,6 +39,9 @@ export class CommandHandler {
         // User Commands
         new Birthday()
         new WhoIs()
+
+        // Car Commands
+        new Versicherung()
         LogManager.info('CommandManager: All commands initialized!')
     }
 }
