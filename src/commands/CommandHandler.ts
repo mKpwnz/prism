@@ -7,6 +7,7 @@ import { CheckImageOwner } from './phone/CheckImageOwner'
 import { Ping } from './system/Ping'
 import { Wahl } from './system/Wahl'
 import { Birthday } from './user/Birthday'
+import { Fraksperre } from './user/Fraksperre'
 import { WhoIs } from './user/WhoIs'
 
 export class CommandHandler {
@@ -39,6 +40,7 @@ export class CommandHandler {
         // User Commands
         new Birthday()
         new WhoIs()
+        new Fraksperre()
 
         // Car Commands
         new Versicherung()
