@@ -1,3 +1,5 @@
 services:
   bot:
     image: prism
+    volumes:
+      - ./stack.env:/usr/src/app/.env # Web and web test share the web_data volume
