@@ -8,6 +8,7 @@ import { Ping } from './system/Ping'
 import { Wahl } from './system/Wahl'
 import { Birthday } from './user/Birthday'
 import { Fraksperre } from './user/Fraksperre'
+import { Rechnung } from './user/Rechnung'
 import { WhoIs } from './user/WhoIs'
 
 export class CommandHandler {
@@ -41,6 +42,7 @@ export class CommandHandler {
         new Birthday()
         new WhoIs()
         new Fraksperre()
+        new Rechnung()
 
         // Car Commands
         new Versicherung()
