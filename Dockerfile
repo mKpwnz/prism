@@ -1,4 +1,4 @@
-FROM node:slim
+FROM node
 
 ENV NODE_ENV production
 USER node
@@ -11,4 +11,4 @@ COPY . .
 
 RUN npm i
 
-CMD [ "mpm", "run",  "start" ]
+CMD [ "npm", "run",  "start" ]
