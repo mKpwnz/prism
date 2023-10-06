@@ -15,6 +15,7 @@ const Config = {
             WHOIS_CUSTOMPICS_DATASTORE: '1140733564963528704',
             BOT_LOG: '1158521924108955699',
             S1_WAHLEN: '1135909041806258187',
+            S1_IMMO_BILLING: '1009567127663034389',
         },
         Users: {},
         Groups: {
@@ -38,5 +39,3 @@ const Config = {
 }
 
 export default Config
-
-
