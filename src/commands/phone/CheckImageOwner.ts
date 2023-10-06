@@ -19,8 +19,15 @@ interface phoneOwnerResponse extends RowDataPacket {
 export class CheckImageOwner extends Command {
     constructor() {
         super(true)
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
-        this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER, Config.Discord.Groups.DEV_BOTTESTER]
+        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
+        this.AllowedGroups = [
+            Config.Discord.Groups.DEV_SERVERENGINEER,
+            Config.Discord.Groups.DEV_BOTTESTER,
+            Config.Discord.Groups.IC_MOD,
+            Config.Discord.Groups.IC_ADMIN,
+            Config.Discord.Groups.IC_HADMIN,
+            Config.Discord.Groups.IC_SUPERADMIN,
+        ]
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('pcheckimageowner')
@@ -63,7 +70,7 @@ export class CheckImageOwner extends Command {
                 [`%${n_link}%`],
             )
             interaction.reply({
-                content: `\`\`\`json\n${JSON.stringify(response, null, 4)}\`\`\``,
+                content: `\`\`\`json\n${JSON.stringify(response[0], null, 4)}\`\`\``,
             })
         } catch (e) {
             LogManager.error(e)
