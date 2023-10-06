@@ -4,21 +4,14 @@ import { EmbedBuilder } from '@discordjs/builders'
 import Config from '@proot/Config'
 import { Database } from '@sql/Database'
 import LogManager from '@utils/Logger'
-import {
-    CommandInteraction,
-    CommandInteractionOptionResolver,
-    SlashCommandBuilder,
-} from 'discord.js'
+import { CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder } from 'discord.js'
 import { RowDataPacket } from 'mysql2'
 
 export class Fraksperre extends Command {
     constructor() {
         super(true)
         this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
-        this.AllowedGroups = [
-            Config.Discord.Groups.DEV_SERVERENGINEER,
-            Config.Discord.Groups.DEV_BOTTESTER,
-        ]
+        this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER]
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('fraksperre')
@@ -28,10 +21,7 @@ export class Fraksperre extends Command {
                         .setName('entfernen')
                         .setDescription('Entferne die Fraktionssperre eines Spielers')
                         .addStringOption((option) =>
-                            option
-                                .setName('steamid')
-                                .setDescription('SteamID des Spielers')
-                                .setRequired(true),
+                            option.setName('steamid').setDescription('SteamID des Spielers').setRequired(true),
                         ),
                 )
                 .addSubcommand((subcommand) =>
@@ -39,15 +29,10 @@ export class Fraksperre extends Command {
                         .setName('setzen')
                         .setDescription('Setze dem Spieler eine Fraksperre')
                         .addStringOption((option) =>
-                            option
-                                .setName('steamid')
-                                .setDescription('SteamID des Spielers')
-                                .setRequired(true),
+                            option.setName('steamid').setDescription('SteamID des Spielers').setRequired(true),
                         )
                         .addIntegerOption((option) =>
-                            option
-                                .setName('zeit')
-                                .setDescription('Setze die Zeit in Tagen (Default: 5 Tage)'),
+                            option.setName('zeit').setDescription('Setze die Zeit in Tagen (Default: 5 Tage)'),
                         ),
                 ),
             this,
@@ -74,9 +59,7 @@ export class Fraksperre extends Command {
                     [steamid],
                 )
                 if (fullname[0].length === 0) {
-                    await interaction.reply(
-                        'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
-                    )
+                    await interaction.reply('Es konnte kein Spieler mit dieser SteamID gefunden werden!')
                     return
                 }
                 const { firstname, lastname, fraksperre } = fullname[0][0] as {
@@ -89,10 +72,7 @@ export class Fraksperre extends Command {
                     await interaction.reply('Der Spieler hat keine Fraktionssperre!')
                     return
                 } else {
-                    await Database.query(
-                        'UPDATE users SET fraksperre = NOW() WHERE identifier = ?',
-                        [steamid],
-                    )
+                    await Database.query('UPDATE users SET fraksperre = NOW() WHERE identifier = ?', [steamid])
                     embed.setTitle('Fraktionssperre entfernt')
                     embed.setDescription(
                         `Die Fraktionssperre von ${firstname} ${lastname} (${steamid}) wurde entfernt!\nAltes Datum: ${fraksperre.toLocaleDateString()}`,
@@ -113,9 +93,7 @@ export class Fraksperre extends Command {
                     [steamid],
                 )
                 if (fullname[0].length === 0) {
-                    await interaction.reply(
-                        'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
-                    )
+                    await interaction.reply('Es konnte kein Spieler mit dieser SteamID gefunden werden!')
                     return
                 }
                 const { firstname, lastname } = fullname[0][0] as {

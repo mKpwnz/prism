@@ -26,7 +26,6 @@ import {
  */
 export class CustomImmageUpload {
     private client: Client | null
-
     private input_phoneNumber: string = ''
     private input_reason: string = ''
     private input_imageUrl: string = ''

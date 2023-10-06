@@ -3,6 +3,7 @@ import LogManager from '@utils/Logger'
 import { Interaction, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js'
 import { Versicherung } from './cars/Versicherung'
 import { SchufaCheck } from './housing/SchufaCheck'
+import { TeamNote } from './user/TeamNote'
 import { CheckImageOwner } from './phone/CheckImageOwner'
 import { Ping } from './system/Ping'
 import { Wahl } from './system/Wahl'
@@ -41,6 +42,7 @@ export class CommandHandler {
         // User Commands
         new Birthday()
         new WhoIs()
+        new TeamNote()
         new Fraksperre()
         new Rechnung()
 

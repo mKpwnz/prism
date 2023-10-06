@@ -61,7 +61,7 @@ export class WhoIs extends Command {
             } else {
                 filter = filter + spalte
             }
-            const finduser: IFindUser[] = await this.searchUsers(identifierValue, spalte)
+            const finduser: IFindUser[] = await WhoIs.searchUsers(identifierValue, spalte)
             if (finduser === null) {
                 await interaction.reply({ content: 'User nicht gefunden', ephemeral: true })
             } else {
@@ -208,7 +208,7 @@ export class WhoIs extends Command {
         }
     }
 
-    async searchUsers(searchText: string, column: string): Promise<IFindUser[]> {
+    private static async searchUsers(searchText: string, column: string): Promise<IFindUser[]> {
         let columns = {
             identifier: 'LOWER( users.identifier ) LIKE LOWER( "%' + searchText + '%" )',
             steamid: 'LOWER( users.steamid ) LIKE LOWER( "%' + searchText + '%" )',
@@ -313,5 +313,12 @@ export class WhoIs extends Command {
             LogManager.error(error)
             return []
         }
+    }
+
+    public static async validateUser(steamID: string): Promise<IFindUser | null> {
+        const user = await WhoIs.searchUsers(steamID, 'steamid')
+        if (user === null) return null
+        if (user.length === 0) return null
+        return user[0]
     }
 }
