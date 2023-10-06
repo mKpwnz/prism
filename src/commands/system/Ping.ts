@@ -6,8 +6,8 @@ import { CommandInteraction, SlashCommandBuilder } from 'discord.js'
 export class Ping extends Command {
     constructor() {
         super(true)
-        this.AllowedChannels = [Config.Discord.Channel.PRISM_DISCORDBOT]
-        this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER, Config.Discord.Groups.DEV_PRISM]
+        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
+        this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER, Config.Discord.Groups.DEV_BOTTESTER]
         RegisterCommand(new SlashCommandBuilder().setName('ping').setDescription('Pong!'), this)
     }
     async execute(interaction: CommandInteraction): Promise<void> {

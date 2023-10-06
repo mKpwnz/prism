@@ -4,7 +4,7 @@ import { Client, IntentsBitField } from 'discord.js'
 import LogManager from '@utils/Logger'
 LogManager.configure()
 
-const token = process.env.DISCORD_TOKEN
+const token = process.env.NODE_ENV === 'production' ? process.env.DISCORD_TOKEN_PROD : process.env.DISCORD_TOKEN_DEV
 
 LogManager.info('Bot is starting...')
 

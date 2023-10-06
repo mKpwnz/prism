@@ -10,8 +10,8 @@ import LogManager from '@utils/Logger'
 export class WhoIs extends Command {
     constructor() {
         super(false)
-        this.AllowedChannels = [Config.Discord.Channel.PRISM_TEST]
-        this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER]
+        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
+        this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER, Config.Discord.Groups.DEV_BOTTESTER]
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('whois')

@@ -9,8 +9,8 @@ import { CommandInteraction, SlashCommandBuilder } from 'discord.js'
 export class CheckImageOwner extends Command {
     constructor() {
         super(true)
-        this.AllowedChannels = [Config.Discord.Channel.PRISM_DISCORDBOT]
-        this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER, Config.Discord.Groups.DEV_PRISM]
+        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
+        this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER, Config.Discord.Groups.DEV_BOTTESTER]
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('pcheckimageowner')
@@ -52,7 +52,6 @@ export class CheckImageOwner extends Command {
 			`,
                 [`%${n_link}%`],
             )
-            console.log(response)
             interaction.reply({
                 content: `\`\`\`json\n${JSON.stringify(response[0], null, 4)}\`\`\``,
             })

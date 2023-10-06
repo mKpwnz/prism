@@ -26,7 +26,10 @@ export class Wahl extends Command {
     constructor() {
         super(true)
         this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
-        this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER]
+        this.AllowedGroups = [
+            Config.Discord.Groups.DEV_SERVERENGINEER,
+            Config.Discord.Groups.DEV_BOTTESTER,
+        ]
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('wahl')
@@ -36,9 +39,14 @@ export class Wahl extends Command {
                         .setName('erstellen')
                         .setDescription('Erstellt eine Wahl')
                         .addStringOption((option) =>
-                            option.setName('name').setDescription('Gib der Wahl einen Namen').setRequired(true),
+                            option
+                                .setName('name')
+                                .setDescription('Gib der Wahl einen Namen')
+                                .setRequired(true),
                         )
-                        .addStringOption((option) => option.setName('job').setDescription('Gib den Job an'))
+                        .addStringOption((option) =>
+                            option.setName('job').setDescription('Gib den Job an'),
+                        )
                         .addBooleanOption((option) =>
                             option.setName('enthaltung').setDescription('Enthaltung aktivieren'),
                         ),
@@ -48,7 +56,10 @@ export class Wahl extends Command {
                         .setName('status')
                         .setDescription('Ändert den Status einer Wahl')
                         .addNumberOption((option) =>
-                            option.setName('wahlid').setDescription('Gib die WahlID an').setRequired(true),
+                            option
+                                .setName('wahlid')
+                                .setDescription('Gib die WahlID an')
+                                .setRequired(true),
                         )
                         .addNumberOption((option) =>
                             option
@@ -78,10 +89,16 @@ export class Wahl extends Command {
                                 .setRequired(true),
                         )
                         .addNumberOption((option) =>
-                            option.setName('wahlid').setDescription('Gib die WahlID an').setRequired(true),
+                            option
+                                .setName('wahlid')
+                                .setDescription('Gib die WahlID an')
+                                .setRequired(true),
                         )
                         .addStringOption((option) =>
-                            option.setName('steamid').setDescription('Gib die SteamID an').setRequired(true),
+                            option
+                                .setName('steamid')
+                                .setDescription('Gib die SteamID an')
+                                .setRequired(true),
                         ),
                 )
                 .addSubcommand((subcommand) =>
@@ -89,7 +106,10 @@ export class Wahl extends Command {
                         .setName('ergebnis')
                         .setDescription('Zeigt das Wahlergebnis an')
                         .addNumberOption((option) =>
-                            option.setName('wahlid').setDescription('Gib die WahlID an').setRequired(true),
+                            option
+                                .setName('wahlid')
+                                .setDescription('Gib die WahlID an')
+                                .setRequired(true),
                         ),
                 )
                 .addSubcommand((subcommand) =>
@@ -100,7 +120,10 @@ export class Wahl extends Command {
                         .setName('kandidaten')
                         .setDescription('Zeigt alle Kandidaten zu einer Wahl an')
                         .addNumberOption((option) =>
-                            option.setName('wahlid').setDescription('Gib die WahlID an').setRequired(true),
+                            option
+                                .setName('wahlid')
+                                .setDescription('Gib die WahlID an')
+                                .setRequired(true),
                         ),
                 )
                 .addSubcommand((subcommand) =>
@@ -118,12 +141,17 @@ export class Wahl extends Command {
                                 .setRequired(true),
                         )
                         .addNumberOption((option) =>
-                            option.setName('wahlid').setDescription('Gib die WahlID an').setRequired(true),
+                            option
+                                .setName('wahlid')
+                                .setDescription('Gib die WahlID an')
+                                .setRequired(true),
                         )
                         .addStringOption((option) =>
                             option
                                 .setName('kandidatennr')
-                                .setDescription('Gib die Kandidatennummer an, diese findest du bei /wahl kandidaten')
+                                .setDescription(
+                                    'Gib die Kandidatennummer an, diese findest du bei /wahl kandidaten',
+                                )
                                 .setRequired(true),
                         )
                         .addNumberOption((option) =>

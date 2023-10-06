@@ -1,15 +1,22 @@
 import { Command } from '@class/Command'
-import { Interaction, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js'
-import { Ping } from './system/Ping'
-import { Birthday } from './user/Birthday'
-import { WhoIs } from './user/WhoIs'
 import LogManager from '@utils/Logger'
-import { CheckImageOwner } from './phone/CheckImageOwner'
+import { Interaction, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js'
+import { Versicherung } from './cars/Versicherung'
 import { SchufaCheck } from './housing/SchufaCheck'
 import { TeamNote } from './user/TeamNote'
+import { CheckImageOwner } from './phone/CheckImageOwner'
+import { Ping } from './system/Ping'
+import { Wahl } from './system/Wahl'
+import { Birthday } from './user/Birthday'
+import { Fraksperre } from './user/Fraksperre'
+import { Rechnung } from './user/Rechnung'
+import { WhoIs } from './user/WhoIs'
 
 export class CommandHandler {
-    static commands: { cmd: Command; scb: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder }[] = []
+    static commands: {
+        cmd: Command
+        scb: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder
+    }[] = []
 
     static async onInteraction(interaction: Interaction) {
         if (!interaction.isCommand()) return
@@ -24,6 +31,7 @@ export class CommandHandler {
         LogManager.info('CommandManager: Initializing all commands...')
         // System Commands
         new Ping()
+        new Wahl()
 
         // Phone Commands
         new CheckImageOwner()
@@ -35,11 +43,19 @@ export class CommandHandler {
         new Birthday()
         new WhoIs()
         new TeamNote()
+        new Fraksperre()
+        new Rechnung()
+
+        // Car Commands
+        new Versicherung()
         LogManager.info('CommandManager: All commands initialized!')
     }
 }
 
-export const RegisterCommand = (scb: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder, cmd: Command) => {
+export const RegisterCommand = (
+    scb: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder,
+    cmd: Command,
+) => {
     CommandHandler.commands.push({
         cmd: cmd,
         scb: scb,
