@@ -3,8 +3,8 @@ image: docker:latest
 build_job:
   stage: build
   script:
-    - echo "starting job..."
+    - echo "Starting Docker Build"
     - docker build -t "${CI_PROJECT_NAME}:latest" .
-    - echo "job finished"
+    - echo "Job Finished. Sending notification to Discord"
   only:
     - release
