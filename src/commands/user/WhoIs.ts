@@ -1,12 +1,12 @@
 import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
+import { ESearchType } from '@enums/ESearchType'
 import Config from '@proot/Config'
 import { Database } from '@sql/Database'
 import { IFindUser } from '@sql/schema/FindUser.schema'
 import { Helper } from '@utils/Helper'
-import { APIEmbed, AttachmentBuilder, CommandInteraction, SlashCommandBuilder } from 'discord.js'
 import LogManager from '@utils/Logger'
-import { ESearchType } from '@enums/ESearchType'
+import { AttachmentBuilder, CommandInteraction, SlashCommandBuilder } from 'discord.js'
 
 export class WhoIs extends Command {
     constructor() {

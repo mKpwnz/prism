@@ -3,13 +3,13 @@ import LogManager from '@utils/Logger'
 import { Interaction, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js'
 import { Versicherung } from './cars/Versicherung'
 import { SchufaCheck } from './housing/SchufaCheck'
-import { TeamNote } from './user/TeamNote'
 import { CheckImageOwner } from './phone/CheckImageOwner'
 import { Ping } from './system/Ping'
 import { Wahl } from './system/Wahl'
 import { Birthday } from './user/Birthday'
 import { Fraksperre } from './user/Fraksperre'
 import { Rechnung } from './user/Rechnung'
+import { TeamNote } from './user/TeamNote'
 import { WhoIs } from './user/WhoIs'
 
 export class CommandHandler {
@@ -52,10 +52,7 @@ export class CommandHandler {
     }
 }
 
-export const RegisterCommand = (
-    scb: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder,
-    cmd: Command,
-) => {
+export const RegisterCommand = (scb: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder, cmd: Command) => {
     CommandHandler.commands.push({
         cmd: cmd,
         scb: scb,

@@ -1,9 +1,9 @@
+import { BotClient } from '@proot/Bot'
+import Config from '@proot/Config'
 import chalk from 'chalk'
 import colorize from 'json-colorizer'
 import winston, { createLogger, format, transports } from 'winston'
 import LokiTransport from 'winston-loki'
-import Config from '@proot/Config'
-import { BotClient } from '@proot/Bot'
 
 /**
  * @description Logger class for logging to console and loki

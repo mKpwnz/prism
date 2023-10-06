@@ -1,24 +1,17 @@
 import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
+import { EmbedBuilder } from '@discordjs/builders'
 import Config from '@proot/Config'
 import { Database } from '@sql/Database'
-import LogManager from '@utils/Logger'
-import { Helper } from '@utils/Helper'
-import { WhoIs } from '../user/WhoIs'
 import { IElection } from '@sql/schema/Election.schema'
 import { IElectionParticipant } from '@sql/schema/ElectionParticipant.schema'
-import { EmbedBuilder } from '@discordjs/builders'
+import LogManager from '@utils/Logger'
 import { Chart, ChartConfiguration } from 'chart.js'
 import { ChartJSNodeCanvas } from 'chartjs-node-canvas'
 import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels'
-import {
-    APIEmbed,
-    CommandInteraction,
-    CommandInteractionOptionResolver,
-    SlashCommandBuilder,
-    TextChannel,
-} from 'discord.js'
+import { CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder, TextChannel } from 'discord.js'
 import { RowDataPacket } from 'mysql2'
+import { WhoIs } from '../user/WhoIs'
 
 declare module 'chartjs-plugin-datalabels' {
     interface Context {

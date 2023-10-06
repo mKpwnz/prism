@@ -1,8 +1,8 @@
-import { Client, Interaction, Message } from 'discord.js'
-import { onReady } from './onReady'
-import { onMessageCreate } from './onMessageCreate'
 import { CommandHandler } from '@commands/CommandHandler'
 import { CustomImmageUpload } from '@features/phone/CustomImageUpload'
+import { Client, Interaction, Message } from 'discord.js'
+import { onMessageCreate } from './onMessageCreate'
+import { onReady } from './onReady'
 
 /**
  * @description Handles all events

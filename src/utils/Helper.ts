@@ -1,5 +1,4 @@
-import Config from '@proot/Config'
-import { CommandInteraction, EmbedBuilder, TextChannel } from 'discord.js'
+import { CommandInteraction, TextChannel } from 'discord.js'
 
 export class Helper {
     /**
@@ -120,6 +119,15 @@ export class Helper {
         return `${dateStr}-${randomStr}`
     }
 
+    /**
+     * @description Validates a numberplate and returns a valid one with 8 characters (including spaces) or an empty string if the input is invalid
+     * @author mKpwnz
+     * @date 06.10.2023
+     * @static
+     * @param {string} platetext
+     * @returns {*}  {string}
+     * @memberof Helper
+     */
     static validateNumberplate(platetext: string): string {
         platetext = platetext.toUpperCase().replace(/[^A-Z0-9 ]*/g, '')
         if (platetext.length == 0) {

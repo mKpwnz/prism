@@ -4,12 +4,11 @@ import { EmbedBuilder } from '@discordjs/builders'
 import Config from '@proot/Config'
 import { Database } from '@sql/Database'
 import { IBilling } from '@sql/schema/Billing.schema'
-import { WhoIs } from './WhoIs'
 import { IJobs } from '@sql/schema/Jobs.schema'
 import LogManager from '@utils/Logger'
-import { Helper } from '@utils/Helper'
 import { CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder, TextChannel } from 'discord.js'
 import { RowDataPacket } from 'mysql2'
+import { WhoIs } from './WhoIs'
 
 export class Rechnung extends Command {
     constructor() {

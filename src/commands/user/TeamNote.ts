@@ -3,8 +3,8 @@ import { RegisterCommand } from '@commands/CommandHandler'
 import { BotClient } from '@proot/Bot'
 import Config from '@proot/Config'
 import { Database } from '@sql/Database'
+import { ITeamNote } from '@sql/schema/TeamNote.schema'
 import LogManager from '@utils/Logger'
-import { Helper } from '@utils/Helper'
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -15,9 +15,7 @@ import {
     SlashCommandBuilder,
     User,
 } from 'discord.js'
-import { RowDataPacket } from 'mysql2'
 import { WhoIs } from './WhoIs'
-import { ITeamNote } from '@sql/schema/TeamNote.schema'
 
 export class TeamNote extends Command {
     constructor() {

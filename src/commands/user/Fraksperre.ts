@@ -3,7 +3,6 @@ import { RegisterCommand } from '@commands/CommandHandler'
 import { EmbedBuilder } from '@discordjs/builders'
 import Config from '@proot/Config'
 import { Database } from '@sql/Database'
-import { Helper } from '@utils/Helper'
 import LogManager from '@utils/Logger'
 import { CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder } from 'discord.js'
 import { WhoIs } from './WhoIs'
@@ -79,9 +78,9 @@ export class Fraksperre extends Command {
             LogManager.log(vUser)
             embed.setTitle('Fraktionssperre entfernt')
             embed.setDescription(
-                `Die Fraktionssperre von ${vUser.firstname} ${vUser.lastname} (${
-                    vUser.identifier
-                }) wurde entfernt!\nAltes Datum: ${vUser.fraksperre.toLocaleDateString()}`,
+                `
+                Die Fraktionssperre von ${vUser.firstname} ${vUser.lastname} (${vUser.identifier}) wurde entfernt!\n
+                Altes Datum: ${vUser.fraksperre.toLocaleDateString()}`,
             )
             await interaction.reply({ embeds: [embed] })
         }
