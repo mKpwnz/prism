@@ -33,7 +33,7 @@ export class CommandHandler {
 
         // System Commands
         new Ping()
-        new Wahl()
+        // new Wahl()
 
         // Phone Commands
         new CheckImageOwner()
@@ -42,14 +42,14 @@ export class CommandHandler {
         new SchufaCheck()
 
         // User Commands
-        new Birthday()
+        // new Birthday()
         new WhoIs()
-        new TeamNote()
-        new Fraksperre()
-        new Rechnung()
+        // new TeamNote()
+        // new Fraksperre()
+        // new Rechnung()
 
         // Car Commands
-        new Versicherung()
+        // new Versicherung()
         LogManager.info('CommandManager: All commands initialized!')
     }
 }

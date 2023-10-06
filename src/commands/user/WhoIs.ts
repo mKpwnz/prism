@@ -67,7 +67,7 @@ export class WhoIs extends Command {
             }
             const finduser: IFindUser[] = await WhoIs.searchUsers(
                 identifierValue,
-                ESearchType[spalte as keyof typeof ESearchType],
+                ESearchType[spalte.toUpperCase() as keyof typeof ESearchType],
             )
             if (finduser === null) {
                 await interaction.reply({ content: 'User nicht gefunden', ephemeral: true })
