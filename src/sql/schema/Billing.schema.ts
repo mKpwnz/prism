@@ -14,6 +14,6 @@ export interface IBilling extends RowDataPacket {
     notes: string
     sent_date: Date
     limit_pay_date: Date
-    fees_amount: number
-    paid_date: string
+    fees_amount: number | null
+    paid_date: string | null
 }

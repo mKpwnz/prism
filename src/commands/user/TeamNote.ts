@@ -4,6 +4,7 @@ import { BotClient } from '@proot/Bot'
 import Config from '@proot/Config'
 import { Database } from '@sql/Database'
 import LogManager from '@utils/Logger'
+import { Helper } from '@utils/Helper'
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -21,12 +22,8 @@ import { ITeamNote } from '@sql/schema/TeamNote.schema'
 export class TeamNote extends Command {
     constructor() {
         super(true)
-        this.AllowedChannels = [Config.Discord.Channel.PRISM_DISCORDBOT]
-        this.AllowedGroups = [
-            Config.Discord.Groups.DEV_SERVERENGINEER,
-            Config.Discord.Groups.DEV_PRISM,
-            Config.Discord.Groups.DEV_PRISM_TEST,
-        ]
+        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
+        this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER]
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('teamnote')
@@ -225,7 +222,7 @@ export class TeamNote extends Command {
         }
     }
     async onInteraction(interaction: Interaction) {}
-    async addNote(user_steamid: string, teamler: User, note: string): Promise<boolean> {
+    private async addNote(user_steamid: string, teamler: User, note: string): Promise<boolean> {
         try {
             let query =
                 'INSERT INTO `team_notes` (`user_steamid`, `teamler_discordid`, `teamler_discordname`, `note`) VALUES ( ?, ?, ?, ?);'
@@ -240,7 +237,7 @@ export class TeamNote extends Command {
             return false
         }
     }
-    async getNotes(user_steamid: string): Promise<ITeamNote[] | false> {
+    private async getNotes(user_steamid: string): Promise<ITeamNote[] | false> {
         try {
             let query = 'SELECT * FROM `team_notes` WHERE `user_steamid` = ?;'
             const [notes] = await Database.query<ITeamNote[]>(query, [user_steamid])
@@ -254,7 +251,7 @@ export class TeamNote extends Command {
             return false
         }
     }
-    async getNote(user_steamid: string, noteid: number): Promise<ITeamNote | false> {
+    private async getNote(user_steamid: string, noteid: number): Promise<ITeamNote | false> {
         try {
             let query = 'SELECT * FROM `team_notes` WHERE `user_steamid` = ? AND `id` = ?;'
             const [notes] = await Database.query<ITeamNote[]>(query, [user_steamid, noteid])
@@ -268,7 +265,7 @@ export class TeamNote extends Command {
             return false
         }
     }
-    async removeNote(user_steamid: string, noteid: number) {
+    private async removeNote(user_steamid: string, noteid: number) {
         try {
             let query = 'DELETE FROM `team_notes` WHERE `user_steamid` = ? AND `id` = ?;'
             const response = await Database.query(query, [user_steamid, noteid])

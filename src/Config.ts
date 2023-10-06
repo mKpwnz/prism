@@ -13,6 +13,8 @@ const Config = {
             WHOIS_NOTICE: '1158521015681417277',
             WHOIS_IMAGEUPLOAD: '1158521623448666112',
             WHOIS_CUSTOMPICS_DATASTORE: '1140733564963528704',
+        },
+        LogChannel: {
             BOT_LOG: '1158521924108955699',
             S1_WAHLEN: '1135909041806258187',
             S1_IMMO_BILLING: '1009567127663034389',
@@ -32,8 +34,7 @@ const Config = {
     },
     Pictures: {
         Prism: {
-            LOGO_BLUE:
-                'https://cdn.discordapp.com/attachments/1157038126884200659/1157083951186317312/icon.png',
+            LOGO_BLUE: 'https://cdn.discordapp.com/attachments/1157038126884200659/1157083951186317312/icon.png',
         },
     },
 }

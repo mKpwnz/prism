@@ -4,6 +4,15 @@ import Config from '@proot/Config'
 import { Database } from '@sql/Database'
 import LogManager from '@utils/Logger'
 import { CommandInteraction, SlashCommandBuilder } from 'discord.js'
+import { RowDataPacket } from 'mysql2'
+
+interface phoneOwnerResponse extends RowDataPacket {
+    firstname: string
+    lastname: string
+    steamID: string
+    phoneNumber: string
+    timestamp: string
+}
 
 // TODO: Response überarbeiten
 export class CheckImageOwner extends Command {
@@ -41,7 +50,7 @@ export class CheckImageOwner extends Command {
             }
             LogManager.debug(n_link)
 
-            const response = await Database.query(
+            const [response] = await Database.query<phoneOwnerResponse[]>(
                 `
 				SELECT u.firstname, u.lastname, phones.id AS steamID, photos.phone_number, photos.timestamp AS img_timestamp
 				FROM phone_photos photos
@@ -53,7 +62,7 @@ export class CheckImageOwner extends Command {
                 [`%${n_link}%`],
             )
             interaction.reply({
-                content: `\`\`\`json\n${JSON.stringify(response[0], null, 4)}\`\`\``,
+                content: `\`\`\`json\n${JSON.stringify(response, null, 4)}\`\`\``,
             })
         } catch (e) {
             LogManager.error(e)

@@ -34,6 +34,9 @@
       "@features/*": [
         "./src/features/*"
       ],
+      "@enums/*": [
+        "./src/enums/*"
+      ],
       "@proot/*": [
         "./src/*"
       ],

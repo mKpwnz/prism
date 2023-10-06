@@ -4,6 +4,14 @@ import Config from '@proot/Config'
 import { Database } from '@sql/Database'
 import LogManager from '@utils/Logger'
 import { CommandInteraction, SlashCommandBuilder } from 'discord.js'
+import { RowDataPacket } from 'mysql2'
+
+interface schufaUser extends RowDataPacket {
+    firstname: string
+    lastname: string
+    steamId: string
+    accounts: any
+}
 
 export class SchufaCheck extends Command {
     constructor() {
@@ -19,14 +27,17 @@ export class SchufaCheck extends Command {
     }
     async execute(interaction: CommandInteraction): Promise<void> {
         try {
-            const response = await Database.query(
+            const [schufaUsers] = await Database.query<schufaUser[]>(
                 `SELECT firstname, lastname, steamId, accounts FROM users u JOIN player_houses ph ON u.identifier = ph.identifier WHERE JSON_EXTRACT(u.accounts, '$.bank') < 0;`,
             )
+            for (const user of schufaUsers) {
+                schufaUsers[schufaUsers.indexOf(user)].accounts = JSON.parse(user.accounts)
+            }
             interaction.reply({
                 content: `**${
-                    response.length - 1
+                    schufaUsers.length
                 }** Hausbesitzer mit negativem Kontostand gefunden.\`\`\`json\n${JSON.stringify(
-                    response[0],
+                    schufaUsers,
                     null,
                     4,
                 )}\`\`\``,

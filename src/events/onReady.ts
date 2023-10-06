@@ -12,7 +12,11 @@ export class onReady extends DCEvent {
             process.env.NODE_ENV === 'production' ? process.env.DISCORD_TOKEN_PROD : process.env.DISCORD_TOKEN_DEV
         const rest = new REST({ version: '9' }).setToken(token as string)
         CommandHandler.initAll()
-        const commandData = CommandHandler.commands.map((command) => command.scb.toJSON())
+        const commandData = CommandHandler.commands.map((command) => {
+            LogManager.debug(command.scb.name)
+            LogManager.debug(command.scb.description)
+            return command.scb.toJSON()
+        })
         await rest.put(Routes.applicationGuildCommands(client.user?.id ?? 'missing id', Config.Discord.ServerID), {
             body: commandData,
         })

@@ -1,4 +1,5 @@
-import { CommandInteraction, TextChannel } from 'discord.js'
+import Config from '@proot/Config'
+import { CommandInteraction, EmbedBuilder, TextChannel } from 'discord.js'
 
 export class Helper {
     /**
@@ -117,5 +118,28 @@ export class Helper {
         let dateStr = Date.now().toString(36)
         let randomStr = Math.random().toString(36).substring(2, 8)
         return `${dateStr}-${randomStr}`
+    }
+
+    static validateNumberplate(platetext: string): string {
+        platetext = platetext.toUpperCase().replace(/[^A-Z0-9 ]*/g, '')
+        if (platetext.length == 0) {
+            return '        '
+        } else if (platetext.length == 8) {
+            return platetext
+        } else if (platetext.length > 8) {
+            return platetext.slice(0, 8)
+        } else {
+            while (platetext.length < 8) {
+                if (platetext.length % 2 == 0) {
+                    platetext = ' ' + platetext
+                } else {
+                    platetext += ' '
+                }
+                if (platetext.length == 8) {
+                    return platetext
+                }
+            }
+        }
+        return platetext
     }
 }

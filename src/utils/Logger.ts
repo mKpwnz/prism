@@ -2,8 +2,8 @@ import chalk from 'chalk'
 import colorize from 'json-colorizer'
 import winston, { createLogger, format, transports } from 'winston'
 import LokiTransport from 'winston-loki'
-import { BotClient } from '@proot/Bot'
 import Config from '@proot/Config'
+import { BotClient } from '@proot/Bot'
 
 /**
  * @description Logger class for logging to console and loki
@@ -119,7 +119,7 @@ export default class LogManager {
         })
     }
     public static discordActionLog(message: string) {
-        var channel = BotClient.channels.cache.get(Config.Discord.Channel.BOT_LOG)
+        var channel = BotClient.channels.cache.get(Config.Discord.LogChannel.BOT_LOG)
         if (channel && channel.isTextBased()) {
             channel.send(message)
         }
