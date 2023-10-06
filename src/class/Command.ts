@@ -1,3 +1,4 @@
+import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
 import { Helper } from '@utils/Helper'
 import LogManager from '@utils/Logger'
@@ -15,10 +16,10 @@ export abstract class Command {
     AllowedGroups: string[] = []
     CheckPermissions: Boolean = false
     CommandEmbed: EmbedBuilder | null = null
+    RunEnvironment: EENV = EENV.DEVELOPMENT
     constructor(checkPermissions: boolean = false) {
         this.CheckPermissions = checkPermissions
     }
-
     abstract execute(interaction: CommandInteraction): Promise<void>
     async run(interaction: CommandInteraction): Promise<void> {
         if (this.CheckPermissions) {

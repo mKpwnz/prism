@@ -6,6 +6,7 @@ import { Database } from '@sql/Database'
 import LogManager from '@utils/Logger'
 import { CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder } from 'discord.js'
 import { WhoIs } from './WhoIs'
+import { EENV } from '@enums/EENV'
 
 export class Fraksperre extends Command {
     constructor() {

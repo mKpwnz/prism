@@ -11,10 +11,10 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "@types/node": "^20.8.0",
+        "@types/node": "^20.8.2",
         "axios": "^1.5.1",
         "chalk": "4.1.2",
-        "chart.js": "^3.9.1",
+        "chart.js": "3.9.1",
         "chartjs-node-canvas": "^4.1.6",
         "chartjs-plugin-datalabels": "^2.2.0",
         "discord.js": "^14.13.0",

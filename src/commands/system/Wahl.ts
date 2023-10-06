@@ -12,6 +12,7 @@ import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels'
 import { CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder, TextChannel } from 'discord.js'
 import { RowDataPacket } from 'mysql2'
 import { WhoIs } from '../user/WhoIs'
+import { EENV } from '@enums/EENV'
 
 declare module 'chartjs-plugin-datalabels' {
     interface Context {

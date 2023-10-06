@@ -11,6 +11,7 @@ import { Fraksperre } from './user/Fraksperre'
 import { Rechnung } from './user/Rechnung'
 import { TeamNote } from './user/TeamNote'
 import { WhoIs } from './user/WhoIs'
+import { EENV } from '@enums/EENV'
 
 export class CommandHandler {
     static commands: {
@@ -29,6 +30,7 @@ export class CommandHandler {
 
     static initAll() {
         LogManager.info('CommandManager: Initializing all commands...')
+
         // System Commands
         new Ping()
         new Wahl()

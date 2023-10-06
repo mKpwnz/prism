@@ -16,6 +16,7 @@ import {
     User,
 } from 'discord.js'
 import { WhoIs } from './WhoIs'
+import { EENV } from '@enums/EENV'
 
 export class TeamNote extends Command {
     constructor() {

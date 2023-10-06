@@ -9,6 +9,7 @@ import LogManager from '@utils/Logger'
 import { CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder, TextChannel } from 'discord.js'
 import { RowDataPacket } from 'mysql2'
 import { WhoIs } from './WhoIs'
+import { EENV } from '@enums/EENV'
 
 export class Rechnung extends Command {
     constructor() {

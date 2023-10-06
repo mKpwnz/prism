@@ -1,7 +1,8 @@
+import 'dotenv/config' // THIS NEED TO BE AT THE TOP !!!IMPORTANT
+
 import { EventHandler } from '@events/EventHandler'
 import LogManager from '@utils/Logger'
 import { Client, IntentsBitField } from 'discord.js'
-import 'dotenv/config'
 LogManager.configure()
 
 const token = process.env.NODE_ENV === 'production' ? process.env.DISCORD_TOKEN_PROD : process.env.DISCORD_TOKEN_DEV

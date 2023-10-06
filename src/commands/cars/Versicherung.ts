@@ -1,5 +1,6 @@
 import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
+import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
 import { Database } from '@sql/Database'
 import { IVersicherung } from '@sql/schema/Versicherung.schema'

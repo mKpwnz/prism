@@ -5,4 +5,5 @@ export const Database = createPool({
     database: process.env.SQL_DATABASE,
     password: process.env.SQL_PASS,
     user: process.env.SQL_USER,
+    port: parseInt(process.env.SQL_PORT ?? '3306'),
 })

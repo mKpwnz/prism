@@ -10,6 +10,7 @@ export class onReady extends DCEvent {
     async process(client: Client) {
         var token =
             process.env.NODE_ENV === 'production' ? process.env.DISCORD_TOKEN_PROD : process.env.DISCORD_TOKEN_DEV
+
         const rest = new REST({ version: '9' }).setToken(token as string)
         CommandHandler.initAll()
         const commandData = CommandHandler.commands.map((command) => {
