@@ -5,6 +5,6 @@ build_job:
   script:
     - echo "starting job..."
     - docker build -t "${CI_PROJECT_NAME}:${CI_COMMIT_REF_NAME}-0.1.${CI_JOB_ID}" .
-    - echo job finished
+    - echo "job finished"
   only:
     - main
