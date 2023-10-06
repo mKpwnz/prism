@@ -1,0 +1,17 @@
+export enum ESearchType {
+    IDENTIFIER,
+    STEAMID,
+    LICENSE,
+    LIVEID,
+    XBLID,
+    DISCORD,
+    PLAYERIP,
+    NAME,
+    PLAYERNAME,
+    FIRSTNAME,
+    LASTNAME,
+    JOB,
+    GROUP,
+    PHONENUMBER,
+    ALL,
+}

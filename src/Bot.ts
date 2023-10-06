@@ -1,16 +1,14 @@
-import { Client, Events, IntentsBitField } from 'discord.js'
-import { onInteraction } from './listeners/CommandHandler'
-import { onOpenTicket } from './listeners/TicketHandler'
-import { onReady } from './listeners/ready'
+import 'dotenv/config' // THIS NEED TO BE AT THE TOP !!!IMPORTANT
 
-const dotenv = require('dotenv')
-dotenv.config()
+import { EventHandler } from '@events/EventHandler'
+import LogManager from '@utils/Logger'
+import { Client, IntentsBitField } from 'discord.js'
+LogManager.configure()
 
-const token = process.env.DISCORD_TOKEN
+const token = process.env.NODE_ENV === 'production' ? process.env.DISCORD_TOKEN_PROD : process.env.DISCORD_TOKEN_DEV
 
-// LAK SHU
-
-console.log('Bot is starting...')
+LogManager.info('Bot is starting...')
+LogManager.info(process.env)
 
 const client = new Client({
     intents: [
@@ -23,7 +21,7 @@ const client = new Client({
     ],
 })
 
-client.on('ready', async () => await onReady(client))
-client.on('interactionCreate', async (interaction) => await onInteraction(interaction))
-client.on(Events.InteractionCreate, async (interaction) => await onOpenTicket(interaction))
+EventHandler.init(client)
 client.login(token)
+
+export const BotClient = client

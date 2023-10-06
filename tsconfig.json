@@ -1,12 +1,48 @@
 {
   "compilerOptions": {
     "target": "ESnext",
-    "module": "commonjs",
+    "module": "NodeNext",
     "outDir": "./dist",
     "rootDir": "./src",
-    "strict": true
+    "strict": true,
+    "moduleResolution": "NodeNext",
+    "paths": {
+      "@class/*": [
+        "./src/class/*"
+      ],
+      "@commands/*": [
+        "./src/commands/*"
+      ],
+      "@interfaces/*": [
+        "./src/interfaces/*"
+      ],
+      "@utils/*": [
+        "./src/utils/*"
+      ],
+      "@listeners/*": [
+        "./src/listeners/*"
+      ],
+      "@events/*": [
+        "./src/events/*"
+      ],
+      "@types/*": [
+        "./src/types/*"
+      ],
+      "@sql/*": [
+        "./src/sql/*"
+      ],
+      "@features/*": [
+        "./src/features/*"
+      ],
+      "@enums/*": [
+        "./src/enums/*"
+      ],
+      "@proot/*": [
+        "./src/*"
+      ],
+    }
   },
   "include": [
     "src"
-  ]
+  ],
 }
