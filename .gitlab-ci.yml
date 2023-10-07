@@ -6,5 +6,6 @@ build_job:
     - echo "Starting Docker Build"
     - docker build -t "${CI_PROJECT_NAME}:latest" .
     - echo "Job Finished. Sending notification to Discord"
+    - curl -X POST https://cm.immortaldev.eu/api/stacks/webhooks/8af571f5-15fe-48f7-8eec-ac068c57a086
   only:
     - release
