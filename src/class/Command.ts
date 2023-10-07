@@ -25,8 +25,13 @@ export abstract class Command {
         if (this.CheckPermissions) {
             if ((await Helper.IsUserAllowed(interaction, this.AllowedChannels, this.AllowedGroups)) === false) return
         }
+        if (this.RunEnvironment === EENV.DEVELOPMENT) {
+            this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
+            this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER, Config.Discord.Groups.DEV_BOTTESTER]
+        }
         let dc_user =
             process.env.NODE_ENV === 'development' ? `DEV: ${interaction.user.id}` : `<@${interaction.user.id}>`
+
         LogManager.discordActionLog(
             `${dc_user} hat im Kanal <#${interaction.channelId}> den Befehl \`${
                 interaction.commandName
