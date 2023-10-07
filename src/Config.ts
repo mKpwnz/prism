@@ -30,12 +30,13 @@ const Config = {
             IC_ADMIN: '1118186443504898068',
             IC_MOD: '1118186467395653682',
         },
-        BOT_NAME: 'PRISM Discord Bot',
+        BOT_NAME: 'PRISM | Whois V2',
     },
     Pictures: {
         Prism: {
-            LOGO_BLUE: 'https://cdn.discordapp.com/attachments/1157038126884200659/1157083951186317312/icon.png',
+            LOGO_BLUE: 'https://i.imgur.com/NkZDE8l.png',
         },
+        WHITESPACE: 'https://i.imgur.com/pdkIDFc.png',
     },
 }
 

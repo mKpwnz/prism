@@ -3,9 +3,11 @@ image: docker:latest
 build_job:
   stage: build
   script:
+    - echo "Installing curl"
+    - apk add --no-cache curl
     - echo "Starting Docker Build"
     - docker build -t "${CI_PROJECT_NAME}:latest" .
-    - echo "Job Finished. Sending notification to Discord"
+    - echo "Job Finished. Sending notification to Discord and triggering deployment"
     - curl -X POST https://cm.immortaldev.eu/api/stacks/webhooks/8af571f5-15fe-48f7-8eec-ac068c57a086
   only:
     - release
