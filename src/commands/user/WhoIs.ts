@@ -140,11 +140,11 @@ export class WhoIs extends Command {
                                     ' ' +
                                     finduser[i].lastname +
                                     '\nBank: ' +
-                                    finduser[i].bank.toLocaleString() +
+                                    finduser[i].bank.toLocaleString('de-DE') +
                                     '€\nHand: ' +
-                                    finduser[i].money.toLocaleString() +
+                                    finduser[i].money.toLocaleString('de-DE') +
                                     '€\nSchwarzgeld: ' +
-                                    finduser[i].black_money.toLocaleString() +
+                                    finduser[i].black_money.toLocaleString('de-DE') +
                                     '€\nNummer: ' +
                                     finduser[i].phone_number +
                                     '' +
