@@ -9,10 +9,14 @@ import LogManager from '@utils/Logger'
 import { Chart, ChartConfiguration } from 'chart.js'
 import { ChartJSNodeCanvas } from 'chartjs-node-canvas'
 import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels'
-import { CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder, TextChannel } from 'discord.js'
+import {
+    CommandInteraction,
+    CommandInteractionOptionResolver,
+    SlashCommandBuilder,
+    TextChannel,
+} from 'discord.js'
 import { RowDataPacket } from 'mysql2'
 import { WhoIs } from '../user/WhoIs'
-import { EENV } from '@enums/EENV'
 
 declare module 'chartjs-plugin-datalabels' {
     interface Context {
@@ -24,7 +28,10 @@ export class Wahl extends Command {
     constructor() {
         super(true)
         this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
-        this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER, Config.Discord.Groups.DEV_BOTTESTER]
+        this.AllowedGroups = [
+            Config.Discord.Groups.DEV_SERVERENGINEER,
+            Config.Discord.Groups.DEV_BOTTESTER,
+        ]
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('wahl')
@@ -34,9 +41,14 @@ export class Wahl extends Command {
                         .setName('erstellen')
                         .setDescription('Erstellt eine Wahl')
                         .addStringOption((option) =>
-                            option.setName('name').setDescription('Gib der Wahl einen Namen').setRequired(true),
+                            option
+                                .setName('name')
+                                .setDescription('Gib der Wahl einen Namen')
+                                .setRequired(true),
                         )
-                        .addStringOption((option) => option.setName('job').setDescription('Gib den Job an'))
+                        .addStringOption((option) =>
+                            option.setName('job').setDescription('Gib den Job an'),
+                        )
                         .addBooleanOption((option) =>
                             option.setName('enthaltung').setDescription('Enthaltung aktivieren'),
                         ),
@@ -46,7 +58,10 @@ export class Wahl extends Command {
                         .setName('status')
                         .setDescription('Ändert den Status einer Wahl')
                         .addNumberOption((option) =>
-                            option.setName('wahlid').setDescription('Gib die WahlID an').setRequired(true),
+                            option
+                                .setName('wahlid')
+                                .setDescription('Gib die WahlID an')
+                                .setRequired(true),
                         )
                         .addNumberOption((option) =>
                             option
@@ -76,10 +91,16 @@ export class Wahl extends Command {
                                 .setRequired(true),
                         )
                         .addNumberOption((option) =>
-                            option.setName('wahlid').setDescription('Gib die WahlID an').setRequired(true),
+                            option
+                                .setName('wahlid')
+                                .setDescription('Gib die WahlID an')
+                                .setRequired(true),
                         )
                         .addStringOption((option) =>
-                            option.setName('steamid').setDescription('Gib die SteamID an').setRequired(true),
+                            option
+                                .setName('steamid')
+                                .setDescription('Gib die SteamID an')
+                                .setRequired(true),
                         ),
                 )
                 .addSubcommand((subcommand) =>
@@ -87,7 +108,10 @@ export class Wahl extends Command {
                         .setName('ergebnis')
                         .setDescription('Zeigt das Wahlergebnis an')
                         .addNumberOption((option) =>
-                            option.setName('wahlid').setDescription('Gib die WahlID an').setRequired(true),
+                            option
+                                .setName('wahlid')
+                                .setDescription('Gib die WahlID an')
+                                .setRequired(true),
                         ),
                 )
                 .addSubcommand((subcommand) =>
@@ -98,7 +122,10 @@ export class Wahl extends Command {
                         .setName('kandidaten')
                         .setDescription('Zeigt alle Kandidaten zu einer Wahl an')
                         .addNumberOption((option) =>
-                            option.setName('wahlid').setDescription('Gib die WahlID an').setRequired(true),
+                            option
+                                .setName('wahlid')
+                                .setDescription('Gib die WahlID an')
+                                .setRequired(true),
                         ),
                 )
                 .addSubcommand((subcommand) =>
@@ -116,12 +143,17 @@ export class Wahl extends Command {
                                 .setRequired(true),
                         )
                         .addNumberOption((option) =>
-                            option.setName('wahlid').setDescription('Gib die WahlID an').setRequired(true),
+                            option
+                                .setName('wahlid')
+                                .setDescription('Gib die WahlID an')
+                                .setRequired(true),
                         )
                         .addStringOption((option) =>
                             option
                                 .setName('kandidatennr')
-                                .setDescription('Gib die Kandidatennummer an, diese findest du bei /wahl kandidaten')
+                                .setDescription(
+                                    'Gib die Kandidatennummer an, diese findest du bei /wahl kandidaten',
+                                )
                                 .setRequired(true),
                         )
                         .addNumberOption((option) =>
@@ -136,7 +168,6 @@ export class Wahl extends Command {
     }
     async execute(interaction: CommandInteraction): Promise<void> {
         if (!interaction.isCommand()) return
-        const status = ['Erstellt', 'Gestartet', 'Beendet', 'Löschen']
         if (this.CommandEmbed === null) this.CommandEmbed = this.updateEmbed(interaction)
         let embed = this.CommandEmbed
         const options = interaction.options as CommandInteractionOptionResolver
@@ -164,7 +195,10 @@ export class Wahl extends Command {
                 await this.manipulateElection(embed, interaction, options)
                 break
             default:
-                await interaction.reply({ content: 'Dieser Befehl existiert nicht!', ephemeral: true })
+                await interaction.reply({
+                    content: 'Dieser Befehl existiert nicht!',
+                    ephemeral: true,
+                })
                 break
         }
     }
@@ -180,7 +214,11 @@ export class Wahl extends Command {
         try {
             var [queryResult] = await Database.query<IElection[]>(
                 'INSERT INTO immo_elections (name, job, status, created, updated) VALUES (?, ?, ?, NOW(), NOW()) RETURNING *',
-                [options.getString('name'), options.getString('job') ?? null, options.getBoolean('enthaltung') ? 1 : 0],
+                [
+                    options.getString('name'),
+                    options.getString('job') ?? null,
+                    options.getBoolean('enthaltung') ? 1 : 0,
+                ],
             )
             embed.setTitle('Wahl erstellt')
             embed.setDescription(
@@ -209,14 +247,16 @@ export class Wahl extends Command {
         interaction: CommandInteraction,
         options: CommandInteractionOptionResolver,
     ): Promise<void> {
+        const status = ['Erstellt', 'Gestartet', 'Beendet', 'Löschen']
         try {
             if (options.getNumber('wahlid') === 0) {
                 await interaction.reply('Bitte gib eine WahlID an!')
                 return
             }
-            let query = await Database.query<RowDataPacket[]>('SELECT * FROM immo_elections WHERE id = ?', [
-                options.getNumber('wahlid'),
-            ])
+            let query = await Database.query<RowDataPacket[]>(
+                'SELECT * FROM immo_elections WHERE id = ?',
+                [options.getNumber('wahlid')],
+            )
             if (query[0].length === 0) {
                 await interaction.reply('Es konnte keine Wahl mit dieser ID gefunden werden!')
                 return
@@ -260,9 +300,10 @@ export class Wahl extends Command {
             await interaction.reply('Bitte gib eine WahlID/SteamID/Operation an!')
             return
         }
-        let [query] = await Database.query<IElection[]>('SELECT * FROM immo_elections WHERE id = ?', [
-            options.getNumber('wahlid'),
-        ])
+        let [query] = await Database.query<IElection[]>(
+            'SELECT * FROM immo_elections WHERE id = ?',
+            [options.getNumber('wahlid')],
+        )
         if (query[0].length === 0) {
             await interaction.reply('Es konnte keine Wahl mit dieser ID gefunden werden!')
             return
@@ -276,7 +317,11 @@ export class Wahl extends Command {
         if (options.getString('operation') === 'add') {
             let [response] = await Database.query<IElectionParticipant[]>(
                 'INSERT INTO immo_elections_participants (electionid, identifier, name) VALUES (?, ?, ?) RETURNING *',
-                [options.getNumber('wahlid'), vUser.identifier, vUser.firstname + ' ' + vUser.lastname],
+                [
+                    options.getNumber('wahlid'),
+                    vUser.identifier,
+                    vUser.firstname + ' ' + vUser.lastname,
+                ],
             )
             embed.setTitle('Nutzer hinzugefügt')
             embed.setDescription(
@@ -338,9 +383,10 @@ export class Wahl extends Command {
         options: CommandInteractionOptionResolver,
     ): Promise<void> {
         try {
-            let [query] = await Database.query<IElection[]>('SELECT * FROM immo_elections WHERE id = ?', [
-                options.getNumber('wahlid'),
-            ])
+            let [query] = await Database.query<IElection[]>(
+                'SELECT * FROM immo_elections WHERE id = ?',
+                [options.getNumber('wahlid')],
+            )
             if (query.length === 0) {
                 await interaction.reply('Es konnte keine Wahl mit dieser ID gefunden werden!')
                 return
@@ -424,7 +470,7 @@ export class Wahl extends Command {
                         },
                         title: {
                             display: true,
-                            text: name,
+                            text: query[0].name,
                             color: 'white',
                             font: {
                                 size: 30,
@@ -443,7 +489,8 @@ export class Wahl extends Command {
                             formatter: (value: number, ctx: Context) => {
                                 const index = ctx.dataIndex
                                 // if there is not enough space, skip
-                                const percentage = (data[index] / data.reduce((acc, val) => acc + val, 0)) * 100
+                                const percentage =
+                                    (data[index] / data.reduce((acc, val) => acc + val, 0)) * 100
                                 if (percentage < 5) return ''
 
                                 return `${percentage.toFixed(0)}%`
@@ -472,8 +519,11 @@ export class Wahl extends Command {
         interaction: CommandInteraction,
         options: CommandInteractionOptionResolver,
     ): Promise<void> {
+        const status = ['Erstellt', 'Gestartet', 'Beendet', 'Löschen']
         try {
-            let [elections] = await Database.query<IElection[]>('SELECT * FROM immo_elections WHERE status != 3')
+            let [elections] = await Database.query<IElection[]>(
+                'SELECT * FROM immo_elections WHERE status != 3',
+            )
             if (elections.length === 0) {
                 await interaction.reply('Es konnte keine Wahlen gefunden werden!')
                 return
@@ -513,9 +563,10 @@ export class Wahl extends Command {
         options: CommandInteractionOptionResolver,
     ): Promise<void> {
         try {
-            let [query] = await Database.query<IElection[]>('SELECT id, name FROM immo_elections WHERE id = ?', [
-                options.getNumber('wahlid'),
-            ])
+            let [query] = await Database.query<IElection[]>(
+                'SELECT id, name FROM immo_elections WHERE id = ?',
+                [options.getNumber('wahlid')],
+            )
             if (query[0].length === 0) {
                 await interaction.reply('Es konnte keine Wahl mit dieser ID gefunden werden!')
                 return
@@ -534,7 +585,9 @@ export class Wahl extends Command {
                 })
             }
             embed.setTitle('Kandidaten')
-            embed.setDescription('Liste aller Kandidaten für ' + election.name + ' (' + election.id + ')')
+            embed.setDescription(
+                'Liste aller Kandidaten für ' + election.name + ' (' + election.id + ')',
+            )
             embed.setFields(fields)
             await interaction.reply({ embeds: [embed] })
         } catch (error) {
@@ -555,12 +608,16 @@ export class Wahl extends Command {
                 options.getNumber('stimmen') === 0 ||
                 options.getString('operation') === ''
             ) {
-                await interaction.reply({ content: 'Deine Angaben sind nicht vollständig!', ephemeral: true })
+                await interaction.reply({
+                    content: 'Deine Angaben sind nicht vollständig!',
+                    ephemeral: true,
+                })
                 return
             }
-            let [query] = await Database.query<IElection[]>('SELECT * FROM immo_elections WHERE id = ?', [
-                options.getNumber('wahlid'),
-            ])
+            let [query] = await Database.query<IElection[]>(
+                'SELECT * FROM immo_elections WHERE id = ?',
+                [options.getNumber('wahlid')],
+            )
             if (query[0].length === 0) {
                 await interaction.reply('Es konnte keine Wahl mit dieser ID gefunden werden!')
                 return
@@ -575,7 +632,8 @@ export class Wahl extends Command {
                 return
             }
             if (options.getString('operation') === 'add') {
-                let querystring = 'INSERT INTO immo_elections_votes (electionid, identifier, participantid) VALUES '
+                let querystring =
+                    'INSERT INTO immo_elections_votes (electionid, identifier, participantid) VALUES '
                 let anzahl = options.getNumber('stimmen') ?? 0
                 for (let i = 0; i < anzahl; i++) {
                     querystring +=
@@ -589,7 +647,14 @@ export class Wahl extends Command {
                 LogManager.debug(response)
                 embed.setTitle('Wahl manipuliert!')
                 embed.setDescription(
-                    anzahl + ' Stimmen für ' + participant[0].name + ' zur Wahl ' + name + ' (' + id + ') hinzugefügt!',
+                    anzahl +
+                        ' Stimmen für ' +
+                        participant[0].name +
+                        ' zur Wahl ' +
+                        name +
+                        ' (' +
+                        id +
+                        ') hinzugefügt!',
                 )
                 const channel = (await interaction.guild?.channels.fetch(
                     Config.Discord.LogChannel.S1_WAHLEN,
@@ -599,7 +664,11 @@ export class Wahl extends Command {
             } else if (options.getString('operation') === 'remove') {
                 let response = await Database.query<RowDataPacket[][]>(
                     'DELETE FROM immo_elections_votes WHERE electionid = ? AND participantid = ? LIMIT ?',
-                    [options.getNumber('wahlid'), options.getString('kandidatennr'), options.getNumber('stimmen')],
+                    [
+                        options.getNumber('wahlid'),
+                        options.getString('kandidatennr'),
+                        options.getNumber('stimmen'),
+                    ],
                 )
                 LogManager.debug(response)
                 embed.setTitle('Wahl manipuliert!')
