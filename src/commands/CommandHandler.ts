@@ -1,8 +1,11 @@
 import { Command } from '@class/Command'
+import { RconClient } from '@class/RconClient'
+import { EENV } from '@enums/EENV'
 import LogManager from '@utils/Logger'
 import { Interaction, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js'
 import { Versicherung } from './cars/Versicherung'
 import { SchufaCheck } from './housing/SchufaCheck'
+import { Nvhx } from './nvhx/Nvhx'
 import { CheckImageOwner } from './phone/CheckImageOwner'
 import { Ping } from './system/Ping'
 import { Wahl } from './system/Wahl'
@@ -31,7 +34,8 @@ export class CommandHandler {
 
     static initAll() {
         LogManager.info('CommandManager: Initializing all commands...')
-
+        const rcon = new RconClient()
+        new Nvhx()
         // System Commands
         new Ping()
         // new Wahl()
@@ -56,7 +60,10 @@ export class CommandHandler {
     }
 }
 
-export const RegisterCommand = (scb: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder, cmd: Command) => {
+export const RegisterCommand = (
+    scb: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder,
+    cmd: Command,
+) => {
     CommandHandler.commands.push({
         cmd: cmd,
         scb: scb,

@@ -13,10 +13,12 @@
     "dependencies": {
         "@types/node": "^20.8.2",
         "axios": "^1.5.1",
+        "buffer": "^6.0.3",
         "chalk": "4.1.2",
         "chart.js": "3.9.1",
         "chartjs-node-canvas": "^4.1.6",
         "chartjs-plugin-datalabels": "^2.2.0",
+        "dgram": "^1.0.1",
         "discord.js": "^14.13.0",
         "dotenv": "^16.3.1",
         "json-colorizer": "^2.2.2",
