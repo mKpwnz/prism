@@ -85,9 +85,20 @@ export class ServerStatus extends Command {
         if (this.CommandEmbed === null) this.CommandEmbed = this.updateEmbed(interaction)
         var embed = this.CommandEmbed
         const EmbedData = await this.getAgregatedData()
+
+        embed.setTitle('Serverstatus')
         if (EmbedData.length === 0) {
             embed.setDescription('Es ist ein Fehler beim Abrufen der Daten aufgetreten!')
         } else {
+            embed.setDescription(
+                `${this.getEmoteForStatus(EServerStatus.UP)} = Online\n${this.getEmoteForStatus(
+                    EServerStatus.DOWN,
+                )} = Offline\n${this.getEmoteForStatus(
+                    EServerStatus.PENDING,
+                )} = Wird gestartet / Fehlerhaft\n${this.getEmoteForStatus(
+                    EServerStatus.MAINTENANCE,
+                )} = Im Wartungsmodus\n\n`,
+            )
             EmbedData.forEach((group) => {
                 var print = ''
                 group.member.forEach((member) => {
