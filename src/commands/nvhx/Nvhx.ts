@@ -3,19 +3,21 @@ import { RconClient } from '@class/RconClient'
 import { RegisterCommand } from '@commands/CommandHandler'
 
 import Config from '@proot/Config'
-import {
-    CommandInteraction,
-    CommandInteractionOptionResolver,
-    EmbedBuilder,
-    SlashCommandBuilder,
-} from 'discord.js'
+import { CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, SlashCommandBuilder } from 'discord.js'
 import LogManager from '../../utils/Logger'
+import { EENV } from '@enums/EENV'
 
 export class Nvhx extends Command {
     constructor() {
         super(true)
+        this.RunEnvironment = EENV.PRODUCTION
         this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
-        this.AllowedGroups = []
+        this.AllowedGroups = [
+            Config.Discord.Groups.DEV_SERVERENGINEER,
+            Config.Discord.Groups.DEV_BOTTESTER,
+            Config.Discord.Groups.IC_SUPERADMIN,
+            Config.Discord.Groups.IC_HADMIN,
+        ]
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('nvhx')
@@ -33,10 +35,7 @@ export class Nvhx extends Command {
                         .setName('unban')
                         .setDescription('Entbanne einen Nutzer')
                         .addStringOption((option) =>
-                            option
-                                .setName('banid')
-                                .setDescription('BanID des Banns')
-                                .setRequired(true),
+                            option.setName('banid').setDescription('BanID des Banns').setRequired(true),
                         ),
                 )
                 .addSubcommand((subcommand) =>
