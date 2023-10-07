@@ -30,7 +30,7 @@ const Config = {
             IC_ADMIN: '1118186443504898068',
             IC_MOD: '1118186467395653682',
         },
-        BOT_NAME: 'PRISM | Whois V2',
+        BOT_NAME: 'PRISM | Whois V2 :)',
     },
     Pictures: {
         Prism: {
