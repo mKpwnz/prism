@@ -25,7 +25,7 @@ export abstract class Command {
         if (this.CheckPermissions) {
             if ((await Helper.IsUserAllowed(interaction, this.AllowedChannels, this.AllowedGroups)) === false) return
         }
-        if (this.RunEnvironment === EENV.DEVELOPMENT) {
+        if (this.RunEnvironment === EENV.DEVELOPMENT || process.env.NODE_ENV === 'development') {
             this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
             this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER, Config.Discord.Groups.DEV_BOTTESTER]
         }
@@ -35,7 +35,7 @@ export abstract class Command {
         LogManager.discordActionLog(
             `${dc_user} hat im Kanal <#${interaction.channelId}> den Befehl \`${
                 interaction.commandName
-            }\` ausgeführt.\`\`\`${JSON.stringify(interaction.options)}\`\`\``,
+            }\` ausgeführt.\`\`\`${JSON.stringify(interaction.options, null, 4)}\`\`\``,
         )
         this.updateEmbed(interaction)
         await this.execute(interaction)
