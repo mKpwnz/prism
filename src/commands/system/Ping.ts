@@ -8,7 +8,18 @@ export class Ping extends Command {
     constructor() {
         super(true)
         this.RunEnvironment = EENV.PRODUCTION
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
+        this.AllowedChannels = [
+            Config.Discord.Channel.WHOIS_TESTI,
+            Config.Discord.Channel.WHOIS_UNLIMITED,
+            Config.Discord.Channel.WHOIS_LIMITED,
+            Config.Discord.Channel.WHOIS_TEBEX,
+            Config.Discord.Channel.WHOIS_TEBEXOLD,
+            Config.Discord.Channel.WHOIS_RENAME,
+            Config.Discord.Channel.WHOIS_ADMIN,
+            Config.Discord.Channel.WHOIS_FRAKTIONEN,
+            Config.Discord.Channel.WHOIS_NOTICE,
+            Config.Discord.Channel.WHOIS_ADMIN,
+        ]
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
