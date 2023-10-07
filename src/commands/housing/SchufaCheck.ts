@@ -17,6 +17,7 @@ interface schufaUser extends RowDataPacket {
 export class SchufaCheck extends Command {
     constructor() {
         super(true)
+        this.RunEnvironment = EENV.PRODUCTION
         this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,

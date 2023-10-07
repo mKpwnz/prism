@@ -12,6 +12,7 @@ import { AttachmentBuilder, CommandInteraction, SlashCommandBuilder } from 'disc
 export class WhoIs extends Command {
     constructor() {
         super(true)
+        this.RunEnvironment = EENV.PRODUCTION
         this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
@@ -37,20 +38,20 @@ export class WhoIs extends Command {
                         .setName('spalte')
                         .setDescription('Sucht in einer speziellen Spalte')
                         .addChoices(
-                            { name: 'Identifier', value: ESearchType.IDENTIFIER.toString() },
-                            { name: 'SteamID', value: ESearchType.STEAMID.toString() },
-                            { name: 'Lizenz', value: ESearchType.LICENSE.toString() },
-                            { name: 'LiveID', value: ESearchType.LIVEID.toString() },
-                            { name: 'XBLID', value: ESearchType.XBLID.toString() },
-                            { name: 'Discord', value: ESearchType.DISCORD.toString() },
-                            { name: 'PlayerIP', value: ESearchType.PLAYERIP.toString() },
-                            { name: 'Name', value: ESearchType.NAME.toString() },
-                            { name: 'Playername', value: ESearchType.PLAYERNAME.toString() },
-                            { name: 'Vorname', value: ESearchType.FIRSTNAME.toString() },
-                            { name: 'Nachname', value: ESearchType.LASTNAME.toString() },
-                            { name: 'Job', value: ESearchType.JOB.toString() },
-                            { name: 'Gruppe', value: ESearchType.GROUP.toString() },
-                            { name: 'Telefonnummer', value: ESearchType.PHONENUMBER.toString() },
+                            { name: 'Identifier', value: ESearchType.IDENTIFIER },
+                            { name: 'SteamID', value: ESearchType.STEAMID },
+                            { name: 'Lizenz', value: ESearchType.LICENSE },
+                            { name: 'LiveID', value: ESearchType.LIVEID },
+                            { name: 'XBLID', value: ESearchType.XBLID },
+                            { name: 'Discord', value: ESearchType.DISCORD },
+                            { name: 'PlayerIP', value: ESearchType.PLAYERIP },
+                            { name: 'Name', value: ESearchType.NAME },
+                            { name: 'Playername', value: ESearchType.PLAYERNAME },
+                            { name: 'Vorname', value: ESearchType.FIRSTNAME },
+                            { name: 'Nachname', value: ESearchType.LASTNAME },
+                            { name: 'Job', value: ESearchType.JOB },
+                            { name: 'Gruppe', value: ESearchType.GROUP },
+                            { name: 'Telefonnummer', value: ESearchType.PHONENUMBER },
                         ),
                 ) as SlashCommandBuilder,
             this,
@@ -67,15 +68,12 @@ export class WhoIs extends Command {
         let embed = this.CommandEmbed
         if (identifierValue) {
             if (spalte === undefined || spalte === null) {
-                spalte = 'all'
+                spalte = ESearchType.ALL
                 filter = ''
             } else {
                 filter = filter + spalte
             }
-            const finduser: IFindUser[] = await WhoIs.searchUsers(
-                identifierValue,
-                ESearchType[spalte.toUpperCase() as keyof typeof ESearchType],
-            )
+            const finduser: IFindUser[] = await WhoIs.searchUsers(identifierValue, spalte)
             if (finduser === null) {
                 await interaction.reply({ content: 'User nicht gefunden', ephemeral: true })
             } else {
@@ -215,8 +213,8 @@ export class WhoIs extends Command {
         }
     }
 
-    private static async searchUsers(searchText: string, column: ESearchType): Promise<IFindUser[]> {
-        let columns = new Map<ESearchType, string>([
+    private static async searchUsers(searchText: string, column: string): Promise<IFindUser[]> {
+        let columns = new Map<string, string>([
             [ESearchType.IDENTIFIER, 'LOWER( users.identifier ) LIKE LOWER( "%' + searchText + '%" )'],
             [ESearchType.STEAMID, 'LOWER( users.steamid ) LIKE LOWER( "%' + searchText + '%" )'],
             [ESearchType.LICENSE, 'LOWER( baninfo.`license` ) LIKE LOWER( "%' + searchText + '%" )'],
