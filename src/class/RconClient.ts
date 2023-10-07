@@ -33,9 +33,7 @@ export class RconClient {
             // Erstelle ein Promise, das auf die Serverantwort wartet
             return new Promise((resolve, reject) => {
                 const timeout = setTimeout(() => {
-                    reject(
-                        new Error('Timeout: Server hat nicht innerhalb von 5 Sekunden geantwortet'),
-                    )
+                    reject(new Error('Timeout: Server hat nicht innerhalb von 5 Sekunden geantwortet'))
                 }, 5000) // Timeout nach 5 Sekunden
 
                 RconClient.socket!.once('message', (msg, rinfo) => {
@@ -44,13 +42,7 @@ export class RconClient {
                     resolve(response)
                 })
 
-                RconClient.socket!.send(
-                    buffer,
-                    0,
-                    buffer.length,
-                    RconClient.options.port,
-                    RconClient.options.host,
-                )
+                RconClient.socket!.send(buffer, 0, buffer.length, RconClient.options.port, RconClient.options.host)
             })
         } else {
             throw new Error('UDP socket is not initialized')

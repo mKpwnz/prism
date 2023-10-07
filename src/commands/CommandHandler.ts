@@ -1,6 +1,4 @@
 import { Command } from '@class/Command'
-import { RconClient } from '@class/RconClient'
-import { EENV } from '@enums/EENV'
 import LogManager from '@utils/Logger'
 import { Interaction, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js'
 import { Versicherung } from './cars/Versicherung'
@@ -34,7 +32,6 @@ export class CommandHandler {
 
     static initAll() {
         LogManager.info('CommandManager: Initializing all commands...')
-        const rcon = new RconClient()
         new Nvhx()
         // System Commands
         new Ping()
@@ -60,10 +57,7 @@ export class CommandHandler {
     }
 }
 
-export const RegisterCommand = (
-    scb: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder,
-    cmd: Command,
-) => {
+export const RegisterCommand = (scb: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder, cmd: Command) => {
     CommandHandler.commands.push({
         cmd: cmd,
         scb: scb,

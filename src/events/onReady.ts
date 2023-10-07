@@ -1,4 +1,5 @@
 import { DCEvent } from '@class/DCEvent'
+import { RconClient } from '@class/RconClient'
 import { CommandHandler } from '@commands/CommandHandler'
 import { REST } from '@discordjs/rest'
 import Config from '@proot/Config'
@@ -13,6 +14,7 @@ export class onReady extends DCEvent {
 
         const rest = new REST({ version: '9' }).setToken(token as string)
         CommandHandler.initAll()
+        new RconClient()
         const commandData = CommandHandler.commands.map((command) => {
             return command.scb.toJSON()
         })
