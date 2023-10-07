@@ -9,6 +9,6 @@ build_job:
     - docker build -t "${CI_PROJECT_NAME}:latest" .
     - echo "Job Finished. Sending notification to Discord and triggering deployment"
     - curl -X POST https://cm.immortaldev.eu/api/stacks/webhooks/e3322129-4b0a-4eb4-aa94-0c470482209c
-    - curl -X POST -d '{"content":"Neuer Botrelease angestoßen.\nDer **PrismBot** wird in kürze ausgerollt","embeds":[],"attachments":[]}' https://discord.com/api/webhooks/1160194694144348270/1VfDy9El76hbp3VZWndIKxObIUuq4hIrDuEtci8TokpSYq8k8vfWfYXAhsktN2vHBkHy
+    - curl -d '{"content":"Neuer Botrelease angestoßen.\nDer **PrismBot** wird in kürze ausgerollt","embeds":[],"attachments":[]}' -H "Content-Type: application/json" -X POST https://discord.com/api/webhooks/1160194694144348270/1VfDy9El76hbp3VZWndIKxObIUuq4hIrDuEtci8TokpSYq8k8vfWfYXAhsktN2vHBkHy
   only:
     - release
