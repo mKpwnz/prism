@@ -37,7 +37,7 @@ export abstract class Command {
                 interaction.commandName
             }\` ausgeführt.\`\`\`${JSON.stringify(interaction.options, null, 4)}\`\`\``,
         )
-        this.updateEmbed(interaction)
+        this.CommandEmbed = this.updateEmbed(interaction)
         await this.execute(interaction)
     }
     updateEmbed(interaction: CommandInteraction): EmbedBuilder {
@@ -50,5 +50,14 @@ export abstract class Command {
                 iconURL: interaction.user.avatarURL() ?? '',
             })
             .setTimestamp(new Date())
+    }
+    updateEmbedWithUser(interaction: CommandInteraction): void {
+        if (!this.CommandEmbed) {
+            this.CommandEmbed = this.updateEmbed(interaction)
+        }
+        this.CommandEmbed.setFooter({
+            text: interaction.user.displayName ?? '',
+            iconURL: interaction.user.avatarURL() ?? '',
+        })
     }
 }

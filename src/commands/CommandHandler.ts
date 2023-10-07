@@ -35,7 +35,7 @@ export class CommandHandler {
         // System Commands
         new Ping()
         // new Wahl()
-        new ServerStatus()
+        // new ServerStatus()
 
         // Phone Commands
         new CheckImageOwner()
