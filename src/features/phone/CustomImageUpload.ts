@@ -1,6 +1,9 @@
+import { WhoIs } from '@commands/user/WhoIs'
 import { ButtonBuilder } from '@discordjs/builders'
+import { ESearchType } from '@enums/ESearchType'
 import Config from '@proot/Config'
 import { Database } from '@sql/Database'
+import { IFindUser } from '@sql/schema/FindUser.schema'
 import { Helper } from '@utils/Helper'
 import LogManager from '@utils/Logger'
 import axios from 'axios'
@@ -36,11 +39,16 @@ export class CustomImmageUpload {
         width: 1280,
         size: 1024 * 800,
     }
+    private vUser: IFindUser | null = null
 
     constructor(client: Client) {
         this.client = client
+        let channel =
+            process.env.NODE_ENV === 'production'
+                ? Config.Discord.Channel.WHOIS_IMAGEUPLOAD
+                : Config.Discord.Channel.WHOIS_TESTI
         client.on('messageCreate', async (message: Message) => {
-            if (message.channelId === Config.Discord.Channel.WHOIS_IMAGEUPLOAD) {
+            if (message.channelId === channel) {
                 this.onMessage(message)
             }
         })
@@ -62,18 +70,32 @@ export class CustomImmageUpload {
             this.message_image_upload = message
             this.input_imageUrl = message.attachments.first()?.url || ''
             this.image_attachment = message.attachments.first() || null
-            await message.reply({
-                content:
-                    'Bitte weise das Bild in den nächsten 60 Sekunden zu. Nach den 60 Sekunden wird das Bild automatisch gelöscht.',
-                components: [
-                    new ActionRowBuilder<ButtonBuilder>().addComponents(
-                        new ButtonBuilder()
-                            .setLabel('Bild zuweisen')
-                            .setStyle(ButtonStyle.Primary)
-                            .setCustomId('phone_ciu_assign_image'),
-                    ),
-                ],
-            })
+
+            const { success, messages } = this.validateImage()
+            if (!success) {
+                var responseMSG = await message.reply({
+                    content: `Es sind Fehler aufgetreten: \`\`\`${messages.join('\n')}\`\`\``,
+                })
+                await this.message_image_upload?.delete()
+                this.resetValues()
+                await setTimeout(async () => {
+                    await responseMSG.delete()
+                }, 15000)
+                return
+            } else {
+                await message.reply({
+                    content:
+                        'Bitte weise das Bild in den nächsten 60 Sekunden zu. Nach den 60 Sekunden wird das Bild automatisch gelöscht.',
+                    components: [
+                        new ActionRowBuilder<ButtonBuilder>().addComponents(
+                            new ButtonBuilder()
+                                .setLabel('Bild zuweisen')
+                                .setStyle(ButtonStyle.Primary)
+                                .setCustomId('phone_ciu_assign_image'),
+                        ),
+                    ],
+                })
+            }
         } else {
             message.delete()
         }
@@ -118,16 +140,6 @@ export class CustomImmageUpload {
         }
         if (interaction.isButton() && interaction.customId === 'phone_ciu_assign_conf_yes') {
             if (interaction.message) await interaction.message.delete()
-            const { success, messages } = this.validateInput()
-            if (!success) {
-                await interaction.reply({
-                    content: `Es sind Fehler aufgetreten: \`\`\`${messages.join('\n')}\`\`\``,
-                    ephemeral: true,
-                })
-                await this.message_image_upload?.delete()
-                this.resetValues()
-                return
-            }
 
             const newImageUrl = await this.reuploadImage()
             const result = await this.assignImageToPlayer(
@@ -156,7 +168,11 @@ export class CustomImmageUpload {
                                     value: `<@${interaction.user.id}>`,
                                     inline: true,
                                 },
-                                { name: 'Hochgeladen auf Handy', value: this.input_phoneNumber, inline: true },
+                                {
+                                    name: 'Hochgeladen auf Handy',
+                                    value: `${this.vUser?.firstname} ${this.vUser?.lastname} (${this.vUser?.phone_number})`,
+                                    inline: true,
+                                },
                                 { name: 'Begründung', value: this.input_reason },
                             )
                             .setImage(newImageUrl)
@@ -179,8 +195,21 @@ export class CustomImmageUpload {
         if (interaction.isModalSubmit() && interaction.customId === 'phone_ciu_modal') {
             this.input_phoneNumber = interaction.fields.getTextInputValue('phone_ciu_in_phoneNumber')
             this.input_reason = interaction.fields.getTextInputValue('phone_ciu_in_reason')
+
+            this.vUser = await WhoIs.validateUser(this.input_phoneNumber, ESearchType.PHONENUMBER)
+            const { success, messages } = this.validateInput()
+            if (!success || !this.vUser) {
+                await interaction.reply({
+                    content: `Es sind Fehler aufgetreten: \`\`\`${messages.join('\n')}\`\`\``,
+                    ephemeral: true,
+                })
+                await this.message_image_upload?.delete()
+                this.resetValues()
+                return
+            }
+
             await interaction.reply({
-                content: `Möchte du das Bild wirklich an ${this.input_phoneNumber} zuweisen?`,
+                content: `Möchte du das Bild wirklich an ${this.vUser.firstname} ${this.vUser.lastname} (${this.input_phoneNumber}) zuweisen?`,
                 components: [
                     new ActionRowBuilder<ButtonBuilder>().addComponents(
                         new ButtonBuilder()
@@ -196,15 +225,11 @@ export class CustomImmageUpload {
             })
         }
     }
-    validateInput(): { success: boolean; messages: string[] } {
+    validateImage() {
         const response: { success: boolean; messages: string[] } = {
             success: false,
             messages: [],
         }
-
-        if (!new RegExp(/^01726\d{5}$/).test(this.input_phoneNumber))
-            response.messages.push('Die Telefonnummer ist ungültig.')
-
         if (this.image_attachment) {
             const { height, width, size } = this.image_attachment
             const url = this.image_attachment.url.split('?')[0]
@@ -224,6 +249,17 @@ export class CustomImmageUpload {
         } else {
             response.messages.push('Es wurde kein Bild angehängt.')
         }
+        if (response.messages.length === 0) response.success = true
+        return response
+    }
+    validateInput(): { success: boolean; messages: string[] } {
+        const response: { success: boolean; messages: string[] } = {
+            success: false,
+            messages: [],
+        }
+
+        if (!new RegExp(/^01726\d{5}$/).test(this.input_phoneNumber) || !this.vUser)
+            response.messages.push('Die Telefonnummer ist ungültig.')
 
         if (response.messages.length === 0) response.success = true
         return response
