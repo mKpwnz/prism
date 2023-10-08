@@ -32,7 +32,7 @@ export class CommandHandler {
 
     static initAll() {
         LogManager.info('CommandManager: Initializing all commands...')
-        new Nvhx()
+        // new Nvhx()
         // System Commands
         new Ping()
         // new Wahl()
