@@ -10,7 +10,6 @@ import { EENV } from '@enums/EENV'
 export class Nvhx extends Command {
     constructor() {
         super(true)
-        this.RunEnvironment = EENV.PRODUCTION
         this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
