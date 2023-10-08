@@ -1,3 +1,4 @@
+import { CommandHandler } from '@commands/CommandHandler'
 import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
 import { Helper } from '@utils/Helper'
@@ -22,12 +23,13 @@ export abstract class Command {
     }
     abstract execute(interaction: CommandInteraction): Promise<void>
     async run(interaction: CommandInteraction): Promise<void> {
-        if (this.CheckPermissions) {
-            if ((await Helper.IsUserAllowed(interaction, this.AllowedChannels, this.AllowedGroups)) === false) return
-        }
         if (this.RunEnvironment === EENV.DEVELOPMENT || process.env.NODE_ENV === 'development') {
             this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
             this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER, Config.Discord.Groups.DEV_BOTTESTER]
+        }
+
+        if (this.CheckPermissions) {
+            if ((await Helper.IsUserAllowed(interaction, this.AllowedChannels, this.AllowedGroups)) === false) return
         }
         let dc_user =
             process.env.NODE_ENV === 'development' ? `DEV: ${interaction.user.id}` : `<@${interaction.user.id}>`
