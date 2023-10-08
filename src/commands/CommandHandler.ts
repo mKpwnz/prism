@@ -22,6 +22,8 @@ export class CommandHandler {
         cmd: Command
         scb: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder
     }[] = []
+    static prodCommands: string[] = []
+    static devCommands: string[] = []
 
     static async onInteraction(interaction: Interaction) {
         if (!interaction.isCommand()) return
@@ -34,8 +36,6 @@ export class CommandHandler {
 
     static initAll() {
         LogManager.info('CommandManager: Initializing all commands...')
-        // new Nvhx()
-        new Give()
         // System Commands
         new Ping()
         // new Wahl()
@@ -50,6 +50,8 @@ export class CommandHandler {
         // User Commands
         // new Birthday()
         new WhoIs()
+        new Nvhx()
+        new Give()
         // new TeamNote()
         // new Fraksperre()
         // new Rechnung()
@@ -58,17 +60,19 @@ export class CommandHandler {
         // Car Commands
         // new Versicherung()
         LogManager.info('CommandManager: All commands initialized!')
+        LogManager.info('Commands [PROD]:', CommandHandler.prodCommands)
+        LogManager.info('Commands [DEV]:', CommandHandler.devCommands)
     }
 }
 
-export const RegisterCommand = (
-    scb: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder,
-    cmd: Command,
-) => {
+export const RegisterCommand = (scb: SlashCommandBuilder | SlashCommandSubcommandsOnlyBuilder, cmd: Command) => {
     CommandHandler.commands.push({
         cmd: cmd,
         scb: scb,
     })
+
+    if (cmd.RunEnvironment === EENV.PRODUCTION) CommandHandler.prodCommands.push(scb.name)
+    if (cmd.RunEnvironment === EENV.PRODUCTION) CommandHandler.prodCommands.push(scb.name)
     LogManager.debug({
         command: scb.name,
         description: scb.description,
