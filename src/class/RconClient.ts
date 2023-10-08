@@ -29,21 +29,35 @@ export class RconClient {
             const buffer = Buffer.alloc(packetLength)
             buffer.write('\xFF\xFF\xFF\xFF', 0, 4, 'binary')
             buffer.write(`rcon ${password} ${command}\0`, 4, packetLength - 4, 'ascii')
+            try {
+                return await new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => {
+                        reject(
+                            new Error(
+                                'Timeout: Server hat nicht innerhalb von 5 Sekunden geantwortet',
+                            ),
+                        )
+                    }, 5000) // Timeout nach 5 Sekunden
 
-            // Erstelle ein Promise, das auf die Serverantwort wartet
-            return new Promise((resolve, reject) => {
-                const timeout = setTimeout(() => {
-                    reject(new Error('Timeout: Server hat nicht innerhalb von 5 Sekunden geantwortet'))
-                }, 5000) // Timeout nach 5 Sekunden
+                    RconClient.socket!.once('message', (msg, rinfo) => {
+                        clearTimeout(timeout)
+                        const response = msg.toString('ascii')
+                        resolve(response)
+                    })
 
-                RconClient.socket!.once('message', (msg, rinfo) => {
-                    clearTimeout(timeout)
-                    const response = msg.toString('ascii')
-                    resolve(response)
+                    RconClient.socket!.send(
+                        buffer,
+                        0,
+                        buffer.length,
+                        RconClient.options.port,
+                        RconClient.options.host,
+                    )
                 })
-
-                RconClient.socket!.send(buffer, 0, buffer.length, RconClient.options.port, RconClient.options.host)
-            })
+            } catch (error) {
+                LogManager.log(error)
+                return 'Error'
+            }
+            // Erstelle ein Promise, das auf die Serverantwort wartet
         } else {
             throw new Error('UDP socket is not initialized')
         }
