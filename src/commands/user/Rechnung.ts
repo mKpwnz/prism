@@ -14,8 +14,16 @@ import { EENV } from '@enums/EENV'
 export class Rechnung extends Command {
     constructor() {
         super(true)
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
-        this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER, Config.Discord.Groups.DEV_BOTTESTER]
+        this.RunEnvironment = EENV.PRODUCTION
+        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
+        this.AllowedGroups = [
+            Config.Discord.Groups.DEV_SERVERENGINEER,
+            Config.Discord.Groups.DEV_BOTTESTER,
+            Config.Discord.Groups.IC_MOD,
+            Config.Discord.Groups.IC_ADMIN,
+            Config.Discord.Groups.IC_HADMIN,
+            Config.Discord.Groups.IC_SUPERADMIN,
+        ]
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('rechnung')

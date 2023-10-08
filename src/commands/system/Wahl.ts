@@ -23,7 +23,6 @@ declare module 'chartjs-plugin-datalabels' {
 export class Wahl extends Command {
     constructor() {
         super(true)
-        this.RunEnvironment = EENV.PRODUCTION
         this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_LIMITED]
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
@@ -183,7 +182,7 @@ export class Wahl extends Command {
         options: CommandInteractionOptionResolver,
     ): Promise<void> {
         if (options.getString('name') === '') {
-            await interaction.reply('Bitte gib einen Namen an!')
+            await interaction.reply({ content: 'Bitte gib einen Namen an!', ephemeral: true })
             return
         }
         try {
@@ -209,7 +208,7 @@ export class Wahl extends Command {
             await interaction.reply({ embeds: [embed] })
         } catch (error) {
             LogManager.error(error)
-            await interaction.reply('Es ist ein Fehler aufgetreten!')
+            await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true })
         }
     }
 
@@ -221,14 +220,17 @@ export class Wahl extends Command {
         const status = ['Erstellt', 'Gestartet', 'Beendet', 'Löschen']
         try {
             if (options.getNumber('wahlid') === 0) {
-                await interaction.reply('Bitte gib eine WahlID an!')
+                await interaction.reply({ content: 'Bitte gib eine WahlID an!', ephemeral: true })
                 return
             }
             let query = await Database.query<RowDataPacket[]>('SELECT * FROM immo_elections WHERE id = ?', [
                 options.getNumber('wahlid'),
             ])
             if (query[0].length === 0) {
-                await interaction.reply('Es konnte keine Wahl mit dieser ID gefunden werden!')
+                await interaction.reply({
+                    content: 'Es konnte keine Wahl mit dieser ID gefunden werden!',
+                    ephemeral: true,
+                })
                 return
             }
             let [response] = await Database.query<IElection[]>(
@@ -253,7 +255,7 @@ export class Wahl extends Command {
             await interaction.reply({ embeds: [embed] })
         } catch (error) {
             LogManager.error(error)
-            await interaction.reply('Es ist ein Fehler aufgetreten!')
+            await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true })
         }
     }
 
@@ -267,20 +269,23 @@ export class Wahl extends Command {
             options.getString('steamid') === '' ||
             options.getString('operation') === ''
         ) {
-            await interaction.reply('Bitte gib eine WahlID/SteamID/Operation an!')
+            await interaction.reply({ content: 'Bitte gib eine WahlID/SteamID/Operation an!', ephemeral: true })
             return
         }
         let [query] = await Database.query<IElection[]>('SELECT * FROM immo_elections WHERE id = ?', [
             options.getNumber('wahlid'),
         ])
         if (query[0].length === 0) {
-            await interaction.reply('Es konnte keine Wahl mit dieser ID gefunden werden!')
+            await interaction.reply({ content: 'Es konnte keine Wahl mit dieser ID gefunden werden!', ephemeral: true })
             return
         }
         let election = query[0]
         const vUser = await WhoIs.validateUser(options.getString('steamid') ?? '')
         if (!vUser) {
-            await interaction.reply('Es konnte kein Spieler mit dieser SteamID gefunden werden!')
+            await interaction.reply({
+                content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
+                ephemeral: true,
+            })
             return
         }
         if (options.getString('operation') === 'add') {
@@ -337,7 +342,7 @@ export class Wahl extends Command {
                 await interaction.reply({ embeds: [embed] })
             } catch (error) {
                 LogManager.error(error)
-                await interaction.reply('Es ist ein Fehler aufgetreten!')
+                await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true })
             }
         }
     }
@@ -352,7 +357,10 @@ export class Wahl extends Command {
                 options.getNumber('wahlid'),
             ])
             if (query.length === 0) {
-                await interaction.reply('Es konnte keine Wahl mit dieser ID gefunden werden!')
+                await interaction.reply({
+                    content: 'Es konnte keine Wahl mit dieser ID gefunden werden!',
+                    ephemeral: true,
+                })
                 return
             }
             interface IVote extends RowDataPacket {
@@ -473,7 +481,7 @@ export class Wahl extends Command {
             await interaction.reply({ embeds: [embed] })
         } catch (error) {
             LogManager.error(error)
-            await interaction.reply('Es ist ein Fehler aufgetreten!')
+            await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true })
         }
     }
 
@@ -514,7 +522,7 @@ export class Wahl extends Command {
             await interaction.reply({ embeds: [embed] })
         } catch (error) {
             LogManager.error(error)
-            await interaction.reply('Es ist ein Fehler aufgetreten!')
+            await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true })
         }
     }
 
@@ -550,7 +558,7 @@ export class Wahl extends Command {
             await interaction.reply({ embeds: [embed] })
         } catch (error) {
             LogManager.error(error)
-            await interaction.reply('Es ist ein Fehler aufgetreten!')
+            await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true })
         }
     }
 
@@ -576,7 +584,10 @@ export class Wahl extends Command {
                 options.getNumber('wahlid'),
             ])
             if (query[0].length === 0) {
-                await interaction.reply('Es konnte keine Wahl mit dieser ID gefunden werden!')
+                await interaction.reply({
+                    content: 'Es konnte keine Wahl mit dieser ID gefunden werden!',
+                    ephemeral: true,
+                })
                 return
             }
             let { id, name } = query[0]
@@ -585,7 +596,10 @@ export class Wahl extends Command {
                 [options.getString('kandidatennr')],
             )
             if (participant[0].length === 0) {
-                await interaction.reply('Es konnte kein Kandidat mit dieser ID gefunden werden!')
+                await interaction.reply({
+                    content: 'Es konnte kein Kandidat mit dieser ID gefunden werden!',
+                    ephemeral: true,
+                })
                 return
             }
             if (options.getString('operation') === 'add') {
@@ -635,7 +649,7 @@ export class Wahl extends Command {
             }
         } catch (error) {
             LogManager.error(error)
-            await interaction.reply('Es ist ein Fehler aufgetreten!')
+            await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true })
         }
     }
 }

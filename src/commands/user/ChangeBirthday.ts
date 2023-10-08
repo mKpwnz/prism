@@ -6,14 +6,19 @@ import { Database } from '@sql/Database'
 import { CommandInteraction, SlashCommandBuilder } from 'discord.js'
 import { RowDataPacket } from 'mysql2'
 
-export class Birthday extends Command {
+export class ChangeBirthday extends Command {
     constructor() {
         super(true)
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
-        this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER, Config.Discord.Groups.DEV_BOTTESTER]
+        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
+        this.AllowedGroups = [
+            Config.Discord.Groups.DEV_SERVERENGINEER,
+            Config.Discord.Groups.DEV_BOTTESTER,
+            Config.Discord.Groups.IC_HADMIN,
+            Config.Discord.Groups.IC_SUPERADMIN,
+        ]
         RegisterCommand(
             new SlashCommandBuilder()
-                .setName('birthday')
+                .setName('changeBirthday')
                 .setDescription('Suche nach Spielern')
                 //add string option
                 .setDMPermission(true)

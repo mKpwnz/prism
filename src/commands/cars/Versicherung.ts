@@ -11,8 +11,15 @@ import { CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, Sla
 export class Versicherung extends Command {
     constructor() {
         super(true)
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
-        this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER, Config.Discord.Groups.DEV_BOTTESTER]
+        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
+        this.AllowedGroups = [
+            Config.Discord.Groups.DEV_SERVERENGINEER,
+            Config.Discord.Groups.DEV_BOTTESTER,
+            Config.Discord.Groups.IC_MOD,
+            Config.Discord.Groups.IC_ADMIN,
+            Config.Discord.Groups.IC_HADMIN,
+            Config.Discord.Groups.IC_SUPERADMIN,
+        ]
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('versicherung')

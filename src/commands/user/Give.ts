@@ -3,22 +3,14 @@ import { RconClient } from '@class/RconClient'
 import { RegisterCommand } from '@commands/CommandHandler'
 import Config from '@proot/Config'
 import LogManager from '@utils/Logger'
-import {
-    CommandInteraction,
-    CommandInteractionOptionResolver,
-    EmbedBuilder,
-    SlashCommandBuilder,
-} from 'discord.js'
+import { CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, SlashCommandBuilder } from 'discord.js'
 import { Helper } from '../../utils/Helper'
 
 export class Give extends Command {
     constructor() {
         super(true)
         this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
-        this.AllowedGroups = [
-            Config.Discord.Groups.DEV_SERVERENGINEER,
-            Config.Discord.Groups.DEV_BOTTESTER,
-        ]
+        this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER, Config.Discord.Groups.DEV_BOTTESTER]
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('give')
@@ -28,19 +20,13 @@ export class Give extends Command {
                         .setName('item')
                         .setDescription('Gib einem Spieler ein Item')
                         .addIntegerOption((option) =>
-                            option
-                                .setName('id')
-                                .setDescription('ID des Spielers')
-                                .setRequired(true),
+                            option.setName('id').setDescription('ID des Spielers').setRequired(true),
                         )
                         .addStringOption((option) =>
                             option.setName('item').setDescription('Itemname').setRequired(true),
                         )
                         .addIntegerOption((option) =>
-                            option
-                                .setName('anzahl')
-                                .setDescription('Anzahl der Items')
-                                .setRequired(true),
+                            option.setName('anzahl').setDescription('Anzahl der Items').setRequired(true),
                         ),
                 )
                 .addSubcommand((subcommand) =>
@@ -48,18 +34,13 @@ export class Give extends Command {
                         .setName('weapon')
                         .setDescription('Gib einem Spieler eine Waffe')
                         .addIntegerOption((option) =>
-                            option
-                                .setName('id')
-                                .setDescription('ID des Spielers')
-                                .setRequired(true),
+                            option.setName('id').setDescription('ID des Spielers').setRequired(true),
                         )
                         .addStringOption((option) =>
                             option.setName('waffe').setDescription('Waffenname').setRequired(true),
                         )
                         .addIntegerOption((option) =>
-                            option
-                                .setName('munition')
-                                .setDescription('Anzahl der Munition (Default: 250)'),
+                            option.setName('munition').setDescription('Anzahl der Munition (Default: 250)'),
                         ),
                 ),
             this,
@@ -75,6 +56,8 @@ export class Give extends Command {
             await this.giveItem(this.CommandEmbed, interaction, options)
         } else if (options.getSubcommand() === 'weapon') {
             await this.giveWeapon(this.CommandEmbed, interaction, options)
+        } else {
+            await interaction.reply({ content: 'Command nicht gefunden.', ephemeral: true })
         }
     }
 
@@ -102,37 +85,40 @@ export class Give extends Command {
         interaction: CommandInteraction,
         options: CommandInteractionOptionResolver,
     ): Promise<void> {
-        const id = options.getInteger('id')
-        let waffe = options.getString('waffe') ?? ''
-        let munition = options.getInteger('munition') ?? 250
-        if (munition > 250) {
-            munition = 250
-        }
-        let validateWeapon = Helper.validateWeaponName(waffe)
-        if (validateWeapon === '') {
-            await interaction.reply({ content: 'Waffe nicht gefunden!', ephemeral: true })
-            return
-        }
-        let response = await RconClient.sendCommand(
-            `giveweapon ${id} ${validateWeapon} ${munition}`,
-        )
-        if (response.includes('Invalid weapon')) {
+        try {
+            const id = options.getInteger('id')
+            let waffe = options.getString('waffe') ?? ''
+            let munition = options.getInteger('munition') ?? 250
+            if (munition > 250) {
+                munition = 250
+            }
+            let validateWeapon = Helper.validateWeaponName(waffe)
+            if (validateWeapon === '') {
+                await interaction.reply({ content: 'Waffe nicht gefunden!', ephemeral: true })
+                return
+            }
+            let response = await RconClient.sendCommand(`giveweapon ${id} ${validateWeapon} ${munition}`)
+            if (response.includes('Invalid weapon')) {
+                await interaction.reply({
+                    content: 'Waffe existiert nicht!',
+                    ephemeral: true,
+                })
+                return
+            } else if (response.includes('Player already has that weapon')) {
+                await interaction.reply({
+                    content: 'Spieler hat diese Waffe bereits!',
+                    ephemeral: true,
+                })
+                return
+            }
+            embed.setTitle('Give Weapon')
+            embed.setDescription(`Spieler ${id} sollte ${validateWeapon} mit ${munition} Munition erhalten haben!`)
+            await interaction.reply({ embeds: [embed] })
+        } catch (error) {
             await interaction.reply({
-                content: 'Waffe existiert nicht!',
+                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(error)}\`\`\``,
                 ephemeral: true,
             })
-            return
-        } else if (response.includes('Player already has that weapon')) {
-            await interaction.reply({
-                content: 'Spieler hat diese Waffe bereits!',
-                ephemeral: true,
-            })
-            return
         }
-        embed.setTitle('Give Weapon')
-        embed.setDescription(
-            `Spieler ${id} sollte ${validateWeapon} mit ${munition} Munition erhalten haben!`,
-        )
-        await interaction.reply({ embeds: [embed] })
     }
 }
