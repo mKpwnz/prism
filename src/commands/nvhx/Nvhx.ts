@@ -2,10 +2,15 @@ import { Command } from '@class/Command'
 import { RconClient } from '@class/RconClient'
 import { RegisterCommand } from '@commands/CommandHandler'
 
-import Config from '@proot/Config'
-import { CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, SlashCommandBuilder } from 'discord.js'
-import LogManager from '../../utils/Logger'
 import { EENV } from '@enums/EENV'
+import Config from '@proot/Config'
+import {
+    CommandInteraction,
+    CommandInteractionOptionResolver,
+    EmbedBuilder,
+    SlashCommandBuilder,
+} from 'discord.js'
+import LogManager from '../../utils/Logger'
 
 export class Nvhx extends Command {
     constructor() {
@@ -34,7 +39,10 @@ export class Nvhx extends Command {
                         .setName('unban')
                         .setDescription('Entbanne einen Nutzer')
                         .addStringOption((option) =>
-                            option.setName('banid').setDescription('BanID des Banns').setRequired(true),
+                            option
+                                .setName('banid')
+                                .setDescription('BanID des Banns')
+                                .setRequired(true),
                         ),
                 )
                 .addSubcommand((subcommand) =>
@@ -129,9 +137,20 @@ export class Nvhx extends Command {
         options: CommandInteractionOptionResolver,
     ): Promise<void> {
         const id = options.getInteger('id', true)
-        RconClient.sendCommand(`nvhx ban ${id}`)
-        embed.setTitle('Neverhax Ban')
-        embed.setDescription(`Bannt SpielerID ${id}`)
-        await interaction.reply({ embeds: [embed] })
+        let response = await RconClient.sendCommand(`nvhx ban ${id}`)
+        response = response.replace('print ', '')
+        response = response.substring(4)
+        response = response.replace('<-- NEVERHAX NVHX -->', '')
+        response = response.replace('Violation: Banned by **CONSOLE**', '')
+        response = response.trim()
+        if (response.includes('Banned: ')) {
+            embed.setTitle('Neverhax Ban')
+            embed.setDescription(
+                `Bannt SpielerID ${id}\nAntwort vom Server:\n\`\`\`${response}\`\`\``,
+            )
+            await interaction.reply({ embeds: [embed] })
+        } else {
+            await interaction.reply({ content: 'Spieler nicht gefunden!', ephemeral: true })
+        }
     }
 }
