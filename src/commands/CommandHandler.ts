@@ -9,13 +9,17 @@ import { CheckImageOwner } from './phone/CheckImageOwner'
 import { Ping } from './system/Ping'
 import { ServerStatus } from './system/ServerStatus'
 import { Wahl } from './system/Wahl'
-import { Birthday } from './user/Birthday'
+import { ChangeBirthday } from './user/ChangeBirthday'
 import { Fraksperre } from './user/Fraksperre'
 import { Kick } from './user/Kick'
 import { Give } from './user/Give'
+import { Revive } from './user/Revive'
+import { Resetpos } from './user/Resetpos'
 import { Rechnung } from './user/Rechnung'
 import { TeamNote } from './user/TeamNote'
 import { WhoIs } from './user/WhoIs'
+import { Help } from './system/Help'
+import { Setjob } from './user/Setjob'
 
 export class CommandHandler {
     static commands: {
@@ -40,6 +44,7 @@ export class CommandHandler {
         new Ping()
         // new Wahl()
         new ServerStatus()
+        new Help()
 
         // Phone Commands
         new CheckImageOwner()
@@ -50,12 +55,15 @@ export class CommandHandler {
         // User Commands
         // new Birthday()
         new WhoIs()
-        new Nvhx()
-        new Give()
+        // new Nvhx()
+        // new Give()
         // new TeamNote()
         // new Fraksperre()
-        // new Rechnung()
-        new Kick()
+        new Rechnung()
+        // new Kick()
+        // new Revive()
+        // new Resetpos()
+        // new Setjob()
 
         // Car Commands
         // new Versicherung()

@@ -32,7 +32,7 @@ export class WhoIs extends Command {
                     option.setName('input').setDescription('Identifier des Spielers').setRequired(true),
                 )
                 .addBooleanOption((option) => option.setName('export').setDescription('Gibt eine JSON Datei aus'))
-                .addIntegerOption((option) => option.setName('page').setDescription('Seitenzahl'))
+                .addIntegerOption((option) => option.setName('seite').setDescription('Seitenzahl'))
                 .addStringOption((option) =>
                     option
                         .setName('spalte')
@@ -61,7 +61,7 @@ export class WhoIs extends Command {
     async execute(interaction: CommandInteraction): Promise<void> {
         const { channel, user, guild } = interaction
         const identifierValue = interaction.options.get('input')?.value?.toString()
-        let page = interaction.options.get('page')?.value as number
+        let page = interaction.options.get('seite')?.value as number
         let spalte = interaction.options.get('spalte')?.value?.toString()
         let filter = '\nFilter: '
         if (this.CommandEmbed === null) this.CommandEmbed = this.updateEmbed(interaction)

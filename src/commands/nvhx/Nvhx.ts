@@ -2,10 +2,10 @@ import { Command } from '@class/Command'
 import { RconClient } from '@class/RconClient'
 import { RegisterCommand } from '@commands/CommandHandler'
 
+import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
 import { CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, SlashCommandBuilder } from 'discord.js'
 import LogManager from '../../utils/Logger'
-import { EENV } from '@enums/EENV'
 
 export class Nvhx extends Command {
     constructor() {
@@ -86,13 +86,18 @@ export class Nvhx extends Command {
         interaction: CommandInteraction,
         options: CommandInteractionOptionResolver,
     ): Promise<void> {
-        const id = options.getInteger('id', true)
-        let response = RconClient.sendCommand(`nvhx sc ${id}`)
-        LogManager.log(response)
-        LogManager.log(JSON.stringify(response))
-        embed.setTitle('Neverhax Screenshot')
-        embed.setDescription(`Triggere Neverhax Screenshot für SpielerID ${id}`)
-        await interaction.reply({ embeds: [embed] })
+        try {
+            const id = options.getInteger('id', true)
+            let response = await RconClient.sendCommand(`nvhx sc ${id}`)
+            embed.setTitle('Neverhax Screenshot')
+            embed.setDescription(`Triggere Neverhax Screenshot für SpielerID ${id}`)
+            await interaction.reply({ embeds: [embed] })
+        } catch (error) {
+            await interaction.reply({
+                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(error)}\`\`\``,
+                ephemeral: true,
+            })
+        }
     }
 
     public async nvhxUnban(
@@ -100,14 +105,21 @@ export class Nvhx extends Command {
         interaction: CommandInteraction,
         options: CommandInteractionOptionResolver,
     ): Promise<void> {
-        const banid = options.getString('banid', true)
-        let response = await RconClient.sendCommand(`nvhx unban ${banid}`)
-        if (response.includes('Unbanned: ')) {
-            embed.setTitle('Neverhax Unban')
-            embed.setDescription(`Entbanne BanID ${banid}`)
-            await interaction.reply({ embeds: [embed] })
-        } else {
-            await interaction.reply({ content: 'BanID nicht gefunden!', ephemeral: true })
+        try {
+            const banid = options.getString('banid', true)
+            let response = await RconClient.sendCommand(`nvhx unban ${banid}`)
+            if (response.includes('Unbanned: ')) {
+                embed.setTitle('Neverhax Unban')
+                embed.setDescription(`Entbanne BanID ${banid}`)
+                await interaction.reply({ embeds: [embed] })
+            } else {
+                await interaction.reply({ content: 'BanID nicht gefunden!', ephemeral: true })
+            }
+        } catch (error) {
+            await interaction.reply({
+                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(error)}\`\`\``,
+                ephemeral: true,
+            })
         }
     }
 
@@ -116,11 +128,18 @@ export class Nvhx extends Command {
         interaction: CommandInteraction,
         options: CommandInteractionOptionResolver,
     ): Promise<void> {
-        const id = options.getInteger('id', true)
-        RconClient.sendCommand(`nvhx info ${id}`)
-        embed.setTitle('Neverhax Info')
-        embed.setDescription(`Triggere Neverhax Info für SpielerID ${id}`)
-        await interaction.reply({ embeds: [embed] })
+        try {
+            const id = options.getInteger('id', true)
+            RconClient.sendCommand(`nvhx info ${id}`)
+            embed.setTitle('Neverhax Info')
+            embed.setDescription(`Triggere Neverhax Info für SpielerID ${id}`)
+            await interaction.reply({ embeds: [embed] })
+        } catch (error) {
+            await interaction.reply({
+                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(error)}\`\`\``,
+                ephemeral: true,
+            })
+        }
     }
 
     public async nvhxBan(
@@ -128,10 +147,26 @@ export class Nvhx extends Command {
         interaction: CommandInteraction,
         options: CommandInteractionOptionResolver,
     ): Promise<void> {
-        const id = options.getInteger('id', true)
-        RconClient.sendCommand(`nvhx ban ${id}`)
-        embed.setTitle('Neverhax Ban')
-        embed.setDescription(`Bannt SpielerID ${id}`)
-        await interaction.reply({ embeds: [embed] })
+        try {
+            const id = options.getInteger('id', true)
+            let response = await RconClient.sendCommand(`nvhx ban ${id}`)
+            response = response.replace('print ', '')
+            response = response.substring(4)
+            response = response.replace('<-- NEVERHAX NVHX -->', '')
+            response = response.replace('Violation: Banned by **CONSOLE**', '')
+            response = response.trim()
+            if (response.includes('Banned: ')) {
+                embed.setTitle('Neverhax Ban')
+                embed.setDescription(`Bannt SpielerID ${id}\nAntwort vom Server:\n\`\`\`${response}\`\`\``)
+                await interaction.reply({ embeds: [embed] })
+            } else {
+                await interaction.reply({ content: 'Spieler nicht gefunden!', ephemeral: true })
+            }
+        } catch (error) {
+            await interaction.reply({
+                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(error)}\`\`\``,
+                ephemeral: true,
+            })
+        }
     }
 }
