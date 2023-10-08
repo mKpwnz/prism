@@ -11,6 +11,7 @@ import { ServerStatus } from './system/ServerStatus'
 import { Wahl } from './system/Wahl'
 import { Birthday } from './user/Birthday'
 import { Fraksperre } from './user/Fraksperre'
+import { Kick } from './user/Kick'
 import { Give } from './user/Give'
 import { Rechnung } from './user/Rechnung'
 import { TeamNote } from './user/TeamNote'
@@ -52,6 +53,7 @@ export class CommandHandler {
         // new TeamNote()
         // new Fraksperre()
         // new Rechnung()
+        new Kick()
 
         // Car Commands
         // new Versicherung()
