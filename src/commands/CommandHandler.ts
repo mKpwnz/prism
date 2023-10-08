@@ -12,6 +12,7 @@ import { Wahl } from './system/Wahl'
 import { Birthday } from './user/Birthday'
 import { Fraksperre } from './user/Fraksperre'
 import { Kick } from './user/Kick'
+import { Give } from './user/Give'
 import { Rechnung } from './user/Rechnung'
 import { TeamNote } from './user/TeamNote'
 import { WhoIs } from './user/WhoIs'
@@ -34,6 +35,7 @@ export class CommandHandler {
     static initAll() {
         LogManager.info('CommandManager: Initializing all commands...')
         // new Nvhx()
+        new Give()
         // System Commands
         new Ping()
         // new Wahl()
