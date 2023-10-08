@@ -103,10 +103,14 @@ export class Nvhx extends Command {
         options: CommandInteractionOptionResolver,
     ): Promise<void> {
         const banid = options.getString('banid', true)
-        RconClient.sendCommand(`nvhx unban ${banid}`)
-        embed.setTitle('Neverhax Unban')
-        embed.setDescription(`Entbanne BanID ${banid}`)
-        await interaction.reply({ embeds: [embed] })
+        let response = await RconClient.sendCommand(`nvhx unban ${banid}`)
+        if (response.includes('Unbanned: ')) {
+            embed.setTitle('Neverhax Unban')
+            embed.setDescription(`Entbanne BanID ${banid}`)
+            await interaction.reply({ embeds: [embed] })
+        } else {
+            await interaction.reply({ content: 'BanID nicht gefunden!', ephemeral: true })
+        }
     }
 
     public async nvhxInfo(
