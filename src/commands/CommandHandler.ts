@@ -3,6 +3,7 @@ import LogManager from '@utils/Logger'
 import { Interaction, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js'
 import { Versicherung } from './cars/Versicherung'
 import { SchufaCheck } from './housing/SchufaCheck'
+import { Nvhx } from './nvhx/Nvhx'
 import { CheckImageOwner } from './phone/CheckImageOwner'
 import { Ping } from './system/Ping'
 import { Wahl } from './system/Wahl'
@@ -31,7 +32,7 @@ export class CommandHandler {
 
     static initAll() {
         LogManager.info('CommandManager: Initializing all commands...')
-
+        new Nvhx()
         // System Commands
         new Ping()
         // new Wahl()
