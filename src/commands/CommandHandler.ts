@@ -72,7 +72,7 @@ export const RegisterCommand = (scb: SlashCommandBuilder | SlashCommandSubcomman
     })
 
     if (cmd.RunEnvironment === EENV.PRODUCTION) CommandHandler.prodCommands.push(scb.name)
-    if (cmd.RunEnvironment === EENV.PRODUCTION) CommandHandler.prodCommands.push(scb.name)
+    if (cmd.RunEnvironment === EENV.DEVELOPMENT) CommandHandler.devCommands.push(scb.name)
     LogManager.debug({
         command: scb.name,
         description: scb.description,
