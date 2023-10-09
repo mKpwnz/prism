@@ -4,7 +4,7 @@ import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
 import { Database } from '@sql/Database'
 import LogManager from '@utils/Logger'
-import { CommandInteraction, SlashCommandBuilder } from 'discord.js'
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 import { RowDataPacket } from 'mysql2'
 
 interface phoneOwnerResponse extends RowDataPacket {
@@ -15,27 +15,25 @@ interface phoneOwnerResponse extends RowDataPacket {
     timestamp: string
 }
 
-// TODO: Response überarbeiten
+// TODO: REFACTOR
 export class CheckImageOwner extends Command {
     constructor() {
-        super(true)
+        super()
         this.RunEnvironment = EENV.PRODUCTION
         this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
-            Config.Discord.Groups.IC_MOD,
-            Config.Discord.Groups.IC_ADMIN,
-            Config.Discord.Groups.IC_HADMIN,
             Config.Discord.Groups.IC_SUPERADMIN,
+            Config.Discord.Groups.IC_HADMIN,
+            Config.Discord.Groups.IC_ADMIN,
+            Config.Discord.Groups.IC_MOD,
         ]
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('pcheckimageowner')
                 .setDescription('Check who created an Ingame image')
-                .addStringOption((option) =>
-                    option.setName('imageurl').setDescription('Image URL').setRequired(true),
-                ) as SlashCommandBuilder,
+                .addStringOption((option) => option.setName('imageurl').setDescription('Image URL').setRequired(true)),
             this,
         )
     }
@@ -47,7 +45,7 @@ export class CheckImageOwner extends Command {
             return null
         }
     }
-    async execute(interaction: CommandInteraction): Promise<void> {
+    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         try {
             const n_link = this.normalizeLink(interaction.options.get('imageurl')?.value?.toString() as string)
             if (!n_link) {

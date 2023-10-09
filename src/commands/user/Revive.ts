@@ -1,14 +1,29 @@
 import { Command } from '@class/Command'
 import { RconClient } from '@class/RconClient'
 import { RegisterCommand } from '@commands/CommandHandler'
+import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
-import { CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder } from 'discord.js'
+import {
+    ChatInputCommandInteraction,
+    CommandInteraction,
+    CommandInteractionOptionResolver,
+    SlashCommandBuilder,
+} from 'discord.js'
 
 export class Revive extends Command {
     constructor() {
-        super(true)
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
-        this.AllowedGroups = [Config.Discord.Groups.DEV_BOTTESTER, Config.Discord.Groups.DEV_SERVERENGINEER]
+        super()
+        this.RunEnvironment = EENV.PRODUCTION
+        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
+        this.AllowedGroups = [
+            Config.Discord.Groups.DEV_SERVERENGINEER,
+            Config.Discord.Groups.DEV_BOTTESTER,
+            Config.Discord.Groups.IC_SUPERADMIN,
+            Config.Discord.Groups.IC_HADMIN,
+            Config.Discord.Groups.IC_ADMIN,
+            Config.Discord.Groups.IC_MOD,
+        ]
+        this.IsBetaCommand = true
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('revive')
@@ -18,16 +33,23 @@ export class Revive extends Command {
                 .addIntegerOption((option) => option.setName('id').setDescription('ID des Spielers').setRequired(true))
                 .addBooleanOption((option) =>
                     option.setName('kampfunfähig').setDescription('Kampfunfähigkeit hinzufügen?'),
-                ) as SlashCommandBuilder,
+                ),
             this,
         )
+        this.IsBetaCommand = true
     }
-    async execute(interaction: CommandInteraction): Promise<void> {
-        if (this.CommandEmbed === null) this.CommandEmbed = this.updateEmbed(interaction)
-        let embed = this.CommandEmbed
-        const options = interaction.options as CommandInteractionOptionResolver
+    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
+        const embed = this.getEmbedTemplate(interaction)
         try {
             const id = options.getInteger('id')
+            if (!id) {
+                await interaction.reply({
+                    content: 'ID wurde nicht gefunden!',
+                    ephemeral: true,
+                })
+                return
+            }
             const kampf = options.getBoolean('kampfunfähig') ?? false
             let command = `revive ${id}`
             if (kampf) command = `revive ${id} 1`

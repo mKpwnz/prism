@@ -4,21 +4,42 @@ import { EmbedBuilder } from '@discordjs/builders'
 import { EENV } from '@enums/EENV'
 import { BotClient } from '@proot/Bot'
 import Config from '@proot/Config'
+import { Helper } from '@utils/Helper'
 import LogManager from '@utils/Logger'
-import { CommandInteraction, SlashCommandBuilder } from 'discord.js'
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
+
+interface ICmdPrintInformation {
+    commandName: string
+    description: string
+    production: boolean
+    isBeta: boolean
+    commandOptions: ICmdPrintInformationOption[]
+    subCommands?: ICmdPrintInformation[]
+    allowedChannels?: string[]
+    allowedGroups?: string[]
+}
+interface ICmdPrintInformationOption {
+    name: string
+    description: string
+    required: boolean
+    choices?: {
+        name: string
+        value: string
+    }[]
+}
 
 export class Help extends Command {
     constructor() {
-        super(true)
+        super()
         this.RunEnvironment = EENV.PRODUCTION
         this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
-            Config.Discord.Groups.IC_MOD,
-            Config.Discord.Groups.IC_ADMIN,
-            Config.Discord.Groups.IC_HADMIN,
             Config.Discord.Groups.IC_SUPERADMIN,
+            Config.Discord.Groups.IC_HADMIN,
+            Config.Discord.Groups.IC_ADMIN,
+            Config.Discord.Groups.IC_MOD,
         ]
         RegisterCommand(new SlashCommandBuilder().setName('help').setDescription('Liste aller Befehle!'), this)
     }
@@ -35,6 +56,7 @@ export class Help extends Command {
                         description: json.description,
                         production: json.required ?? false,
                         commandOptions: json.options,
+                        isBeta: cmd.cmd.IsBetaCommand,
                     })
                 } else {
                     cmdOptions.push({
@@ -55,25 +77,28 @@ export class Help extends Command {
                 subCommands: subCommands,
                 allowedChannels: cmd.cmd.AllowedChannels,
                 allowedGroups: cmd.cmd.AllowedGroups,
+                isBeta: cmd.cmd.IsBetaCommand,
             })
         })
         return CmdPrintInformation
     }
-    async execute(interaction: CommandInteraction): Promise<void> {
+    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const { channel, user, guild } = interaction
-
+        if (!channel) return
+        var betaEmote = await Helper.getEmote('pbot_beta')
+        LogManager.debug(betaEmote)
         var cmds = this.getCommands()
         var fields: { name: string; value: string }[] = []
         var embeds: EmbedBuilder[] = []
         cmds.forEach((cmd) => {
-            if (!cmd.production) return
+            // if (!cmd.production) return
             var groupString = ''
             if (cmd.allowedGroups) {
                 cmd.allowedGroups.forEach((group) => {
                     if (group == Config.Discord.Groups.DEV_BOTTESTER) return
                     if (
                         group == Config.Discord.Groups.DEV_SERVERENGINEER &&
-                        channel?.id != Config.Discord.Channel.WHOIS_TESTI
+                        channel.id != Config.Discord.Channel.WHOIS_TESTI
                     )
                         return
                     groupString += `[**${BotClient.guilds.cache
@@ -86,7 +111,9 @@ export class Help extends Command {
             if (cmd.subCommands && cmd.subCommands.length > 0) {
                 cmd.subCommands.forEach((subcmd) => {
                     fields.push({
-                        name: `**/${cmd.commandName} ${subcmd.commandName} ${subcmd.commandOptions
+                        name: `${cmd.isBeta && betaEmote ? `${betaEmote} ` : ''}**/${cmd.commandName} ${
+                            subcmd.commandName
+                        } ${subcmd.commandOptions
                             .map((opt) => (opt.required ? `[${opt.name}]` : `<${opt.name}>`))
                             .join(' ')}**`,
                         value: `*${subcmd.description}*\n${
@@ -98,7 +125,7 @@ export class Help extends Command {
                 })
             } else {
                 fields.push({
-                    name: `**/${cmd.commandName} ${cmd.commandOptions
+                    name: `${cmd.isBeta && betaEmote ? `${betaEmote} ` : ''}**/${cmd.commandName} ${cmd.commandOptions
                         .map((opt) => (opt.required ? `<${opt.name}>` : `[${opt.name}]`))
                         .join(' ')}**`,
                     value: `*${cmd.description}*\n${
@@ -107,19 +134,15 @@ export class Help extends Command {
                 })
             }
         })
+        fields.push({
+            name: '### Hinweis',
+            value: `Die Befehle mit dem ${betaEmote} sind aktuell in der BETA phase!`,
+        })
         const MAX_LENGHT = 15
         var embedCount = Math.ceil(fields.length / MAX_LENGHT)
 
         for (let i = 0; i < embedCount; i++) {
-            let localEmbed = new EmbedBuilder()
-                .setColor(0x0792f1)
-                .setTimestamp()
-                .setAuthor({ name: Config.Discord.BOT_NAME, iconURL: Config.Pictures.Prism.LOGO_BLUE })
-                .setFooter({
-                    text: interaction.user.displayName ?? '',
-                    iconURL: interaction.user.avatarURL() ?? '',
-                })
-                .setTimestamp(new Date())
+            let localEmbed = this.getEmbedTemplate(interaction)
             localEmbed.setTitle(`**Befehlsübersicht** ${embedCount > 1 ? `${i + 1} / ${embedCount}` : ''}`)
 
             var des = ''
@@ -134,26 +157,9 @@ export class Help extends Command {
             localEmbed.setImage(Config.Pictures.WHITESPACE)
             embeds.push(localEmbed)
         }
-
-        await interaction.reply({ content: ' ', embeds: embeds })
-        // await interaction.user.send({ content: ' ', embeds: embeds })
+        await interaction.reply({ content: 'Die übersicht aller Commands:', ephemeral: true })
+        embeds.forEach(async (embed) => {
+            await channel.send({ embeds: [embed] })
+        })
     }
-}
-interface ICmdPrintInformation {
-    commandName: string
-    description: string
-    production: boolean
-    commandOptions: ICmdPrintInformationOption[]
-    subCommands?: ICmdPrintInformation[]
-    allowedChannels?: string[]
-    allowedGroups?: string[]
-}
-interface ICmdPrintInformationOption {
-    name: string
-    description: string
-    required: boolean
-    choices?: {
-        name: string
-        value: string
-    }[]
 }

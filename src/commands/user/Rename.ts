@@ -5,47 +5,42 @@ import Config from '@proot/Config'
 import { Database } from '@sql/Database'
 import { IUser } from '@sql/schema/User.schema'
 import LogManager from '@utils/Logger'
-import { CommandInteraction, SlashCommandBuilder } from 'discord.js'
+import { ChatInputCommandInteraction, CommandInteraction, SlashCommandBuilder } from 'discord.js'
 import { RowDataPacket } from 'mysql2'
 import { WhoIs } from './WhoIs'
 
 export class Rename extends Command {
     constructor() {
-        super(true)
-        this.AllowedChannels = [
-            Config.Discord.Channel.WHOIS_TESTI,
-            Config.Discord.Channel.WHOIS_RENAME,
-        ]
+        super()
+        this.RunEnvironment = EENV.PRODUCTION
+        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_RENAME]
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
-            Config.Discord.Groups.IC_HADMIN,
             Config.Discord.Groups.IC_SUPERADMIN,
+        ]
+        this.AllowedUsers = [
+            Config.Discord.Users.List.L33V33N,
+            Config.Discord.Users.List.ZMASTER,
+            Config.Discord.Users.List.MANU,
         ]
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('rename')
                 .setDescription('Suche nach Spielern')
                 .addStringOption((option) =>
-                    option
-                        .setName('steam')
-                        .setDescription('Steam ID des Nutzers')
-                        .setRequired(true),
+                    option.setName('steam').setDescription('Steam ID des Nutzers').setRequired(true),
                 )
-                .addStringOption((option) =>
-                    option.setName('vorname').setDescription('Vorname des Spielers'),
-                )
-                .addStringOption((option) =>
-                    option.setName('nachname').setDescription('Nachname des Spielers'),
-                ) as SlashCommandBuilder,
+                .addStringOption((option) => option.setName('vorname').setDescription('Vorname des Spielers'))
+                .addStringOption((option) => option.setName('nachname').setDescription('Nachname des Spielers')),
             this,
         )
     }
-    async execute(interaction: CommandInteraction): Promise<void> {
+    // TODO: Refactor
+    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         let steam = interaction.options.get('steam')?.value?.toString() ?? ''
         const vUser = await WhoIs.validateUser(steam ?? '')
-        if (this.CommandEmbed === null) this.CommandEmbed = this.updateEmbed(interaction)
-        let embed = this.CommandEmbed
+        let embed = this.getEmbedTemplate(interaction)
         if (!vUser) {
             await interaction.reply('Es konnte kein Spieler mit dieser SteamID gefunden werden!')
             return

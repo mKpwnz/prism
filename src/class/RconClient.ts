@@ -6,9 +6,9 @@ export class RconClient {
     private static socket: Socket | null = null
 
     private static options = {
-        host: process.env.RCON_HOST as string,
-        port: parseInt(process.env.RCON_PORT as string),
-        password: process.env.RCON_PASSWORD as string,
+        host: process.env.RCON_HOST ?? '',
+        port: parseInt(process.env.RCON_PORT ?? '0'),
+        password: process.env.RCON_PASSWORD ?? '',
     }
 
     constructor() {

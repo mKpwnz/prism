@@ -1,24 +1,24 @@
 import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
-import { EmbedBuilder } from '@discordjs/builders'
-import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
 import { Database } from '@sql/Database'
 import LogManager from '@utils/Logger'
-import {
-    CommandInteraction,
-    CommandInteractionOptionResolver,
-    SlashCommandBuilder,
-} from 'discord.js'
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 import { WhoIs } from './WhoIs'
+import { EENV } from '@enums/EENV'
 
 export class Fraksperre extends Command {
     constructor() {
-        super(true)
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
+        super()
+        this.RunEnvironment = EENV.PRODUCTION
+        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
+            Config.Discord.Groups.IC_SUPERADMIN,
+            Config.Discord.Groups.IC_HADMIN,
+            Config.Discord.Groups.IC_ADMIN,
+            Config.Discord.Groups.IC_MOD,
         ]
         RegisterCommand(
             new SlashCommandBuilder()
@@ -29,10 +29,7 @@ export class Fraksperre extends Command {
                         .setName('entfernen')
                         .setDescription('Entferne die Fraktionssperre eines Spielers')
                         .addStringOption((option) =>
-                            option
-                                .setName('steamid')
-                                .setDescription('SteamID des Spielers')
-                                .setRequired(true),
+                            option.setName('steamid').setDescription('SteamID des Spielers').setRequired(true),
                         ),
                 )
                 .addSubcommand((subcommand) =>
@@ -40,39 +37,35 @@ export class Fraksperre extends Command {
                         .setName('setzen')
                         .setDescription('Setze dem Spieler eine Fraksperre')
                         .addStringOption((option) =>
-                            option
-                                .setName('steamid')
-                                .setDescription('SteamID des Spielers')
-                                .setRequired(true),
+                            option.setName('steamid').setDescription('SteamID des Spielers').setRequired(true),
                         )
                         .addIntegerOption((option) =>
-                            option
-                                .setName('zeit')
-                                .setDescription('Setze die Zeit in Tagen (Default: 5 Tage)'),
+                            option.setName('zeit').setDescription('Setze die Zeit in Tagen (Default: 5 Tage)'),
                         ),
                 ),
             this,
         )
     }
 
-    async execute(interaction: CommandInteraction): Promise<void> {
-        if (!interaction.isCommand()) return
-        if (this.CommandEmbed === null) this.CommandEmbed = this.updateEmbed(interaction)
-        const options = interaction.options as CommandInteractionOptionResolver
-
-        if (options.getSubcommand() === 'entfernen') {
-            await this.removeFraksperre(this.CommandEmbed, interaction, options)
-        } else if (options.getSubcommand() === 'setzen') {
-            await this.setFraksperre(this.CommandEmbed, interaction, options)
+    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+        if (interaction.options.getSubcommand() === 'entfernen') {
+            await this.removeFraksperre(interaction)
+        } else if (interaction.options.getSubcommand() === 'setzen') {
+            await this.setFraksperre(interaction)
+        } else {
+            await interaction.reply({ content: 'Command nicht gefunden.', ephemeral: true })
         }
     }
 
-    private async removeFraksperre(
-        embed: EmbedBuilder,
-        interaction: CommandInteraction,
-        options: CommandInteractionOptionResolver,
-    ): Promise<void> {
-        const vUser = await WhoIs.validateUser(options.getString('steamid') ?? '')
+    private async removeFraksperre(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
+        const embed = this.getEmbedTemplate(interaction)
+        let steamid = options.getString('steamid')
+        if (!steamid) {
+            await interaction.reply({ content: 'Bitte gib eine SteamID an!', ephemeral: true })
+            return
+        }
+        const vUser = await WhoIs.validateUser(steamid)
         if (!vUser) {
             await interaction.reply({
                 content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
@@ -87,40 +80,39 @@ export class Fraksperre extends Command {
                 ephemeral: true,
             })
             return
-        } else {
-            try {
-                var dbResponse = await Database.query(
-                    'UPDATE users SET fraksperre = NOW() WHERE identifier = ?',
-                    [vUser.identifier],
-                )
-                LogManager.debug(dbResponse)
-            } catch (error) {
-                LogManager.error(error)
-                await interaction.reply({
-                    content: 'Es ist ein Fehler aufgetreten!',
-                    ephemeral: true,
-                })
-            }
-            LogManager.log(vUser)
-            embed.setTitle('Fraktionssperre entfernt')
-            embed.setDescription(
-                `
-                Die Fraktionssperre von ${vUser.firstname} ${vUser.lastname} (${
-                    vUser.identifier
-                }) wurde entfernt!\n
-                Altes Datum: ${vUser.fraksperre.toLocaleDateString()}`,
-            )
-            await interaction.reply({ embeds: [embed] })
         }
+        try {
+            // TODO: Response verarbeiten und auswerten
+            var dbResponse = await Database.query('UPDATE users SET fraksperre = NOW() WHERE identifier = ?', [
+                vUser.identifier,
+            ])
+            LogManager.debug(dbResponse)
+        } catch (error) {
+            LogManager.error(error)
+            await interaction.reply({
+                content: 'Es ist ein Fehler aufgetreten!',
+                ephemeral: true,
+            })
+        }
+        LogManager.log(vUser)
+        embed.setTitle('Fraktionssperre entfernt')
+        embed.setDescription(
+            `
+                Die Fraktionssperre von ${vUser.firstname} ${vUser.lastname} (${vUser.identifier}) wurde entfernt!\n
+                Altes Datum: ${vUser.fraksperre.toLocaleDateString()}`,
+        )
+        await interaction.reply({ embeds: [embed] })
     }
 
-    private async setFraksperre(
-        embed: EmbedBuilder,
-        interaction: CommandInteraction,
-        options: CommandInteractionOptionResolver,
-    ): Promise<void> {
+    private async setFraksperre(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
         let days = options.getInteger('zeit') ?? 5
-        const vUser = await WhoIs.validateUser(options.getString('steamid') ?? '')
+        let steamid = options.getString('steamid')
+        if (!steamid) {
+            await interaction.reply({ content: 'Bitte gib eine SteamID an!', ephemeral: true })
+            return
+        }
+        const vUser = await WhoIs.validateUser(steamid)
         if (!vUser) {
             await interaction.reply({
                 content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
@@ -131,6 +123,7 @@ export class Fraksperre extends Command {
         let ts = new Date()
         ts.setDate(ts.getDate() + days)
         try {
+            // TODO: Response verarbeiten und auswerten
             var dbResponse = await Database.query(
                 'UPDATE users SET fraksperre = ADDDATE(NOW(), INTERVAL ? DAY) WHERE identifier = ?',
                 [days, vUser.identifier],
@@ -140,6 +133,7 @@ export class Fraksperre extends Command {
             LogManager.error(error)
             await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true })
         }
+        var embed = this.getEmbedTemplate(interaction)
         embed.setTitle('Fraktionssperre gesetzt')
         embed.setDescription(
             'Die Fraktionssperre von ' +

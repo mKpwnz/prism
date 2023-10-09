@@ -4,20 +4,64 @@ import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
 import LogManager from '@utils/Logger'
 import axios from 'axios'
-import { CommandInteraction, SlashCommandBuilder } from 'discord.js'
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
+
+enum EServerStatus {
+    DOWN = 0,
+    UP = 1,
+    PENDING = 2,
+    MAINTENANCE = 3,
+}
+type DiscordResponse = {
+    status: EServerStatus
+    name: string
+    uptime: number
+    print: string
+}
+type DiscordResponseGroupe = {
+    name: string
+    member: DiscordResponse[]
+}
+type pglMonitor = {
+    id: number
+    name: string
+    sendUrl: any
+    type: string
+}
+type publicGroupListEntry = {
+    id: number
+    name: string
+    weight: number
+    monitorList: pglMonitor[]
+}
+
+type heartbeatResponse = {
+    heartbeatList: {
+        [key: number]: hearbeatEntry[]
+    }
+    uptimeList: {
+        [key: string]: number
+    }
+}
+type hearbeatEntry = {
+    status: EServerStatus
+    time: string
+    msg: string
+    ping: string | null
+}
 
 export class ServerStatus extends Command {
     constructor() {
-        super(true)
+        super()
         this.RunEnvironment = EENV.PRODUCTION
         this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
-            Config.Discord.Groups.IC_MOD,
-            Config.Discord.Groups.IC_ADMIN,
-            Config.Discord.Groups.IC_HADMIN,
             Config.Discord.Groups.IC_SUPERADMIN,
+            Config.Discord.Groups.IC_HADMIN,
+            Config.Discord.Groups.IC_ADMIN,
+            Config.Discord.Groups.IC_MOD,
         ]
         RegisterCommand(
             new SlashCommandBuilder().setName('serverstatus').setDescription('Gibt den aktuellen Serverstatus zurück!'),
@@ -81,9 +125,8 @@ export class ServerStatus extends Command {
 
         return res
     }
-    async execute(interaction: CommandInteraction): Promise<void> {
-        if (this.CommandEmbed === null) this.CommandEmbed = this.updateEmbed(interaction)
-        var embed = this.CommandEmbed
+    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+        var embed = this.getEmbedTemplate(interaction)
         const EmbedData = await this.getAgregatedData()
 
         embed.setTitle('Serverstatus')
@@ -110,47 +153,4 @@ export class ServerStatus extends Command {
         }
         interaction.reply({ content: ' ', embeds: [embed] })
     }
-}
-
-enum EServerStatus {
-    DOWN = 0,
-    UP = 1,
-    PENDING = 2,
-    MAINTENANCE = 3,
-}
-type DiscordResponse = {
-    status: EServerStatus
-    name: string
-    uptime: number
-    print: string
-}
-type DiscordResponseGroupe = {
-    name: string
-    member: DiscordResponse[]
-}
-type pglMonitor = {
-    id: number
-    name: string
-    sendUrl: any
-    type: string
-}
-type publicGroupListEntry = {
-    id: number
-    name: string
-    weight: number
-    monitorList: pglMonitor[]
-}
-type heartbeatResponse = {
-    heartbeatList: {
-        [key: number]: hearbeatEntry[]
-    }
-    uptimeList: {
-        [key: string]: number
-    }
-}
-type hearbeatEntry = {
-    status: EServerStatus
-    time: string
-    msg: string
-    ping: string | null
 }

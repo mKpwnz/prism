@@ -1,31 +1,43 @@
 import { Command } from '@class/Command'
 import { RconClient } from '@class/RconClient'
 import { RegisterCommand } from '@commands/CommandHandler'
+import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
-import { CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder } from 'discord.js'
+import {
+    ChatInputCommandInteraction,
+    CommandInteraction,
+    CommandInteractionOptionResolver,
+    SlashCommandBuilder,
+} from 'discord.js'
 
 export class Kick extends Command {
     constructor() {
-        super(true)
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
-        this.AllowedGroups = [Config.Discord.Groups.DEV_BOTTESTER, Config.Discord.Groups.DEV_SERVERENGINEER]
+        super()
+        this.RunEnvironment = EENV.PRODUCTION
+        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
+        this.AllowedGroups = [
+            Config.Discord.Groups.DEV_SERVERENGINEER,
+            Config.Discord.Groups.DEV_BOTTESTER,
+            Config.Discord.Groups.IC_SUPERADMIN,
+            Config.Discord.Groups.IC_HADMIN,
+            Config.Discord.Groups.IC_ADMIN,
+            Config.Discord.Groups.IC_MOD,
+        ]
+        this.IsBetaCommand = true
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('kick')
                 .setDescription('Suche nach Spielern')
-                //add string option
-                .setDMPermission(true)
                 .addIntegerOption((option) => option.setName('id').setDescription('ID des Spielers').setRequired(true))
-                .addStringOption((option) =>
-                    option.setName('grund').setDescription('Grund des Kicks'),
-                ) as SlashCommandBuilder,
+                .addStringOption((option) => option.setName('grund').setDescription('Grund des Kicks')),
             this,
         )
     }
-    async execute(interaction: CommandInteraction): Promise<void> {
-        if (this.CommandEmbed === null) this.CommandEmbed = this.updateEmbed(interaction)
-        let embed = this.CommandEmbed
-        const options = interaction.options as CommandInteractionOptionResolver
+    // await interaction.reply({ content: 'Command nicht gefunden.', ephemeral: true })
+    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
+        let embed = this.getEmbedTemplate(interaction)
+
         try {
             const id = options.getInteger('id')
             const grund = options.getString('grund') ?? 'Du wurdest vom Support gekickt!'

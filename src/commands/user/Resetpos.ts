@@ -5,25 +5,24 @@ import Config from '@proot/Config'
 import { Database } from '@sql/Database'
 import { IUser } from '@sql/schema/User.schema'
 import LogManager from '@utils/Logger'
-import { CommandInteraction, SlashCommandBuilder } from 'discord.js'
+import { ChatInputCommandInteraction, CommandInteraction, SlashCommandBuilder } from 'discord.js'
 import { RowDataPacket } from 'mysql2'
 import { WhoIs } from './WhoIs'
 
 export class Resetpos extends Command {
     constructor() {
-        super(true)
-        this.AllowedChannels = [
-            Config.Discord.Channel.WHOIS_TESTI,
-            Config.Discord.Channel.WHOIS_UNLIMITED,
-        ]
+        super()
+        this.RunEnvironment = EENV.PRODUCTION
+        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
-            Config.Discord.Groups.IC_MOD,
-            Config.Discord.Groups.IC_ADMIN,
-            Config.Discord.Groups.IC_HADMIN,
             Config.Discord.Groups.IC_SUPERADMIN,
+            Config.Discord.Groups.IC_HADMIN,
+            Config.Discord.Groups.IC_ADMIN,
+            Config.Discord.Groups.IC_MOD,
         ]
+        this.IsBetaCommand = true
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('resetpos')
@@ -31,25 +30,21 @@ export class Resetpos extends Command {
                 //add string option
                 .setDMPermission(true)
                 .addStringOption((option) =>
-                    option
-                        .setName('steam')
-                        .setDescription('Steam ID des Nutzers')
-                        .setRequired(true),
-                ) as SlashCommandBuilder,
+                    option.setName('steam').setDescription('Steam ID des Nutzers').setRequired(true),
+                ),
             this,
         )
     }
-    async execute(interaction: CommandInteraction): Promise<void> {
+    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         let steam = interaction.options.get('steam')?.value?.toString() ?? ''
         const vUser = await WhoIs.validateUser(steam ?? '')
-        if (this.CommandEmbed === null) this.CommandEmbed = this.updateEmbed(interaction)
-        let embed = this.CommandEmbed
+        let embed = this.getEmbedTemplate(interaction)
         if (!vUser) {
             await interaction.reply('Es konnte kein Spieler mit dieser SteamID gefunden werden!')
             return
         }
         try {
-            const newPosition = { x: 229.28, heading: 0.0, z: 30.5, y: -886.76 }
+            const newPosition = Config.Commands.Resetpos.DefaultPosition
             let query = 'UPDATE users SET position = ? WHERE identifier = ?'
             let result = (await Database.execute(query, [
                 JSON.stringify(newPosition),
