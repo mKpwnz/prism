@@ -18,11 +18,19 @@ import {
 import { WhoIs } from './WhoIs'
 import { EENV } from '@enums/EENV'
 
+// TODO: Refactor this command
 export class TeamNote extends Command {
     constructor() {
-        super(true)
+        super()
         this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
-        this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER]
+        this.AllowedGroups = [
+            Config.Discord.Groups.DEV_SERVERENGINEER,
+            Config.Discord.Groups.DEV_BOTTESTER,
+            Config.Discord.Groups.IC_SUPERADMIN,
+            Config.Discord.Groups.IC_HADMIN,
+            Config.Discord.Groups.IC_ADMIN,
+            Config.Discord.Groups.IC_MOD,
+        ]
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('teamnote')
@@ -43,7 +51,7 @@ export class TeamNote extends Command {
                 )
                 .addIntegerOption((option) =>
                     option.setName('noteid').setDescription('ID der Notiz').setRequired(false),
-                ) as SlashCommandBuilder,
+                ),
             this,
         )
         BotClient.on('interactionCreate', this.onInteraction)

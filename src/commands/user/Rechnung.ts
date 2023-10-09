@@ -6,23 +6,29 @@ import { Database } from '@sql/Database'
 import { IBilling } from '@sql/schema/Billing.schema'
 import { IJobs } from '@sql/schema/Jobs.schema'
 import LogManager from '@utils/Logger'
-import { CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder, TextChannel } from 'discord.js'
+import {
+    ChatInputCommandInteraction,
+    CommandInteraction,
+    CommandInteractionOptionResolver,
+    SlashCommandBuilder,
+    TextChannel,
+} from 'discord.js'
 import { RowDataPacket } from 'mysql2'
 import { WhoIs } from './WhoIs'
 import { EENV } from '@enums/EENV'
 
 export class Rechnung extends Command {
     constructor() {
-        super(true)
+        super()
         this.RunEnvironment = EENV.PRODUCTION
         this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
-            Config.Discord.Groups.IC_MOD,
-            Config.Discord.Groups.IC_ADMIN,
-            Config.Discord.Groups.IC_HADMIN,
             Config.Discord.Groups.IC_SUPERADMIN,
+            Config.Discord.Groups.IC_HADMIN,
+            Config.Discord.Groups.IC_ADMIN,
+            Config.Discord.Groups.IC_MOD,
         ]
         RegisterCommand(
             new SlashCommandBuilder()
@@ -88,43 +94,44 @@ export class Rechnung extends Command {
                             option.setName('beschreibung').setDescription('Beschreibung der Rechnung'),
                         ),
                 ),
+
             this,
         )
     }
-    async execute(interaction: CommandInteraction): Promise<void> {
-        if (!interaction.isCommand()) return
-        if (this.CommandEmbed === null) this.CommandEmbed = this.updateEmbed(interaction)
-        const options = interaction.options as CommandInteractionOptionResolver
-
-        switch (options.getSubcommand()) {
+    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+        switch (interaction.options.getSubcommand()) {
             case 'suchen':
-                await this.searchInvoice(this.CommandEmbed, interaction, options)
+                await this.searchInvoice(interaction)
                 break
             case 'anzeigen':
-                await this.showInvoice(this.CommandEmbed, interaction, options)
+                await this.showInvoice(interaction)
                 break
             case 'bezahlen':
-                await this.payInvoice(this.CommandEmbed, interaction, options)
+                await this.payInvoice(interaction)
                 break
             case 'löschen':
-                await this.deleteInvoice(this.CommandEmbed, interaction, options)
+                await this.deleteInvoice(interaction)
                 break
             case 'erstellen':
-                await this.createInvoice(this.CommandEmbed, interaction, options)
+                await this.createInvoice(interaction)
                 break
             default:
+                await interaction.reply({ content: 'Command nicht gefunden.', ephemeral: true })
                 break
         }
     }
 
-    private async searchInvoice(
-        embed: EmbedBuilder,
-        interaction: CommandInteraction,
-        options: CommandInteractionOptionResolver,
-    ): Promise<void> {
+    private async searchInvoice(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
+        const embed = this.getEmbedTemplate(interaction)
         try {
-            //Hole den User nach der SteamID
-            const vUser = await WhoIs.validateUser(options.getString('steamid') ?? '')
+            const steamid = options.getString('steamid')
+            if (!steamid) {
+                await interaction.reply({ content: 'Es wurde keine SteamID angegeben!', ephemeral: true })
+                return
+            }
+
+            const vUser = await WhoIs.validateUser(steamid)
             if (!vUser) {
                 await interaction.reply('Es konnte kein Spieler mit dieser SteamID gefunden werden!')
                 return
@@ -132,8 +139,8 @@ export class Rechnung extends Command {
 
             // Lege die Paginierung fest
             const LIMIT_MAX = 10
-            let page = (interaction.options.get('page')?.value as number) ?? 1
-            let limit = (interaction.options.get('limit')?.value as number) ?? 5
+            const page = options.getInteger('page') ?? 1
+            let limit = options.getInteger('limit') ?? 5
             if (limit > LIMIT_MAX) limit = LIMIT_MAX
 
             // Hole die Rechnungen aus der Datenbank
@@ -147,52 +154,51 @@ export class Rechnung extends Command {
                 embed.setDescription('Es wurden keine Rechnungen gefunden\nSteamID: ' + vUser.identifier)
                 await interaction.reply({ embeds: [embed] })
                 return
-            } else {
-                //Generiere die einzelnen Fields im Embed
-                let fields = []
-                for (let i = limit * (page - 1); i < rechnungen.length; i++) {
-                    if (fields.length >= limit) break
-                    fields.push({
-                        name: `Rechnung #${rechnungen[i].id}`,
-                        value: `Empfänger: ${rechnungen[i].receiver_name} (\`${
-                            rechnungen[i].receiver_identifier
-                        }\`)\nSender: ${rechnungen[i].author_name} (\`${rechnungen[i].author_identifier}\`)\nBetrag: ${
-                            rechnungen[i].invoice_value
-                        }€\nSociety: ${rechnungen[i].society_name} (${rechnungen[i].society})\nGrund: ${
-                            rechnungen[i].item
-                        }\nNotiz: ${rechnungen[i].notes}\nStatus: ${rechnungen[i].status}\nVersendet am: ${
-                            rechnungen[i].sent_date
-                        }\nZahlungsziel: ${rechnungen[i].limit_pay_date ?? 'Kein Limit'}\nGebühren: ${
-                            rechnungen[i].fees_amount
-                        }\nBezahlt am: ${rechnungen[i].paid_date ?? 'Nicht bezahlt'}`,
-                        inline: false,
-                    })
-                }
-                // Falls Pagination verfügbar, zeige String an
-                let pageString = ''
-                if (rechnungen.length > limit) {
-                    pageString =
-                        '\nSeite ' +
-                        page +
-                        '/' +
-                        Math.ceil(rechnungen.length / limit) +
-                        `\n${rechnungen.length - fields.length} weitere Ergebnisse sind ausgeblendet!`
-                }
-                // Generiere das Embed
-                embed.setTitle('Rechnungsübersicht')
-                embed.setDescription(
-                    'Rechnungen für Empfänger: ' +
-                        rechnungen[0].receiver_name +
-                        ' (`' +
-                        rechnungen[0].receiver_identifier +
-                        '`)' +
-                        pageString,
-                )
-                // Rückgabe des Embeds
-                embed.setFields(fields)
-                await interaction.reply({ embeds: [embed] })
-                return
             }
+
+            let fields = []
+            for (let i = limit * (page - 1); i < rechnungen.length; i++) {
+                if (fields.length >= limit) break
+                fields.push({
+                    name: `Rechnung #${rechnungen[i].id}`,
+                    value: `Empfänger: ${rechnungen[i].receiver_name} (\`${
+                        rechnungen[i].receiver_identifier
+                    }\`)\nSender: ${rechnungen[i].author_name} (\`${rechnungen[i].author_identifier}\`)\nBetrag: ${
+                        rechnungen[i].invoice_value
+                    }€\nSociety: ${rechnungen[i].society_name} (${rechnungen[i].society})\nGrund: ${
+                        rechnungen[i].item
+                    }\nNotiz: ${rechnungen[i].notes}\nStatus: ${rechnungen[i].status}\nVersendet am: ${
+                        rechnungen[i].sent_date
+                    }\nZahlungsziel: ${rechnungen[i].limit_pay_date ?? 'Kein Limit'}\nGebühren: ${
+                        rechnungen[i].fees_amount
+                    }\nBezahlt am: ${rechnungen[i].paid_date ?? 'Nicht bezahlt'}`,
+                    inline: false,
+                })
+            }
+            // Falls Pagination verfügbar, zeige String an
+            let pageString = ''
+            if (rechnungen.length > limit) {
+                pageString =
+                    '\nSeite ' +
+                    page +
+                    '/' +
+                    Math.ceil(rechnungen.length / limit) +
+                    `\n${rechnungen.length - fields.length} weitere Ergebnisse sind ausgeblendet!`
+            }
+            // Generiere das Embed
+            embed.setTitle('Rechnungsübersicht')
+            embed.setDescription(
+                'Rechnungen für Empfänger: ' +
+                    rechnungen[0].receiver_name +
+                    ' (`' +
+                    rechnungen[0].receiver_identifier +
+                    '`)' +
+                    pageString,
+            )
+            // Rückgabe des Embeds
+            embed.setFields(fields)
+            await interaction.reply({ embeds: [embed] })
+            return
         } catch (error) {
             LogManager.error(error)
             await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true })
@@ -200,11 +206,9 @@ export class Rechnung extends Command {
         }
     }
 
-    private async showInvoice(
-        embed: EmbedBuilder,
-        interaction: CommandInteraction,
-        options: CommandInteractionOptionResolver,
-    ): Promise<void> {
+    private async showInvoice(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
+        const embed = this.getEmbedTemplate(interaction)
         try {
             let rechnungsnummer = options.getInteger('id')
             if (!rechnungsnummer) {
@@ -236,23 +240,27 @@ export class Rechnung extends Command {
                 }\nGebühren: ${rechnungen[0].fees_amount}\nBezahlt am: ${rechnungen[0].paid_date ?? 'Nicht bezahlt'}`,
                 inline: false,
             }
+            // Generiere das Embed
             embed.setTitle('Rechnung anzeigen')
             embed.setDescription('RechnungsID: ' + rechnungsnummer)
             embed.setFields([field])
             await interaction.reply({ embeds: [embed] })
+            return
         } catch (error) {
             LogManager.error(error)
             await interaction.reply({ content: 'Es ist ein Datenbankfehler aufgetreten!', ephemeral: true })
         }
     }
 
-    private async payInvoice(
-        embed: EmbedBuilder,
-        interaction: CommandInteraction,
-        options: CommandInteractionOptionResolver,
-    ): Promise<void> {
+    private async payInvoice(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
+        const embed = this.getEmbedTemplate(interaction)
         try {
-            let rechnungsnummer = options.getInteger('id') as number
+            let rechnungsnummer = options.getInteger('id')
+            if (!rechnungsnummer) {
+                await interaction.reply({ content: 'Es wurde keine Rechnungsnummer angegeben!', ephemeral: true })
+                return
+            }
             const [rechnungen] = await Database.query<IBilling[]>('SELECT * FROM immobilling WHERE id = ? LIMIT 1', [
                 rechnungsnummer,
             ])
@@ -267,35 +275,33 @@ export class Rechnung extends Command {
                 embed.setDescription('Die Rechnung wurde bereits bezahlt')
                 await interaction.reply({ embeds: [embed] })
                 return
-            } else {
-                let now = new Date()
-                let paid_date = now.toISOString().slice(0, 19).replace('T', ' ')
-                await Database.query('UPDATE immobilling SET status = "paid", paid_date = ? WHERE id = ?', [
-                    paid_date,
-                    rechnungsnummer,
-                ])
-                embed.setTitle('Rechnung bezahlen')
-                embed.setDescription('Die Rechnung wurde erfolgreich bezahlt')
-                const channel = (await interaction.guild?.channels.fetch(
-                    Config.Discord.LogChannel.S1_IMMO_BILLING,
-                )) as TextChannel
-                await channel?.send({ embeds: [embed] })
-                await interaction.reply({ embeds: [embed] })
-                return
             }
+            let now = new Date()
+            let paid_date = now.toISOString().slice(0, 19).replace('T', ' ')
+            await Database.query('UPDATE immobilling SET status = "paid", paid_date = ? WHERE id = ?', [
+                paid_date,
+                rechnungsnummer,
+            ])
+            embed.setTitle('Rechnung bezahlen')
+            embed.setDescription('Die Rechnung wurde erfolgreich bezahlt')
+            const channel = await interaction.guild?.channels.fetch(Config.Discord.LogChannel.S1_IMMO_BILLING)
+            if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] })
+            await interaction.reply({ embeds: [embed] })
         } catch (error) {
             LogManager.error(error)
             await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true })
         }
     }
 
-    private async deleteInvoice(
-        embed: EmbedBuilder,
-        interaction: CommandInteraction,
-        options: CommandInteractionOptionResolver,
-    ): Promise<void> {
+    private async deleteInvoice(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
+        const embed = this.getEmbedTemplate(interaction)
         try {
-            let rechnungsnummer = options.getInteger('id') as number
+            const rechnungsnummer = options.getInteger('id')
+            if (!rechnungsnummer) {
+                await interaction.reply({ content: 'Es wurde keine Rechnungsnummer angegeben!', ephemeral: true })
+                return
+            }
             const [rechnungen] = await Database.query<IBilling[]>('SELECT * FROM immobilling WHERE id = ? LIMIT 1', [
                 rechnungsnummer,
             ])
@@ -310,35 +316,45 @@ export class Rechnung extends Command {
                 embed.setDescription('Die Rechnung wurde bereits bezahlt')
                 await interaction.reply({ embeds: [embed] })
                 return
-            } else {
-                await Database.query('DELETE FROM immobilling WHERE id = ?', [rechnungsnummer])
-                embed.setTitle('Rechnung löschen')
-                embed.setDescription('Die Rechnung wurde erfolgreich gelöscht')
-                const channel = (await interaction.guild?.channels.fetch(
-                    Config.Discord.LogChannel.S1_IMMO_BILLING,
-                )) as TextChannel
-                await channel?.send({ embeds: [embed] })
-                await interaction.reply({ embeds: [embed] })
-                return
             }
+            await Database.query('DELETE FROM immobilling WHERE id = ?', [rechnungsnummer])
+            embed.setTitle('Rechnung löschen')
+            embed.setDescription('Die Rechnung wurde erfolgreich gelöscht')
+            const channel = await interaction.guild?.channels.fetch(Config.Discord.LogChannel.S1_IMMO_BILLING)
+            if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] })
+            await interaction.reply({ embeds: [embed] })
         } catch (error) {
             LogManager.error(error)
             await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true })
         }
     }
 
-    private async createInvoice(
-        embed: EmbedBuilder,
-        interaction: CommandInteraction,
-        options: CommandInteractionOptionResolver,
-    ): Promise<void> {
-        const vUser = await WhoIs.validateUser(options.getString('steamid') ?? '')
+    private async createInvoice(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
+        const embed = this.getEmbedTemplate(interaction)
+        const steamid = options.getString('steamid')
+        if (!steamid) {
+            await interaction.reply({ content: 'Es wurde keine SteamID angegeben!', ephemeral: true })
+            return
+        }
+        const vUser = await WhoIs.validateUser(steamid)
         if (!vUser) {
             await interaction.reply('Es konnte kein Spieler mit dieser SteamID gefunden werden!')
             return
         }
-        let betrag = options.getInteger('betrag') as number
-        if (betrag < 0) betrag = betrag * -1
+        let betrag = options.getInteger('betrag')
+        if (!betrag) {
+            await interaction.reply({ content: 'Es wurde kein Betrag angegeben!', ephemeral: true })
+            return
+        }
+        if (betrag == 0) {
+            await interaction.reply({ content: 'Der Betrag darf nicht 0 sein!', ephemeral: true })
+            return
+        }
+        if (betrag < 0) {
+            await interaction.reply({ content: 'Der Betrag darf nicht negativ sein!', ephemeral: true })
+            return
+        }
         let grund = options.getString('grund') ?? ''
         let sender = options.getString('sender') ?? 'dortmund'
         let sendername = 'Stadt Dortmund'
@@ -359,8 +375,8 @@ export class Rechnung extends Command {
         let limit_pay_date = new Date()
         limit_pay_date.setDate(limit_pay_date.getDate() + 3)
         let limit_pay_date_string = limit_pay_date.toISOString().slice(0, 19).replace('T', ' ')
-        let response = (await Database.query(
-            'INSERT INTO immobilling (receiver_identifier, receiver_name, author_identifier, author_name, society, society_name, item, invoice_value, status, notes, sent_date, limit_pay_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        let [response] = await Database.query<IBilling[]>(
+            'INSERT INTO immobilling (receiver_identifier, receiver_name, author_identifier, author_name, society, society_name, item, invoice_value, status, notes, sent_date, limit_pay_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING *',
             [
                 vUser.identifier,
                 vUser.firstname + ' ' + vUser.lastname,
@@ -375,10 +391,10 @@ export class Rechnung extends Command {
                 sent_date,
                 limit_pay_date_string,
             ],
-        )) as RowDataPacket[]
+        )
         let field = {
             name: `Rechnung erstellt`,
-            value: `ID: ${response[0]['insertId']}\nEmpfänger: ${vUser.firstname} ${vUser.lastname} (\`${
+            value: `ID: ${response[0].id}\nEmpfänger: ${vUser.firstname} ${vUser.lastname} (\`${
                 vUser.identifier
             }\`)\nSender: ${sendername}\nBetrag: ${betrag}€\nSociety: ${sender} (${sendername})\nGrund: ${grund}\nNotiz: ${beschreibung}\nStatus: unpaid\nVersendet am: ${sent_date}\nZahlungsziel: ${
                 limit_pay_date_string ?? 'Kein Limit'
@@ -387,11 +403,8 @@ export class Rechnung extends Command {
         }
         embed.setTitle('Rechnung erstellen')
         embed.setFields([field])
-        const channel = (await interaction.guild?.channels.fetch(
-            Config.Discord.LogChannel.S1_IMMO_BILLING,
-        )) as TextChannel
-        await channel?.send({ embeds: [embed] })
+        const channel = await interaction.guild?.channels.fetch(Config.Discord.LogChannel.S1_IMMO_BILLING)
+        if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] })
         await interaction.reply({ embeds: [embed] })
-        return
     }
 }

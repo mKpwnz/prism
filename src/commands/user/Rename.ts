@@ -9,32 +9,34 @@ import { ChatInputCommandInteraction, CommandInteraction, SlashCommandBuilder } 
 import { RowDataPacket } from 'mysql2'
 import { WhoIs } from './WhoIs'
 
-export class Resetpos extends Command {
+export class Rename extends Command {
     constructor() {
         super()
         this.RunEnvironment = EENV.PRODUCTION
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
+        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_RENAME]
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
             Config.Discord.Groups.IC_SUPERADMIN,
-            Config.Discord.Groups.IC_HADMIN,
-            Config.Discord.Groups.IC_ADMIN,
-            Config.Discord.Groups.IC_MOD,
         ]
-        this.IsBetaCommand = true
+        this.AllowedUsers = [
+            Config.Discord.Users.List.L33V33N,
+            Config.Discord.Users.List.ZMASTER,
+            Config.Discord.Users.List.MANU,
+        ]
         RegisterCommand(
             new SlashCommandBuilder()
-                .setName('resetpos')
-                .setDescription('Setze die Position eines Spielers zum Würfelpark zurück')
-                //add string option
-                .setDMPermission(true)
+                .setName('rename')
+                .setDescription('Suche nach Spielern')
                 .addStringOption((option) =>
                     option.setName('steam').setDescription('Steam ID des Nutzers').setRequired(true),
-                ),
+                )
+                .addStringOption((option) => option.setName('vorname').setDescription('Vorname des Spielers'))
+                .addStringOption((option) => option.setName('nachname').setDescription('Nachname des Spielers')),
             this,
         )
     }
+    // TODO: Refactor
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         let steam = interaction.options.get('steam')?.value?.toString() ?? ''
         const vUser = await WhoIs.validateUser(steam ?? '')
@@ -43,28 +45,52 @@ export class Resetpos extends Command {
             await interaction.reply('Es konnte kein Spieler mit dieser SteamID gefunden werden!')
             return
         }
+        let firstname = interaction.options.get('vorname')?.value?.toString() ?? vUser.firstname
+        let lastname = interaction.options.get('nachname')?.value?.toString() ?? vUser.lastname
+        if (firstname == '' && lastname == '') {
+            await interaction.reply({
+                content: 'Es wurde kein Vor- oder Nachname angegeben!',
+                ephemeral: true,
+            })
+            return
+        }
         try {
-            const newPosition = Config.Commands.Resetpos.DefaultPosition
-            let query = 'UPDATE users SET position = ? WHERE identifier = ?'
-            let result = (await Database.execute(query, [
-                JSON.stringify(newPosition),
+            let query = 'UPDATE users SET '
+            LogManager.log(lastname)
+            LogManager.log(vUser.lastname)
+            if (firstname != vUser.firstname) {
+                query += "firstname = '" + firstname + "'"
+                if (lastname != vUser.lastname) {
+                    query += ', '
+                }
+            }
+            if (lastname != vUser.lastname) {
+                query += "lastname = '" + lastname + "' "
+            }
+
+            LogManager.log(query)
+            let result = (await Database.execute(query + 'WHERE identifier = ? ', [
                 vUser.identifier,
             ])) as RowDataPacket[]
             if (result[0]['rowsChanged'] !== 0) {
-                embed.setTitle('Position zurückgesetzt')
+                embed.setTitle('Spieler umbenannt')
                 embed.setDescription(
-                    'Die Position von ' +
+                    'Der Spieler mit dem Namen "' +
                         vUser.firstname +
                         ' ' +
                         vUser.lastname +
-                        ' (`' +
+                        '" (`' +
                         vUser.identifier +
-                        '`) wurde zurückgesetzt.',
+                        '`) hat nun den Namen "' +
+                        firstname +
+                        ' ' +
+                        lastname +
+                        '".',
                 )
                 await interaction.reply({ embeds: [embed] })
             } else {
                 await interaction.reply({
-                    content: 'Der Versuch, die Position zu ändern, ist fehlgeschlagen!',
+                    content: 'Der Spieler konnte nicht umbenannt werden!',
                     ephemeral: true,
                 })
             }

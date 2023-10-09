@@ -3,14 +3,28 @@ import { RconClient } from '@class/RconClient'
 import { RegisterCommand } from '@commands/CommandHandler'
 import Config from '@proot/Config'
 import LogManager from '@utils/Logger'
-import { CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, SlashCommandBuilder } from 'discord.js'
-import { Helper } from '../../utils/Helper'
+import {
+    ChatInputCommandInteraction,
+    CommandInteraction,
+    CommandInteractionOptionResolver,
+    EmbedBuilder,
+    SlashCommandBuilder,
+} from 'discord.js'
+import { EENV } from '@enums/EENV'
+import { Helper } from '@utils/Helper'
 
 export class Give extends Command {
     constructor() {
-        super(true)
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
-        this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER, Config.Discord.Groups.DEV_BOTTESTER]
+        super()
+        this.RunEnvironment = EENV.PRODUCTION
+        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_LIMITED]
+        this.AllowedGroups = [
+            Config.Discord.Groups.DEV_SERVERENGINEER,
+            Config.Discord.Groups.DEV_BOTTESTER,
+            Config.Discord.Groups.IC_SUPERADMIN,
+            Config.Discord.Groups.IC_HADMIN,
+        ]
+        this.IsBetaCommand = true
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('give')
@@ -47,28 +61,24 @@ export class Give extends Command {
         )
     }
 
-    async execute(interaction: CommandInteraction): Promise<void> {
-        if (!interaction.isCommand()) return
-        if (this.CommandEmbed === null) this.CommandEmbed = this.updateEmbed(interaction)
-        const options = interaction.options as CommandInteractionOptionResolver
-
-        if (options.getSubcommand() === 'item') {
-            await this.giveItem(this.CommandEmbed, interaction, options)
-        } else if (options.getSubcommand() === 'weapon') {
-            await this.giveWeapon(this.CommandEmbed, interaction, options)
+    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+        if (interaction.options.getSubcommand() === 'item') {
+            await this.giveItem(interaction)
+        } else if (interaction.options.getSubcommand() === 'weapon') {
+            await this.giveWeapon(interaction)
         } else {
             await interaction.reply({ content: 'Command nicht gefunden.', ephemeral: true })
         }
     }
 
-    private async giveItem(
-        embed: EmbedBuilder,
-        interaction: CommandInteraction,
-        options: CommandInteractionOptionResolver,
-    ): Promise<void> {
+    // TODO: Item Liste als Autocomplete mit einbauen
+    private async giveItem(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
+        const embed = this.getEmbedTemplate(interaction)
         const id = options.getInteger('id')
-        let item = options.getString('item')
+        const item = options.getString('item')
         const anzahl = options.getInteger('anzahl')
+
         if (item === '' || item === null) {
             await interaction.reply({ content: 'Item darf nicht leer sein!', ephemeral: true })
             return
@@ -76,18 +86,17 @@ export class Give extends Command {
         let validateitem = await Helper.validateItemName(item ?? '')
         let response = RconClient.sendCommand(`giveitem ${id} ${validateitem} ${anzahl}`)
         embed.setTitle('Give Item')
-        embed.setDescription(`Spieler ${id} sollte ${anzahl}x ${item} erhalten haben!`)
+        embed.setDescription(`Spieler ${id} sollte ${anzahl}x ${validateitem} erhalten haben!`)
         await interaction.reply({ embeds: [embed] })
     }
 
-    private async giveWeapon(
-        embed: EmbedBuilder,
-        interaction: CommandInteraction,
-        options: CommandInteractionOptionResolver,
-    ): Promise<void> {
+    // TODO: Waffenliste als Choose einbauen @Micha
+    private async giveWeapon(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
+        const embed = this.getEmbedTemplate(interaction)
         try {
             const id = options.getInteger('id')
-            let waffe = options.getString('waffe') ?? ''
+            const waffe = options.getString('waffe') ?? ''
             let munition = options.getInteger('munition') ?? 250
             if (munition > 250) {
                 munition = 250

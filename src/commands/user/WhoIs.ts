@@ -7,20 +7,20 @@ import { Database } from '@sql/Database'
 import { IFindUser } from '@sql/schema/FindUser.schema'
 import { Helper } from '@utils/Helper'
 import LogManager from '@utils/Logger'
-import { AttachmentBuilder, CommandInteraction, SlashCommandBuilder } from 'discord.js'
+import { AttachmentBuilder, ChatInputCommandInteraction, CommandInteraction, SlashCommandBuilder } from 'discord.js'
 
 export class WhoIs extends Command {
     constructor() {
-        super(true)
+        super()
         this.RunEnvironment = EENV.PRODUCTION
         this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
-            Config.Discord.Groups.IC_MOD,
-            Config.Discord.Groups.IC_ADMIN,
-            Config.Discord.Groups.IC_HADMIN,
             Config.Discord.Groups.IC_SUPERADMIN,
+            Config.Discord.Groups.IC_HADMIN,
+            Config.Discord.Groups.IC_ADMIN,
+            Config.Discord.Groups.IC_MOD,
         ]
         RegisterCommand(
             new SlashCommandBuilder()
@@ -53,19 +53,18 @@ export class WhoIs extends Command {
                             { name: 'Gruppe', value: ESearchType.GROUP },
                             { name: 'Telefonnummer', value: ESearchType.PHONENUMBER },
                         ),
-                ) as SlashCommandBuilder,
+                ),
             this,
         )
     }
 
-    async execute(interaction: CommandInteraction): Promise<void> {
+    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const { channel, user, guild } = interaction
         const identifierValue = interaction.options.get('input')?.value?.toString()
         let page = interaction.options.get('seite')?.value as number
         let spalte = interaction.options.get('spalte')?.value?.toString()
         let filter = '\nFilter: '
-        if (this.CommandEmbed === null) this.CommandEmbed = this.updateEmbed(interaction)
-        let embed = this.CommandEmbed
+        let embed = this.getEmbedTemplate(interaction)
         if (identifierValue) {
             if (spalte === undefined || spalte === null) {
                 spalte = ESearchType.ALL
@@ -318,6 +317,7 @@ export class WhoIs extends Command {
         }
     }
 
+    // TODO: Update Validate user to custom querys
     public static async validateUser(
         searchString: string,
         type: ESearchType = ESearchType.STEAMID,

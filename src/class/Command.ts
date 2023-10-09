@@ -1,9 +1,8 @@
-import { CommandHandler } from '@commands/CommandHandler'
 import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
 import { Helper } from '@utils/Helper'
 import LogManager from '@utils/Logger'
-import { CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder } from 'discord.js'
+import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js'
 
 /**
  * @author mKpwnz
@@ -15,53 +14,66 @@ import { CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder } fr
 export abstract class Command {
     AllowedChannels: string[] = []
     AllowedGroups: string[] = []
-    CheckPermissions: Boolean = false
-    CommandEmbed: EmbedBuilder | null = null
+    AllowedUsers: string[] = []
+    BlockedUsers: string[] = []
+    CheckPermissions: Boolean = true
     RunEnvironment: EENV = EENV.DEVELOPMENT
-    constructor(checkPermissions: boolean = false) {
-        this.CheckPermissions = checkPermissions
-    }
-    abstract execute(interaction: CommandInteraction): Promise<void>
-    async run(interaction: CommandInteraction): Promise<void> {
-        if (this.RunEnvironment === EENV.DEVELOPMENT || process.env.NODE_ENV === 'development') {
+    IsBetaCommand: boolean = false
+    constructor() {}
+    abstract execute(interaction: ChatInputCommandInteraction): Promise<void>
+    async run(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options, user } = interaction
+
+        // Override Channel in Devmode
+        if (this.RunEnvironment != EENV.PRODUCTION) {
             this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
             this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER, Config.Discord.Groups.DEV_BOTTESTER]
         }
 
+        // Check Permissions
         if (this.CheckPermissions) {
-            if ((await Helper.IsUserAllowed(interaction, this.AllowedChannels, this.AllowedGroups)) === false) return
+            if (
+                (await Helper.IsUserAllowed(
+                    interaction,
+                    this.AllowedChannels,
+                    this.AllowedGroups,
+                    this.AllowedUsers,
+                    this.BlockedUsers,
+                )) === false
+            )
+                return
         }
-        let dc_user =
-            process.env.NODE_ENV === 'development' ? `DEV: ${interaction.user.id}` : `<@${interaction.user.id}>`
 
-        var loptions = interaction.options as CommandInteractionOptionResolver
         let inputFields: { name: string; value: string }[] = []
-        loptions.data.forEach((input) => {
+        options.data.forEach((input) => {
             var d = JSON.parse(JSON.stringify(input))
             inputFields.push({ name: d['name'], value: d['value'] })
         })
         var cmdPrint = {
             user: {
-                displayame: interaction.user.displayName,
-                id: interaction.user.id,
+                displayame: user.displayName,
+                id: user.id,
             },
             command: interaction.commandName,
             options: inputFields,
         }
-
         LogManager.discordActionLog(
-            `\` ${interaction.user.displayName} (${interaction.user.id}) \` hat im Kanal <#${
-                interaction.channelId
-            }> den Befehl \`${interaction.commandName}\` ausgeführt:\`\`\`json\n${JSON.stringify(
-                cmdPrint,
-                null,
-                4,
-            )}\`\`\``,
+            `\` ${interaction.user.displayName} (${user.id}) \` hat im Kanal <#${interaction.channelId}> den Befehl \`${
+                interaction.commandName
+            }\` ausgeführt:\`\`\`json\n${JSON.stringify(cmdPrint, null, 4)}\`\`\``,
         )
-        this.CommandEmbed = this.updateEmbed(interaction)
-        await this.execute(interaction)
+
+        try {
+            await this.execute(interaction)
+        } catch (error) {
+            LogManager.error(error)
+            await interaction.reply({
+                content: `Es ist ein Fehler aufgetreten!\`\`\`json${JSON.stringify(error)}\`\`\``,
+                ephemeral: true,
+            })
+        }
     }
-    updateEmbed(interaction: CommandInteraction): EmbedBuilder {
+    getEmbedTemplate(interaction: ChatInputCommandInteraction): EmbedBuilder {
         return new EmbedBuilder()
             .setColor(0x0792f1)
             .setTimestamp()
@@ -71,14 +83,6 @@ export abstract class Command {
                 iconURL: interaction.user.avatarURL() ?? '',
             })
             .setTimestamp(new Date())
-    }
-    updateEmbedWithUser(interaction: CommandInteraction): void {
-        if (!this.CommandEmbed) {
-            this.CommandEmbed = this.updateEmbed(interaction)
-        }
-        this.CommandEmbed.setFooter({
-            text: interaction.user.displayName ?? '',
-            iconURL: interaction.user.avatarURL() ?? '',
-        })
+            .setImage(Config.Pictures.WHITESPACE)
     }
 }

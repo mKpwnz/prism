@@ -1,17 +1,21 @@
 import { Database } from '@sql/Database'
 import { IItems } from '@sql/schema/Items.schema'
-import { CommandInteraction, TextChannel } from 'discord.js'
+import { CommandInteraction, GuildEmoji, TextChannel } from 'discord.js'
 import LogManager from './Logger'
+import Config from '@proot/Config'
+import { BotClient } from '@proot/Bot'
 
 export class Helper {
     /**
      * @description Checks if the user is allowed to execute the command
      * @author mKpwnz
-     * @date 29.09.2023
+     * @date 09.10.2023
      * @static
      * @param {CommandInteraction} interaction
      * @param {string[]} [allowedChannels=[]]
      * @param {string[]} [allowedGroups=[]]
+     * @param {string[]} [allowedUsers=[]]
+     * @param {string[]} [blockedUsers=[]]
      * @returns {*}  {Promise<boolean>}
      * @memberof Helper
      */
@@ -19,14 +23,31 @@ export class Helper {
         interaction: CommandInteraction,
         allowedChannels: string[] = [],
         allowedGroups: string[] = [],
+        allowedUsers: string[] = [],
+        blockedUsers: string[] = [],
     ): Promise<boolean> {
         const { channel, user, guild } = interaction
+        if (!guild) return false
 
-        const userRoleCache = guild?.members.cache.get(user.id)
-        const userIsAllowed =
-            allowedGroups.length > 0
-                ? allowedGroups.some((roleID) => userRoleCache?.roles.cache.has(roleID))
-                : true
+        const userRoleCache = guild.members.cache.get(user.id)
+        var userIsAllowed = false
+
+        if (allowedUsers.length == 0) {
+            userIsAllowed = true
+        } else if (allowedGroups.some((roleID) => userRoleCache?.roles.cache.has(roleID))) {
+            userIsAllowed = true
+        } else if (allowedUsers.includes(user.id)) {
+            userIsAllowed = true
+        }
+        if (blockedUsers.includes(user.id)) {
+            userIsAllowed = false
+        }
+        if (Config.Discord.Users.GlobalBlocked.includes(user.id)) {
+            userIsAllowed = false
+        }
+        if (Config.Discord.Users.GlobalWhitelist.includes(user.id)) {
+            userIsAllowed = true
+        }
 
         if (channel instanceof TextChannel) {
             if (allowedChannels.length > 0 && !allowedChannels.includes(channel.id)) {
@@ -156,13 +177,20 @@ export class Helper {
         return platetext
     }
 
+    /**
+     * @description
+     * @author sirjxsh
+     * @date 09.10.2023
+     * @static
+     * @param {string} itemName
+     * @returns {*}  {Promise<string>}
+     * @memberof Helper
+     */
     static async validateItemName(itemName: string): Promise<string> {
         itemName = itemName.toLowerCase()
         itemName = '%' + itemName + '%'
         try {
-            let [item] = await Database.query<IItems[]>('SELECT * FROM items WHERE name LIKE ?', [
-                itemName,
-            ])
+            let [item] = await Database.query<IItems[]>('SELECT * FROM items WHERE name LIKE ?', [itemName])
             if (item.length > 0) {
                 return item[0].name
             }
@@ -173,6 +201,15 @@ export class Helper {
         }
     }
 
+    /**
+     * @description
+     * @author sirsxsh
+     * @date 09.10.2023
+     * @static
+     * @param {string} weaponName
+     * @returns {*}  {string}
+     * @memberof Helper
+     */
     static validateWeaponName(weaponName: string): string {
         LogManager.log(weaponName)
         if (!weaponName.startsWith('WEAPON_')) {
@@ -273,5 +310,21 @@ export class Helper {
             LogManager.log('Weapon found')
             return weaponName
         }
+    }
+
+    /**
+     * @description
+     * @author mKpwnz
+     * @date 09.10.2023
+     * @static
+     * @param {string} emoteName
+     * @returns {*}  {(string | null)}
+     * @memberof Helper
+     */
+    static async getEmote(emoteName: string): Promise<GuildEmoji | null> {
+        const guild = BotClient.guilds.cache.get(Config.Discord.ServerID)
+        if (!guild) return null
+        var emoteData = await guild.emojis.fetch()
+        return emoteData.find((e) => e.name === emoteName) ?? null
     }
 }

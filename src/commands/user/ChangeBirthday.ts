@@ -3,23 +3,28 @@ import { RegisterCommand } from '@commands/CommandHandler'
 import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
 import { Database } from '@sql/Database'
-import { CommandInteraction, SlashCommandBuilder } from 'discord.js'
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 import { RowDataPacket } from 'mysql2'
 
 export class ChangeBirthday extends Command {
     constructor() {
-        super(true)
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
+        super()
+        this.RunEnvironment = EENV.PRODUCTION
+        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_RENAME]
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
-            Config.Discord.Groups.IC_HADMIN,
             Config.Discord.Groups.IC_SUPERADMIN,
+        ]
+        this.AllowedUsers = [
+            Config.Discord.Users.List.L33V33N,
+            Config.Discord.Users.List.ZMASTER,
+            Config.Discord.Users.List.MANU,
         ]
         RegisterCommand(
             new SlashCommandBuilder()
-                .setName('changeBirthday')
-                .setDescription('Suche nach Spielern')
+                .setName('changebirthday')
+                .setDescription('Ändert den Geburtstag eines Nutzers')
                 //add string option
                 .setDMPermission(true)
                 .addStringOption((option) =>
@@ -30,13 +35,12 @@ export class ChangeBirthday extends Command {
                         .setName('datum')
                         .setDescription('Neuer Geburtstag des Spielers (dd.mm.yyyy)')
                         .setRequired(true),
-                ) as SlashCommandBuilder,
+                ),
             this,
         )
     }
-    async execute(interaction: CommandInteraction): Promise<void> {
-        const { channel, user, guild } = interaction
-        //if ((await IsUserAllowed(interaction, AllowedChannels, AllowedGroups)) === false) return
+    // TODO: Refactor Command
+    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const birthday = interaction.options.get('datum')?.value?.toString() ?? ''
         let steam = interaction.options.get('steam')?.value?.toString() ?? ''
         //Regex for date

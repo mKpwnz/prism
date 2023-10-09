@@ -9,7 +9,7 @@ import LogManager from '@utils/Logger'
 import { Chart, ChartConfiguration } from 'chart.js'
 import { ChartJSNodeCanvas } from 'chartjs-node-canvas'
 import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels'
-import { CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder, TextChannel } from 'discord.js'
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 import { RowDataPacket } from 'mysql2'
 import { WhoIs } from '../user/WhoIs'
 import { EENV } from '@enums/EENV'
@@ -20,14 +20,19 @@ declare module 'chartjs-plugin-datalabels' {
     }
 }
 
+interface IVote extends RowDataPacket {
+    name: string
+    vote_count: number
+}
+
 export class Wahl extends Command {
     constructor() {
-        super(true)
+        super()
+        this.RunEnvironment = EENV.PRODUCTION
         this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_LIMITED]
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
-
             Config.Discord.Groups.IC_SUPERADMIN,
             Config.Discord.Groups.IC_HADMIN,
         ]
@@ -136,57 +141,47 @@ export class Wahl extends Command {
                                 .setDescription('Gib die Anzahl der Stimmen an an')
                                 .setRequired(true),
                         ),
-                ) as SlashCommandBuilder,
+                ),
             this,
         )
     }
-    async execute(interaction: CommandInteraction): Promise<void> {
-        if (!interaction.isCommand()) return
-        if (this.CommandEmbed === null) this.CommandEmbed = this.updateEmbed(interaction)
-        let embed = this.CommandEmbed
-        const options = interaction.options as CommandInteractionOptionResolver
-
-        switch (options.getSubcommand()) {
+    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+        switch (interaction.options.getSubcommand()) {
             case 'erstellen':
-                await this.createElection(embed, interaction, options)
+                await this.createElection(interaction)
                 break
             case 'status':
-                await this.showStatus(embed, interaction, options)
+                await this.showStatus(interaction)
                 break
             case 'user':
-                await this.manageUser(embed, interaction, options)
+                await this.manageUser(interaction)
                 break
             case 'ergebnis':
-                await this.showResult(embed, interaction, options)
+                await this.showResult(interaction)
                 break
             case 'liste':
-                await this.listElections(embed, interaction, options)
+                await this.listElections(interaction)
                 break
             case 'kandidaten':
-                await this.listCandidates(embed, interaction, options)
+                await this.listCandidates(interaction)
                 break
             case 'manipulieren':
-                await this.manipulateElection(embed, interaction, options)
+                await this.manipulateElection(interaction)
                 break
             default:
-                await interaction.reply({
-                    content: 'Dieser Befehl existiert nicht!',
-                    ephemeral: true,
-                })
+                await interaction.reply({ content: 'Command nicht gefunden.', ephemeral: true })
                 break
         }
     }
-    private async createElection(
-        embed: EmbedBuilder,
-        interaction: CommandInteraction,
-        options: CommandInteractionOptionResolver,
-    ): Promise<void> {
+    private async createElection(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
+        const embed = this.getEmbedTemplate(interaction)
         if (options.getString('name') === '') {
             await interaction.reply({ content: 'Bitte gib einen Namen an!', ephemeral: true })
             return
         }
         try {
-            var [queryResult] = await Database.query<IElection[]>(
+            const [queryResult] = await Database.query<IElection[]>(
                 'INSERT INTO immo_elections (name, job, status, created, updated) VALUES (?, ?, ?, NOW(), NOW()) RETURNING *',
                 [options.getString('name'), options.getString('job') ?? null, options.getBoolean('enthaltung') ? 1 : 0],
             )
@@ -201,10 +196,8 @@ export class Wahl extends Command {
                     '\nID: ' +
                     queryResult[0].id,
             )
-            const channel = (await interaction.guild?.channels.fetch(
-                Config.Discord.LogChannel.S1_WAHLEN,
-            )) as TextChannel
-            await channel?.send({ embeds: [embed] })
+            const channel = await interaction.guild?.channels.fetch(Config.Discord.LogChannel.S1_WAHLEN)
+            if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] })
             await interaction.reply({ embeds: [embed] })
         } catch (error) {
             LogManager.error(error)
@@ -212,46 +205,50 @@ export class Wahl extends Command {
         }
     }
 
-    private async showStatus(
-        embed: EmbedBuilder,
-        interaction: CommandInteraction,
-        options: CommandInteractionOptionResolver,
-    ): Promise<void> {
+    private async showStatus(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
+        const embed = this.getEmbedTemplate(interaction)
         const status = ['Erstellt', 'Gestartet', 'Beendet', 'Löschen']
         try {
             if (options.getNumber('wahlid') === 0) {
                 await interaction.reply({ content: 'Bitte gib eine WahlID an!', ephemeral: true })
                 return
             }
-            let query = await Database.query<RowDataPacket[]>('SELECT * FROM immo_elections WHERE id = ?', [
+            const [query] = await Database.query<IElection[]>('SELECT * FROM immo_elections WHERE id = ?', [
                 options.getNumber('wahlid'),
             ])
-            if (query[0].length === 0) {
+            if (!query[0]) {
                 await interaction.reply({
                     content: 'Es konnte keine Wahl mit dieser ID gefunden werden!',
                     ephemeral: true,
                 })
                 return
             }
-            let [response] = await Database.query<IElection[]>(
-                'UPDATE immo_elections SET status = ?, updated = NOW() WHERE id = ? RETURNING *',
+            // TODO: Umbauen von "as RowDataPacket[]" aut Database.query<T>
+            const response = (await Database.query(
+                'UPDATE immo_elections SET status = ?, updated = NOW() WHERE id = ?',
                 [options.getNumber('option_status'), options.getNumber('wahlid')],
-            )
+            )) as RowDataPacket[]
+            if (response[0]['rowsChanged'] === 0) {
+                await interaction.reply({
+                    content: 'Die Wahl konnte nicht verändert werden!',
+                    ephemeral: true,
+                })
+                return
+            }
             embed.setTitle('Wahlstatus geändert')
             embed.setDescription(
                 'Wahlstatus für ' +
-                    response[0].name +
+                    query[0].name +
                     ' (' +
-                    response[0].id +
+                    query[0].id +
                     ')' +
                     ' auf ' +
                     status[options.getNumber('option_status') ?? 0] +
                     ' geändert!',
             )
-            const channel = (await interaction.guild?.channels.fetch(
-                Config.Discord.LogChannel.S1_WAHLEN,
-            )) as TextChannel
-            await channel?.send({ embeds: [embed] })
+            const channel = await interaction.guild?.channels.fetch(Config.Discord.LogChannel.S1_WAHLEN)
+            if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] })
             await interaction.reply({ embeds: [embed] })
         } catch (error) {
             LogManager.error(error)
@@ -259,24 +256,28 @@ export class Wahl extends Command {
         }
     }
 
-    public async manageUser(
-        embed: EmbedBuilder,
-        interaction: CommandInteraction,
-        options: CommandInteractionOptionResolver,
-    ): Promise<void> {
+    public async manageUser(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
+        const embed = this.getEmbedTemplate(interaction)
         if (
             options.getNumber('wahlid') === 0 ||
             options.getString('steamid') === '' ||
             options.getString('operation') === ''
         ) {
-            await interaction.reply({ content: 'Bitte gib eine WahlID/SteamID/Operation an!', ephemeral: true })
+            await interaction.reply({
+                content: 'Bitte gib eine WahlID/SteamID/Operation an!',
+                ephemeral: true,
+            })
             return
         }
-        let [query] = await Database.query<IElection[]>('SELECT * FROM immo_elections WHERE id = ?', [
+        const [query] = await Database.query<IElection[]>('SELECT * FROM immo_elections WHERE id = ?', [
             options.getNumber('wahlid'),
         ])
         if (query[0].length === 0) {
-            await interaction.reply({ content: 'Es konnte keine Wahl mit dieser ID gefunden werden!', ephemeral: true })
+            await interaction.reply({
+                content: 'Es konnte keine Wahl mit dieser ID gefunden werden!',
+                ephemeral: true,
+            })
             return
         }
         let election = query[0]
@@ -289,7 +290,7 @@ export class Wahl extends Command {
             return
         }
         if (options.getString('operation') === 'add') {
-            let [response] = await Database.query<IElectionParticipant[]>(
+            const [response] = await Database.query<IElectionParticipant[]>(
                 'INSERT INTO immo_elections_participants (electionid, identifier, name) VALUES (?, ?, ?) RETURNING *',
                 [options.getNumber('wahlid'), vUser.identifier, vUser.firstname + ' ' + vUser.lastname],
             )
@@ -308,19 +309,19 @@ export class Wahl extends Command {
                     '`\nParticipantID: ' +
                     response[0].id,
             )
-            const channel = (await interaction.guild?.channels.fetch(
-                Config.Discord.LogChannel.S1_WAHLEN,
-            )) as TextChannel
-            await channel?.send({ embeds: [embed] })
+            const channel = await interaction.guild?.channels.fetch(Config.Discord.LogChannel.S1_WAHLEN)
+            if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] })
             await interaction.reply({ embeds: [embed] })
         } else if (options.getString('operation') === 'remove') {
             try {
                 let steamid = options.getString('steamid') ?? ''
                 if (!steamid.startsWith('steam:')) steamid = 'steam:' + steamid
-                await Database.query<RowDataPacket[][]>(
+                // TODO: Auswertung "affected rows" einfügen
+                const res = await Database.query<RowDataPacket[][]>(
                     'DELETE FROM immo_elections_participants WHERE electionid = ? AND identifier = ?',
                     [options.getNumber('wahlid'), steamid],
                 )
+                LogManager.debug(res)
                 embed.setTitle('Nutzer hinzugefügt')
                 embed.setDescription(
                     'Nutzer ' +
@@ -335,25 +336,24 @@ export class Wahl extends Command {
                         steamid +
                         '`',
                 )
-                const channel = (await interaction.guild?.channels.fetch(
-                    Config.Discord.LogChannel.S1_WAHLEN,
-                )) as TextChannel
-                await channel?.send({ embeds: [embed] })
+                const channel = await interaction.guild?.channels.fetch(Config.Discord.LogChannel.S1_WAHLEN)
+                if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] })
                 await interaction.reply({ embeds: [embed] })
             } catch (error) {
                 LogManager.error(error)
-                await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true })
+                await interaction.reply({
+                    content: 'Es ist ein Fehler aufgetreten!',
+                    ephemeral: true,
+                })
             }
         }
     }
 
-    public async showResult(
-        embed: EmbedBuilder,
-        interaction: CommandInteraction,
-        options: CommandInteractionOptionResolver,
-    ): Promise<void> {
+    public async showResult(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
+        const embed = this.getEmbedTemplate(interaction)
         try {
-            let [query] = await Database.query<IElection[]>('SELECT * FROM immo_elections WHERE id = ?', [
+            const [query] = await Database.query<IElection[]>('SELECT * FROM immo_elections WHERE id = ?', [
                 options.getNumber('wahlid'),
             ])
             if (query.length === 0) {
@@ -363,11 +363,8 @@ export class Wahl extends Command {
                 })
                 return
             }
-            interface IVote extends RowDataPacket {
-                name: string
-                vote_count: number
-            }
-            let [votes] = await Database.query<IVote[]>(
+
+            const [votes] = await Database.query<IVote[]>(
                 'SELECT ep.name as name, COUNT(ev.id) AS vote_count ' +
                     'FROM immo_elections_participants ep ' +
                     'LEFT JOIN immo_elections_votes ev ON ev.participantid = ep.id AND ev.electionid = ? ' +
@@ -391,10 +388,11 @@ export class Wahl extends Command {
             Chart.register(ChartDataLabels)
             const labels = votes.map((vote) => vote.name + ' (' + vote.vote_count + ')')
             const data = votes.map((vote) => vote.vote_count)
-            const config = {
+            const config: ChartConfiguration = {
                 type: 'doughnut',
+                plugins: [ChartDataLabels], // EDIT: Hierhin verschoben um Typescript Fehler zu vermeiden. Muss getestet werden
                 data: {
-                    plugins: [ChartDataLabels],
+                    // plugins: [ChartDataLabels],
                     labels: labels,
                     datasets: [
                         {
@@ -433,7 +431,7 @@ export class Wahl extends Command {
                         legend: {
                             position: 'right',
                             labels: {
-                                display: true,
+                                // display: true, // Gibt es nach ChartConfiguration nicht
                                 color: 'white',
                                 font: {
                                     size: 25,
@@ -469,11 +467,11 @@ export class Wahl extends Command {
                         },
                     },
                 },
-            } as ChartConfiguration
+            }
             const image = await chart.renderToBuffer(config)
 
-            interaction.channel?.send({ files: [image] })
-
+            if (interaction.channel && interaction.channel.isTextBased())
+                await interaction.channel.send({ files: [image] })
             embed.setTitle('Wahlergebnis')
             embed.setDescription('Wahlergebnis für ' + query[0].name + ' (' + query[0].id + ')')
             //post image to channel
@@ -485,14 +483,12 @@ export class Wahl extends Command {
         }
     }
 
-    public async listElections(
-        embed: EmbedBuilder,
-        interaction: CommandInteraction,
-        options: CommandInteractionOptionResolver,
-    ): Promise<void> {
+    public async listElections(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
+        const embed = this.getEmbedTemplate(interaction)
         const status = ['Erstellt', 'Gestartet', 'Beendet', 'Löschen']
         try {
-            let [elections] = await Database.query<IElection[]>('SELECT * FROM immo_elections WHERE status != 3')
+            const [elections] = await Database.query<IElection[]>('SELECT * FROM immo_elections WHERE status != 3')
             if (elections.length === 0) {
                 await interaction.reply('Es konnte keine Wahlen gefunden werden!')
                 return
@@ -526,13 +522,11 @@ export class Wahl extends Command {
         }
     }
 
-    public async listCandidates(
-        embed: EmbedBuilder,
-        interaction: CommandInteraction,
-        options: CommandInteractionOptionResolver,
-    ): Promise<void> {
+    public async listCandidates(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
+        const embed = this.getEmbedTemplate(interaction)
         try {
-            let [query] = await Database.query<IElection[]>('SELECT id, name FROM immo_elections WHERE id = ?', [
+            const [query] = await Database.query<IElection[]>('SELECT id, name FROM immo_elections WHERE id = ?', [
                 options.getNumber('wahlid'),
             ])
             if (query[0].length === 0) {
@@ -541,7 +535,7 @@ export class Wahl extends Command {
             }
             let election = query[0]
 
-            let [participants] = await Database.query<IElectionParticipant[]>(
+            const [participants] = await Database.query<IElectionParticipant[]>(
                 'SELECT * FROM immo_elections_participants WHERE electionid = ?',
                 [options.getNumber('wahlid')],
             )
@@ -562,11 +556,9 @@ export class Wahl extends Command {
         }
     }
 
-    public async manipulateElection(
-        embed: EmbedBuilder,
-        interaction: CommandInteraction,
-        options: CommandInteractionOptionResolver,
-    ): Promise<void> {
+    public async manipulateElection(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
+        const embed = this.getEmbedTemplate(interaction)
         try {
             if (
                 options.getNumber('wahlid') === 0 ||
@@ -580,7 +572,7 @@ export class Wahl extends Command {
                 })
                 return
             }
-            let [query] = await Database.query<IElection[]>('SELECT * FROM immo_elections WHERE id = ?', [
+            const [query] = await Database.query<IElection[]>('SELECT * FROM immo_elections WHERE id = ?', [
                 options.getNumber('wahlid'),
             ])
             if (query[0].length === 0) {
@@ -591,7 +583,7 @@ export class Wahl extends Command {
                 return
             }
             let { id, name } = query[0]
-            let [participant] = await Database.query<IElectionParticipant[]>(
+            const [participant] = await Database.query<IElectionParticipant[]>(
                 'SELECT id, name FROM immo_elections_participants WHERE id = ?',
                 [options.getString('kandidatennr')],
             )
@@ -603,6 +595,7 @@ export class Wahl extends Command {
                 return
             }
             if (options.getString('operation') === 'add') {
+                // TODO: Umbau SQL mit RETURNING * und const [data] = await Databse.query<T> (Anmerkung: die Daten sind nicht interessant, lediglich wie viele Zeilen geändert wurden)
                 let querystring = 'INSERT INTO immo_elections_votes (electionid, identifier, participantid) VALUES '
                 let anzahl = options.getNumber('stimmen') ?? 0
                 for (let i = 0; i < anzahl; i++) {
@@ -619,13 +612,12 @@ export class Wahl extends Command {
                 embed.setDescription(
                     anzahl + ' Stimmen für ' + participant[0].name + ' zur Wahl ' + name + ' (' + id + ') hinzugefügt!',
                 )
-                const channel = (await interaction.guild?.channels.fetch(
-                    Config.Discord.LogChannel.S1_WAHLEN,
-                )) as TextChannel
-                await channel?.send({ embeds: [embed] })
+                const channel = await interaction.guild?.channels.fetch(Config.Discord.LogChannel.S1_WAHLEN)
+                //if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] })
                 await interaction.reply({ embeds: [embed] })
             } else if (options.getString('operation') === 'remove') {
-                let response = await Database.query<RowDataPacket[][]>(
+                // TODO: Umbau auf neue Query Struktur
+                const response = await Database.query<RowDataPacket[][]>(
                     'DELETE FROM immo_elections_votes WHERE electionid = ? AND participantid = ? LIMIT ?',
                     [options.getNumber('wahlid'), options.getString('kandidatennr'), options.getNumber('stimmen')],
                 )
@@ -641,10 +633,8 @@ export class Wahl extends Command {
                         id +
                         ') entfernt!',
                 )
-                const channel = (await interaction.guild?.channels.fetch(
-                    Config.Discord.LogChannel.S1_WAHLEN,
-                )) as TextChannel
-                await channel?.send({ embeds: [embed] })
+                const channel = await interaction.guild?.channels.fetch(Config.Discord.LogChannel.S1_WAHLEN)
+                if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] })
                 await interaction.reply({ embeds: [embed] })
             }
         } catch (error) {

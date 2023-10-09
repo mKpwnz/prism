@@ -1,21 +1,36 @@
 import { Command } from '@class/Command'
+import { RconClient } from '@class/RconClient'
 import { RegisterCommand } from '@commands/CommandHandler'
 import { EmbedBuilder } from '@discordjs/builders'
+import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
 import { Database } from '@sql/Database'
-import LogManager from '@utils/Logger'
-import { CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder } from 'discord.js'
-import { WhoIs } from './WhoIs'
-import { EENV } from '@enums/EENV'
 import { IJobs } from '@sql/schema/Jobs.schema'
 import { IUser } from '@sql/schema/User.schema'
-import { RconClient } from '@class/RconClient'
+import LogManager from '@utils/Logger'
+import {
+    ChatInputCommandInteraction,
+    CommandInteraction,
+    CommandInteractionOptionResolver,
+    SlashCommandBuilder,
+} from 'discord.js'
+import { RowDataPacket } from 'mysql2'
+import { WhoIs } from './WhoIs'
 
 export class Setjob extends Command {
     constructor() {
-        super(true)
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
-        this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER, Config.Discord.Groups.DEV_BOTTESTER]
+        super()
+        this.RunEnvironment = EENV.PRODUCTION
+        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
+        this.AllowedGroups = [
+            Config.Discord.Groups.DEV_SERVERENGINEER,
+            Config.Discord.Groups.DEV_BOTTESTER,
+            Config.Discord.Groups.IC_SUPERADMIN,
+            Config.Discord.Groups.IC_HADMIN,
+            Config.Discord.Groups.IC_ADMIN,
+            Config.Discord.Groups.IC_MOD,
+        ]
+        this.IsBetaCommand = true
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('setjob')
@@ -52,35 +67,34 @@ export class Setjob extends Command {
         )
     }
 
-    async execute(interaction: CommandInteraction): Promise<void> {
-        if (!interaction.isCommand()) return
-        if (this.CommandEmbed === null) this.CommandEmbed = this.updateEmbed(interaction)
-        const options = interaction.options as CommandInteractionOptionResolver
+    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
 
         if (options.getSubcommand() === 'online') {
-            await this.setOnline(this.CommandEmbed, interaction, options)
+            await this.setOnline(interaction)
         } else if (options.getSubcommand() === 'offline') {
-            await this.setOffline(this.CommandEmbed, interaction, options)
+            await this.setOffline(interaction)
         } else {
             await interaction.reply({ content: 'Command nicht gefunden.', ephemeral: true })
         }
     }
 
-    private async setOnline(
-        embed: EmbedBuilder,
-        interaction: CommandInteraction,
-        options: CommandInteractionOptionResolver,
-    ): Promise<void> {
-        let job = options.getString('jobname') ?? ''
+    private async setOnline(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
+        const embed = this.getEmbedTemplate(interaction)
+        let job = options.getString('jobname')
         let grade = options.getInteger('grade') ?? 0
-        if (job === '') {
+        if (!job) {
             await interaction.reply({ content: 'Es wurde kein Job angegeben!', ephemeral: true })
             return
         }
         try {
             const [jobquery] = await Database.query<IJobs[]>('SELECT * FROM jobs WHERE name = ?', [job.toLowerCase()])
             if (jobquery.length === 0) {
-                await interaction.reply({ content: 'Es wurde kein Job mit diesem Namen gefunden!', ephemeral: true })
+                await interaction.reply({
+                    content: 'Es wurde kein Job mit diesem Namen gefunden!',
+                    ephemeral: true,
+                })
                 return
             }
             let response = await RconClient.sendCommand(
@@ -99,12 +113,21 @@ export class Setjob extends Command {
         }
     }
 
-    private async setOffline(
-        embed: EmbedBuilder,
-        interaction: CommandInteraction,
-        options: CommandInteractionOptionResolver,
-    ): Promise<void> {
-        const vUser = await WhoIs.validateUser(options.getString('steamid') ?? '')
+    private async setOffline(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
+        const embed = this.getEmbedTemplate(interaction)
+        const steamid = options.getString('steamid')
+        const job = options.getString('jobname')
+        const grade = options.getInteger('grade') ?? 0
+        if (!steamid) {
+            await interaction.reply({ content: 'Es wurde keine SteamID angegeben!', ephemeral: true })
+            return
+        }
+        if (!job) {
+            await interaction.reply({ content: 'Es wurde kein Job angegeben!', ephemeral: true })
+            return
+        }
+        const vUser = await WhoIs.validateUser(steamid)
         if (!vUser) {
             await interaction.reply({
                 content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
@@ -112,25 +135,28 @@ export class Setjob extends Command {
             })
             return
         }
-        let job = options.getString('jobname') ?? ''
-        let grade = options.getInteger('grade') ?? 0
-        if (job === '') {
-            await interaction.reply({ content: 'Es wurde kein Job angegeben!', ephemeral: true })
-            return
-        }
         try {
             const [jobquery] = await Database.query<IJobs[]>('SELECT * FROM jobs WHERE name = ?', [job.toLowerCase()])
+            LogManager.debug(jobquery)
             if (jobquery.length === 0) {
-                await interaction.reply({ content: 'Es wurde kein Job mit diesem Namen gefunden!', ephemeral: true })
+                await interaction.reply({
+                    content: 'Es wurde kein Job mit diesem Namen gefunden!',
+                    ephemeral: true,
+                })
                 return
             }
-            let [query] = await Database.query<IUser[]>('UPDATE users SET job = ?, grade = ? WHERE identifier = ?', [
+            // TODO: Update zu "affectedRows" mit Database.query<T>
+            let query = (await Database.query('UPDATE users SET job = ?, job_grade = ? WHERE identifier = ?', [
                 job.toLowerCase(),
                 grade,
                 vUser.identifier,
-            ])
-            if (query.length === 0) {
-                await interaction.reply({ content: 'Der Job konnte nicht geändert werden!', ephemeral: true })
+            ])) as RowDataPacket[]
+
+            if (query[0]['affectedRows'] === 0) {
+                await interaction.reply({
+                    content: 'Der Job konnte nicht geändert werden!',
+                    ephemeral: true,
+                })
                 return
             }
             embed.setTitle('Job geändert (offline)')
@@ -139,14 +165,13 @@ export class Setjob extends Command {
                     vUser.firstname +
                     ' ' +
                     vUser.lastname +
-                    '(' +
+                    ' (`' +
                     vUser.identifier +
-                    ')' +
-                    ' wurde auf ' +
-                    query[0].job +
-                    ' Grade ' +
-                    query[0].grade +
-                    ' gesetzt!',
+                    '`)' +
+                    ' wurde geändert!\nNeuer Job: ' +
+                    jobquery[0].label +
+                    '\nGrade: ' +
+                    grade,
             )
             await interaction.reply({ embeds: [embed] })
         } catch (error) {

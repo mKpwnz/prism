@@ -1,24 +1,23 @@
 import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
-import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
 import { Database } from '@sql/Database'
 import { IVersicherung } from '@sql/schema/Versicherung.schema'
 import { Helper } from '@utils/Helper'
 import LogManager from '@utils/Logger'
-import { CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, SlashCommandBuilder } from 'discord.js'
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 
 export class Versicherung extends Command {
     constructor() {
-        super(true)
+        super()
         this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
-            Config.Discord.Groups.IC_MOD,
-            Config.Discord.Groups.IC_ADMIN,
-            Config.Discord.Groups.IC_HADMIN,
             Config.Discord.Groups.IC_SUPERADMIN,
+            Config.Discord.Groups.IC_HADMIN,
+            Config.Discord.Groups.IC_ADMIN,
+            Config.Discord.Groups.IC_MOD,
         ]
         RegisterCommand(
             new SlashCommandBuilder()
@@ -76,25 +75,28 @@ export class Versicherung extends Command {
         )
     }
 
-    async execute(interaction: CommandInteraction): Promise<void> {
-        if (!interaction.isCommand()) return
-        if (this.CommandEmbed === null) this.CommandEmbed = this.updateEmbed(interaction)
-        const options = interaction.options as CommandInteractionOptionResolver
+    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
 
-        if (options.getSubcommand() === 'prüfen') {
-            await this.checkInsurance(this.CommandEmbed, interaction, options)
-        } else if (options.getSubcommand() === 'hinzufügen') {
-            await this.addInsurance(this.CommandEmbed, interaction, options)
-        } else if (options.getSubcommand() === 'entfernen') {
-            await this.removeInsurance(this.CommandEmbed, interaction, options)
+        switch (options.getSubcommand()) {
+            case 'prüfen':
+                await this.checkInsurance(interaction)
+                break
+            case 'hinzufügen':
+                await this.addInsurance(interaction)
+                break
+            case 'entfernen':
+                await this.removeInsurance(interaction)
+                break
+            default:
+                await interaction.reply({ content: 'Command nicht gefunden.', ephemeral: true })
+                break
         }
     }
 
-    private async checkInsurance(
-        embed: EmbedBuilder,
-        interaction: CommandInteraction,
-        options: CommandInteractionOptionResolver,
-    ): Promise<void> {
+    private async checkInsurance(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
+        const embed = this.getEmbedTemplate(interaction)
         try {
             let kennzeichen = options.getString('kennzeichen')
             if (!kennzeichen) {
@@ -136,11 +138,9 @@ export class Versicherung extends Command {
             await interaction.reply('Es ist ein Fehler aufgetreten!')
         }
     }
-    private async addInsurance(
-        embed: EmbedBuilder,
-        interaction: CommandInteraction,
-        options: CommandInteractionOptionResolver,
-    ): Promise<void> {
+    private async addInsurance(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
+        const embed = this.getEmbedTemplate(interaction)
         try {
             let kennzeichen = options.getString('kennzeichen')
             if (!kennzeichen) {
@@ -163,7 +163,6 @@ export class Versicherung extends Command {
             const versicherung = queryResult[0]
             var ts = new Date()
             ts.setDate(ts.getDate() + dauer)
-
             embed.setTitle('Versicherung Hinzufügen')
             embed.addFields({
                 name: kennzeichen ?? 'Fehler',
@@ -181,11 +180,9 @@ export class Versicherung extends Command {
             await interaction.reply('Es ist ein Fehler aufgetreten!')
         }
     }
-    private async removeInsurance(
-        embed: EmbedBuilder,
-        interaction: CommandInteraction,
-        options: CommandInteractionOptionResolver,
-    ): Promise<void> {
+    private async removeInsurance(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
+        const embed = this.getEmbedTemplate(interaction)
         try {
             let kennzeichen = options.getString('kennzeichen')
             if (!kennzeichen) {

@@ -19,7 +19,22 @@ const Config = {
             S1_WAHLEN: '1135909041806258187',
             S1_IMMO_BILLING: '1009567127663034389',
         },
-        Users: {},
+        Users: {
+            List: {
+                MIKA: '530485414453051402',
+                L33V33N: '312132715128553472',
+                MANU: '219123072295370754',
+                ZMASTER: '469606487312957452',
+            },
+            GlobalBlocked: [
+                '487678405412782082', // Justim
+            ],
+            GlobalWhitelist: [
+                '388818838189375491', // Sparta
+                '548588225455849483', // Rigu
+                '483002612417822721', // DrGruselig
+            ],
+        },
         Groups: {
             DEV_BOTTESTER: '1158522410929246258',
             DEV_SERVERENGINEER: '996094054867673189',
@@ -30,6 +45,12 @@ const Config = {
             IC_ADMIN: '1118186443504898068',
             IC_MOD: '1118186467395653682',
         },
+        Emotes: [
+            {
+                name: 'pbot_beta',
+                link: 'https://i.imgur.com/akyHolt.png',
+            },
+        ],
         BOT_NAME: 'PRISM | Whois V2 :)',
     },
     Pictures: {
@@ -37,6 +58,11 @@ const Config = {
             LOGO_BLUE: 'https://i.imgur.com/NkZDE8l.png',
         },
         WHITESPACE: 'https://i.imgur.com/pdkIDFc.png',
+    },
+    Commands: {
+        Resetpos: {
+            DefaultPosition: { x: 229.28, heading: 0.0, z: 30.5, y: -886.76 },
+        },
     },
 }
 
