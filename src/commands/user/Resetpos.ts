@@ -3,15 +3,19 @@ import { RegisterCommand } from '@commands/CommandHandler'
 import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
 import { Database } from '@sql/Database'
+import { IUser } from '@sql/schema/User.schema'
+import LogManager from '@utils/Logger'
 import { CommandInteraction, SlashCommandBuilder } from 'discord.js'
 import { RowDataPacket } from 'mysql2'
 import { WhoIs } from './WhoIs'
-import { IUser } from '@sql/schema/User.schema'
 
 export class Resetpos extends Command {
     constructor() {
         super(true)
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
+        this.AllowedChannels = [
+            Config.Discord.Channel.WHOIS_TESTI,
+            Config.Discord.Channel.WHOIS_UNLIMITED,
+        ]
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -27,7 +31,10 @@ export class Resetpos extends Command {
                 //add string option
                 .setDMPermission(true)
                 .addStringOption((option) =>
-                    option.setName('steam').setDescription('Steam ID des Nutzers').setRequired(true),
+                    option
+                        .setName('steam')
+                        .setDescription('Steam ID des Nutzers')
+                        .setRequired(true),
                 ) as SlashCommandBuilder,
             this,
         )
@@ -43,19 +50,21 @@ export class Resetpos extends Command {
         }
         try {
             const newPosition = { x: 229.28, heading: 0.0, z: 30.5, y: -886.76 }
-            let query =
-                'UPDATE users SET position = "' + JSON.stringify(newPosition) + '"WHERE identifier = ? RETURNING *'
-            let [result] = await Database.execute<IUser[]>(query, [vUser.identifier])
-            if (result[0]) {
+            let query = 'UPDATE users SET position = ? WHERE identifier = ?'
+            let result = (await Database.execute(query, [
+                JSON.stringify(newPosition),
+                vUser.identifier,
+            ])) as RowDataPacket[]
+            if (result[0]['rowsChanged'] !== 0) {
                 embed.setTitle('Position zurückgesetzt')
                 embed.setDescription(
                     'Die Position von ' +
                         vUser.firstname +
                         ' ' +
                         vUser.lastname +
-                        ' (' +
+                        ' (`' +
                         vUser.identifier +
-                        ') wurde zurückgesetzt.',
+                        '`) wurde zurückgesetzt.',
                 )
                 await interaction.reply({ embeds: [embed] })
             } else {
@@ -65,6 +74,7 @@ export class Resetpos extends Command {
                 })
             }
         } catch (error) {
+            LogManager.error(error)
             await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true })
         }
     }
