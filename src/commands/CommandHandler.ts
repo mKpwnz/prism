@@ -20,8 +20,10 @@ import { Resetpos } from './user/Resetpos'
 import { Setjob } from './user/Setjob'
 import { TeamNote } from './user/TeamNote'
 import { Kick } from './user/Kick'
+import { Lizenz } from './user/Lizenz'
 import { Revive } from './user/Revive'
 import { Versicherung } from './cars/Versicherung'
+import { RequestToSupport } from './user/RequestToSupport'
 
 export class CommandHandler {
     static commands: {
@@ -50,30 +52,31 @@ export class CommandHandler {
         new Help()
         new ServerStatus()
 
-        // Wahl
-        new Wahl() //Funktionsfähig
-
-        // Phone Commands
-        new CheckImageOwner()
-
-        // Housing Commands
-        new SchufaCheck()
-
-        // User Commands
-        new ChangeBirthday() //Funktionsfähig
-        new Rename() //Funktionsfähig
         new WhoIs()
+
+        new RequestToSupport() //Funktionsfähig RCON
+
         new Nvhx() //Funktionsfähig RCON
         new NvhxBan() //Funktionsfähig RCON
-        new Give() //Funktionsfähig RCON
-        // new TeamNote()
+
+        new ChangeBirthday() //Funktionsfähig
+        new Rename() //Funktionsfähig
         new Fraksperre() //Funktionsfähig
-        new Rechnung()
+        new Give() //Funktionsfähig RCON
+
         new Kick() //Funktionsfähig RCON
         new Revive() //Funktionsfähig RCON
         new Resetpos() //Funktionsfähig
         new Setjob() //Funktionsfähig RCON
+        new Lizenz() // Funktionsfähig
 
+        new CheckImageOwner()
+        new SchufaCheck()
+
+        new Rechnung()
+        // Wahl
+        new Wahl()
+        // new TeamNote()
         // Car Commands
         // new Versicherung()
         LogManager.info('CommandManager: All commands initialized!')

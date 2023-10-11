@@ -9,6 +9,7 @@ import {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
+    ChatInputCommandInteraction,
     CommandInteraction,
     EmbedBuilder,
     Interaction,
@@ -56,7 +57,7 @@ export class TeamNote extends Command {
         )
         BotClient.on('interactionCreate', this.onInteraction)
     }
-    async execute(interaction: CommandInteraction): Promise<void> {
+    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const { channel, user, guild, options } = interaction
         const action = options.get('action')?.value as string
         const steamid = options.get('steamid')?.value as string
