@@ -38,6 +38,9 @@
       "@enums/*": [
         "./src/enums/*"
       ],
+      "@web/*": [
+        "./src/web/*"
+      ],
       "@proot/*": [
         "./src/*"
       ],
