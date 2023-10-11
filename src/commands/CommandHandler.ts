@@ -20,6 +20,7 @@ import { Resetpos } from './user/Resetpos'
 import { Setjob } from './user/Setjob'
 import { TeamNote } from './user/TeamNote'
 import { Kick } from './user/Kick'
+import { Lizenz } from './user/Lizenz'
 import { Revive } from './user/Revive'
 import { Versicherung } from './cars/Versicherung'
 import { RequestToSupport } from './user/RequestToSupport'
@@ -67,6 +68,7 @@ export class CommandHandler {
         new Revive() //Funktionsfähig RCON
         new Resetpos() //Funktionsfähig
         new Setjob() //Funktionsfähig RCON
+        new Lizenz() // Funktionsfähig
 
         new CheckImageOwner()
         new SchufaCheck()
