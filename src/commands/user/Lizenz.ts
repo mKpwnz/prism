@@ -22,6 +22,8 @@ export class Lizenz extends Command {
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
             Config.Discord.Groups.IC_SUPERADMIN,
+            Config.Discord.Groups.IC_HADMIN,
+            Config.Discord.Groups.IC_ADMIN,
         ]
         this.IsBetaCommand = true
         RegisterCommand(

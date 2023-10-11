@@ -6,6 +6,7 @@ import { CustomError } from './CustomError'
 import StatusCode from '@enums/StatusCodes'
 import { Netmask } from 'netmask'
 import * as requestIp from 'request-ip'
+import { Help } from '@commands/system/Help'
 
 export class ExpressApp {
     public app: express.Application
@@ -16,8 +17,15 @@ export class ExpressApp {
         this.app.set('trust proxy', true)
         this.app.use(this.handlePermissions)
 
-        this.app.get('/commandhelplist', (req, res) => {
-            res.json('commandhelplist')
+        this.app.get('/commandhelplist', async (req, res) => {
+            var cmd = await Help.getCommands()
+
+            // Soll sein Map<string, string> (groupid, group display name)
+            var grp = await Help.getGroups()
+
+            // Soll sein Map<string, string> (channelid, channel display name)
+            var chan = await Help.getChannel()
+            res.send({ commands: cmd, channel: chan, groups: grp })
         })
         this.app.use((req, res, next) => {
             throw new CustomError({ code: StatusCode.ClientErrorNotFound })
@@ -42,10 +50,7 @@ export class ExpressApp {
         const whitelisted = ['::1', '127.0.0.1', '::ffff:127.0.0.1']
         var ip = requestIp.getClientIp(req)
         if (!ip) throw new CustomError({ code: StatusCode.ClientErrorUnauthorized })
-
         ip = ip?.replace('::ffff:', '')
-        LogManager.info(`Request from ${ip}`)
-
         if (whitelisted.includes(ip)) return next()
         var isInSubnet = false
         subnets.forEach((subnet) => {

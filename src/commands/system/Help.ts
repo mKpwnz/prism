@@ -6,7 +6,7 @@ import { BotClient } from '@proot/Bot'
 import Config from '@proot/Config'
 import { Helper } from '@utils/Helper'
 import LogManager from '@utils/Logger'
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
+import { ChatInputCommandInteraction, Collection, SlashCommandBuilder } from 'discord.js'
 
 interface ICmdPrintInformation {
     commandName: string
@@ -43,7 +43,7 @@ export class Help extends Command {
         ]
         RegisterCommand(new SlashCommandBuilder().setName('help').setDescription('Liste aller Befehle!'), this)
     }
-    private getCommands(): ICmdPrintInformation[] {
+    public static getCommands(): ICmdPrintInformation[] {
         var CmdPrintInformation: ICmdPrintInformation[] = []
         CommandHandler.commands.map((cmd) => {
             var cmdOptions: ICmdPrintInformationOption[] = []
@@ -82,12 +82,30 @@ export class Help extends Command {
         })
         return CmdPrintInformation
     }
+    public static async getGroups(): Promise<{ [key: string]: string }> {
+        var res: { [key: string]: string } = {}
+        var roles = await BotClient.guilds.cache.get(Config.Discord.ServerID)?.roles.cache
+        if (!roles) return res
+        for (const [key, value] of roles.entries()) {
+            res[key] = value.name
+        }
+        return res
+    }
+    public static async getChannel(): Promise<{ [key: string]: string }> {
+        var col: { [key: string]: string } = {}
+        var channel = await BotClient.guilds.cache.get(Config.Discord.ServerID)?.channels.cache
+        if (!channel) return col
+        for (const [key, value] of channel.entries()) {
+            col[key] = value.name
+        }
+        return col
+    }
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const { channel, user, guild } = interaction
         if (!channel) return
         var betaEmote = await Helper.getEmote('pbot_beta')
         LogManager.debug(betaEmote)
-        var cmds = this.getCommands()
+        var cmds = Help.getCommands()
         var fields: { name: string; value: string }[] = []
         var embeds: EmbedBuilder[] = []
         cmds.forEach((cmd) => {
