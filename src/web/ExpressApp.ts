@@ -13,6 +13,7 @@ export class ExpressApp {
     constructor() {
         this.app = express()
         this.config()
+        this.app.set('trust proxy', true)
         this.app.use(this.handlePermissions)
 
         this.app.get('/commandhelplist', (req, res) => {
@@ -38,12 +39,20 @@ export class ExpressApp {
 
     private handlePermissions(req: Request, res: Response, next: NextFunction) {
         const subnet = new Netmask('193.42.12.128/28')
+        const subnets = [new Netmask('193.42.12.128/28'), new Netmask('10.0.0.0/16')]
         const whitelisted = ['::1', '127.0.0.1', '::ffff:127.0.0.1']
-        const ip = requestIp.getClientIp(req)
-        LogManager.info(`Request from ${ip}`)
+        var ip = requestIp.getClientIp(req)
         if (!ip) throw new CustomError({ code: StatusCode.ClientErrorUnauthorized })
+
+        ip = ip?.replace('::ffff:', '')
+        LogManager.info(`Request from ${ip}`)
+
         if (whitelisted.includes(ip)) return next()
-        if (!subnet.contains(ip)) throw new CustomError({ code: StatusCode.ClientErrorUnauthorized })
+        var isInSubnet = false
+        subnets.forEach((subnet) => {
+            if (subnet.contains(ip ?? '')) isInSubnet = true
+        })
+        if (!isInSubnet) throw new CustomError({ code: StatusCode.ClientErrorUnauthorized })
         next()
     }
 
