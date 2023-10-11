@@ -1,9 +1,9 @@
+import { BotClient } from '@proot/Bot'
+import Config from '@proot/Config'
 import { Database } from '@sql/Database'
 import { IItems } from '@sql/schema/Items.schema'
 import { CommandInteraction, GuildEmoji, TextChannel } from 'discord.js'
 import LogManager from './Logger'
-import Config from '@proot/Config'
-import { BotClient } from '@proot/Bot'
 
 export class Helper {
     /**
@@ -190,7 +190,9 @@ export class Helper {
         itemName = itemName.toLowerCase()
         itemName = '%' + itemName + '%'
         try {
-            let [item] = await Database.query<IItems[]>('SELECT * FROM items WHERE name LIKE ?', [itemName])
+            let [item] = await Database.query<IItems[]>('SELECT * FROM items WHERE name LIKE ?', [
+                itemName,
+            ])
             if (item.length > 0) {
                 return item[0].name
             }
@@ -326,5 +328,20 @@ export class Helper {
         if (!guild) return null
         var emoteData = await guild.emojis.fetch()
         return emoteData.find((e) => e.name === emoteName) ?? null
+    }
+
+    /**
+     * @description
+     * @author mKpwnz
+     * @date 11.10.2023
+     * @static
+     * @param {string} val
+     * @param {T} _enum
+     * @memberof Helper
+     */
+    static enumFromValue = <T extends Record<string, string>>(val: string, _enum: T) => {
+        const enumName = (Object.keys(_enum) as Array<keyof T>).find((k) => _enum[k] === val)
+        if (!enumName) throw Error()
+        return _enum[enumName]
     }
 }
