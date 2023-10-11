@@ -15,7 +15,7 @@ export class ExpressApp {
         this.app = express()
         this.config()
         this.app.set('trust proxy', true)
-        this.app.use(this.handlePermissions)
+        // this.app.use(this.handlePermissions)
 
         this.app.get('/commandhelplist', async (req, res) => {
             var cmd = await Help.getCommands()
