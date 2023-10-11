@@ -1,5 +1,7 @@
 services:
-  bot:
-    image: prism
-    env_file:
-      - stack.env
+    bot:
+        image: prism
+        ports:
+            - '51333:3000'
+        env_file:
+            - stack.env
