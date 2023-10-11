@@ -17,17 +17,11 @@ export class Lizenz extends Command {
     constructor() {
         super()
         this.RunEnvironment = EENV.PRODUCTION
-        this.AllowedChannels = [
-            Config.Discord.Channel.WHOIS_TESTI,
-            Config.Discord.Channel.WHOIS_UNLIMITED,
-        ]
+        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
             Config.Discord.Groups.IC_SUPERADMIN,
-            Config.Discord.Groups.IC_HADMIN,
-            Config.Discord.Groups.IC_ADMIN,
-            Config.Discord.Groups.IC_MOD,
         ]
         this.IsBetaCommand = true
         RegisterCommand(
@@ -39,10 +33,7 @@ export class Lizenz extends Command {
                         .setName('entfernen')
                         .setDescription('Entferne die Lizenz eines Spielers')
                         .addStringOption((option) =>
-                            option
-                                .setName('steamid')
-                                .setDescription('SteamID des Spielers')
-                                .setRequired(true),
+                            option.setName('steamid').setDescription('SteamID des Spielers').setRequired(true),
                         )
                         .addStringOption((option) =>
                             option
@@ -69,10 +60,7 @@ export class Lizenz extends Command {
                         .setName('hinzufügen')
                         .setDescription('Füge dem Spieler eine Lizenz hinzu')
                         .addStringOption((option) =>
-                            option
-                                .setName('steamid')
-                                .setDescription('SteamID des Spielers')
-                                .setRequired(true),
+                            option.setName('steamid').setDescription('SteamID des Spielers').setRequired(true),
                         )
                         .addStringOption((option) =>
                             option
@@ -261,10 +249,7 @@ export class Lizenz extends Command {
         }
     }
 
-    public static async checkLicense(
-        vUser: IFindUser,
-        license: Exclude<ELicenses, ELicenses.ALL>,
-    ): Promise<boolean> {
+    public static async checkLicense(vUser: IFindUser, license: Exclude<ELicenses, ELicenses.ALL>): Promise<boolean> {
         try {
             const [result] = await Database.query<IUserLicense[]>(
                 'SELECT * FROM user_licenses WHERE owner = ? AND type = ?',
