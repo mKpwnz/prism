@@ -6,6 +6,7 @@ import { CustomError } from './CustomError'
 import StatusCode from '@enums/StatusCodes'
 import { Netmask } from 'netmask'
 import * as requestIp from 'request-ip'
+import cors from 'cors'
 import { Help } from '@commands/system/Help'
 
 export class ExpressApp {
@@ -14,6 +15,11 @@ export class ExpressApp {
     constructor() {
         this.app = express()
         this.config()
+        this.app.use(
+            cors({
+                origin: ['https://brand.immortaldev.eu/', 'https://localhost:5173/'],
+            }),
+        )
         this.app.set('trust proxy', true)
         // this.app.use(this.handlePermissions)
 
