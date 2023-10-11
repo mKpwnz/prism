@@ -38,8 +38,7 @@ export class ExpressApp {
     }
 
     private handlePermissions(req: Request, res: Response, next: NextFunction) {
-        const subnet = new Netmask('193.42.12.128/28')
-        const subnets = [new Netmask('193.42.12.128/28'), new Netmask('10.0.0.0/16')]
+        const subnets = [new Netmask('193.42.12.128/28'), new Netmask('10.8.0.0/16')]
         const whitelisted = ['::1', '127.0.0.1', '::ffff:127.0.0.1']
         var ip = requestIp.getClientIp(req)
         if (!ip) throw new CustomError({ code: StatusCode.ClientErrorUnauthorized })
