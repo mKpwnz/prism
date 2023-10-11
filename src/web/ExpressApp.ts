@@ -15,11 +15,7 @@ export class ExpressApp {
     constructor() {
         this.app = express()
         this.config()
-        this.app.use(
-            cors({
-                origin: ['https://brand.immortaldev.eu/', 'https://localhost:5173/'],
-            }),
-        )
+        this.app.use(cors())
         this.app.set('trust proxy', true)
         // this.app.use(this.handlePermissions)
 
