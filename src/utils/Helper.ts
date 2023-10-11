@@ -327,4 +327,19 @@ export class Helper {
         var emoteData = await guild.emojis.fetch()
         return emoteData.find((e) => e.name === emoteName) ?? null
     }
+
+    /**
+     * @description
+     * @author mKpwnz
+     * @date 11.10.2023
+     * @static
+     * @param {string} val
+     * @param {T} _enum
+     * @memberof Helper
+     */
+    static enumFromValue = <T extends Record<string, string>>(val: string, _enum: T) => {
+        const enumName = (Object.keys(_enum) as Array<keyof T>).find((k) => _enum[k] === val)
+        if (!enumName) throw Error()
+        return _enum[enumName]
+    }
 }
