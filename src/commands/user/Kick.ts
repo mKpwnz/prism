@@ -27,7 +27,7 @@ export class Kick extends Command {
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('kick')
-                .setDescription('Suche nach Spielern')
+                .setDescription('Kickt einen Spieler')
                 .addIntegerOption((option) => option.setName('id').setDescription('ID des Spielers').setRequired(true))
                 .addStringOption((option) => option.setName('grund').setDescription('Grund des Kicks')),
             this,
