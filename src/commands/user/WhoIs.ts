@@ -83,10 +83,9 @@ export class WhoIs extends Command {
                 if (finduser.length > 0) {
                     for (let i = 20 * (page - 1); i < finduser.length; i++) {
                         let identifier = finduser[i].identifier ? finduser[i].identifier : 'Unbekannt'
-
                         let steamId
                         if (finduser[i].identifier) {
-                            const hexString = '0x' + identifier
+                            const hexString = '0x' + finduser[i].identifier.replace('steam:', '')
                             if (/^0x[0-9A-Fa-f]+$/g.test(hexString)) {
                                 steamId = BigInt(hexString)
                             } else {
