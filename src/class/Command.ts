@@ -1,5 +1,6 @@
 import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
+import { LogDB } from '@sql/Database'
 import { Helper } from '@utils/Helper'
 import LogManager from '@utils/Logger'
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js'
@@ -19,6 +20,7 @@ export abstract class Command {
     CheckPermissions: Boolean = true
     RunEnvironment: EENV = EENV.DEVELOPMENT
     IsBetaCommand: boolean = false
+    DoNotCountUse: boolean = false
     constructor() {}
     abstract execute(interaction: ChatInputCommandInteraction): Promise<void>
     async run(interaction: ChatInputCommandInteraction): Promise<void> {
@@ -62,7 +64,26 @@ export abstract class Command {
                 interaction.commandName
             }\` ausgeführt:\`\`\`json\n${JSON.stringify(cmdPrint, null, 4)}\`\`\``,
         )
-
+        var commandName = interaction.commandName
+        if (!this.DoNotCountUse) {
+            try {
+                if (interaction.options.getSubcommand()) {
+                    commandName += ` ${interaction.options.getSubcommand()}`
+                }
+            } catch (e) {
+                commandName = interaction.commandName
+            }
+            await LogDB.command_log.create({
+                data: {
+                    command: commandName,
+                    user: user.id,
+                    channel: interaction.channelId,
+                    options: cmdPrint.options,
+                    jsonData: cmdPrint,
+                },
+            })
+        }
+        // LogManager.debug(logEntry)
         try {
             await this.execute(interaction)
         } catch (error) {

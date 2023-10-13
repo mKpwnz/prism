@@ -1,4 +1,7 @@
+import { PrismaClient } from '@prisma/client'
 import { createPool } from 'mysql2/promise'
+
+const prisma = new PrismaClient()
 
 export const Database = createPool({
     host: process.env.SQL_HOST,
@@ -7,3 +10,5 @@ export const Database = createPool({
     user: process.env.SQL_USER,
     port: parseInt(process.env.SQL_PORT ?? '3306'),
 })
+
+export const LogDB = prisma
