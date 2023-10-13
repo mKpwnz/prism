@@ -2,7 +2,7 @@ import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
 import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
-import { Database } from '@sql/Database'
+import { GameDB } from '@sql/Database'
 import { IUser } from '@sql/schema/User.schema'
 import LogManager from '@utils/Logger'
 import { ChatInputCommandInteraction, CommandInteraction, SlashCommandBuilder } from 'discord.js'
@@ -69,9 +69,7 @@ export class Rename extends Command {
             }
 
             LogManager.log(query)
-            let result = (await Database.execute(query + 'WHERE identifier = ? ', [
-                vUser.identifier,
-            ])) as RowDataPacket[]
+            let result = (await GameDB.execute(query + 'WHERE identifier = ? ', [vUser.identifier])) as RowDataPacket[]
             if (result[0]['rowsChanged'] !== 0) {
                 embed.setTitle('Spieler umbenannt')
                 embed.setDescription(

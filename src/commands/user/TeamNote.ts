@@ -2,7 +2,7 @@ import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
 import { BotClient } from '@proot/Bot'
 import Config from '@proot/Config'
-import { Database } from '@sql/Database'
+import { GameDB } from '@sql/Database'
 import { ITeamNote } from '@sql/schema/TeamNote.schema'
 import LogManager from '@utils/Logger'
 import {
@@ -19,7 +19,6 @@ import {
 import { WhoIs } from './WhoIs'
 import { EENV } from '@enums/EENV'
 
-// TODO: Refactor this command
 export class TeamNote extends Command {
     constructor() {
         super()
@@ -234,7 +233,7 @@ export class TeamNote extends Command {
         try {
             let query =
                 'INSERT INTO `team_notes` (`user_steamid`, `teamler_discordid`, `teamler_discordname`, `note`) VALUES ( ?, ?, ?, ?);'
-            const response = await Database.query(query, [user_steamid, teamler.id, teamler.displayName, note])
+            const response = await GameDB.query(query, [user_steamid, teamler.id, teamler.displayName, note])
             if (response) {
                 return true
             } else {
@@ -248,7 +247,7 @@ export class TeamNote extends Command {
     private async getNotes(user_steamid: string): Promise<ITeamNote[] | false> {
         try {
             let query = 'SELECT * FROM `team_notes` WHERE `user_steamid` = ?;'
-            const [notes] = await Database.query<ITeamNote[]>(query, [user_steamid])
+            const [notes] = await GameDB.query<ITeamNote[]>(query, [user_steamid])
             if (notes && notes.length > 0) {
                 return notes
             } else {
@@ -262,7 +261,7 @@ export class TeamNote extends Command {
     private async getNote(user_steamid: string, noteid: number): Promise<ITeamNote | false> {
         try {
             let query = 'SELECT * FROM `team_notes` WHERE `user_steamid` = ? AND `id` = ?;'
-            const [notes] = await Database.query<ITeamNote[]>(query, [user_steamid, noteid])
+            const [notes] = await GameDB.query<ITeamNote[]>(query, [user_steamid, noteid])
             if (notes && notes.length == 1) {
                 return notes[0]
             } else {
@@ -276,7 +275,7 @@ export class TeamNote extends Command {
     private async removeNote(user_steamid: string, noteid: number) {
         try {
             let query = 'DELETE FROM `team_notes` WHERE `user_steamid` = ? AND `id` = ?;'
-            const response = await Database.query(query, [user_steamid, noteid])
+            const response = await GameDB.query(query, [user_steamid, noteid])
             if (response) {
                 return true
             } else {

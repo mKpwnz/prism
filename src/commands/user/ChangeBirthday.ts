@@ -2,7 +2,7 @@ import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
 import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
-import { Database } from '@sql/Database'
+import { GameDB } from '@sql/Database'
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 import { RowDataPacket } from 'mysql2'
 
@@ -53,11 +53,11 @@ export class ChangeBirthday extends Command {
                 query += `'${steam}' LIMIT 1`
             }
             try {
-                let result = await Database.query(query)
+                let result = await GameDB.query(query)
                 let datarow = result[0] as RowDataPacket[]
                 if (datarow.length > 0) {
                     query = 'UPDATE users SET dateofbirth = ' + `'${birthday}' WHERE identifier = '${steam}'`
-                    result = await Database.execute(query)
+                    result = await GameDB.execute(query)
                     if (result) {
                         await interaction.reply('Geburtstag erfolgreich geändert')
                     } else {

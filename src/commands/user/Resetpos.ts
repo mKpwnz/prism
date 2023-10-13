@@ -2,7 +2,7 @@ import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
 import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
-import { Database } from '@sql/Database'
+import { GameDB } from '@sql/Database'
 import { IUser } from '@sql/schema/User.schema'
 import LogManager from '@utils/Logger'
 import { ChatInputCommandInteraction, CommandInteraction, SlashCommandBuilder } from 'discord.js'
@@ -46,7 +46,7 @@ export class Resetpos extends Command {
         try {
             const newPosition = Config.Commands.Resetpos.DefaultPosition
             let query = 'UPDATE users SET position = ? WHERE identifier = ?'
-            let result = (await Database.execute(query, [
+            let result = (await GameDB.execute(query, [
                 JSON.stringify(newPosition),
                 vUser.identifier,
             ])) as RowDataPacket[]

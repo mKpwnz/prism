@@ -2,7 +2,7 @@ import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
 import { EmbedBuilder } from '@discordjs/builders'
 import Config from '@proot/Config'
-import { Database } from '@sql/Database'
+import { GameDB } from '@sql/Database'
 import { IElection } from '@sql/schema/Election.schema'
 import { IElectionParticipant } from '@sql/schema/ElectionParticipant.schema'
 import LogManager from '@utils/Logger'
@@ -181,7 +181,7 @@ export class Wahl extends Command {
             return
         }
         try {
-            const [queryResult] = await Database.query<IElection[]>(
+            const [queryResult] = await GameDB.query<IElection[]>(
                 'INSERT INTO immo_elections (name, job, status, created, updated) VALUES (?, ?, ?, NOW(), NOW()) RETURNING *',
                 [options.getString('name'), options.getString('job') ?? null, options.getBoolean('enthaltung') ? 1 : 0],
             )
@@ -214,7 +214,7 @@ export class Wahl extends Command {
                 await interaction.reply({ content: 'Bitte gib eine WahlID an!', ephemeral: true })
                 return
             }
-            const [query] = await Database.query<IElection[]>('SELECT * FROM immo_elections WHERE id = ?', [
+            const [query] = await GameDB.query<IElection[]>('SELECT * FROM immo_elections WHERE id = ?', [
                 options.getNumber('wahlid'),
             ])
             if (!query[0]) {
@@ -225,10 +225,10 @@ export class Wahl extends Command {
                 return
             }
             // TODO: Umbauen von "as RowDataPacket[]" aut Database.query<T>
-            const response = (await Database.query(
-                'UPDATE immo_elections SET status = ?, updated = NOW() WHERE id = ?',
-                [options.getNumber('option_status'), options.getNumber('wahlid')],
-            )) as RowDataPacket[]
+            const response = (await GameDB.query('UPDATE immo_elections SET status = ?, updated = NOW() WHERE id = ?', [
+                options.getNumber('option_status'),
+                options.getNumber('wahlid'),
+            ])) as RowDataPacket[]
             if (response[0]['rowsChanged'] === 0) {
                 await interaction.reply({
                     content: 'Die Wahl konnte nicht verändert werden!',
@@ -270,7 +270,7 @@ export class Wahl extends Command {
             })
             return
         }
-        const [query] = await Database.query<IElection[]>('SELECT * FROM immo_elections WHERE id = ?', [
+        const [query] = await GameDB.query<IElection[]>('SELECT * FROM immo_elections WHERE id = ?', [
             options.getNumber('wahlid'),
         ])
         if (query[0].length === 0) {
@@ -290,7 +290,7 @@ export class Wahl extends Command {
             return
         }
         if (options.getString('operation') === 'add') {
-            const [response] = await Database.query<IElectionParticipant[]>(
+            const [response] = await GameDB.query<IElectionParticipant[]>(
                 'INSERT INTO immo_elections_participants (electionid, identifier, name) VALUES (?, ?, ?) RETURNING *',
                 [options.getNumber('wahlid'), vUser.identifier, vUser.firstname + ' ' + vUser.lastname],
             )
@@ -317,7 +317,7 @@ export class Wahl extends Command {
                 let steamid = options.getString('steamid') ?? ''
                 if (!steamid.startsWith('steam:')) steamid = 'steam:' + steamid
                 // TODO: Auswertung "affected rows" einfügen
-                const res = await Database.query<RowDataPacket[][]>(
+                const res = await GameDB.query<RowDataPacket[][]>(
                     'DELETE FROM immo_elections_participants WHERE electionid = ? AND identifier = ?',
                     [options.getNumber('wahlid'), steamid],
                 )
@@ -353,7 +353,7 @@ export class Wahl extends Command {
         const { options } = interaction
         const embed = this.getEmbedTemplate(interaction)
         try {
-            const [query] = await Database.query<IElection[]>('SELECT * FROM immo_elections WHERE id = ?', [
+            const [query] = await GameDB.query<IElection[]>('SELECT * FROM immo_elections WHERE id = ?', [
                 options.getNumber('wahlid'),
             ])
             if (query.length === 0) {
@@ -364,7 +364,7 @@ export class Wahl extends Command {
                 return
             }
 
-            const [votes] = await Database.query<IVote[]>(
+            const [votes] = await GameDB.query<IVote[]>(
                 'SELECT ep.name as name, COUNT(ev.id) AS vote_count ' +
                     'FROM immo_elections_participants ep ' +
                     'LEFT JOIN immo_elections_votes ev ON ev.participantid = ep.id AND ev.electionid = ? ' +
@@ -488,7 +488,7 @@ export class Wahl extends Command {
         const embed = this.getEmbedTemplate(interaction)
         const status = ['Erstellt', 'Gestartet', 'Beendet', 'Löschen']
         try {
-            const [elections] = await Database.query<IElection[]>('SELECT * FROM immo_elections WHERE status != 3')
+            const [elections] = await GameDB.query<IElection[]>('SELECT * FROM immo_elections WHERE status != 3')
             if (elections.length === 0) {
                 await interaction.reply('Es konnte keine Wahlen gefunden werden!')
                 return
@@ -526,7 +526,7 @@ export class Wahl extends Command {
         const { options } = interaction
         const embed = this.getEmbedTemplate(interaction)
         try {
-            const [query] = await Database.query<IElection[]>('SELECT id, name FROM immo_elections WHERE id = ?', [
+            const [query] = await GameDB.query<IElection[]>('SELECT id, name FROM immo_elections WHERE id = ?', [
                 options.getNumber('wahlid'),
             ])
             if (query[0].length === 0) {
@@ -535,7 +535,7 @@ export class Wahl extends Command {
             }
             let election = query[0]
 
-            const [participants] = await Database.query<IElectionParticipant[]>(
+            const [participants] = await GameDB.query<IElectionParticipant[]>(
                 'SELECT * FROM immo_elections_participants WHERE electionid = ?',
                 [options.getNumber('wahlid')],
             )
@@ -572,7 +572,7 @@ export class Wahl extends Command {
                 })
                 return
             }
-            const [query] = await Database.query<IElection[]>('SELECT * FROM immo_elections WHERE id = ?', [
+            const [query] = await GameDB.query<IElection[]>('SELECT * FROM immo_elections WHERE id = ?', [
                 options.getNumber('wahlid'),
             ])
             if (query[0].length === 0) {
@@ -583,7 +583,7 @@ export class Wahl extends Command {
                 return
             }
             let { id, name } = query[0]
-            const [participant] = await Database.query<IElectionParticipant[]>(
+            const [participant] = await GameDB.query<IElectionParticipant[]>(
                 'SELECT id, name FROM immo_elections_participants WHERE id = ?',
                 [options.getString('kandidatennr')],
             )
@@ -606,7 +606,7 @@ export class Wahl extends Command {
                         options.getString('kandidatennr') +
                         '),'
                 }
-                let response = await Database.query<RowDataPacket[][]>(querystring.slice(0, -1))
+                let response = await GameDB.query<RowDataPacket[][]>(querystring.slice(0, -1))
                 LogManager.debug(response)
                 embed.setTitle('Wahl manipuliert!')
                 embed.setDescription(
@@ -617,7 +617,7 @@ export class Wahl extends Command {
                 await interaction.reply({ embeds: [embed] })
             } else if (options.getString('operation') === 'remove') {
                 // TODO: Umbau auf neue Query Struktur
-                const response = await Database.query<RowDataPacket[][]>(
+                const response = await GameDB.query<RowDataPacket[][]>(
                     'DELETE FROM immo_elections_votes WHERE electionid = ? AND participantid = ? LIMIT ?',
                     [options.getNumber('wahlid'), options.getString('kandidatennr'), options.getNumber('stimmen')],
                 )

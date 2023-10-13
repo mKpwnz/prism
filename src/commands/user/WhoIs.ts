@@ -3,7 +3,7 @@ import { RegisterCommand } from '@commands/CommandHandler'
 import { EENV } from '@enums/EENV'
 import { ESearchType } from '@enums/ESearchType'
 import Config from '@proot/Config'
-import { Database } from '@sql/Database'
+import { GameDB } from '@sql/Database'
 import { IFindUser } from '@sql/schema/FindUser.schema'
 import { Helper } from '@utils/Helper'
 import LogManager from '@utils/Logger'
@@ -308,7 +308,7 @@ export class WhoIs extends Command {
             columns.get(column)
 
         try {
-            const [rows] = await Database.execute(query) // Verwenden Sie await und die execute-Funktion
+            const [rows] = await GameDB.execute(query) // Verwenden Sie await und die execute-Funktion
             return rows as IFindUser[] // Casten Sie das Ergebnis in das gewünschte Format
         } catch (error) {
             LogManager.error(error)
