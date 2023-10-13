@@ -1,7 +1,7 @@
 import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
 import Config from '@proot/Config'
-import { Database } from '@sql/Database'
+import { GameDB } from '@sql/Database'
 import { IVersicherung } from '@sql/schema/Versicherung.schema'
 import { Helper } from '@utils/Helper'
 import LogManager from '@utils/Logger'
@@ -105,7 +105,7 @@ export class Versicherung extends Command {
             } else {
                 kennzeichen = Helper.validateNumberplate(kennzeichen)
             }
-            const [versicherungen] = await Database.query<IVersicherung[]>(
+            const [versicherungen] = await GameDB.query<IVersicherung[]>(
                 'SELECT * FROM `versicherungen` WHERE `plate` = ?',
                 [kennzeichen],
             )
@@ -156,7 +156,7 @@ export class Versicherung extends Command {
             }
             let premium = options.getBoolean('premium') ?? false
 
-            const [queryResult] = await Database.query<IVersicherung[]>(
+            const [queryResult] = await GameDB.query<IVersicherung[]>(
                 'INSERT INTO `versicherungen` (`plate`, `ts`, `premium`) VALUES (?, ADDDATE(NOW (), INTERVAL ? DAY), ?) ON DUPLICATE KEY UPDATE ts = ADDDATE(NOW (), INTERVAL ? DAY), premium = ? RETURNING * ',
                 [kennzeichen, dauer, premium ? 1 : 0, dauer, premium ? 1 : 0],
             )
@@ -192,7 +192,7 @@ export class Versicherung extends Command {
                 kennzeichen = Helper.validateNumberplate(kennzeichen)
             }
 
-            const [versicherungen] = await Database.query<IVersicherung[]>(
+            const [versicherungen] = await GameDB.query<IVersicherung[]>(
                 'SELECT * FROM `versicherungen` WHERE `plate` = ?',
                 [kennzeichen],
             )
@@ -204,7 +204,7 @@ export class Versicherung extends Command {
                 return
             }
             const versicherung = versicherungen[0]
-            await Database.query('DELETE FROM `versicherungen` WHERE `plate` = ?', [versicherung.plate])
+            await GameDB.query('DELETE FROM `versicherungen` WHERE `plate` = ?', [versicherung.plate])
             embed.setTitle('Versicherung Entfernen')
             embed.addFields({
                 name: kennzeichen,

@@ -3,7 +3,7 @@ import { RegisterCommand } from '@commands/CommandHandler'
 import { EmbedBuilder } from '@discordjs/builders'
 import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
-import { Database } from '@sql/Database'
+import { GameDB } from '@sql/Database'
 import { IBilling } from '@sql/schema/Billing.schema'
 import { IJobs } from '@sql/schema/Jobs.schema'
 import LogManager from '@utils/Logger'
@@ -21,10 +21,7 @@ export class Rechnung extends Command {
     constructor() {
         super()
         this.RunEnvironment = EENV.PRODUCTION
-        this.AllowedChannels = [
-            Config.Discord.Channel.WHOIS_TESTI,
-            Config.Discord.Channel.WHOIS_UNLIMITED,
-        ]
+        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -42,10 +39,7 @@ export class Rechnung extends Command {
                         .setName('suchen')
                         .setDescription('Suche nach Rechnungen eines bestimmten Spielers')
                         .addStringOption((option) =>
-                            option
-                                .setName('steamid')
-                                .setDescription('SteamID des Spielers')
-                                .setRequired(true),
+                            option.setName('steamid').setDescription('SteamID des Spielers').setRequired(true),
                         )
                         .addStringOption((option) =>
                             option
@@ -58,13 +52,9 @@ export class Rechnung extends Command {
                                     { name: 'Alle', value: 'all' },
                                 ),
                         )
+                        .addIntegerOption((option) => option.setName('page').setDescription('Seitenzahl'))
                         .addIntegerOption((option) =>
-                            option.setName('page').setDescription('Seitenzahl'),
-                        )
-                        .addIntegerOption((option) =>
-                            option
-                                .setName('limit')
-                                .setDescription('Limit an Ergebnissen Default: 5 Max: 10'),
+                            option.setName('limit').setDescription('Limit an Ergebnissen Default: 5 Max: 10'),
                         ),
                 )
                 .addSubcommand((subcommand) =>
@@ -72,10 +62,7 @@ export class Rechnung extends Command {
                         .setName('anzeigen')
                         .setDescription('Zeigt eine bestimmte Rechnung anhand der ID an')
                         .addIntegerOption((option) =>
-                            option
-                                .setName('id')
-                                .setDescription('ID der Rechnung')
-                                .setRequired(true),
+                            option.setName('id').setDescription('ID der Rechnung').setRequired(true),
                         ),
                 )
                 .addSubcommand((subcommand) =>
@@ -83,10 +70,7 @@ export class Rechnung extends Command {
                         .setName('bezahlen')
                         .setDescription('Bezahle die Rechnung eines Spielers')
                         .addIntegerOption((option) =>
-                            option
-                                .setName('id')
-                                .setDescription('ID der Rechnung')
-                                .setRequired(true),
+                            option.setName('id').setDescription('ID der Rechnung').setRequired(true),
                         ),
                 )
                 .addSubcommand((subcommand) =>
@@ -94,10 +78,7 @@ export class Rechnung extends Command {
                         .setName('löschen')
                         .setDescription('Löscht die Rechnung eines Spielers')
                         .addIntegerOption((option) =>
-                            option
-                                .setName('id')
-                                .setDescription('ID der Rechnung')
-                                .setRequired(true),
+                            option.setName('id').setDescription('ID der Rechnung').setRequired(true),
                         ),
                 )
                 .addSubcommand((subcommand) =>
@@ -105,22 +86,13 @@ export class Rechnung extends Command {
                         .setName('erstellen')
                         .setDescription('Stelle eine Rechnung für einen Spieler aus')
                         .addStringOption((option) =>
-                            option
-                                .setName('steamid')
-                                .setDescription('SteamID des Spielers')
-                                .setRequired(true),
+                            option.setName('steamid').setDescription('SteamID des Spielers').setRequired(true),
                         )
                         .addIntegerOption((option) =>
-                            option
-                                .setName('betrag')
-                                .setDescription('Betrag der Rechnung')
-                                .setRequired(true),
+                            option.setName('betrag').setDescription('Betrag der Rechnung').setRequired(true),
                         )
                         .addStringOption((option) =>
-                            option
-                                .setName('grund')
-                                .setDescription('Grund der Rechnung')
-                                .setRequired(true),
+                            option.setName('grund').setDescription('Grund der Rechnung').setRequired(true),
                         )
                         .addStringOption((option) =>
                             option
@@ -130,9 +102,7 @@ export class Rechnung extends Command {
                                 ),
                         )
                         .addStringOption((option) =>
-                            option
-                                .setName('beschreibung')
-                                .setDescription('Beschreibung der Rechnung'),
+                            option.setName('beschreibung').setDescription('Beschreibung der Rechnung'),
                         ),
                 ),
 
@@ -196,13 +166,11 @@ export class Rechnung extends Command {
             }
             LogManager.log(querystring)
             // Hole die Rechnungen aus der Datenbank
-            const [rechnungen] = await Database.query<IBilling[]>(querystring, [vUser.identifier])
+            const [rechnungen] = await GameDB.query<IBilling[]>(querystring, [vUser.identifier])
             LogManager.debug(rechnungen)
             if (rechnungen.length === 0) {
                 embed.setTitle('Rechnungsübersicht')
-                embed.setDescription(
-                    'Es wurden keine Rechnungen gefunden\nSteamID: ' + vUser.identifier,
-                )
+                embed.setDescription('Es wurden keine Rechnungen gefunden\nSteamID: ' + vUser.identifier)
                 await interaction.reply({ embeds: [embed] })
                 return
             }
@@ -214,13 +182,11 @@ export class Rechnung extends Command {
                     name: `Rechnung #${rechnungen[i].id}`,
                     value: `Empfänger: ${rechnungen[i].receiver_name} (\`${
                         rechnungen[i].receiver_identifier
-                    }\`)\nSender: ${rechnungen[i].author_name} (\`${
-                        rechnungen[i].author_identifier
-                    }\`)\nBetrag: ${rechnungen[i].invoice_value}€\nSociety: ${
-                        rechnungen[i].society_name
-                    } (${rechnungen[i].society})\nGrund: ${rechnungen[i].item}\nNotiz: ${
-                        rechnungen[i].notes
-                    }\nStatus: ${rechnungen[i].status}\nVersendet am: ${
+                    }\`)\nSender: ${rechnungen[i].author_name} (\`${rechnungen[i].author_identifier}\`)\nBetrag: ${
+                        rechnungen[i].invoice_value
+                    }€\nSociety: ${rechnungen[i].society_name} (${rechnungen[i].society})\nGrund: ${
+                        rechnungen[i].item
+                    }\nNotiz: ${rechnungen[i].notes}\nStatus: ${rechnungen[i].status}\nVersendet am: ${
                         rechnungen[i].sent_date
                     }\nZahlungsziel: ${rechnungen[i].limit_pay_date ?? 'Kein Limit'}\nGebühren: ${
                         rechnungen[i].fees_amount
@@ -272,35 +238,28 @@ export class Rechnung extends Command {
                 return
             }
             // Hole die Rechnung aus der Datenbank
-            const [rechnungen] = await Database.query<IBilling[]>(
-                'SELECT * FROM immobilling WHERE id = ? LIMIT 1',
-                [rechnungsnummer],
-            )
+            const [rechnungen] = await GameDB.query<IBilling[]>('SELECT * FROM immobilling WHERE id = ? LIMIT 1', [
+                rechnungsnummer,
+            ])
             LogManager.debug(rechnungen)
             if (rechnungen.length === 0) {
                 embed.setTitle('Rechnung anzeigen')
-                embed.setDescription(
-                    'Es wurde keine Rechnung gefunden\nRechnungsID: ' + rechnungsnummer,
-                )
+                embed.setDescription('Es wurde keine Rechnung gefunden\nRechnungsID: ' + rechnungsnummer)
                 await interaction.reply({ embeds: [embed] })
                 return
             }
             // Generiere das Rückgabe-Embed
             let field = {
                 name: `Rechnung #${rechnungen[0].id}`,
-                value: `Empfänger: ${rechnungen[0].receiver_name} (\`${
-                    rechnungen[0].receiver_identifier
-                }\`)\nSender: ${rechnungen[0].author_name} (\`${
-                    rechnungen[0].author_identifier
-                }\`)\nBetrag: ${rechnungen[0].invoice_value}€\nSociety: ${
+                value: `Empfänger: ${rechnungen[0].receiver_name} (\`${rechnungen[0].receiver_identifier}\`)\nSender: ${
+                    rechnungen[0].author_name
+                } (\`${rechnungen[0].author_identifier}\`)\nBetrag: ${rechnungen[0].invoice_value}€\nSociety: ${
                     rechnungen[0].society_name
-                } (${rechnungen[0].society})\nGrund: ${rechnungen[0].item}\nNotiz: ${
-                    rechnungen[0].notes
-                }\nStatus: ${rechnungen[0].status}\nVersendet am: ${
-                    rechnungen[0].sent_date
-                }\nZahlungsziel: ${rechnungen[0].limit_pay_date ?? 'Kein Limit'}\nGebühren: ${
-                    rechnungen[0].fees_amount
-                }\nBezahlt am: ${rechnungen[0].paid_date ?? 'Nicht bezahlt'}`,
+                } (${rechnungen[0].society})\nGrund: ${rechnungen[0].item}\nNotiz: ${rechnungen[0].notes}\nStatus: ${
+                    rechnungen[0].status
+                }\nVersendet am: ${rechnungen[0].sent_date}\nZahlungsziel: ${
+                    rechnungen[0].limit_pay_date ?? 'Kein Limit'
+                }\nGebühren: ${rechnungen[0].fees_amount}\nBezahlt am: ${rechnungen[0].paid_date ?? 'Nicht bezahlt'}`,
                 inline: false,
             }
             // Generiere das Embed
@@ -330,15 +289,12 @@ export class Rechnung extends Command {
                 })
                 return
             }
-            const [rechnungen] = await Database.query<IBilling[]>(
-                'SELECT * FROM immobilling WHERE id = ? LIMIT 1',
-                [rechnungsnummer],
-            )
+            const [rechnungen] = await GameDB.query<IBilling[]>('SELECT * FROM immobilling WHERE id = ? LIMIT 1', [
+                rechnungsnummer,
+            ])
             if (rechnungen.length === 0) {
                 embed.setTitle('Rechnung bezahlen')
-                embed.setDescription(
-                    'Es wurde keine Rechnung gefunden\nRechnungsID: ' + rechnungsnummer,
-                )
+                embed.setDescription('Es wurde keine Rechnung gefunden\nRechnungsID: ' + rechnungsnummer)
                 await interaction.reply({ embeds: [embed] })
                 return
             }
@@ -350,15 +306,13 @@ export class Rechnung extends Command {
             }
             let now = new Date()
             let paid_date = now.toISOString().slice(0, 19).replace('T', ' ')
-            await Database.query(
-                'UPDATE immobilling SET status = "paid", paid_date = ? WHERE id = ?',
-                [paid_date, rechnungsnummer],
-            )
+            await GameDB.query('UPDATE immobilling SET status = "paid", paid_date = ? WHERE id = ?', [
+                paid_date,
+                rechnungsnummer,
+            ])
             embed.setTitle('Rechnung bezahlen')
             embed.setDescription('Die Rechnung wurde erfolgreich bezahlt')
-            const channel = await interaction.guild?.channels.fetch(
-                Config.Discord.LogChannel.S1_IMMO_BILLING,
-            )
+            const channel = await interaction.guild?.channels.fetch(Config.Discord.LogChannel.S1_IMMO_BILLING)
             if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] })
             await interaction.reply({ embeds: [embed] })
         } catch (error) {
@@ -379,15 +333,12 @@ export class Rechnung extends Command {
                 })
                 return
             }
-            const [rechnungen] = await Database.query<IBilling[]>(
-                'SELECT * FROM immobilling WHERE id = ? LIMIT 1',
-                [rechnungsnummer],
-            )
+            const [rechnungen] = await GameDB.query<IBilling[]>('SELECT * FROM immobilling WHERE id = ? LIMIT 1', [
+                rechnungsnummer,
+            ])
             if (rechnungen.length === 0) {
                 embed.setTitle('Rechnung löschen')
-                embed.setDescription(
-                    'Es wurde keine Rechnung gefunden\nRechnungsID: ' + rechnungsnummer,
-                )
+                embed.setDescription('Es wurde keine Rechnung gefunden\nRechnungsID: ' + rechnungsnummer)
                 await interaction.reply({ embeds: [embed] })
                 return
             }
@@ -397,12 +348,10 @@ export class Rechnung extends Command {
                 await interaction.reply({ embeds: [embed] })
                 return
             }
-            await Database.query('DELETE FROM immobilling WHERE id = ?', [rechnungsnummer])
+            await GameDB.query('DELETE FROM immobilling WHERE id = ?', [rechnungsnummer])
             embed.setTitle('Rechnung löschen')
             embed.setDescription('Die Rechnung wurde erfolgreich gelöscht')
-            const channel = await interaction.guild?.channels.fetch(
-                Config.Discord.LogChannel.S1_IMMO_BILLING,
-            )
+            const channel = await interaction.guild?.channels.fetch(Config.Discord.LogChannel.S1_IMMO_BILLING)
             if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] })
             await interaction.reply({ embeds: [embed] })
         } catch (error) {
@@ -450,10 +399,7 @@ export class Rechnung extends Command {
         let sender = options.getString('sender') ?? 'dortmund'
         let sendername = 'Stadt Dortmund'
         if (sender != 'dortmund') {
-            const [senderquery] = await Database.query<IJobs[]>(
-                'SELECT * FROM jobs WHERE name = ?',
-                [sender],
-            )
+            const [senderquery] = await GameDB.query<IJobs[]>('SELECT * FROM jobs WHERE name = ?', [sender])
             if (senderquery.length === 0) {
                 sender = 'dortmund'
                 sendername = 'Stadt Dortmund'
@@ -469,7 +415,7 @@ export class Rechnung extends Command {
         let limit_pay_date = new Date()
         limit_pay_date.setDate(limit_pay_date.getDate() + 3)
         let limit_pay_date_string = limit_pay_date.toISOString().slice(0, 19).replace('T', ' ')
-        let [response] = await Database.query<IBilling[]>(
+        let [response] = await GameDB.query<IBilling[]>(
             'INSERT INTO immobilling (receiver_identifier, receiver_name, author_identifier, author_name, society, society_name, item, invoice_value, status, notes, sent_date, limit_pay_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING *',
             [
                 vUser.identifier,
@@ -497,9 +443,7 @@ export class Rechnung extends Command {
         }
         embed.setTitle('Rechnung erstellen')
         embed.setFields([field])
-        const channel = await interaction.guild?.channels.fetch(
-            Config.Discord.LogChannel.S1_IMMO_BILLING,
-        )
+        const channel = await interaction.guild?.channels.fetch(Config.Discord.LogChannel.S1_IMMO_BILLING)
         if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] })
         await interaction.reply({ embeds: [embed] })
     }

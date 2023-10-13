@@ -2,7 +2,7 @@ import { WhoIs } from '@commands/user/WhoIs'
 import { ButtonBuilder } from '@discordjs/builders'
 import { ESearchType } from '@enums/ESearchType'
 import Config from '@proot/Config'
-import { Database } from '@sql/Database'
+import { GameDB } from '@sql/Database'
 import { IFindUser } from '@sql/schema/FindUser.schema'
 import { Helper } from '@utils/Helper'
 import LogManager from '@utils/Logger'
@@ -298,7 +298,7 @@ export class CustomImmageUpload {
                 '", ' +
                 size / 1000 +
                 ')'
-            const response = await Database.query(query)
+            const response = await GameDB.query(query)
             if (response) {
                 return true
             } else {

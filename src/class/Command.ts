@@ -1,6 +1,6 @@
 import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
-import { LogDB } from '@sql/Database'
+import { BotDB } from '@sql/Database'
 import { Helper } from '@utils/Helper'
 import LogManager from '@utils/Logger'
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js'
@@ -73,7 +73,7 @@ export abstract class Command {
             } catch (e) {
                 commandName = interaction.commandName
             }
-            await LogDB.command_log.create({
+            await BotDB.command_log.create({
                 data: {
                     command: commandName,
                     user: user.id,

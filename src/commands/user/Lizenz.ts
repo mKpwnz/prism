@@ -4,7 +4,7 @@ import { RegisterCommand } from '@commands/CommandHandler'
 import { EENV } from '@enums/EENV'
 import { ELicenses } from '@enums/Licenses'
 import Config from '@proot/Config'
-import { Database } from '@sql/Database'
+import { GameDB } from '@sql/Database'
 import { IFindUser } from '@sql/schema/FindUser.schema'
 import { IUserLicense } from '@sql/schema/License.schema'
 import { Helper } from '@utils/Helper'
@@ -174,7 +174,7 @@ export class Lizenz extends Command {
             if (license !== 'all') {
                 query += ' AND type = "' + license + '"'
             }
-            let [lizenzen] = await Database.query<IUserLicense[]>(query, [vUser.identifier])
+            let [lizenzen] = await GameDB.query<IUserLicense[]>(query, [vUser.identifier])
             if (lizenzen.length !== 0) {
                 await interaction.reply({
                     content: 'Der Spieler hat diese Lizenz bereits!',
@@ -182,10 +182,10 @@ export class Lizenz extends Command {
                 })
                 return
             }
-            let [lizenz] = await Database.query<IUserLicense[]>(
-                'INSERT INTO user_licenses(type, owner) VALUES (?, ?)',
-                [license, vUser.identifier],
-            )
+            let [lizenz] = await GameDB.query<IUserLicense[]>('INSERT INTO user_licenses(type, owner) VALUES (?, ?)', [
+                license,
+                vUser.identifier,
+            ])
             if (lizenz.length === 0) {
                 await interaction.reply({
                     content: 'Es ist ein Fehler beim Hinzufügen der Lizenz aufgetreten!',
@@ -243,7 +243,7 @@ export class Lizenz extends Command {
                     query += 'type = "' + licenses + '"'
                 }
             }
-            const result = await Database.query<ResultSetHeader>(query, [vUser.identifier])
+            const result = await GameDB.query<ResultSetHeader>(query, [vUser.identifier])
             return result[0]
         } catch (error) {
             LogManager.error(error)
@@ -253,7 +253,7 @@ export class Lizenz extends Command {
 
     public static async checkLicense(vUser: IFindUser, license: Exclude<ELicenses, ELicenses.ALL>): Promise<boolean> {
         try {
-            const [result] = await Database.query<IUserLicense[]>(
+            const [result] = await GameDB.query<IUserLicense[]>(
                 'SELECT * FROM user_licenses WHERE owner = ? AND type = ?',
                 [vUser.identifier, license],
             )

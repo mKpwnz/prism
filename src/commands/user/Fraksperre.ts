@@ -1,7 +1,7 @@
 import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
 import Config from '@proot/Config'
-import { Database } from '@sql/Database'
+import { GameDB } from '@sql/Database'
 import LogManager from '@utils/Logger'
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 import { WhoIs } from './WhoIs'
@@ -83,7 +83,7 @@ export class Fraksperre extends Command {
         }
         try {
             // TODO: Response verarbeiten und auswerten
-            var dbResponse = await Database.query('UPDATE users SET fraksperre = NOW() WHERE identifier = ?', [
+            var dbResponse = await GameDB.query('UPDATE users SET fraksperre = NOW() WHERE identifier = ?', [
                 vUser.identifier,
             ])
             LogManager.debug(dbResponse)
@@ -124,7 +124,7 @@ export class Fraksperre extends Command {
         ts.setDate(ts.getDate() + days)
         try {
             // TODO: Response verarbeiten und auswerten
-            var dbResponse = await Database.query(
+            var dbResponse = await GameDB.query(
                 'UPDATE users SET fraksperre = ADDDATE(NOW(), INTERVAL ? DAY) WHERE identifier = ?',
                 [days, vUser.identifier],
             )

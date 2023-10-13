@@ -4,7 +4,7 @@ import { RegisterCommand } from '@commands/CommandHandler'
 import { EmbedBuilder } from '@discordjs/builders'
 import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
-import { Database } from '@sql/Database'
+import { GameDB } from '@sql/Database'
 import { IJobs } from '@sql/schema/Jobs.schema'
 import { IUser } from '@sql/schema/User.schema'
 import LogManager from '@utils/Logger'
@@ -89,7 +89,7 @@ export class Setjob extends Command {
             return
         }
         try {
-            const [jobquery] = await Database.query<IJobs[]>('SELECT * FROM jobs WHERE name = ?', [job.toLowerCase()])
+            const [jobquery] = await GameDB.query<IJobs[]>('SELECT * FROM jobs WHERE name = ?', [job.toLowerCase()])
             if (jobquery.length === 0) {
                 await interaction.reply({
                     content: 'Es wurde kein Job mit diesem Namen gefunden!',
@@ -136,7 +136,7 @@ export class Setjob extends Command {
             return
         }
         try {
-            const [jobquery] = await Database.query<IJobs[]>('SELECT * FROM jobs WHERE name = ?', [job.toLowerCase()])
+            const [jobquery] = await GameDB.query<IJobs[]>('SELECT * FROM jobs WHERE name = ?', [job.toLowerCase()])
             LogManager.debug(jobquery)
             if (jobquery.length === 0) {
                 await interaction.reply({
@@ -146,7 +146,7 @@ export class Setjob extends Command {
                 return
             }
             // TODO: Update zu "affectedRows" mit Database.query<T>
-            let query = (await Database.query('UPDATE users SET job = ?, job_grade = ? WHERE identifier = ?', [
+            let query = (await GameDB.query('UPDATE users SET job = ?, job_grade = ? WHERE identifier = ?', [
                 job.toLowerCase(),
                 grade,
                 vUser.identifier,

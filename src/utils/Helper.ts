@@ -1,6 +1,6 @@
 import { BotClient } from '@proot/Bot'
 import Config from '@proot/Config'
-import { Database } from '@sql/Database'
+import { GameDB } from '@sql/Database'
 import { IItems } from '@sql/schema/Items.schema'
 import { CommandInteraction, GuildEmoji, TextChannel } from 'discord.js'
 import LogManager from './Logger'
@@ -190,9 +190,7 @@ export class Helper {
         itemName = itemName.toLowerCase()
         itemName = '%' + itemName + '%'
         try {
-            let [item] = await Database.query<IItems[]>('SELECT * FROM items WHERE name LIKE ?', [
-                itemName,
-            ])
+            let [item] = await GameDB.query<IItems[]>('SELECT * FROM items WHERE name LIKE ?', [itemName])
             if (item.length > 0) {
                 return item[0].name
             }

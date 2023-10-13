@@ -2,7 +2,7 @@ import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
 import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
-import { Database } from '@sql/Database'
+import { GameDB } from '@sql/Database'
 import LogManager from '@utils/Logger'
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 import { RowDataPacket } from 'mysql2'
@@ -57,7 +57,7 @@ export class CheckImageOwner extends Command {
             }
             LogManager.debug(n_link)
 
-            const [response] = await Database.query<phoneOwnerResponse[]>(
+            const [response] = await GameDB.query<phoneOwnerResponse[]>(
                 `
 				SELECT u.firstname, u.lastname, phones.id AS steamID, photos.phone_number, photos.timestamp AS img_timestamp
 				FROM phone_photos photos
