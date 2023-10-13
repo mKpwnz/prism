@@ -8,12 +8,14 @@ datasource db {
 }
 
 model command_log {
-  id       Int     @id @default(autoincrement())
-  user     Decimal @db.Decimal
-  command  String
-  channel  String
-  options  Json?   @db.Json
-  jsonData Json
+  id         Int      @id @default(autoincrement())
+  user       Decimal  @db.Decimal
+  command    String
+  channel    String
+  options    Json?    @db.Json
+  jsonData   Json
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model team_notes {
