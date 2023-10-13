@@ -319,7 +319,7 @@ export class WhoIs extends Command {
     // TODO: Update Validate user to custom querys
     public static async validateUser(
         searchString: string,
-        type: ESearchType = ESearchType.STEAMID,
+        type: ESearchType = ESearchType.IDENTIFIER,
     ): Promise<IFindUser | null> {
         const user = await WhoIs.searchUsers(searchString, type)
         if (user === null) return null
