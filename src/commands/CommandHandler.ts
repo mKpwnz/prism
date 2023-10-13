@@ -77,7 +77,7 @@ export class CommandHandler {
         new Rechnung()
         // Wahl
         new Wahl()
-        // new TeamNote()
+        new TeamNote()
         // Car Commands
         // new Versicherung()
         new BotStats()
