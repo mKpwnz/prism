@@ -24,6 +24,7 @@ import { Lizenz } from './user/Lizenz'
 import { Revive } from './user/Revive'
 import { Versicherung } from './cars/Versicherung'
 import { RequestToSupport } from './user/RequestToSupport'
+import { BotStats } from './system/BotStats'
 
 export class CommandHandler {
     static commands: {
@@ -79,6 +80,7 @@ export class CommandHandler {
         // new TeamNote()
         // Car Commands
         // new Versicherung()
+        new BotStats()
         LogManager.info('CommandManager: All commands initialized!')
         LogManager.info('Commands [PROD]:', CommandHandler.prodCommands)
         LogManager.info('Commands [DEV]:', CommandHandler.devCommands)
