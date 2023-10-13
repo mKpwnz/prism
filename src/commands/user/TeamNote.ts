@@ -1,28 +1,25 @@
 import { Command } from '@class/Command'
+import { RconClient } from '@class/RconClient'
 import { RegisterCommand } from '@commands/CommandHandler'
-import { BotClient } from '@proot/Bot'
 import Config from '@proot/Config'
-import { GameDB } from '@sql/Database'
-import { ITeamNote } from '@sql/schema/TeamNote.schema'
 import LogManager from '@utils/Logger'
 import {
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
     ChatInputCommandInteraction,
     CommandInteraction,
+    CommandInteractionOptionResolver,
     EmbedBuilder,
-    Interaction,
     SlashCommandBuilder,
-    User,
 } from 'discord.js'
-import { WhoIs } from './WhoIs'
 import { EENV } from '@enums/EENV'
+import { Helper } from '@utils/Helper'
+import { WhoIs } from './WhoIs'
+import { BotDB } from '@sql/Database'
 
 export class TeamNote extends Command {
     constructor() {
         super()
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
+        this.RunEnvironment = EENV.PRODUCTION
+        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -35,255 +32,201 @@ export class TeamNote extends Command {
             new SlashCommandBuilder()
                 .setName('teamnote')
                 .setDescription('Team Notizen')
-                .addStringOption((option) =>
-                    option
-                        .setName('action')
-                        .setDescription('Was möchtest du machen?')
-                        .addChoices(
-                            { name: 'Hinzufügen', value: 'add' },
-                            { name: 'Anzeigen', value: 'view' },
-                            { name: 'Löschen', value: 'delete' },
+                .addSubcommand((subcommand) =>
+                    subcommand
+                        .setName('einfügen')
+                        .setDescription('Fügt eine Notiz hinzu')
+                        .addStringOption((option) =>
+                            option.setName('steamid').setDescription('SteamID des Spielers').setRequired(true),
                         )
-                        .setRequired(true),
+                        .addStringOption((option) =>
+                            option.setName('notiz').setDescription('Die Notiz').setRequired(true),
+                        ),
                 )
-                .addStringOption((option) =>
-                    option.setName('steamid').setDescription('SteamID des Spielers').setRequired(true),
+                .addSubcommand((subcommand) =>
+                    subcommand
+                        .setName('auflisten')
+                        .setDescription('Zeigt alle Notizen eines Spielers an')
+                        .addStringOption((option) =>
+                            option.setName('steamid').setDescription('SteamID des Spielers').setRequired(true),
+                        ),
                 )
-                .addIntegerOption((option) =>
-                    option.setName('noteid').setDescription('ID der Notiz').setRequired(false),
+                .addSubcommand((subcommand) =>
+                    subcommand
+                        .setName('anzeigen')
+                        .setDescription('Zeigt eine Notiz an')
+                        .addIntegerOption((option) =>
+                            option.setName('id').setDescription('ID der Notiz').setRequired(true),
+                        ),
                 ),
             this,
         )
-        BotClient.on('interactionCreate', this.onInteraction)
+        this.IsBetaCommand = true
     }
+
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { channel, user, guild, options } = interaction
-        const action = options.get('action')?.value as string
-        const steamid = options.get('steamid')?.value as string
-        const noteid = options.get('noteid')?.value as number
+        if (interaction.options.getSubcommand() === 'hinzufügen') {
+            await this.addNote(interaction)
+        } else if (interaction.options.getSubcommand() === 'auflisten') {
+            await this.listNotes(interaction)
+        } else if (interaction.options.getSubcommand() === 'anzeigen') {
+            await this.viewNote(interaction)
+        } else {
+            await interaction.reply({ content: 'Command nicht gefunden.', ephemeral: true })
+        }
+    }
 
-        if (!channel) {
-            await interaction.reply('Das darfst du hier nicht!')
-            return
-        }
-        if (!action) {
-            await interaction.reply({ content: 'Du musst eine Aktion angeben!', ephemeral: true })
-            return
-        }
+    private async addNote(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
+        const embed = this.getEmbedTemplate(interaction)
+        const steamid = options.getString('steamid')
+        const note = options.getString('notiz')
+
         if (!steamid) {
-            await interaction.reply({ content: 'Du musst eine SteamID angeben!', ephemeral: true })
+            embed.setTitle('Teamnote | Fehler')
+            embed.setDescription('Es wurde keine SteamID angegeben.')
+            await interaction.reply({ embeds: [embed] })
             return
         }
-        const player = await WhoIs.validateUser(steamid)
-        if (!player) {
-            await interaction.reply({ content: 'Die SteamID ist nicht gültig!', ephemeral: true })
+        const vUser = await WhoIs.validateUser(steamid)
+        if (!vUser) {
+            embed.setTitle('Teamnote | Fehler')
+            embed.setDescription('Die angegebene SteamID ist ungültig.')
+            await interaction.reply({ embeds: [embed] })
+            return
+        }
+        if (!note) {
+            embed.setTitle('Teamnote | Fehler')
+            embed.setDescription('Es wurde keine Notiz angegeben.')
+            await interaction.reply({ embeds: [embed] })
             return
         }
 
-        if (action === 'add') {
-            await interaction.reply({
-                content: `Notiz für **${player.firstname} ${player.lastname}** | **${player.identifier}**`,
-                components: [
-                    new ActionRowBuilder<ButtonBuilder>().addComponents(
-                        new ButtonBuilder()
-                            .setLabel('Notiz erstellen')
-                            .setStyle(ButtonStyle.Primary)
-                            .setCustomId('teamnode_add_note'),
-                    ),
-                ],
-                ephemeral: true,
-            })
-        } else if (action === 'delete') {
-            if (!noteid) {
-                await interaction.reply({ content: 'Du musst eine Notiz ID angeben!', ephemeral: true })
-                return
-            }
-            const note = await this.getNote(steamid, noteid)
-            if (!note) {
-                await interaction.reply({
-                    content: `Die Notiz ID konnte bei dem Spieler ${player.identifier} nicht gefunden werden!`,
-                    ephemeral: true,
-                })
-                return
-            }
-            LogManager.debug(note)
-            await interaction.reply({
-                embeds: [
-                    new EmbedBuilder()
-                        .setColor(0xe91916)
-                        .setTitle('Teamnote löschen')
-                        .setAuthor({
-                            name: Config.Discord.BOT_NAME,
-                            iconURL: Config.Pictures.Prism.LOGO_BLUE,
-                        })
-                        .addFields(
-                            {
-                                name: 'Teamnote ID',
-                                value: `${note.id}`,
-                                inline: true,
-                            },
-                            {
-                                name: 'Erstellt von',
-                                value: `${note.teamler_discordname}`,
-                                inline: true,
-                            },
-                            {
-                                name: 'Erstellt von (DC)',
-                                value: `<@${note.teamler_discordid}>`,
-                                inline: true,
-                            },
-                            {
-                                name: 'Spieler (IC Name)',
-                                value: `${player.firstname} ${player.lastname}`,
-                                inline: true,
-                            },
-                            {
-                                name: 'Spieler (SteamID)',
-                                value: `${player.identifier}`,
-                                inline: true,
-                            },
-                            {
-                                name: 'Spieler (Job)',
-                                value: `${player.job} (${player.job_grade})`,
-                                inline: true,
-                            },
-                            {
-                                name: 'Notiz',
-                                value: `${note.note}`,
-                                inline: false,
-                            },
-                        )
-                        .setImage('https://i.imgur.com/pdkIDFc.png')
-                        .setTimestamp(),
-                ],
-                components: [
-                    new ActionRowBuilder<ButtonBuilder>().addComponents(
-                        new ButtonBuilder()
-                            .setLabel('Abbrechen')
-                            .setStyle(ButtonStyle.Danger)
-                            .setCustomId('teamnode_delete_confirm_no'),
-                        new ButtonBuilder()
-                            .setLabel('Notiz löschen')
-                            .setStyle(ButtonStyle.Success)
-                            .setCustomId('teamnode_delete_confirm_yes'),
-                    ),
-                ],
-                ephemeral: true,
-            })
+        const data = await BotDB.team_notes.create({
+            data: {
+                user: vUser.identifier,
+                noterId: interaction.user.id,
+                noterName: interaction.user.username,
+                note: note,
+            },
+        })
+        embed.setTitle('Teamnote | Hinzugefügt (ID: ' + data.id + ')')
+        embed.setFields([
+            {
+                name: 'User (IC Name)',
+                value: vUser.firstname + ' ' + vUser.lastname,
+                inline: true,
+            },
+            {
+                name: 'User (SteamID)',
+                value: vUser.identifier,
+                inline: true,
+            },
+            { name: '\u200B', value: '\u200B', inline: true },
+            {
+                name: 'Hinzugefügt von',
+                value: data.noterName + ' (' + data.noterId + ')',
+                inline: true,
+            },
+            {
+                name: 'Hinzugefügt am',
+                value: data.created_at.toLocaleString(),
+                inline: true,
+            },
+            {
+                name: 'Notiz',
+                value: data.note,
+            },
+        ])
+        await interaction.reply({ embeds: [embed] })
+    }
+    private async listNotes(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
+        const embed = this.getEmbedTemplate(interaction)
+        const steamid = options.getString('steamid')
+
+        if (!steamid) {
+            embed.setTitle('Teamnote | Fehler')
+            embed.setDescription('Es wurde keine SteamID angegeben.')
+            await interaction.reply({ embeds: [embed] })
             return
-        } else if (action === 'view') {
-            const notes = await this.getNotes(steamid)
-            if (notes) {
-                let message = `Alle Notizen (${notes.length}) zu ${player.name} (${player.identifier})`
-                var embeds = []
-                for (const note of notes) {
-                    embeds.push(
-                        new EmbedBuilder()
-                            .setColor(0x0792f1)
-                            .setTitle(`Teamnote ${note.id}`)
-                            .addFields(
-                                {
-                                    name: 'Teamnote ID',
-                                    value: `${note.id}`,
-                                    inline: true,
-                                },
-                                {
-                                    name: 'Erstellt von',
-                                    value: `${note.teamler_discordname}`,
-                                    inline: true,
-                                },
-                                {
-                                    name: 'Erstellt von (DC)',
-                                    value: `<@${note.teamler_discordid}>`,
-                                    inline: true,
-                                },
-                                {
-                                    name: 'Spieler (IC Name)',
-                                    value: `${player.firstname} ${player.lastname}`,
-                                    inline: true,
-                                },
-                                {
-                                    name: 'Spieler (SteamID)',
-                                    value: `${player.identifier}`,
-                                    inline: true,
-                                },
-                                {
-                                    name: 'Spieler (Job)',
-                                    value: `${player.job} (${player.job_grade})`,
-                                    inline: true,
-                                },
-                                {
-                                    name: 'Notiz',
-                                    value: `${note.note}`,
-                                    inline: false,
-                                },
-                            )
-                            .setImage('https://i.imgur.com/pdkIDFc.png')
-                            .setTimestamp(),
-                    )
-                }
-                await interaction.reply({ content: message, embeds: embeds })
-            } else {
-                await interaction.reply('Es ist ein Fehler aufgetreten!')
-            }
         }
+        const vUser = await WhoIs.validateUser(steamid)
+        if (!vUser) {
+            embed.setTitle('Teamnote | Fehler')
+            embed.setDescription('Die angegebene SteamID ist ungültig.')
+            await interaction.reply({ embeds: [embed] })
+            return
+        }
+
+        const data = await BotDB.team_notes.findMany({
+            where: {
+                user: vUser.identifier,
+            },
+            orderBy: {
+                created_at: 'desc',
+            },
+        })
+        var notes = ''
+        data.slice(0, 5).forEach((note) => {
+            notes += `ID: **${note.id}** | Erstellt von: **${
+                note.noterName
+            }** | Erstellt am **${note.created_at.toLocaleString()}**\n\`\`\`${note.note}\`\`\`\n`
+        })
+        embed.setDescription(
+            `Notizen (${data.length > 5 ? 5 : data.length}/${data.length}) von **${vUser.firstname} ${
+                vUser.lastname
+            }**  (${vUser.identifier})\n${
+                data.length > 5
+                    ? `Ausgeblendete IDs: **${data
+                          .slice(5)
+                          .map((note) => note.id)
+                          .join(', ')}**`
+                    : ''
+            }\n\n${notes}`,
+        )
+        await interaction.reply({ embeds: [embed] })
     }
-    async onInteraction(interaction: Interaction) {}
-    private async addNote(user_steamid: string, teamler: User, note: string): Promise<boolean> {
-        try {
-            let query =
-                'INSERT INTO `team_notes` (`user_steamid`, `teamler_discordid`, `teamler_discordname`, `note`) VALUES ( ?, ?, ?, ?);'
-            const response = await GameDB.query(query, [user_steamid, teamler.id, teamler.displayName, note])
-            if (response) {
-                return true
-            } else {
-                return false
-            }
-        } catch (error) {
-            LogManager.error(error)
-            return false
+    private async viewNote(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
+        const embed = this.getEmbedTemplate(interaction)
+        const id = options.getInteger('id')
+
+        if (!id) {
+            embed.setTitle('Teamnote | Fehler')
+            embed.setDescription('Es wurde keine ID angegeben.')
+            await interaction.reply({ embeds: [embed] })
+            return
         }
-    }
-    private async getNotes(user_steamid: string): Promise<ITeamNote[] | false> {
-        try {
-            let query = 'SELECT * FROM `team_notes` WHERE `user_steamid` = ?;'
-            const [notes] = await GameDB.query<ITeamNote[]>(query, [user_steamid])
-            if (notes && notes.length > 0) {
-                return notes
-            } else {
-                return false
-            }
-        } catch (error) {
-            LogManager.error(error)
-            return false
+        const data = await BotDB.team_notes.findUnique({
+            where: {
+                id: id,
+            },
+        })
+        if (!data) {
+            embed.setTitle('Teamnote | Fehler')
+            embed.setDescription('Die angegebene ID ist ungültig.')
+            await interaction.reply({ embeds: [embed] })
+            return
         }
-    }
-    private async getNote(user_steamid: string, noteid: number): Promise<ITeamNote | false> {
-        try {
-            let query = 'SELECT * FROM `team_notes` WHERE `user_steamid` = ? AND `id` = ?;'
-            const [notes] = await GameDB.query<ITeamNote[]>(query, [user_steamid, noteid])
-            if (notes && notes.length == 1) {
-                return notes[0]
-            } else {
-                return false
-            }
-        } catch (error) {
-            LogManager.error(error)
-            return false
+        const vUser = await WhoIs.validateUser(data.user)
+        if (vUser) {
+            embed.setDescription(
+                `Notizen von **${vUser.firstname} ${vUser.lastname}**  (${vUser.identifier})\n\nID: **${
+                    data.id
+                }** | Erstellt von: **${
+                    data.noterName
+                }** | Erstellt am **${data.created_at.toLocaleString()}**\n\`\`\`${data.note}\`\`\`\n`,
+            )
+        } else {
+            embed.setDescription(
+                `*Die SteamID konnte keinem Nutzer zugewiesen werden!*\n\nNotizen von **${data.user}** \n\nID: **${
+                    data.id
+                }** | Erstellt von: **${
+                    data.noterName
+                }** | Erstellt am **${data.created_at.toLocaleString()}**\n\`\`\`${data.note}\`\`\`\n`,
+            )
         }
-    }
-    private async removeNote(user_steamid: string, noteid: number) {
-        try {
-            let query = 'DELETE FROM `team_notes` WHERE `user_steamid` = ? AND `id` = ?;'
-            const response = await GameDB.query(query, [user_steamid, noteid])
-            if (response) {
-                return true
-            } else {
-                return false
-            }
-        } catch (error) {
-            LogManager.error(error)
-            return false
-        }
+        await interaction.reply({ embeds: [embed] })
     }
 }
