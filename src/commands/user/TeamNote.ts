@@ -34,7 +34,7 @@ export class TeamNote extends Command {
                 .setDescription('Team Notizen')
                 .addSubcommand((subcommand) =>
                     subcommand
-                        .setName('einfügen')
+                        .setName('hinzufügen')
                         .setDescription('Fügt eine Notiz hinzu')
                         .addStringOption((option) =>
                             option.setName('steamid').setDescription('SteamID des Spielers').setRequired(true),
