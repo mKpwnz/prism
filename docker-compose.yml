@@ -5,3 +5,17 @@ services:
             - '51333:3000'
         env_file:
             - stack.env
+    log_db:
+        image: postgres:latest
+        env_file:
+            - stack.env
+        logging:
+            driver: 'none'
+        restart: unless-stopped
+        volumes:
+            - db-data:/var/lib/postgresql/data
+        ports:
+            - '5432:5432'
+
+volumes:
+    db-data:
