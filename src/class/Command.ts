@@ -28,12 +28,15 @@ export abstract class Command {
 
         // Override Channel in Devmode
         if (this.RunEnvironment != EENV.PRODUCTION) {
+            this.DoNotCountUse = true
             this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
             this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER, Config.Discord.Groups.DEV_BOTTESTER]
         }
-
-        // Check Permissions
+        if (process.env.NODE_ENV !== 'production') {
+            this.DoNotCountUse = true
+        }
         if (this.CheckPermissions) {
+            // Check Permissions
             if (
                 (await Helper.IsUserAllowed(
                     interaction,
