@@ -4,7 +4,7 @@ import { EENV } from '@enums/EENV'
 
 import { ELicenses } from '@enums/Licenses'
 import Config from '@proot/Config'
-import { Database } from '@sql/Database'
+import { GameDB } from '@sql/Database'
 import { IFindUser } from '@sql/schema/FindUser.schema'
 import { IUser } from '@sql/schema/User.schema'
 import LogManager from '@utils/Logger'
@@ -28,10 +28,7 @@ export class Deletecharacter extends Command {
                 .setName('deletecharacter')
                 .setDescription('Löscht einen Charakter von einem Spieler')
                 .addStringOption((option) =>
-                    option
-                        .setName('steamid')
-                        .setDescription('SteamID des zu löschenden Spielers')
-                        .setRequired(true),
+                    option.setName('steamid').setDescription('SteamID des zu löschenden Spielers').setRequired(true),
                 ),
             this,
         )
@@ -95,7 +92,7 @@ export class Deletecharacter extends Command {
     public async deletePhone(itendifier: string): Promise<boolean> {
         try {
             // TODO: ADD Return Handling
-            await Database.query('DELETE FROM phone_phones WHERE identifier = ?', [itendifier])
+            await GameDB.query('DELETE FROM phone_phones WHERE identifier = ?', [itendifier])
             return true
         } catch (error) {
             LogManager.error(error)
@@ -107,12 +104,9 @@ export class Deletecharacter extends Command {
         try {
             let newIdentifier = user.identifier.replace('steam', 'deleted')
             // TODO: Add Return Handler
-            await Database.query('UPDATE users SET identifier = ? WHERE identifier = ?', [
-                newIdentifier,
-                user.identifier,
-            ])
+            await GameDB.query('UPDATE users SET identifier = ? WHERE identifier = ?', [newIdentifier, user.identifier])
             // Move to Archive
-            let [response] = await Database.query<IUser[]>(
+            let [response] = await GameDB.query<IUser[]>(
                 'INSERT INTO users_deleted SELECT * FROM users WHERE identifier = ? RETURNING *',
                 [user.identifier],
             )

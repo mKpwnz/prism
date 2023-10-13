@@ -3,7 +3,7 @@ import { createPool } from 'mysql2/promise'
 
 const prisma = new PrismaClient()
 
-export const Database = createPool({
+export const GameDB = createPool({
     host: process.env.SQL_HOST,
     database: process.env.SQL_DATABASE,
     password: process.env.SQL_PASS,
@@ -11,4 +11,4 @@ export const Database = createPool({
     port: parseInt(process.env.SQL_PORT ?? '3306'),
 })
 
-export const LogDB = prisma
+export const BotDB = prisma

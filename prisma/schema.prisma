@@ -15,3 +15,13 @@ model command_log {
   options  Json?   @db.Json
   jsonData Json
 }
+
+model team_notes {
+  id         Int      @id @default(autoincrement())
+  user       String
+  noterId    Decimal  @db.Decimal
+  noterName  String
+  notes      String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}

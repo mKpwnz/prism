@@ -2,7 +2,7 @@ import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
 import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
-import { LogDB } from '@sql/Database'
+import { BotDB } from '@sql/Database'
 import LogManager from '@utils/Logger'
 import { AlignmentEnum, AsciiTable3 } from 'ascii-table3'
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
@@ -31,7 +31,7 @@ export class BotStats extends Command {
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const embed = this.getEmbedTemplate(interaction)
         embed.setTitle('Bot Stats')
-        const data = await LogDB.command_log.groupBy({
+        const data = await BotDB.command_log.groupBy({
             by: ['command'],
             _count: {
                 command: true,
