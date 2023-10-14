@@ -3,7 +3,7 @@ import * as bodyParser from 'body-parser'
 import errorhandler from 'errorhandler'
 import express, { NextFunction, Request, Response } from 'express'
 import { CustomError } from './CustomError'
-import StatusCode from '@enums/StatusCodes'
+import EStatusCode from '@enums/EStatusCode'
 import { Netmask } from 'netmask'
 import * as requestIp from 'request-ip'
 import cors from 'cors'
@@ -30,7 +30,7 @@ export class ExpressApp {
             res.send({ commands: cmd, channel: chan, groups: grp })
         })
         this.app.use((req, res, next) => {
-            throw new CustomError({ code: StatusCode.ClientErrorNotFound })
+            throw new CustomError({ code: EStatusCode.ClientErrorNotFound })
         })
         this.app.use(this.errorhandler)
         this.app.listen(3000, () => {
@@ -63,14 +63,14 @@ export class ExpressApp {
         const subnets = [new Netmask('193.42.12.128/28'), new Netmask('10.8.0.0/16')]
         const whitelisted = ['::1', '127.0.0.1', '::ffff:127.0.0.1']
         var ip = requestIp.getClientIp(req)
-        if (!ip) throw new CustomError({ code: StatusCode.ClientErrorUnauthorized })
+        if (!ip) throw new CustomError({ code: EStatusCode.ClientErrorUnauthorized })
         ip = ip?.replace('::ffff:', '')
         if (whitelisted.includes(ip)) return next()
         var isInSubnet = false
         subnets.forEach((subnet) => {
             if (subnet.contains(ip ?? '')) isInSubnet = true
         })
-        if (!isInSubnet) throw new CustomError({ code: StatusCode.ClientErrorUnauthorized })
+        if (!isInSubnet) throw new CustomError({ code: EStatusCode.ClientErrorUnauthorized })
         next()
     }
 

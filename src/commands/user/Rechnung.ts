@@ -1,20 +1,12 @@
 import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
-import { EmbedBuilder } from '@discordjs/builders'
 import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
 import { GameDB } from '@sql/Database'
 import { IBilling } from '@sql/schema/Billing.schema'
-import { IJobs } from '@sql/schema/Jobs.schema'
+import { IJob } from '@sql/schema/Job.schema'
 import LogManager from '@utils/Logger'
-import {
-    ChatInputCommandInteraction,
-    CommandInteraction,
-    CommandInteractionOptionResolver,
-    SlashCommandBuilder,
-    TextChannel,
-} from 'discord.js'
-import { RowDataPacket } from 'mysql2'
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 import { WhoIs } from './WhoIs'
 
 export class Rechnung extends Command {
@@ -399,7 +391,7 @@ export class Rechnung extends Command {
         let sender = options.getString('sender') ?? 'dortmund'
         let sendername = 'Stadt Dortmund'
         if (sender != 'dortmund') {
-            const [senderquery] = await GameDB.query<IJobs[]>('SELECT * FROM jobs WHERE name = ?', [sender])
+            const [senderquery] = await GameDB.query<IJob[]>('SELECT * FROM jobs WHERE name = ?', [sender])
             if (senderquery.length === 0) {
                 sender = 'dortmund'
                 sendername = 'Stadt Dortmund'

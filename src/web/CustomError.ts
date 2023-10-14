@@ -1,4 +1,4 @@
-import StatusCode from '@enums/StatusCodes'
+import EStatusCode from '@enums/EStatusCode'
 
 export type CustomErrorContent = {
     message: string
@@ -19,10 +19,10 @@ export class CustomError extends Error {
      * @author mKpwnz
      * @date 14.10.2023
      * @private
-     * @type {StatusCode}
+     * @type {EStatusCode}
      * @memberof CustomError
      */
-    private readonly _code: StatusCode
+    private readonly _code: EStatusCode
 
     /**
      * @description Gibt an, ob der Fehler geloggt werden soll oder nicht. (Standard: false) (Nur in Production true)
@@ -48,13 +48,18 @@ export class CustomError extends Error {
      * Creates an instance of CustomError.
      * @author mKpwnz
      * @date 14.10.2023
-     * @param {{ code?: StatusCode; message?: string; logging?: boolean; context?: { [key: string]: any } }} [params]
+     * @param {{ code?: EStatusCode; message?: string; logging?: boolean; context?: { [key: string]: any } }} [params]
      * @memberof CustomError
      */
-    constructor(params?: { code?: StatusCode; message?: string; logging?: boolean; context?: { [key: string]: any } }) {
+    constructor(params?: {
+        code?: EStatusCode
+        message?: string
+        logging?: boolean
+        context?: { [key: string]: any }
+    }) {
         const { code, message, logging } = params || {}
-        super(message || StatusCode[code ?? StatusCode.ServerErrorInternal])
-        this._code = code || StatusCode.ServerErrorInternal
+        super(message || EStatusCode[code ?? EStatusCode.ServerErrorInternal])
+        this._code = code || EStatusCode.ServerErrorInternal
         this._logging = logging || false
         this._context = params?.context || {}
     }

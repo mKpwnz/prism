@@ -1,12 +1,10 @@
 {
-	"$schema": "https://typedoc.org/schema.json",
 	"entryPoints": [
 		"src"
 	],
 	"entryPointStrategy": "expand",
 	"out": "../prism-docs/public",
 	"plugin": [
-		"@mxssfd/typedoc-theme",
 		"typedoc-theme-hierarchy"
 	],
 	"theme": "hierarchy",

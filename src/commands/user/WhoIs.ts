@@ -4,10 +4,10 @@ import { EENV } from '@enums/EENV'
 import { ESearchType } from '@enums/ESearchType'
 import Config from '@proot/Config'
 import { BotDB, GameDB } from '@sql/Database'
-import { IFindUser } from '@sql/schema/FindUser.schema'
+import { IFindUser } from '@sql/schema/User.schema'
 import { Helper } from '@utils/Helper'
 import LogManager from '@utils/Logger'
-import { AttachmentBuilder, ChatInputCommandInteraction, CommandInteraction, SlashCommandBuilder } from 'discord.js'
+import { AttachmentBuilder, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 
 export class WhoIs extends Command {
     constructor() {

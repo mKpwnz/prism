@@ -2,6 +2,11 @@ import { Command } from '@class/Command'
 import { EENV } from '@enums/EENV'
 import LogManager from '@utils/Logger'
 import { Interaction, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js'
+import { ValidateTrunk } from './cars'
+import { SchufaCheck } from './housing'
+import { Nvhx, NvhxBan } from './nvhx'
+import { CheckImageOwner } from './phone'
+import { BotStats, CachePerformance, Help, Ping, ServerStatus, Wahl } from './system'
 import {
     ChangeBirthday,
     Fraksperre,
@@ -17,11 +22,6 @@ import {
     TeamNote,
     WhoIs,
 } from './user'
-import { BotStats, CachePerformance, Help, Ping, ServerStatus, Wahl } from './system'
-import { Nvhx, NvhxBan } from './nvhx'
-import { CheckImageOwner } from './phone'
-import { SchufaCheck } from './housing'
-import { ValidateTrunk } from './cars'
 
 export class CommandHandler {
     static commands: {

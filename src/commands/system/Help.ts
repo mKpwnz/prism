@@ -1,32 +1,11 @@
 import { Command } from '@class/Command'
 import { CommandHandler, RegisterCommand } from '@commands/CommandHandler'
-import { EmbedBuilder } from '@discordjs/builders'
 import { EENV } from '@enums/EENV'
+import { ICmdPrintInformation } from '@interfaces/ICmdPrintInformation'
+import { ICmdPrintInformationOption } from '@interfaces/ICmdPrintInformationOption'
 import { BotClient } from '@proot/Bot'
 import Config from '@proot/Config'
-import { Helper } from '@utils/Helper'
-import LogManager from '@utils/Logger'
-import { ChatInputCommandInteraction, Collection, SlashCommandBuilder } from 'discord.js'
-
-interface ICmdPrintInformation {
-    commandName: string
-    description: string
-    production: boolean
-    isBeta: boolean
-    commandOptions: ICmdPrintInformationOption[]
-    subCommands?: ICmdPrintInformation[]
-    allowedChannels?: string[]
-    allowedGroups?: string[]
-}
-interface ICmdPrintInformationOption {
-    name: string
-    description: string
-    required: boolean
-    choices?: {
-        name: string
-        value: string
-    }[]
-}
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 
 export class Help extends Command {
     constructor() {

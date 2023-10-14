@@ -3,16 +3,10 @@ import { RegisterCommand } from '@commands/CommandHandler'
 import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
 import { GameDB } from '@sql/Database'
+import { ISchufaUser } from '@sql/schema/User.schema'
 import LogManager from '@utils/Logger'
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 import { RowDataPacket } from 'mysql2'
-
-interface schufaUser extends RowDataPacket {
-    firstname: string
-    lastname: string
-    steamId: string
-    accounts: any
-}
 
 // TODO: REFACTOR
 export class SchufaCheck extends Command {
@@ -37,7 +31,7 @@ export class SchufaCheck extends Command {
     }
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         try {
-            const [schufaUsers] = await GameDB.query<schufaUser[]>(
+            const [schufaUsers] = await GameDB.query<ISchufaUser[]>(
                 `SELECT firstname, lastname, steamId, accounts FROM users u JOIN player_houses ph ON u.identifier = ph.identifier WHERE JSON_EXTRACT(u.accounts, '$.bank') < 0;`,
             )
             for (const user of schufaUsers) {

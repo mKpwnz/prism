@@ -1,10 +1,10 @@
 import 'dotenv/config' // THIS NEED TO BE AT THE TOP !!!IMPORTANT
 
 import { EventHandler } from '@events/EventHandler'
-import LogManager from '@utils/Logger'
-import { Client, Collection, Events, IntentsBitField, Message, SnowflakeUtil, TextChannel } from 'discord.js'
-import { ExpressApp } from '@web/ExpressApp'
 import { Cache } from '@utils/Cache'
+import LogManager from '@utils/Logger'
+import { ExpressApp } from '@web/ExpressApp'
+import { Client, Events, IntentsBitField } from 'discord.js'
 LogManager.configure()
 
 const token = process.env.NODE_ENV === 'production' ? process.env.DISCORD_TOKEN_PROD : process.env.DISCORD_TOKEN_DEV

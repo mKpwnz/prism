@@ -26,8 +26,8 @@
       "@events/*": [
         "./src/events/*"
       ],
-      "@types/*": [
-        "./src/types/*"
+      "@ctypes/*": [
+        "./src/ctypes/*"
       ],
       "@sql/*": [
         "./src/sql/*"

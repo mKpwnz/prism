@@ -3,12 +3,7 @@ import { RconClient } from '@class/RconClient'
 import { RegisterCommand } from '@commands/CommandHandler'
 import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
-import {
-    ChatInputCommandInteraction,
-    CommandInteraction,
-    CommandInteractionOptionResolver,
-    SlashCommandBuilder,
-} from 'discord.js'
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 
 export class Kick extends Command {
     constructor() {

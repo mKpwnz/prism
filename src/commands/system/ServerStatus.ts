@@ -1,54 +1,15 @@
 import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
+import { DiscordResponse } from '@ctypes/DiscordResponse'
+import { DiscordResponseGroupe } from '@ctypes/DiscordResponseGroupe'
+import { HeartbeatResponse } from '@ctypes/HeartbeatResponse'
+import { PublicGroupListEntry } from '@ctypes/PublicGroupListEntry'
 import { EENV } from '@enums/EENV'
+import { EServerStatus } from '@enums/EServerStatus'
 import Config from '@proot/Config'
 import LogManager from '@utils/Logger'
 import axios from 'axios'
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
-
-enum EServerStatus {
-    DOWN = 0,
-    UP = 1,
-    PENDING = 2,
-    MAINTENANCE = 3,
-}
-type DiscordResponse = {
-    status: EServerStatus
-    name: string
-    uptime: number
-    print: string
-}
-type DiscordResponseGroupe = {
-    name: string
-    member: DiscordResponse[]
-}
-type pglMonitor = {
-    id: number
-    name: string
-    sendUrl: any
-    type: string
-}
-type publicGroupListEntry = {
-    id: number
-    name: string
-    weight: number
-    monitorList: pglMonitor[]
-}
-
-type heartbeatResponse = {
-    heartbeatList: {
-        [key: number]: hearbeatEntry[]
-    }
-    uptimeList: {
-        [key: string]: number
-    }
-}
-type hearbeatEntry = {
-    status: EServerStatus
-    time: string
-    msg: string
-    ping: string | null
-}
 
 export class ServerStatus extends Command {
     constructor() {
@@ -88,7 +49,7 @@ export class ServerStatus extends Command {
     }
     async getAgregatedData(): Promise<DiscordResponseGroupe[]> {
         var res: DiscordResponseGroupe[] = []
-        const pglRes: publicGroupListEntry[] = await axios
+        const pglRes: PublicGroupListEntry[] = await axios
             .get('https://status.immortaldev.eu/api/status-page/9t7abvczql56qa629fkejnfg2dyl072r', {
                 timeout: 2500,
             })
@@ -97,7 +58,7 @@ export class ServerStatus extends Command {
                 LogManager.error(err)
                 return []
             })
-        const hbdRes: heartbeatResponse = await axios
+        const hbdRes: HeartbeatResponse = await axios
             .get('https://status.immortaldev.eu/api/status-page/heartbeat/9t7abvczql56qa629fkejnfg2dyl072r', {
                 timeout: 2500,
             })

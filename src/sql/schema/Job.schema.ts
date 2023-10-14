@@ -1,6 +1,6 @@
 import { RowDataPacket } from 'mysql2'
 
-export interface IJobs extends RowDataPacket {
+export interface IJob extends RowDataPacket {
     name: string
     label: string
     armory: string
