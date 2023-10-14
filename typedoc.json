@@ -4,7 +4,7 @@
 		"src"
 	],
 	"entryPointStrategy": "expand",
-	"out": "public/docs",
+	"out": "../prism-docs/public",
 	"plugin": [
 		"@mxssfd/typedoc-theme",
 		"typedoc-theme-hierarchy"
