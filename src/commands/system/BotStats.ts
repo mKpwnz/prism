@@ -47,7 +47,6 @@ export class BotStats extends Command {
             .setHeading('Command', 'Count')
             .setAlign(1, AlignmentEnum.LEFT)
             .setAlign(2, AlignmentEnum.RIGHT)
-        var tableContent: string[] = []
         data.forEach((d) => {
             table.addRow(d.command, d._count.command)
         })
