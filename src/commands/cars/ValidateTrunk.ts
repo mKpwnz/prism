@@ -51,6 +51,11 @@ export class ValidateTrunk extends Command {
                 return
             }
             var veh = vehicles[0]
+            if (!veh.kofferraum) {
+                embed.setDescription(`Das Fahrzeug mit dem Kennzeichen \`${veh.plate}\` hat keinen Kofferraum.`)
+                await interaction.reply({ embeds: [embed], ephemeral: true })
+                return
+            }
             var trunk = JSON.parse(veh.kofferraum)
             var scuffedItems = []
             var ignoreList = ['c_money_cash', 'c_money_black', 'weapon_weapons']

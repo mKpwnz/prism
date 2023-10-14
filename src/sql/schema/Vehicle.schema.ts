@@ -8,8 +8,8 @@ export interface IVehicle extends RowDataPacket {
     vehicle: string
     type: string
     job: string | null
-    kofferraum: string
-    handschuhfach: string
+    kofferraum: string | null
+    handschuhfach: string | null
     inserted: Date
     updated: Date
 }
