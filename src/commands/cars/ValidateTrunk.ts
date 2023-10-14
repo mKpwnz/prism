@@ -63,14 +63,16 @@ export class ValidateTrunk extends Command {
             }
             if (!scuffedItems.length) {
                 embed.setColor(EmbedColors.SUCCESS)
-                embed.setDescription(`Der Kofferraum des Fahrzeugs mit dem Kennzeichen **${plate}** ist valid.`)
+                embed.setDescription(`Der Kofferraum des Fahrzeugs mit dem Kennzeichen \`${veh.plate}\` ist valid.`)
                 await interaction.reply({
                     embeds: [embed],
                 })
             } else {
                 embed.setColor(EmbedColors.ALERT)
                 embed.setDescription(
-                    `Der Kofferraum des Fahrzeugs mit dem Kennzeichen **${plate}** ist nicht valid.\nFolgende Items sind nicht mehr im Spiel:\n\`\`\`${scuffedItems.join(
+                    `Der Kofferraum des Fahrzeugs mit dem Kennzeichen \`${
+                        veh.plate
+                    }\` ist nicht valid.\nFolgende Items sind nicht mehr im Spiel:\n\`\`\`${scuffedItems.join(
                         '\n',
                     )}\`\`\``,
                 )
