@@ -1,6 +1,6 @@
 import { RowDataPacket } from 'mysql2'
 
-export interface IItems extends RowDataPacket {
+export interface IItem extends RowDataPacket {
     name: string
     label: string
     weight: number

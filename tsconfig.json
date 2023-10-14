@@ -41,6 +41,9 @@
       "@web/*": [
         "./src/web/*"
       ],
+      "@controller/*": [
+        "./src/controller/*"
+      ],
       "@proot/*": [
         "./src/*"
       ],

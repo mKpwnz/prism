@@ -17,7 +17,7 @@ import {
     TeamNote,
     WhoIs,
 } from './user'
-import { BotStats, Help, Ping, ServerStatus, Wahl } from './system'
+import { BotStats, CachePerformance, Help, Ping, ServerStatus, Wahl } from './system'
 import { Nvhx, NvhxBan } from './nvhx'
 import { CheckImageOwner } from './phone'
 import { SchufaCheck } from './housing'
@@ -80,6 +80,7 @@ export class CommandHandler {
         // Car Commands
         // new Versicherung()
         new BotStats()
+        new CachePerformance()
         LogManager.info('CommandManager: All commands initialized!')
         LogManager.info('Commands [PROD]:', CommandHandler.prodCommands)
         LogManager.info('Commands [DEV]:', CommandHandler.devCommands)
