@@ -1,15 +1,21 @@
 import { EmbedColors } from '@enums/EmbedColors'
 import Config from '@proot/Config'
+import { AlignmentEnum, AsciiTable3 } from 'ascii-table3'
 import { MemoryCache, MemoryStore, caching } from 'cache-manager'
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js'
-import LogManager from './Logger'
-import * as ts from 'typescript'
 import * as prettier from 'prettier'
-import { AlignmentEnum, AsciiTable3 } from 'ascii-table3'
 
 export class Cache {
     private static mc: MemoryCache
 
+    /**
+     * @description Initialisiert den Cache
+     * @author mKpwnz
+     * @date 14.10.2023
+     * @static
+     * @returns {*}  {Promise<void>}
+     * @memberof Cache
+     */
     public static async init(): Promise<void> {
         Cache.mc = await caching('memory', {
             max: 100,
@@ -17,26 +23,88 @@ export class Cache {
         })
     }
 
+    /**
+     * @description Setzt einen Wert in den Cache.  (TTL in Millisekunden) (Standard TTL: 60 Minuten)
+     * @author mKpwnz
+     * @date 14.10.2023
+     * @static
+     * @param {string} key
+     * @param {*} value
+     * @param {number} [ttl]
+     * @returns {*}  {Promise<void>}
+     * @memberof Cache
+     */
     public static async set(key: string, value: any, ttl?: number): Promise<void> {
         if (!Cache.mc) await Cache.init()
         await Cache.mc.set(key, value, ttl)
     }
+
+    /**
+     * @description Gibt den Wert des Caches zurück, wenn vorhanden. Ansonsten undefined.
+     * @author mKpwnz
+     * @date 14.10.2023
+     * @static
+     * @template T
+     * @param {string} key
+     * @returns {*}  {(Promise<T | undefined>)}
+     * @memberof Cache
+     */
     public static async get<T>(key: string): Promise<T | undefined> {
         if (!Cache.mc) await Cache.init()
         return (await Cache.mc.get(key)) as T
     }
+
+    /**
+     * @description Löscht einen Wert aus dem Cache, wenn vorhanden. Ansonsten passiert nichts.
+     * @author mKpwnz
+     * @date 14.10.2023
+     * @static
+     * @param {string} key
+     * @returns {*}  {Promise<void>}
+     * @memberof Cache
+     */
     public static async delete(key: string): Promise<void> {
         if (!Cache.mc) await Cache.init()
         await Cache.mc.del(key)
     }
+
+    /**
+     * @description Löscht den gesamten Cache. ACHTUNG: Dieser Befehl sollte nur im Notfall verwendet werden, da er den gesamten Cache leert.
+     * @author mKpwnz
+     * @date 14.10.2023
+     * @static
+     * @returns {*}  {Promise<void>}
+     * @memberof Cache
+     */
     public static async reset(): Promise<void> {
         if (!Cache.mc) await Cache.init()
         await Cache.mc.reset()
     }
+
+    /**
+     * @description Gibt den gesamten Cache zurück. ACHTUNG: Dieser Befehl sollte nur im Notfall verwendet werden, da er den gesamten Cache zurückgibt.
+     * @author mKpwnz
+     * @date 14.10.2023
+     * @static
+     * @returns {*}  {Promise<MemoryStore>}
+     * @memberof Cache
+     */
     public static async getStore(): Promise<MemoryStore> {
         if (!Cache.mc) await Cache.init()
         return await Cache.mc.store
     }
+
+    /**
+     * @description Führt einen Performance Test durch und gibt die Ergebnisse in einem Embed zurück.
+     * @author mKpwnz
+     * @date 14.10.2023
+     * @static
+     * @param {ChatInputCommandInteraction} interaction
+     * @param {Function} callback
+     * @param {string} [cachingKey]
+     * @returns {*}  {Promise<void>}
+     * @memberof Cache
+     */
     public static async testPerformance(
         interaction: ChatInputCommandInteraction,
         callback: Function,

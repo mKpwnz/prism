@@ -177,6 +177,7 @@ export class Helper {
         return platetext
     }
 
+    // TODO: Move to Item.controller.ts
     /**
      * @description
      * @author sirjxsh
@@ -201,6 +202,7 @@ export class Helper {
         }
     }
 
+    // TODO: Move to Item.controller.ts
     /**
      * @description
      * @author mKpwnz

@@ -47,6 +47,18 @@ export class ExpressApp {
         this.app.use(bodyParser.urlencoded({ extended: false }))
     }
 
+    /**
+     * @description
+     * @author mKpwnz
+     * @date 14.10.2023
+     * @private
+     * @param {Request} req
+     * @param {Response} res
+     * @param {NextFunction} next
+     * @returns {*}
+     * @memberof ExpressApp
+     * @deprecated Wird nicht mehr benötigt, da die API nur noch über den Reverse Proxy erreichbar ist.
+     */
     private handlePermissions(req: Request, res: Response, next: NextFunction) {
         const subnets = [new Netmask('193.42.12.128/28'), new Netmask('10.8.0.0/16')]
         const whitelisted = ['::1', '127.0.0.1', '::ffff:127.0.0.1']
@@ -62,6 +74,18 @@ export class ExpressApp {
         next()
     }
 
+    /**
+     * @description Errorhandler für die API. Wird immer aufgerufen, wenn ein Fehler auftritt. (z.B. 404) (Wird auch in der Konsole geloggt, wenn der Fehler geloggt werden soll.)
+     * @author mKpwnz
+     * @date 14.10.2023
+     * @private
+     * @param {Error} err
+     * @param {Request} req
+     * @param {Response} res
+     * @param {NextFunction} next
+     * @returns {*}
+     * @memberof ExpressApp
+     */
     private errorhandler(err: Error, req: Request, res: Response, next: NextFunction) {
         if (err instanceof CustomError) {
             const { statusCode, errors, logging } = err
