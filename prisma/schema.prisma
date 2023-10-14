@@ -24,6 +24,7 @@ model team_notes {
   noterId    Decimal  @db.Decimal
   noterName  String
   note       String
+  display    Boolean  @default(true)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 }
