@@ -11,11 +11,3 @@ build_job:
         - curl -X POST https://cm.immortaldev.eu/api/stacks/webhooks/e3322129-4b0a-4eb4-aa94-0c470482209c
     only:
         - release
-
-pages:
-    stage: build
-    artifacts:
-        paths:
-            - public
-    only:
-        - main
