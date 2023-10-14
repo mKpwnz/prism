@@ -21,6 +21,7 @@ import { BotStats, Help, Ping, ServerStatus, Wahl } from './system'
 import { Nvhx, NvhxBan } from './nvhx'
 import { CheckImageOwner } from './phone'
 import { SchufaCheck } from './housing'
+import { ValidateTrunk } from './cars'
 
 export class CommandHandler {
     static commands: {
@@ -74,6 +75,8 @@ export class CommandHandler {
         // Wahl
         new Wahl()
         new TeamNote()
+
+        new ValidateTrunk()
         // Car Commands
         // new Versicherung()
         new BotStats()
