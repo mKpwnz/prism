@@ -1,4 +1,5 @@
 import { EENV } from '@enums/EENV'
+import { EmbedColors } from '@enums/EmbedColors'
 import Config from '@proot/Config'
 import { BotDB } from '@sql/Database'
 import { Helper } from '@utils/Helper'
@@ -99,7 +100,7 @@ export abstract class Command {
     }
     getEmbedTemplate(interaction: ChatInputCommandInteraction): EmbedBuilder {
         return new EmbedBuilder()
-            .setColor(0x0792f1)
+            .setColor(EmbedColors.DEFAULT)
             .setTimestamp()
             .setAuthor({ name: Config.Discord.BOT_NAME, iconURL: Config.Pictures.Prism.LOGO_BLUE })
             .setFooter({

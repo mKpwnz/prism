@@ -203,6 +203,29 @@ export class Helper {
 
     /**
      * @description
+     * @author mKpwnz
+     * @date 14.10.2023
+     * @static
+     * @param {string} itemName
+     * @returns {*}  {Promise<boolean>}
+     * @memberof Helper
+     */
+    static async doesItemExists(itemName: string): Promise<boolean> {
+        itemName = itemName.toLowerCase()
+        try {
+            let [item] = await GameDB.query<IItems[]>('SELECT * FROM items WHERE name = ?', [itemName])
+            if (item.length > 0) {
+                return true
+            }
+            return false
+        } catch (error) {
+            LogManager.error(error)
+            return false
+        }
+    }
+
+    /**
+     * @description
      * @author sirsxsh
      * @date 09.10.2023
      * @static
