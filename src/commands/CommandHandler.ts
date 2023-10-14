@@ -2,29 +2,25 @@ import { Command } from '@class/Command'
 import { EENV } from '@enums/EENV'
 import LogManager from '@utils/Logger'
 import { Interaction, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js'
-import { SchufaCheck } from './housing/SchufaCheck'
-import { Nvhx } from './nvhx/Nvhx'
-import { CheckImageOwner } from './phone/CheckImageOwner'
-import { Help } from './system/Help'
-import { Ping } from './system/Ping'
-import { ServerStatus } from './system/ServerStatus'
-import { Rechnung } from './user/Rechnung'
-import { WhoIs } from './user/WhoIs'
-import { Wahl } from './system/Wahl'
-import { Rename } from './user/Rename'
-import { ChangeBirthday } from './user/ChangeBirthday'
-import { Fraksperre } from './user/Fraksperre'
-import { NvhxBan } from './nvhx/NvhxBan'
-import { Give } from './user/Give'
-import { Resetpos } from './user/Resetpos'
-import { Setjob } from './user/Setjob'
-import { TeamNote } from './user/TeamNote'
-import { Kick } from './user/Kick'
-import { Lizenz } from './user/Lizenz'
-import { Revive } from './user/Revive'
-import { Versicherung } from './cars/Versicherung'
-import { RequestToSupport } from './user/RequestToSupport'
-import { BotStats } from './system/BotStats'
+import {
+    ChangeBirthday,
+    Fraksperre,
+    Give,
+    Kick,
+    Lizenz,
+    Rechnung,
+    Rename,
+    RequestToSupport,
+    Resetpos,
+    Revive,
+    Setjob,
+    TeamNote,
+    WhoIs,
+} from './user'
+import { BotStats, Help, Ping, ServerStatus, Wahl } from './system'
+import { Nvhx, NvhxBan } from './nvhx'
+import { CheckImageOwner } from './phone'
+import { SchufaCheck } from './housing'
 
 export class CommandHandler {
     static commands: {
