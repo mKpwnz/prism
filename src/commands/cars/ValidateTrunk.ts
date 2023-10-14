@@ -57,13 +57,13 @@ export class ValidateTrunk extends Command {
                 return
             }
             var trunk = JSON.parse(veh.kofferraum)
-            var scuffedItems = []
+            var scuffedItems: { item: string; count: number }[] = []
             var ignoreList = ['c_money_cash', 'c_money_black', 'weapon_weapons']
             for (const item of Object.keys(trunk)) {
                 if (ignoreList.includes(item)) continue
                 const found = await Helper.doesItemExists(item)
                 if (!found) {
-                    scuffedItems.push(item)
+                    scuffedItems.push({ item, count: trunk[item] })
                 }
             }
             if (!scuffedItems.length) {
@@ -77,9 +77,9 @@ export class ValidateTrunk extends Command {
                 embed.setDescription(
                     `Der Kofferraum des Fahrzeugs mit dem Kennzeichen \`${
                         veh.plate
-                    }\` ist nicht valid.\nFolgende Items sind nicht mehr im Spiel:\n\`\`\`${scuffedItems.join(
-                        '\n',
-                    )}\`\`\``,
+                    }\` ist nicht valid.\nFolgende Items sind nicht mehr im Spiel:\n\`\`\`${scuffedItems
+                        .map((itm) => `${itm.item} (${itm.count})`)
+                        .join('\n')}\`\`\``,
                 )
                 await interaction.reply({ embeds: [embed] })
             }
