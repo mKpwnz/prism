@@ -13,7 +13,9 @@ build_job:
         - release
 
 pages:
-    stage: build
+    stage: deploy
+    script:
+        - echo 'Nothing to do...'
     artifacts:
         paths:
             - public
