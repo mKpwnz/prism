@@ -118,7 +118,7 @@ export class WhoIs extends Command {
                             }
                             var teamNoteCount = await BotDB.team_notes.count({
                                 where: {
-                                    user: identifier,
+                                    user: finduser[i].identifier,
                                 },
                             })
                             fields.push({
