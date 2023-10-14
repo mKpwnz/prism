@@ -52,8 +52,8 @@ export class ValidateTrunk extends Command {
             }
             var veh = vehicles[0]
             if (!veh.kofferraum) {
-                embed.setDescription(`Das Fahrzeug mit dem Kennzeichen \`${veh.plate}\` hat keinen Kofferraum.`)
-                await interaction.reply({ embeds: [embed], ephemeral: true })
+                embed.setDescription(`Der Kofferraum des Fahrzeug mit dem Kennzeichen \`${veh.plate}\` ist leer.`)
+                await interaction.reply({ embeds: [embed] })
                 return
             }
             var trunk = JSON.parse(veh.kofferraum)
