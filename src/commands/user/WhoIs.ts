@@ -3,7 +3,7 @@ import { RegisterCommand } from '@commands/CommandHandler'
 import { EENV } from '@enums/EENV'
 import { ESearchType } from '@enums/ESearchType'
 import Config from '@proot/Config'
-import { GameDB } from '@sql/Database'
+import { BotDB, GameDB } from '@sql/Database'
 import { IFindUser } from '@sql/schema/FindUser.schema'
 import { Helper } from '@utils/Helper'
 import LogManager from '@utils/Logger'
@@ -116,6 +116,11 @@ export class WhoIs extends Command {
                                     '\nCrafting Level: ' +
                                     (finduser[i].crafting_level - (finduser[i].crafting_level % 100)) / 100
                             }
+                            var teamNoteCount = await BotDB.team_notes.count({
+                                where: {
+                                    user: identifier,
+                                },
+                            })
                             fields.push({
                                 name: finduser[i].playername + ' (' + finduser[i].name + ')',
                                 value:
@@ -147,7 +152,9 @@ export class WhoIs extends Command {
                                     finduser[i].phone_number +
                                     '' +
                                     fraksperrestring +
-                                    levelString,
+                                    levelString +
+                                    '\nTeamnote vorhanden? **' +
+                                    `${teamNoteCount > 0 ? 'Ja' : 'Nein'}**`,
                                 inline: false,
                             })
                         }

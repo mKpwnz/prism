@@ -130,7 +130,7 @@ export class TeamNote extends Command {
             },
             {
                 name: 'Hinzugefügt am',
-                value: data.created_at.toLocaleString(),
+                value: data.created_at.toLocaleString('de-DE'),
                 inline: true,
             },
             {
@@ -171,7 +171,7 @@ export class TeamNote extends Command {
         data.slice(0, 5).forEach((note) => {
             notes += `ID: **${note.id}** | Erstellt von: **${
                 note.noterName
-            }** | Erstellt am **${note.created_at.toLocaleString()}**\n\`\`\`${note.note}\`\`\`\n`
+            }** | Erstellt am **${note.created_at.toLocaleString('de-DE')}**\n\`\`\`${note.note}\`\`\`\n`
         })
         embed.setDescription(
             `Notizen (${data.length > 5 ? 5 : data.length}/${data.length}) von **${vUser.firstname} ${
@@ -214,17 +214,17 @@ export class TeamNote extends Command {
             embed.setDescription(
                 `Notizen von **${vUser.firstname} ${vUser.lastname}**  (${vUser.identifier})\n\nID: **${
                     data.id
-                }** | Erstellt von: **${
-                    data.noterName
-                }** | Erstellt am **${data.created_at.toLocaleString()}**\n\`\`\`${data.note}\`\`\`\n`,
+                }** | Erstellt von: **${data.noterName}** | Erstellt am **${data.created_at.toLocaleString(
+                    'de-DE',
+                )}**\n\`\`\`${data.note}\`\`\`\n`,
             )
         } else {
             embed.setDescription(
                 `*Die SteamID konnte keinem Nutzer zugewiesen werden!*\n\nNotizen von **${data.user}** \n\nID: **${
                     data.id
-                }** | Erstellt von: **${
-                    data.noterName
-                }** | Erstellt am **${data.created_at.toLocaleString()}**\n\`\`\`${data.note}\`\`\`\n`,
+                }** | Erstellt von: **${data.noterName}** | Erstellt am **${data.created_at.toLocaleString(
+                    'de-DE',
+                )}**\n\`\`\`${data.note}\`\`\`\n`,
             )
         }
         await interaction.reply({ embeds: [embed] })
