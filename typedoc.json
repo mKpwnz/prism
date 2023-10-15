@@ -4,7 +4,6 @@
 	],
 	"customCss": "./typedoc.theme.css",
 	"entryPointStrategy": "expand",
-	"excludeNotDocumented": true,
 	"out": "../prism-docs/public",
 	"plugin": [
 		"typedoc-theme-hierarchy"

@@ -1,4 +1,4 @@
-/* @import url('https://fonts.googleapis.com/css2?family=Exo:wght@100;200;300;400;500;600;700&display=swap'); */
+@import url('https://fonts.googleapis.com/css2?family=Exo:wght@100;200;300;400;500;600;700&display=swap');
 :root {
     --color-background: #1f1f24;
     --color-background-secondary: #2c2c32;
@@ -177,8 +177,8 @@ body::before {
 .tsd-typography p,
 .tsd-typography ul,
 .tsd-typography ol {
-    margin-top: 0;
+    margin-top: 0 !important;
 }
 h4 {
-    margin-bottom: 0;
+    margin-bottom: 0 !important;
 }
