@@ -1,5 +1,13 @@
 import { RowDataPacket } from 'mysql2'
 
+/**
+ * @description
+ * @author mKpwnz
+ * @date 15.10.2023
+ * @export
+ * @interface IUser
+ * @extends {RowDataPacket}
+ */
 export interface IUser extends RowDataPacket {
     identifier: string
     steamId: string
@@ -40,6 +48,14 @@ export interface IUser extends RowDataPacket {
     updated: Date
 }
 
+/**
+ * @description
+ * @author mKpwnz
+ * @date 15.10.2023
+ * @export
+ * @interface IFindUser
+ * @extends {RowDataPacket}
+ */
 export interface IFindUser extends RowDataPacket {
     playername: string
     discord: string
@@ -59,6 +75,14 @@ export interface IFindUser extends RowDataPacket {
     crafting_level: number
 }
 
+/**
+ * @description
+ * @author mKpwnz
+ * @date 15.10.2023
+ * @export
+ * @interface ISchufaUser
+ * @extends {RowDataPacket}
+ */
 export interface ISchufaUser extends RowDataPacket {
     firstname: string
     lastname: string

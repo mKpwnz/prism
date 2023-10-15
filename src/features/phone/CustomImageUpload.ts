@@ -21,13 +21,7 @@ import {
     TextInputStyle,
 } from 'discord.js'
 
-/**
- * Permissions für:
-    Eventverwaltung
-    Fraktionsverwaltung
-    Serverleitung
- */
-export class CustomImmageUpload {
+export class CustomImageUpload {
     private client: Client | null
     private input_phoneNumber: string = ''
     private input_reason: string = ''

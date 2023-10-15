@@ -1,10 +1,5 @@
 import EStatusCode from '@enums/EStatusCode'
 
-export type CustomErrorContent = {
-    message: string
-    context?: { [key: string]: any }
-}
-
 /**
  * @description Custom Error Klasse für die WebAPI.
  * @author mKpwnz

@@ -1,5 +1,13 @@
 import { RowDataPacket } from 'mysql2'
 
+/**
+ * @description
+ * @author mKpwnz
+ * @date 15.10.2023
+ * @export
+ * @interface ITeamNote
+ * @extends {RowDataPacket}
+ */
 export interface ITeamNote extends RowDataPacket {
     id: number
     user_steamid: string

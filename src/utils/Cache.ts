@@ -5,6 +5,13 @@ import { MemoryCache, MemoryStore, caching } from 'cache-manager'
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js'
 import * as prettier from 'prettier'
 
+/**
+ * @description Cache Klasse für den MemCache. (https://www.npmjs.com/package/cache-manager)
+ * @author mKpwnz
+ * @date 15.10.2023
+ * @export
+ * @class Cache
+ */
 export class Cache {
     private static mc: MemoryCache
 
