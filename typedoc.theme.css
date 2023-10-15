@@ -174,3 +174,11 @@ body::before {
 .container {
     max-width: 1480px;
 }
+.tsd-typography p,
+.tsd-typography ul,
+.tsd-typography ol {
+    margin-top: 0;
+}
+h4 {
+    margin-bottom: 0;
+}
