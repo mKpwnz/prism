@@ -39,9 +39,12 @@ export class onReady extends DCEvent {
                     LogManager.info(`Deleted emote ${e.name} (${e.id})`)
                 }
             })
+        }
+        for (const configEmote of Config.Discord.Emotes) {
             var newEmote = await guild.emojis.create({ name: configEmote.name, attachment: configEmote.link })
             LogManager.info(`Added/Updated emote ${newEmote.name} (${newEmote.id})`)
         }
+
         LogManager.info('Emotes checked!')
         return
     }

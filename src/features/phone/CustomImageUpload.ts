@@ -7,6 +7,7 @@ import { IFindUser } from '@sql/schema/User.schema'
 import { Helper } from '@utils/Helper'
 import LogManager from '@utils/Logger'
 import axios from 'axios'
+import { Channel } from 'diagnostics_channel'
 import {
     ActionRowBuilder,
     Attachment,
@@ -91,7 +92,7 @@ export class CustomImageUpload {
                 })
             }
         } else {
-            message.delete()
+            if (Config.Discord.Channel.WHOIS_IMAGEUPLOAD) message.delete()
         }
     }
     async onInteract(interaction: Interaction) {

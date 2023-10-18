@@ -50,6 +50,10 @@ const Config = {
                 name: 'pbot_beta',
                 link: 'https://i.imgur.com/akyHolt.png',
             },
+            {
+                name: 'pbot_banned',
+                link: 'https://i.imgur.com/ZvpqMBv.png',
+            },
         ],
         BOT_NAME: 'PRISM | Whois V2 :)',
     },
