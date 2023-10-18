@@ -1,9 +1,14 @@
 import { Command } from '@class/Command'
 import { RconClient } from '@class/RconClient'
 import { RegisterCommand } from '@commands/CommandHandler'
+import { NvhxData } from '@controller/NvhxData.controller'
+import { Player } from '@controller/Player.controller'
 import { EENV } from '@enums/EENV'
+import { ILivePlayer } from '@interfaces/ILivePlayer'
 
 import Config from '@proot/Config'
+import { Helper } from '@utils/Helper'
+import LogManager from '@utils/Logger'
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 
 export class Nvhx extends Command {
@@ -39,15 +44,10 @@ export class Nvhx extends Command {
                         .addStringOption((option) =>
                             option.setName('banid').setDescription('BanID des Banns').setRequired(true),
                         ),
+                )
+                .addSubcommand((subcommand) =>
+                    subcommand.setName('checkplayerbans').setDescription('Triggert Neverhax Info'),
                 ),
-            // .addSubcommand((subcommand) =>
-            //     subcommand
-            //         .setName('info')
-            //         .setDescription('Triggert Neverhax Info')
-            //         .addIntegerOption((option) =>
-            //             option.setName('id').setDescription('SpielerID').setRequired(true),
-            //         ),
-            // ),
             this,
         )
     }
@@ -62,9 +62,9 @@ export class Nvhx extends Command {
             case 'unban':
                 await this.nvhxUnban(interaction)
                 break
-            // case 'info':
-            //     await this.nvhxInfo(interaction)
-            //     break
+            case 'checkplayerbans':
+                await this.nvhxCheckPlayerBans(interaction)
+                break
             default:
                 await interaction.reply({ content: 'Command nicht gefunden.', ephemeral: true })
         }
@@ -100,6 +100,34 @@ export class Nvhx extends Command {
             } else {
                 await interaction.reply({ content: 'BanID nicht gefunden!', ephemeral: true })
             }
+        } catch (error) {
+            await interaction.reply({
+                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(error)}\`\`\``,
+                ephemeral: true,
+            })
+        }
+    }
+
+    public async nvhxCheckPlayerBans(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction
+        const embed = this.getEmbedTemplate(interaction)
+        try {
+            var bannedEmote = Helper.getEmote('pbot_banned')
+            var bannedPlayers: ILivePlayer[] = []
+            var livePlayers = await Player.getAllLivePlayers()
+            for (const [key, value] of livePlayers.entries()) {
+                var isBanned = await NvhxData.CheckIfUserIsBanned(value.identifiers)
+                if (isBanned) {
+                    bannedPlayers.push(value)
+                }
+            }
+            var desc = `Es sind aktuell **${bannedPlayers.length}** von NVHX Global gebannte Spieler auf dem Server.\n`
+            if (bannedPlayers.length > 0) desc += '\nAktuell gebannte Spieler:\n'
+            bannedPlayers.forEach((player) => {
+                desc += `\n${bannedEmote} **${player.name}** \`\`\`json ${player.identifiers}\`\`\``
+            })
+            embed.setDescription(desc)
+            await interaction.reply({ embeds: [embed] })
         } catch (error) {
             await interaction.reply({
                 content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(error)}\`\`\``,
