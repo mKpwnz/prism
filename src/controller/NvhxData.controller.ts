@@ -5,6 +5,14 @@ import LogManager from '@utils/Logger'
 import axios from 'axios'
 
 export class NvhxData {
+    /**
+     * @description Get all items from the NVHX API
+     * @author mKpwnz
+     * @date 18.10.2023
+     * @static
+     * @returns {*}  {Promise<String[]>}
+     * @memberof NvhxData
+     */
     public static async GetAllGlobalBans(): Promise<String[]> {
         var nvhxGlobalBans = await Cache.get<String[]>('nvhxGlobalBans')
         if (!nvhxGlobalBans) {
@@ -21,6 +29,15 @@ export class NvhxData {
         return nvhxGlobalBans
     }
 
+    /**
+     * @description Check if a user is banned on NVHX API (global bans) by his id
+     * @author mKpwnz
+     * @date 18.10.2023
+     * @static
+     * @param {string[]} userIds
+     * @returns {*}  {Promise<boolean>}
+     * @memberof NvhxData
+     */
     public static async CheckIfUserIsBanned(userIds: string[]): Promise<boolean> {
         var nvhxGlobalBans = await NvhxData.GetAllGlobalBans()
         for (const id of userIds) {
