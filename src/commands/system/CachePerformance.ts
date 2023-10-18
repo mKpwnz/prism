@@ -2,6 +2,7 @@ import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
 import { Items } from '@controller/Item.controller'
 import { NvhxData } from '@controller/NvhxData.controller'
+import { Player } from '@controller/Player.controller'
 import Config from '@proot/Config'
 import { IItem } from '@sql/schema/Item.schema'
 import { Cache } from '@utils/Cache'
@@ -22,10 +23,9 @@ export class CachePerformance extends Command {
         await Cache.testPerformance(
             interaction,
             async () => {
-                var data = await NvhxData.GetAllGlobalBans()
-                console.log(data)
+                var data = await Player.getAllLivePlayers()
             },
-            'items',
+            'livePlayers',
         )
     }
 }
