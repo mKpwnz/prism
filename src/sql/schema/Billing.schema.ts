@@ -1,5 +1,13 @@
 import { RowDataPacket } from 'mysql2'
 
+/**
+ * @description
+ * @author mKpwnz
+ * @date 15.10.2023
+ * @export
+ * @interface IBilling
+ * @extends {RowDataPacket}
+ */
 export interface IBilling extends RowDataPacket {
     id: number
     receiver_identifier: string

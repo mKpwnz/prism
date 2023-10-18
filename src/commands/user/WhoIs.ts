@@ -1,13 +1,14 @@
 import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
+import { NvhxData } from '@controller/NvhxData.controller'
 import { EENV } from '@enums/EENV'
 import { ESearchType } from '@enums/ESearchType'
 import Config from '@proot/Config'
 import { BotDB, GameDB } from '@sql/Database'
-import { IFindUser } from '@sql/schema/FindUser.schema'
+import { IFindUser } from '@sql/schema/User.schema'
 import { Helper } from '@utils/Helper'
 import LogManager from '@utils/Logger'
-import { AttachmentBuilder, ChatInputCommandInteraction, CommandInteraction, SlashCommandBuilder } from 'discord.js'
+import { AttachmentBuilder, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 
 export class WhoIs extends Command {
     constructor() {
@@ -61,6 +62,7 @@ export class WhoIs extends Command {
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const { channel, user, guild } = interaction
         const identifierValue = interaction.options.get('input')?.value?.toString()
+        const pageSize = 18
         let page = interaction.options.get('seite')?.value as number
         let spalte = interaction.options.get('spalte')?.value?.toString()
         let filter = '\nFilter: '
@@ -80,8 +82,9 @@ export class WhoIs extends Command {
                     page = 1
                 }
                 let fields = []
+                var bannedEmote = await Helper.getEmote('pbot_banned')
                 if (finduser.length > 0) {
-                    for (let i = 20 * (page - 1); i < finduser.length; i++) {
+                    for (let i = pageSize * (page - 1); i < finduser.length; i++) {
                         let identifier = finduser[i].identifier ? finduser[i].identifier : 'Unbekannt'
                         let steamId
                         if (finduser[i].identifier) {
@@ -95,7 +98,7 @@ export class WhoIs extends Command {
                             steamId = BigInt(0) // Fallback-Wert, wenn identifier nicht vorhanden ist
                         }
 
-                        if (fields.length >= 20) {
+                        if (fields.length >= pageSize) {
                             break
                         } else {
                             let fraksperrestring = ''
@@ -121,10 +124,17 @@ export class WhoIs extends Command {
                                     user: finduser[i].identifier,
                                 },
                             })
+                            var nvhxBanned = await NvhxData.CheckIfUserIsBanned([
+                                finduser[i].identifier,
+                                finduser[i].discord,
+                            ])
                             fields.push({
-                                name: finduser[i].playername + ' (' + finduser[i].name + ')',
+                                name: `${finduser[i].playername} (${finduser[i].name})`,
                                 value:
-                                    'SteamID: [' +
+                                    `${
+                                        nvhxBanned ? `${bannedEmote} **NVHX Global Ban Detected** ${bannedEmote}` : ''
+                                    }` +
+                                    '\nSteamID: [' +
                                     finduser[i].identifier +
                                     '](https://steamid.pro/de/lookup/' +
                                     steamId +
@@ -153,8 +163,8 @@ export class WhoIs extends Command {
                                     '' +
                                     fraksperrestring +
                                     levelString +
-                                    '\nTeamnote vorhanden? **' +
-                                    `${teamNoteCount > 0 ? 'Ja' : 'Nein'}**`,
+                                    `${teamNoteCount > 0 ? '\n**Es ist eine Teamnote vorhanden**' : ''}` +
+                                    `\n${fields.length < pageSize - 1 ? '-----' : ''}`,
                                 inline: false,
                             })
                         }
@@ -185,11 +195,11 @@ export class WhoIs extends Command {
                         })
                     } else {
                         let pageString = ''
-                        if (finduser.length > 20) {
-                            pageString = '\nSeite ' + page + '/' + Math.ceil(finduser.length / 20)
+                        if (finduser.length > pageSize) {
+                            pageString = '\nSeite ' + page + '/' + Math.ceil(finduser.length / pageSize)
                         }
                         let additionalString = ''
-                        if (fields.length == 20 || page > 1) {
+                        if (fields.length == pageSize || page > 1) {
                             additionalString = `\n${
                                 finduser.length - fields.length
                             } weitere Ergebnisse sind ausgeblendet!`

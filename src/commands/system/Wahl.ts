@@ -1,6 +1,6 @@
 import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
-import { EmbedBuilder } from '@discordjs/builders'
+import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
 import { GameDB } from '@sql/Database'
 import { IElection } from '@sql/schema/Election.schema'
@@ -12,7 +12,6 @@ import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels'
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 import { RowDataPacket } from 'mysql2'
 import { WhoIs } from '../user/WhoIs'
-import { EENV } from '@enums/EENV'
 
 declare module 'chartjs-plugin-datalabels' {
     interface Context {

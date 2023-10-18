@@ -1,17 +1,10 @@
 import { Command } from '@class/Command'
 import { RconClient } from '@class/RconClient'
 import { RegisterCommand } from '@commands/CommandHandler'
-import Config from '@proot/Config'
-import LogManager from '@utils/Logger'
-import {
-    ChatInputCommandInteraction,
-    CommandInteraction,
-    CommandInteractionOptionResolver,
-    EmbedBuilder,
-    SlashCommandBuilder,
-} from 'discord.js'
 import { EENV } from '@enums/EENV'
+import Config from '@proot/Config'
 import { Helper } from '@utils/Helper'
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 
 export class Give extends Command {
     constructor() {

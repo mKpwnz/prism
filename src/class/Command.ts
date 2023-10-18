@@ -14,16 +14,99 @@ import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js'
  * @class Command
  */
 export abstract class Command {
+    /**
+     * @description Gibt an, in welchen Kanälen der Command ausgeführt werden darf (Discord) (ID)
+     * @author mKpwnz
+     * @date 14.10.2023
+     * @type {string[]}
+     * @memberof Command
+     */
     AllowedChannels: string[] = []
+
+    /**
+     * @description Gibt an, welche Gruppen den Command ausgeführt dürfen (Discord) (ID)
+     * @author mKpwnz
+     * @date 14.10.2023
+     * @type {string[]}
+     * @memberof Command
+     */
     AllowedGroups: string[] = []
+
+    /**
+     * @description Gibt an, welche User den Command ausführen dürfen (Unabhängig von Gruppenrechten) (Discord) (ID)
+     * @author mKpwnz
+     * @date 14.10.2023
+     * @type {string[]}
+     * @memberof Command
+     */
     AllowedUsers: string[] = []
+
+    /**
+     * @description Gibt an, welche User den Command nicht ausführen dürfen (Unabhängig von Gruppenrechten) (Discord) (ID)
+     * @author mKpwnz
+     * @date 14.10.2023
+     * @type {string[]}
+     * @memberof Command
+     */
     BlockedUsers: string[] = []
+
+    /**
+     * @description Gibt an, ob die Permissions geprüft werden sollen oder nicht.
+     * @author mKpwnz
+     * @date 14.10.2023
+     * @type {Boolean} [CheckPermissions=true]
+     * @memberof Command
+     */
     CheckPermissions: Boolean = true
+
+    /**
+     * @description Gibt an, in welcher Umgebung der Command ausgeführt werden darf.
+     * @author mKpwnz
+     * @date 14.10.2023
+     * @type {EENV} [RunEnvironment=EENV.DEVELOPMENT]
+     * @memberof Command
+     */
     RunEnvironment: EENV = EENV.DEVELOPMENT
+
+    /**
+     * @description Gibt an, ob der Command ein Beta Command ist oder nicht.
+     * @author mKpwnz
+     * @date 14.10.2023
+     * @type {boolean} [IsBetaCommand=false]
+     * @memberof Command
+     */
     IsBetaCommand: boolean = false
+
+    /**
+     * @description Gibt an, ob der Command nicht gezählt werden soll (Statistik)
+     * @author mKpwnz
+     * @date 14.10.2023
+     * @type {boolean} [DoNotCountUse=false]
+     * @memberof Command
+     */
     DoNotCountUse: boolean = false
+
     constructor() {}
+
+    /**
+     * @description Führt den Command aus. Muss in der Klasse, die von Command erbt, implementiert werden. (execute() { ... })
+     * @author mKpwnz
+     * @date 14.10.2023
+     * @abstract
+     * @param {ChatInputCommandInteraction} interaction
+     * @returns {*}  {Promise<void>}
+     * @memberof Command
+     */
     abstract execute(interaction: ChatInputCommandInteraction): Promise<void>
+
+    /**
+     * @description Wird vom CommandHandler ausgeführt
+     * @author mKpwnz
+     * @date 14.10.2023
+     * @param {ChatInputCommandInteraction} interaction
+     * @returns {*}  {Promise<void>}
+     * @memberof Command
+     */
     async run(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options, user } = interaction
 
@@ -98,6 +181,15 @@ export abstract class Command {
             })
         }
     }
+
+    /**
+     * @description Gibt ein Embed Template zurück, welches für die meisten Commands verwendet werden kann. (Footer, Author, Timestamp, Color, Image, etc.)
+     * @author mKpwnz
+     * @date 14.10.2023
+     * @param {ChatInputCommandInteraction} interaction
+     * @returns {*}  {EmbedBuilder}
+     * @memberof Command
+     */
     getEmbedTemplate(interaction: ChatInputCommandInteraction): EmbedBuilder {
         return new EmbedBuilder()
             .setColor(EmbedColors.DEFAULT)

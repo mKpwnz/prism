@@ -1,7 +1,7 @@
 import { BotClient } from '@proot/Bot'
 import Config from '@proot/Config'
 import { GameDB } from '@sql/Database'
-import { IItems } from '@sql/schema/Items.schema'
+import { IItem } from '@sql/schema/Item.schema'
 import { CommandInteraction, GuildEmoji, TextChannel } from 'discord.js'
 import LogManager from './Logger'
 
@@ -177,6 +177,7 @@ export class Helper {
         return platetext
     }
 
+    // TODO: Move to Item.controller.ts
     /**
      * @description
      * @author sirjxsh
@@ -190,7 +191,7 @@ export class Helper {
         itemName = itemName.toLowerCase()
         itemName = '%' + itemName + '%'
         try {
-            let [item] = await GameDB.query<IItems[]>('SELECT * FROM items WHERE name LIKE ?', [itemName])
+            let [item] = await GameDB.query<IItem[]>('SELECT * FROM items WHERE name LIKE ?', [itemName])
             if (item.length > 0) {
                 return item[0].name
             }
@@ -201,6 +202,7 @@ export class Helper {
         }
     }
 
+    // TODO: Move to Item.controller.ts
     /**
      * @description
      * @author mKpwnz
@@ -213,7 +215,7 @@ export class Helper {
     static async doesItemExists(itemName: string): Promise<boolean> {
         itemName = itemName.toLowerCase()
         try {
-            let [item] = await GameDB.query<IItems[]>('SELECT * FROM items WHERE name = ?', [itemName])
+            let [item] = await GameDB.query<IItem[]>('SELECT * FROM items WHERE name = ?', [itemName])
             if (item.length > 0) {
                 return true
             }

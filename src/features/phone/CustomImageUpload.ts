@@ -3,10 +3,11 @@ import { ButtonBuilder } from '@discordjs/builders'
 import { ESearchType } from '@enums/ESearchType'
 import Config from '@proot/Config'
 import { GameDB } from '@sql/Database'
-import { IFindUser } from '@sql/schema/FindUser.schema'
+import { IFindUser } from '@sql/schema/User.schema'
 import { Helper } from '@utils/Helper'
 import LogManager from '@utils/Logger'
 import axios from 'axios'
+import { Channel } from 'diagnostics_channel'
 import {
     ActionRowBuilder,
     Attachment,
@@ -21,13 +22,7 @@ import {
     TextInputStyle,
 } from 'discord.js'
 
-/**
- * Permissions für:
-    Eventverwaltung
-    Fraktionsverwaltung
-    Serverleitung
- */
-export class CustomImmageUpload {
+export class CustomImageUpload {
     private client: Client | null
     private input_phoneNumber: string = ''
     private input_reason: string = ''
@@ -97,7 +92,7 @@ export class CustomImmageUpload {
                 })
             }
         } else {
-            message.delete()
+            if (Config.Discord.Channel.WHOIS_IMAGEUPLOAD) message.delete()
         }
     }
     async onInteract(interaction: Interaction) {

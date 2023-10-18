@@ -60,6 +60,7 @@ export default class LogManager {
             return message
         }
     }
+
     public static async configure() {
         var logTransports: winston.transport[] = [new transports.Console()]
 
@@ -93,31 +94,85 @@ export default class LogManager {
             transports: logTransports,
         })
     }
+
+    /**
+     * @description Loggt eine Nachricht in die Konsole und in Loki (nur in Production).
+     * @author mKpwnz
+     * @date 14.10.2023
+     * @static
+     * @param {...any[]} args
+     * @memberof LogManager
+     */
     public static log(...args: any[]) {
         args.forEach((arg) => {
             this.logger.debug(arg)
         })
     }
+
+    /**
+     * @description Loggt eine Nachricht in die Konsole und in Loki (nur in Production).
+     * @author mKpwnz
+     * @date 14.10.2023
+     * @static
+     * @param {...any[]} args
+     * @memberof LogManager
+     */
     public static error(...args: any[]) {
         args.forEach((arg) => {
             this.logger.error(arg)
         })
     }
+
+    /**
+     * @description Loggt eine Nachricht in die Konsole und in Loki (nur in Production).
+     * @author mKpwnz
+     * @date 14.10.2023
+     * @static
+     * @param {...any[]} args
+     * @memberof LogManager
+     */
     public static warn(...args: any[]) {
         args.forEach((arg) => {
             this.logger.warn(arg)
         })
     }
+
+    /**
+     * @description Loggt eine Nachricht in die Konsole und in Loki (nur in Production).
+     * @author mKpwnz
+     * @date 14.10.2023
+     * @static
+     * @param {...any[]} args
+     * @memberof LogManager
+     */
     public static info(...args: any[]) {
         args.forEach((arg) => {
             this.logger.info(arg)
         })
     }
+
+    /**
+     * @description Loggt eine Nachricht in die Konsole und in Loki (nur in Production).
+     * @author mKpwnz
+     * @date 14.10.2023
+     * @static
+     * @param {...any[]} args
+     * @memberof LogManager
+     */
     public static debug(...args: any[]) {
         args.forEach((arg) => {
             this.logger.debug(arg)
         })
     }
+
+    /**
+     * @description Loggt eine Nachricht in den Bot Log Channel auf Discord.
+     * @author mKpwnz
+     * @date 14.10.2023
+     * @static
+     * @param {string} message
+     * @memberof LogManager
+     */
     public static discordActionLog(message: string) {
         var channel = BotClient.channels.cache.get(Config.Discord.LogChannel.BOT_LOG)
         if (channel && channel.isTextBased()) {

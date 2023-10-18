@@ -1,19 +1,10 @@
 import { Command } from '@class/Command'
-import { RconClient } from '@class/RconClient'
 import { RegisterCommand } from '@commands/CommandHandler'
-import Config from '@proot/Config'
-import LogManager from '@utils/Logger'
-import {
-    ChatInputCommandInteraction,
-    CommandInteraction,
-    CommandInteractionOptionResolver,
-    EmbedBuilder,
-    SlashCommandBuilder,
-} from 'discord.js'
 import { EENV } from '@enums/EENV'
-import { Helper } from '@utils/Helper'
-import { WhoIs } from './WhoIs'
+import Config from '@proot/Config'
 import { BotDB } from '@sql/Database'
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
+import { WhoIs } from './WhoIs'
 
 export class TeamNote extends Command {
     constructor() {

@@ -1,5 +1,5 @@
 import { CommandHandler } from '@commands/CommandHandler'
-import { CustomImmageUpload } from '@features/phone/CustomImageUpload'
+import { CustomImageUpload } from '@features/phone/CustomImageUpload'
 import { Client, Interaction, Message } from 'discord.js'
 import { onMessageCreate } from './onMessageCreate'
 import { onReady } from './onReady'
@@ -17,7 +17,7 @@ export class EventHandler {
         client.on('messageCreate', async (message) => this.onMessageCreate(message))
         client.on('interactionCreate', async (interaction) => this.onInteractionCreate(interaction))
 
-        new CustomImmageUpload(client)
+        new CustomImageUpload(client)
     }
 
     private static onReady(client: Client) {

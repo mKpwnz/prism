@@ -3,7 +3,6 @@ import { RconClient } from '@class/RconClient'
 import { RegisterCommand } from '@commands/CommandHandler'
 import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
-import LogManager from '@utils/Logger'
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 
 export class RequestToSupport extends Command {

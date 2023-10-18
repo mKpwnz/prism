@@ -5,12 +5,13 @@ import { RowDataPacket } from 'mysql2'
  * @author mKpwnz
  * @date 15.10.2023
  * @export
- * @interface IElectionParticipant
+ * @interface IJob
  * @extends {RowDataPacket}
  */
-export interface IElectionParticipant extends RowDataPacket {
-    id: number
-    electionid: number
-    identifier: string
+export interface IJob extends RowDataPacket {
     name: string
+    label: string
+    armory: string
+    money: number
+    blackmoney: number
 }

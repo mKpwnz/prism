@@ -1,6 +1,14 @@
 import { RowDataPacket } from 'mysql2'
 
-export interface IItems extends RowDataPacket {
+/**
+ * @description
+ * @author mKpwnz
+ * @date 15.10.2023
+ * @export
+ * @interface IItem
+ * @extends {RowDataPacket}
+ */
+export interface IItem extends RowDataPacket {
     name: string
     label: string
     weight: number

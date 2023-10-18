@@ -3,7 +3,6 @@ import { RconClient } from '@class/RconClient'
 import { CommandHandler } from '@commands/CommandHandler'
 import { REST } from '@discordjs/rest'
 import Config from '@proot/Config'
-import { Helper } from '@utils/Helper'
 import LogManager from '@utils/Logger'
 import { Routes } from 'discord-api-types/v9'
 import { Client } from 'discord.js'
@@ -40,9 +39,12 @@ export class onReady extends DCEvent {
                     LogManager.info(`Deleted emote ${e.name} (${e.id})`)
                 }
             })
+        }
+        for (const configEmote of Config.Discord.Emotes) {
             var newEmote = await guild.emojis.create({ name: configEmote.name, attachment: configEmote.link })
             LogManager.info(`Added/Updated emote ${newEmote.name} (${newEmote.id})`)
         }
+
         LogManager.info('Emotes checked!')
         return
     }

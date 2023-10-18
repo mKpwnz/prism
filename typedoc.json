@@ -1,0 +1,14 @@
+{
+	"entryPoints": [
+		"src/*"
+	],
+	"customCss": "./typedoc.theme.css",
+	"entryPointStrategy": "expand",
+	"out": "../prism-docs/public",
+	"plugin": [
+		"typedoc-theme-hierarchy"
+	],
+	"theme": "hierarchy",
+	"tsconfig": "./tsconfig.json",
+	"name": "PRISM Bot"
+}

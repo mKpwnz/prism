@@ -1,19 +1,12 @@
 import { Command } from '@class/Command'
 import { RconClient } from '@class/RconClient'
 import { RegisterCommand } from '@commands/CommandHandler'
-import { EmbedBuilder } from '@discordjs/builders'
 import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
 import { GameDB } from '@sql/Database'
-import { IJobs } from '@sql/schema/Jobs.schema'
-import { IUser } from '@sql/schema/User.schema'
+import { IJob } from '@sql/schema/Job.schema'
 import LogManager from '@utils/Logger'
-import {
-    ChatInputCommandInteraction,
-    CommandInteraction,
-    CommandInteractionOptionResolver,
-    SlashCommandBuilder,
-} from 'discord.js'
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 import { RowDataPacket } from 'mysql2'
 import { WhoIs } from './WhoIs'
 
@@ -89,7 +82,7 @@ export class Setjob extends Command {
             return
         }
         try {
-            const [jobquery] = await GameDB.query<IJobs[]>('SELECT * FROM jobs WHERE name = ?', [job.toLowerCase()])
+            const [jobquery] = await GameDB.query<IJob[]>('SELECT * FROM jobs WHERE name = ?', [job.toLowerCase()])
             if (jobquery.length === 0) {
                 await interaction.reply({
                     content: 'Es wurde kein Job mit diesem Namen gefunden!',
@@ -136,7 +129,7 @@ export class Setjob extends Command {
             return
         }
         try {
-            const [jobquery] = await GameDB.query<IJobs[]>('SELECT * FROM jobs WHERE name = ?', [job.toLowerCase()])
+            const [jobquery] = await GameDB.query<IJob[]>('SELECT * FROM jobs WHERE name = ?', [job.toLowerCase()])
             LogManager.debug(jobquery)
             if (jobquery.length === 0) {
                 await interaction.reply({

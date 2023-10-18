@@ -1,5 +1,13 @@
 import { RowDataPacket } from 'mysql2'
 
+/**
+ * @description
+ * @author mKpwnz
+ * @date 15.10.2023
+ * @export
+ * @interface IVehicle
+ * @extends {RowDataPacket}
+ */
 export interface IVehicle extends RowDataPacket {
     owner: string
     plate: string

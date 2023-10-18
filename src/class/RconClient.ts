@@ -1,6 +1,5 @@
 import LogManager from '@utils/Logger'
 import { RemoteInfo, Socket, createSocket } from 'dgram'
-import { CommandInteraction } from 'discord.js'
 
 export class RconClient {
     private static socket: Socket | null = null
