@@ -111,7 +111,7 @@ export class Nvhx extends Command {
         const { options } = interaction
         const embed = this.getEmbedTemplate(interaction)
         try {
-            var bannedEmote = Helper.getEmote('pbot_banned')
+            var bannedEmote = await Helper.getEmote('pbot_banned')
             var bannedPlayers: ILivePlayer[] = []
             var livePlayers = await Player.getAllLivePlayers()
             for (const [key, value] of livePlayers.entries()) {
@@ -123,13 +123,15 @@ export class Nvhx extends Command {
             var desc = `Es sind aktuell **${bannedPlayers.length}** von NVHX Global gebannte Spieler auf dem Server.\n`
             if (bannedPlayers.length > 0) desc += '\nAktuell gebannte Spieler:\n'
             bannedPlayers.forEach((player) => {
-                desc += `\n${bannedEmote} **${player.name}** \`\`\`json ${player.identifiers}\`\`\``
+                desc += `\n${bannedEmote} **${player.name} | ServerID: ${player.id}** \`\`\`${player.identifiers.join(
+                    '\n',
+                )}\`\`\``
             })
             embed.setDescription(desc)
             await interaction.reply({ embeds: [embed] })
         } catch (error) {
             await interaction.reply({
-                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(error)}\`\`\``,
+                content: `Probleme mit der Serverkommunikation:\`\`\`json\n${JSON.stringify(error)}\`\`\``,
                 ephemeral: true,
             })
         }
