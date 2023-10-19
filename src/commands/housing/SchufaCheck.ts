@@ -6,7 +6,6 @@ import { GameDB } from '@sql/Database'
 import { ISchufaUser } from '@sql/schema/User.schema'
 import LogManager from '@utils/Logger'
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
-import { RowDataPacket } from 'mysql2'
 
 // TODO: REFACTOR
 export class SchufaCheck extends Command {

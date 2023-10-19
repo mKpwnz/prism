@@ -332,15 +332,4 @@ export class WhoIs extends Command {
             return []
         }
     }
-
-    // TODO: Update Validate user to custom querys
-    public static async validateUser(
-        searchString: string,
-        type: ESearchType = ESearchType.IDENTIFIER,
-    ): Promise<IFindUser | null> {
-        const user = await WhoIs.searchUsers(searchString, type)
-        if (user === null) return null
-        if (user.length === 0) return null
-        return user[0]
-    }
 }

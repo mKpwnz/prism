@@ -1,5 +1,6 @@
 import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
+import { Player } from '@controller/Player.controller'
 import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
 import { GameDB } from '@sql/Database'
@@ -11,7 +12,6 @@ import { ChartJSNodeCanvas } from 'chartjs-node-canvas'
 import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels'
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 import { RowDataPacket } from 'mysql2'
-import { WhoIs } from '../user/WhoIs'
 
 declare module 'chartjs-plugin-datalabels' {
     interface Context {
@@ -280,8 +280,8 @@ export class Wahl extends Command {
             return
         }
         let election = query[0]
-        const vUser = await WhoIs.validateUser(options.getString('steamid') ?? '')
-        if (!vUser) {
+        const vPlayer = await Player.validatePlayer(options.getString('steamid') ?? '')
+        if (!vPlayer) {
             await interaction.reply({
                 content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
                 ephemeral: true,
@@ -291,20 +291,18 @@ export class Wahl extends Command {
         if (options.getString('operation') === 'add') {
             const [response] = await GameDB.query<IElectionParticipant[]>(
                 'INSERT INTO immo_elections_participants (electionid, identifier, name) VALUES (?, ?, ?) RETURNING *',
-                [options.getNumber('wahlid'), vUser.identifier, vUser.firstname + ' ' + vUser.lastname],
+                [options.getNumber('wahlid'), vPlayer.identifiers.steam, vPlayer.playerdata.fullname],
             )
             embed.setTitle('Nutzer hinzugefügt')
             embed.setDescription(
                 'Nutzer ' +
-                    vUser.firstname +
-                    ' ' +
-                    vUser.lastname +
+                    vPlayer.playerdata.fullname +
                     ' zur Wahl ' +
                     election.name +
                     ' (' +
                     election.id +
                     ') hinzugefügt!\nSteamID: `' +
-                    vUser.identifier +
+                    vPlayer.identifiers.steam +
                     '`\nParticipantID: ' +
                     response[0].id,
             )
@@ -324,9 +322,7 @@ export class Wahl extends Command {
                 embed.setTitle('Nutzer hinzugefügt')
                 embed.setDescription(
                     'Nutzer ' +
-                        vUser.firstname +
-                        ' ' +
-                        vUser.lastname +
+                        vPlayer.playerdata.fullname +
                         ' von Wahl ' +
                         election.name +
                         ' (' +

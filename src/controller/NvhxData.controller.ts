@@ -4,6 +4,13 @@ import { Cache } from '@utils/Cache'
 import LogManager from '@utils/Logger'
 import axios from 'axios'
 
+/**
+ * @description Class to get data from the NVHX API
+ * @author mKpwnz
+ * @date 19.10.2023
+ * @export
+ * @class NvhxData
+ */
 export class NvhxData {
     /**
      * @description Get all items from the NVHX API

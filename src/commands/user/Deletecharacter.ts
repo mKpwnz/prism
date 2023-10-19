@@ -2,14 +2,15 @@ import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
 import { EENV } from '@enums/EENV'
 
+import { Player } from '@controller/Player.controller'
+import { ValidatedPlayer } from '@ctypes/ValidatedPlayer'
 import { ELicenses } from '@enums/ELicenses'
 import Config from '@proot/Config'
 import { GameDB } from '@sql/Database'
-import { IFindUser, IUser } from '@sql/schema/User.schema'
+import { IUser } from '@sql/schema/User.schema'
 import LogManager from '@utils/Logger'
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 import { Lizenz } from './Lizenz'
-import { WhoIs } from './WhoIs'
 
 export class Deletecharacter extends Command {
     constructor() {
@@ -47,15 +48,15 @@ export class Deletecharacter extends Command {
                 await interaction.reply({ content: 'Bitte gib eine SteamID an!', ephemeral: true })
                 return
             }
-            const vUser = await WhoIs.validateUser(steamid)
-            if (!vUser) {
+            const vPlayer = await Player.validatePlayer(steamid)
+            if (!vPlayer) {
                 await interaction.reply({
                     content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
                     ephemeral: true,
                 })
                 return
             }
-            let phone = await this.deletePhone(vUser.identifier)
+            let phone = await this.deletePhone(vPlayer.identifiers.steam)
             if (!phone) {
                 await interaction.reply({
                     content: 'Es ist ein Fehler beim Löschen des Telefons aufgetreten!',
@@ -63,7 +64,7 @@ export class Deletecharacter extends Command {
                 })
                 return
             }
-            let licenses = await Lizenz.deleteLicense(vUser, ELicenses.ALL)
+            let licenses = await Lizenz.deleteLicense(vPlayer, ELicenses.ALL)
             if (licenses instanceof Error) {
                 LogManager.error(licenses)
                 await interaction.reply({
@@ -74,7 +75,7 @@ export class Deletecharacter extends Command {
                 })
                 return
             }
-            let archive = await this.moveCharacterToArchive(vUser)
+            let archive = await this.moveCharacterToArchive(vPlayer)
             if (!archive) {
                 await interaction.reply({
                     content: 'Es ist ein Fehler beim Archivieren des Charakters aufgetreten!',
@@ -99,15 +100,18 @@ export class Deletecharacter extends Command {
         }
     }
 
-    private async moveCharacterToArchive(user: IFindUser): Promise<boolean> {
+    private async moveCharacterToArchive(vPlayer: ValidatedPlayer): Promise<boolean> {
         try {
-            let newIdentifier = user.identifier.replace('steam', 'deleted')
+            let newIdentifier = vPlayer.identifiers.steam.replace('steam', 'deleted')
             // TODO: Add Return Handler
-            await GameDB.query('UPDATE users SET identifier = ? WHERE identifier = ?', [newIdentifier, user.identifier])
+            await GameDB.query('UPDATE users SET identifier = ? WHERE identifier = ?', [
+                newIdentifier,
+                vPlayer.identifiers.steam,
+            ])
             // Move to Archive
             let [response] = await GameDB.query<IUser[]>(
                 'INSERT INTO users_deleted SELECT * FROM users WHERE identifier = ? RETURNING *',
-                [user.identifier],
+                [vPlayer.identifiers.steam],
             )
             /* Löschen des Charakters
             await Database.query('DELETE FROM users WHERE identifier = ?', [user.identifier])

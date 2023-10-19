@@ -1,13 +1,12 @@
-import { WhoIs } from '@commands/user/WhoIs'
+import { Player } from '@controller/Player.controller'
+import { ValidatedPlayer } from '@ctypes/ValidatedPlayer'
 import { ButtonBuilder } from '@discordjs/builders'
-import { ESearchType } from '@enums/ESearchType'
+import { EUniqueIdentifier } from '@enums/ESearchType'
 import Config from '@proot/Config'
 import { GameDB } from '@sql/Database'
-import { IFindUser } from '@sql/schema/User.schema'
 import { Helper } from '@utils/Helper'
 import LogManager from '@utils/Logger'
 import axios from 'axios'
-import { Channel } from 'diagnostics_channel'
 import {
     ActionRowBuilder,
     Attachment,
@@ -34,7 +33,7 @@ export class CustomImageUpload {
         width: 1280,
         size: 1024 * 800,
     }
-    private vUser: IFindUser | null = null
+    private vPlayer: ValidatedPlayer | null = null
 
     constructor(client: Client) {
         this.client = client
@@ -165,7 +164,7 @@ export class CustomImageUpload {
                                 },
                                 {
                                     name: 'Hochgeladen auf Handy',
-                                    value: `${this.vUser?.firstname} ${this.vUser?.lastname} (${this.vUser?.phone_number})`,
+                                    value: `${this.vPlayer?.playerdata.fullname} (${this.vPlayer?.playerdata.phonenumber})`,
                                     inline: true,
                                 },
                                 { name: 'Begründung', value: this.input_reason },
@@ -191,9 +190,9 @@ export class CustomImageUpload {
             this.input_phoneNumber = interaction.fields.getTextInputValue('phone_ciu_in_phoneNumber')
             this.input_reason = interaction.fields.getTextInputValue('phone_ciu_in_reason')
 
-            this.vUser = await WhoIs.validateUser(this.input_phoneNumber, ESearchType.PHONENUMBER)
+            this.vPlayer = await Player.validatePlayer(this.input_phoneNumber, EUniqueIdentifier.PHONENUMBER)
             const { success, messages } = this.validateInput()
-            if (!success || !this.vUser) {
+            if (!success || !this.vPlayer) {
                 await interaction.reply({
                     content: `Es sind Fehler aufgetreten: \`\`\`${messages.join('\n')}\`\`\``,
                     ephemeral: true,
@@ -204,7 +203,7 @@ export class CustomImageUpload {
             }
 
             await interaction.reply({
-                content: `Möchte du das Bild wirklich an ${this.vUser.firstname} ${this.vUser.lastname} (${this.input_phoneNumber}) zuweisen?`,
+                content: `Möchte du das Bild wirklich an ${this.vPlayer.playerdata.fullname} (${this.input_phoneNumber}) zuweisen?`,
                 components: [
                     new ActionRowBuilder<ButtonBuilder>().addComponents(
                         new ButtonBuilder()
@@ -253,7 +252,7 @@ export class CustomImageUpload {
             messages: [],
         }
 
-        if (!new RegExp(/^01726\d{5}$/).test(this.input_phoneNumber) || !this.vUser)
+        if (!new RegExp(/^01726\d{5}$/).test(this.input_phoneNumber) || !this.vPlayer)
             response.messages.push('Die Telefonnummer ist ungültig.')
 
         if (response.messages.length === 0) response.success = true

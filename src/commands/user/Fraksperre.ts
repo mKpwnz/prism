@@ -6,6 +6,7 @@ import LogManager from '@utils/Logger'
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 import { WhoIs } from './WhoIs'
 import { EENV } from '@enums/EENV'
+import { Player } from '@controller/Player.controller'
 
 export class Fraksperre extends Command {
     constructor() {
@@ -65,8 +66,8 @@ export class Fraksperre extends Command {
             await interaction.reply({ content: 'Bitte gib eine SteamID an!', ephemeral: true })
             return
         }
-        const vUser = await WhoIs.validateUser(steamid)
-        if (!vUser) {
+        const vPlayer = await Player.validatePlayer(steamid)
+        if (!vPlayer) {
             await interaction.reply({
                 content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
                 ephemeral: true,
@@ -74,7 +75,7 @@ export class Fraksperre extends Command {
             return
         }
         const today = new Date()
-        if (vUser.fraksperre.getTime() < today.getTime()) {
+        if (vPlayer.playerdata.job.fraksperre.getTime() < today.getTime()) {
             await interaction.reply({
                 content: 'Der Spieler hat keine Fraktionssperre!',
                 ephemeral: true,
@@ -84,7 +85,7 @@ export class Fraksperre extends Command {
         try {
             // TODO: Response verarbeiten und auswerten
             var dbResponse = await GameDB.query('UPDATE users SET fraksperre = NOW() WHERE identifier = ?', [
-                vUser.identifier,
+                vPlayer.identifiers.steam,
             ])
             LogManager.debug(dbResponse)
         } catch (error) {
@@ -94,12 +95,12 @@ export class Fraksperre extends Command {
                 ephemeral: true,
             })
         }
-        LogManager.log(vUser)
+        LogManager.log(vPlayer)
         embed.setTitle('Fraktionssperre entfernt')
         embed.setDescription(
             `
-                Die Fraktionssperre von ${vUser.firstname} ${vUser.lastname} (${vUser.identifier}) wurde entfernt!\n
-                Altes Datum: ${vUser.fraksperre.toLocaleDateString()}`,
+                Die Fraktionssperre von ${vPlayer.playerdata.fullname} (${vPlayer.identifiers.steam}) wurde entfernt!\n
+                Altes Datum: ${vPlayer.playerdata.job.fraksperre.toLocaleDateString()}`,
         )
         await interaction.reply({ embeds: [embed] })
     }
@@ -112,8 +113,8 @@ export class Fraksperre extends Command {
             await interaction.reply({ content: 'Bitte gib eine SteamID an!', ephemeral: true })
             return
         }
-        const vUser = await WhoIs.validateUser(steamid)
-        if (!vUser) {
+        const vPlayer = await Player.validatePlayer(steamid)
+        if (!vPlayer) {
             await interaction.reply({
                 content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
                 ephemeral: true,
@@ -126,7 +127,7 @@ export class Fraksperre extends Command {
             // TODO: Response verarbeiten und auswerten
             var dbResponse = await GameDB.query(
                 'UPDATE users SET fraksperre = ADDDATE(NOW(), INTERVAL ? DAY) WHERE identifier = ?',
-                [days, vUser.identifier],
+                [days, vPlayer.identifiers.steam],
             )
             LogManager.debug(dbResponse)
         } catch (error) {
@@ -136,13 +137,7 @@ export class Fraksperre extends Command {
         var embed = this.getEmbedTemplate(interaction)
         embed.setTitle('Fraktionssperre gesetzt')
         embed.setDescription(
-            'Die Fraktionssperre von ' +
-                vUser.firstname +
-                ' ' +
-                vUser.lastname +
-                ' (`' +
-                vUser.identifier +
-                '`)' +
+            `Die Fraktionssperre von ${vPlayer.playerdata.fullname} (${vPlayer.identifiers.steam})` +
                 ' wurde gesetzt!\nDauer: ' +
                 days +
                 ' Tage\nEndet am: ' +

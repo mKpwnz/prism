@@ -1,12 +1,12 @@
 import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
+import { Player } from '@controller/Player.controller'
 import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
 import { GameDB } from '@sql/Database'
 import LogManager from '@utils/Logger'
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 import { RowDataPacket } from 'mysql2'
-import { WhoIs } from './WhoIs'
 
 export class Rename extends Command {
     constructor() {
@@ -38,14 +38,14 @@ export class Rename extends Command {
     // TODO: Refactor
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         let steam = interaction.options.get('steam')?.value?.toString() ?? ''
-        const vUser = await WhoIs.validateUser(steam ?? '')
+        const vPlayer = await Player.validatePlayer(steam)
         let embed = this.getEmbedTemplate(interaction)
-        if (!vUser) {
+        if (!vPlayer) {
             await interaction.reply('Es konnte kein Spieler mit dieser SteamID gefunden werden!')
             return
         }
-        let firstname = interaction.options.get('vorname')?.value?.toString() ?? vUser.firstname
-        let lastname = interaction.options.get('nachname')?.value?.toString() ?? vUser.lastname
+        let firstname = interaction.options.get('vorname')?.value?.toString() ?? vPlayer.playerdata.firstname
+        let lastname = interaction.options.get('nachname')?.value?.toString() ?? vPlayer.playerdata.lastname
         if (firstname == '' && lastname == '') {
             await interaction.reply({
                 content: 'Es wurde kein Vor- oder Nachname angegeben!',
@@ -56,28 +56,30 @@ export class Rename extends Command {
         try {
             let query = 'UPDATE users SET '
             LogManager.log(lastname)
-            LogManager.log(vUser.lastname)
-            if (firstname != vUser.firstname) {
+            LogManager.log(vPlayer.playerdata.lastname)
+            if (firstname != vPlayer.playerdata.firstname) {
                 query += "firstname = '" + firstname + "'"
-                if (lastname != vUser.lastname) {
+                if (lastname != vPlayer.playerdata.lastname) {
                     query += ', '
                 }
             }
-            if (lastname != vUser.lastname) {
+            if (lastname != vPlayer.playerdata.lastname) {
                 query += "lastname = '" + lastname + "' "
             }
 
             LogManager.log(query)
-            let result = (await GameDB.execute(query + 'WHERE identifier = ? ', [vUser.identifier])) as RowDataPacket[]
+            let result = (await GameDB.execute(query + 'WHERE identifier = ? ', [
+                vPlayer.identifiers.steam,
+            ])) as RowDataPacket[]
             if (result[0]['rowsChanged'] !== 0) {
                 embed.setTitle('Spieler umbenannt')
                 embed.setDescription(
                     'Der Spieler mit dem Namen "' +
-                        vUser.firstname +
+                        vPlayer.playerdata.firstname +
                         ' ' +
-                        vUser.lastname +
+                        vPlayer.playerdata.lastname +
                         '" (`' +
-                        vUser.identifier +
+                        vPlayer.identifiers.steam +
                         '`) hat nun den Namen "' +
                         firstname +
                         ' ' +

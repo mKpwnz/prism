@@ -8,7 +8,6 @@ import { ILivePlayer } from '@interfaces/ILivePlayer'
 
 import Config from '@proot/Config'
 import { Helper } from '@utils/Helper'
-import LogManager from '@utils/Logger'
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 
 export class Nvhx extends Command {
@@ -135,21 +134,4 @@ export class Nvhx extends Command {
             })
         }
     }
-
-    // public async nvhxInfo(interaction: ChatInputCommandInteraction): Promise<void> {
-    //     const { options } = interaction
-    //     const embed = this.getEmbedTemplate(interaction)
-    //     try {
-    //         const id = options.getInteger('id', true)
-    //         RconClient.sendCommand(`nvhx info ${id}`)
-    //         embed.setTitle('Neverhax Info')
-    //         embed.setDescription(`Triggere Neverhax Info für SpielerID ${id}`)
-    //         await interaction.reply({ embeds: [embed] })
-    //     } catch (error) {
-    //         await interaction.reply({
-    //             content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(error)}\`\`\``,
-    //             ephemeral: true,
-    //         })
-    //     }
-    // }
 }
