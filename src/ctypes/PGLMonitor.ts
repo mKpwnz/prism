@@ -1,3 +1,6 @@
+/**
+ * @typedef PGLMonitor
+ */
 export type PGLMonitor = {
     id: number
     name: string

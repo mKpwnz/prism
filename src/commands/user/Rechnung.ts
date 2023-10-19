@@ -1,5 +1,6 @@
 import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
+import { Player } from '@controller/Player.controller'
 import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
 import { GameDB } from '@sql/Database'
@@ -7,7 +8,6 @@ import { IBilling } from '@sql/schema/Billing.schema'
 import { IJob } from '@sql/schema/Job.schema'
 import LogManager from '@utils/Logger'
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
-import { WhoIs } from './WhoIs'
 
 export class Rechnung extends Command {
     constructor() {
@@ -138,8 +138,8 @@ export class Rechnung extends Command {
                 return
             }
 
-            const vUser = await WhoIs.validateUser(steamid)
-            if (!vUser) {
+            const vPlayer = await Player.validatePlayer(steamid)
+            if (!vPlayer) {
                 await interaction.reply({
                     content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
                     ephemeral: true,
@@ -158,11 +158,11 @@ export class Rechnung extends Command {
             }
             LogManager.log(querystring)
             // Hole die Rechnungen aus der Datenbank
-            const [rechnungen] = await GameDB.query<IBilling[]>(querystring, [vUser.identifier])
+            const [rechnungen] = await GameDB.query<IBilling[]>(querystring, [vPlayer.identifiers.steam])
             LogManager.debug(rechnungen)
             if (rechnungen.length === 0) {
                 embed.setTitle('Rechnungsübersicht')
-                embed.setDescription('Es wurden keine Rechnungen gefunden\nSteamID: ' + vUser.identifier)
+                embed.setDescription('Es wurden keine Rechnungen gefunden\nSteamID: ' + vPlayer.identifiers.steam)
                 await interaction.reply({ embeds: [embed] })
                 return
             }
@@ -363,8 +363,8 @@ export class Rechnung extends Command {
             })
             return
         }
-        const vUser = await WhoIs.validateUser(steamid)
-        if (!vUser) {
+        const vPlayer = await Player.validatePlayer(steamid)
+        if (!vPlayer) {
             await interaction.reply({
                 content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
                 ephemeral: true,
@@ -410,8 +410,8 @@ export class Rechnung extends Command {
         let [response] = await GameDB.query<IBilling[]>(
             'INSERT INTO immobilling (receiver_identifier, receiver_name, author_identifier, author_name, society, society_name, item, invoice_value, status, notes, sent_date, limit_pay_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING *',
             [
-                vUser.identifier,
-                vUser.firstname + ' ' + vUser.lastname,
+                vPlayer.identifiers.steam,
+                vPlayer.playerdata.fullname,
                 'DiscordBot',
                 sendername,
                 'society_' + sender,
@@ -426,8 +426,8 @@ export class Rechnung extends Command {
         )
         let field = {
             name: `Rechnung erstellt`,
-            value: `ID: ${response[0].id}\nEmpfänger: ${vUser.firstname} ${vUser.lastname} (\`${
-                vUser.identifier
+            value: `ID: ${response[0].id}\nEmpfänger: ${vPlayer.playerdata.fullname} (\`${
+                vPlayer.identifiers.steam
             }\`)\nSender: ${sendername}\nBetrag: ${betrag}€\nSociety: ${sender} (${sendername})\nGrund: ${grund}\nNotiz: ${beschreibung}\nStatus: unpaid\nVersendet am: ${sent_date}\nZahlungsziel: ${
                 limit_pay_date_string ?? 'Kein Limit'
             }`,

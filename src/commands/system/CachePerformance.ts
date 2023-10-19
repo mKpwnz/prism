@@ -1,10 +1,7 @@
 import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
-import { Items } from '@controller/Item.controller'
-import { NvhxData } from '@controller/NvhxData.controller'
 import { Player } from '@controller/Player.controller'
 import Config from '@proot/Config'
-import { IItem } from '@sql/schema/Item.schema'
 import { Cache } from '@utils/Cache'
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 
@@ -23,7 +20,8 @@ export class CachePerformance extends Command {
         await Cache.testPerformance(
             interaction,
             async () => {
-                var data = await Player.getAllLivePlayers()
+                var player = await Player.validatePlayer('steam:1100001370db0ea')
+                console.log(player)
             },
             'livePlayers',
         )

@@ -1,6 +1,8 @@
 import { Command } from '@class/Command'
 import { NonEmptyArray } from '@class/NonEmptyArray'
 import { RegisterCommand } from '@commands/CommandHandler'
+import { Player } from '@controller/Player.controller'
+import { ValidatedPlayer } from '@ctypes/ValidatedPlayer'
 import { EENV } from '@enums/EENV'
 import { ELicenses } from '@enums/ELicenses'
 import Config from '@proot/Config'
@@ -10,8 +12,6 @@ import { Helper } from '@utils/Helper'
 import LogManager from '@utils/Logger'
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 import { ResultSetHeader } from 'mysql2'
-import { WhoIs } from './WhoIs'
-import { IFindUser } from '@sql/schema/User.schema'
 
 export class Lizenz extends Command {
     constructor() {
@@ -121,15 +121,15 @@ export class Lizenz extends Command {
             await interaction.reply({ content: 'Bitte gib eine SteamID an!', ephemeral: true })
             return
         }
-        const vUser = await WhoIs.validateUser(steamid)
-        if (!vUser) {
+        const vPlayer = await Player.validatePlayer(steamid)
+        if (!vPlayer) {
             await interaction.reply({
                 content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
                 ephemeral: true,
             })
             return
         }
-        let response = await Lizenz.deleteLicense(vUser, license)
+        let response = await Lizenz.deleteLicense(vPlayer, license)
         if (response instanceof Error) {
             LogManager.error(response)
             await interaction.reply({
@@ -143,7 +143,7 @@ export class Lizenz extends Command {
         embed.setTitle('Lizenz entfernt')
         embed.setDescription(
             `
-                Es wurde/n ${response.affectedRows} Lizenz/en von ${vUser.firstname} ${vUser.lastname} (\`${vUser.identifier}\`) entfernt!`,
+                Es wurde/n ${response.affectedRows} Lizenz/en von ${vPlayer.playerdata.fullname} (\`${vPlayer.identifiers.steam}\`) entfernt!`,
         )
         await interaction.reply({ embeds: [embed] })
     }
@@ -161,8 +161,8 @@ export class Lizenz extends Command {
             await interaction.reply({ content: 'Bitte gib eine Lizenz an!', ephemeral: true })
             return
         }
-        const vUser = await WhoIs.validateUser(steamid)
-        if (!vUser) {
+        const vPlayer = await Player.validatePlayer(steamid)
+        if (!vPlayer) {
             await interaction.reply({
                 content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
                 ephemeral: true,
@@ -174,7 +174,7 @@ export class Lizenz extends Command {
             if (license !== 'all') {
                 query += ' AND type = "' + license + '"'
             }
-            let [lizenzen] = await GameDB.query<IUserLicense[]>(query, [vUser.identifier])
+            let [lizenzen] = await GameDB.query<IUserLicense[]>(query, [vPlayer.identifiers.steam])
             if (lizenzen.length !== 0) {
                 await interaction.reply({
                     content: 'Der Spieler hat diese Lizenz bereits!',
@@ -184,7 +184,7 @@ export class Lizenz extends Command {
             }
             let [lizenz] = await GameDB.query<IUserLicense[]>('INSERT INTO user_licenses(type, owner) VALUES (?, ?)', [
                 license,
-                vUser.identifier,
+                vPlayer.identifiers.steam,
             ])
             if (lizenz.length === 0) {
                 await interaction.reply({
@@ -195,15 +195,7 @@ export class Lizenz extends Command {
             }
             embed.setTitle('Lizenz hinzugefügt')
             embed.setDescription(
-                'Die Lizenz ' +
-                    license +
-                    ' wurde ' +
-                    vUser.firstname +
-                    ' ' +
-                    vUser.lastname +
-                    ' (`' +
-                    vUser.identifier +
-                    '`) hinzugefügt!',
+                `Die Lizenz ${license} wurde ${vPlayer.playerdata.fullname} (${vPlayer.identifiers.steam}) hinzugefügt!`,
             )
             await interaction.reply({ embeds: [embed] })
         } catch (error) {
@@ -213,7 +205,7 @@ export class Lizenz extends Command {
     }
 
     public static async deleteLicense(
-        vUser: IFindUser,
+        vPlayer: ValidatedPlayer,
         licenses: ELicenses | NonEmptyArray<Exclude<ELicenses, ELicenses.ALL>>,
     ): Promise<ResultSetHeader | Error> {
         try {
@@ -221,7 +213,7 @@ export class Lizenz extends Command {
 
             if (Array.isArray(licenses)) {
                 for (let license of licenses) {
-                    if (!(await Lizenz.checkLicense(vUser, license))) {
+                    if (!(await Lizenz.checkLicense(vPlayer, license))) {
                         continue
                     }
                     if (license === licenses[0]) {
@@ -237,13 +229,13 @@ export class Lizenz extends Command {
                 if (licenses === ELicenses.ALL) {
                     query = 'DELETE FROM user_licenses WHERE owner = ?'
                 } else {
-                    if (!(await Lizenz.checkLicense(vUser, licenses))) {
+                    if (!(await Lizenz.checkLicense(vPlayer, licenses))) {
                         return new Error('Der Spieler besitzt diese Lizenz nicht!')
                     }
                     query += 'type = "' + licenses + '"'
                 }
             }
-            const result = await GameDB.query<ResultSetHeader>(query, [vUser.identifier])
+            const result = await GameDB.query<ResultSetHeader>(query, [vPlayer.identifiers.steam])
             return result[0]
         } catch (error) {
             LogManager.error(error)
@@ -251,11 +243,14 @@ export class Lizenz extends Command {
         }
     }
 
-    public static async checkLicense(vUser: IFindUser, license: Exclude<ELicenses, ELicenses.ALL>): Promise<boolean> {
+    public static async checkLicense(
+        vPlayer: ValidatedPlayer,
+        license: Exclude<ELicenses, ELicenses.ALL>,
+    ): Promise<boolean> {
         try {
             const [result] = await GameDB.query<IUserLicense[]>(
                 'SELECT * FROM user_licenses WHERE owner = ? AND type = ?',
-                [vUser.identifier, license],
+                [vPlayer.identifiers.steam, license],
             )
             if (result.length === 0) {
                 return false

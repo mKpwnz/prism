@@ -21,3 +21,17 @@ export enum ESearchType {
     PHONENUMBER = 'phonenumber',
     ALL = 'all',
 }
+
+/**
+ * @description
+ * @author mKpwnz
+ * @date 19.10.2023
+ * @export
+ * @enum {number}
+ */
+export enum EUniqueIdentifier {
+    IDENTIFIER = 'identifier',
+    STEAMID = 'steamid',
+    LICENSE = 'license',
+    PHONENUMBER = 'phonenumber',
+}

@@ -1,6 +1,7 @@
 import { Command } from '@class/Command'
 import { RconClient } from '@class/RconClient'
 import { RegisterCommand } from '@commands/CommandHandler'
+import { Player } from '@controller/Player.controller'
 import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
 import { GameDB } from '@sql/Database'
@@ -8,7 +9,6 @@ import { IJob } from '@sql/schema/Job.schema'
 import LogManager from '@utils/Logger'
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 import { RowDataPacket } from 'mysql2'
-import { WhoIs } from './WhoIs'
 
 export class Setjob extends Command {
     constructor() {
@@ -120,8 +120,8 @@ export class Setjob extends Command {
             await interaction.reply({ content: 'Es wurde kein Job angegeben!', ephemeral: true })
             return
         }
-        const vUser = await WhoIs.validateUser(steamid)
-        if (!vUser) {
+        const vPlayer = await Player.validatePlayer(steamid)
+        if (!vPlayer) {
             await interaction.reply({
                 content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
                 ephemeral: true,
@@ -142,7 +142,7 @@ export class Setjob extends Command {
             let query = (await GameDB.query('UPDATE users SET job = ?, job_grade = ? WHERE identifier = ?', [
                 job.toLowerCase(),
                 grade,
-                vUser.identifier,
+                vPlayer.identifiers.steam,
             ])) as RowDataPacket[]
 
             if (query[0]['affectedRows'] === 0) {
@@ -155,11 +155,11 @@ export class Setjob extends Command {
             embed.setTitle('Job geändert (offline)')
             embed.setDescription(
                 'Der Job von ' +
-                    vUser.firstname +
+                    vPlayer.playerdata.firstname +
                     ' ' +
-                    vUser.lastname +
+                    vPlayer.playerdata.lastname +
                     ' (`' +
-                    vUser.identifier +
+                    vPlayer.identifiers.steam +
                     '`)' +
                     ' wurde geändert!\nNeuer Job: ' +
                     jobquery[0].label +

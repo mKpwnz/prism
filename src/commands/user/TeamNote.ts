@@ -1,10 +1,10 @@
 import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
+import { Player } from '@controller/Player.controller'
 import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
 import { BotDB } from '@sql/Database'
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
-import { WhoIs } from './WhoIs'
 
 export class TeamNote extends Command {
     constructor() {
@@ -79,8 +79,8 @@ export class TeamNote extends Command {
             await interaction.reply({ embeds: [embed] })
             return
         }
-        const vUser = await WhoIs.validateUser(steamid)
-        if (!vUser) {
+        const vPlayer = await Player.validatePlayer(steamid)
+        if (!vPlayer) {
             embed.setTitle('Teamnote | Fehler')
             embed.setDescription('Die angegebene SteamID ist ungültig.')
             await interaction.reply({ embeds: [embed] })
@@ -95,7 +95,7 @@ export class TeamNote extends Command {
 
         const data = await BotDB.team_notes.create({
             data: {
-                user: vUser.identifier,
+                user: vPlayer.identifiers.steam,
                 noterId: interaction.user.id,
                 noterName: interaction.user.username,
                 note: note,
@@ -105,12 +105,12 @@ export class TeamNote extends Command {
         embed.setFields([
             {
                 name: 'User (IC Name)',
-                value: vUser.firstname + ' ' + vUser.lastname,
+                value: vPlayer.playerdata.fullname,
                 inline: true,
             },
             {
                 name: 'User (SteamID)',
-                value: vUser.identifier,
+                value: vPlayer.identifiers.steam,
                 inline: true,
             },
             { name: '\u200B', value: '\u200B', inline: true },
@@ -142,8 +142,8 @@ export class TeamNote extends Command {
             await interaction.reply({ embeds: [embed] })
             return
         }
-        const vUser = await WhoIs.validateUser(steamid)
-        if (!vUser) {
+        const vPlayer = await Player.validatePlayer(steamid)
+        if (!vPlayer) {
             embed.setTitle('Teamnote | Fehler')
             embed.setDescription('Die angegebene SteamID ist ungültig.')
             await interaction.reply({ embeds: [embed] })
@@ -152,7 +152,7 @@ export class TeamNote extends Command {
 
         const data = await BotDB.team_notes.findMany({
             where: {
-                user: vUser.identifier,
+                user: vPlayer.identifiers.steam,
             },
             orderBy: {
                 created_at: 'desc',
@@ -165,9 +165,9 @@ export class TeamNote extends Command {
             }** | Erstellt am **${note.created_at.toLocaleString('de-DE')}**\n\`\`\`${note.note}\`\`\`\n`
         })
         embed.setDescription(
-            `Notizen (${data.length > 5 ? 5 : data.length}/${data.length}) von **${vUser.firstname} ${
-                vUser.lastname
-            }**  (${vUser.identifier})\n${
+            `Notizen (${data.length > 5 ? 5 : data.length}/${data.length}) von **${vPlayer.playerdata.fullname}**  (${
+                vPlayer.identifiers.steam
+            })\n${
                 data.length > 5
                     ? `Ausgeblendete IDs: **${data
                           .slice(5)
@@ -200,10 +200,10 @@ export class TeamNote extends Command {
             await interaction.reply({ embeds: [embed] })
             return
         }
-        const vUser = await WhoIs.validateUser(data.user)
-        if (vUser) {
+        const vPlayer = await Player.validatePlayer(data.user)
+        if (vPlayer) {
             embed.setDescription(
-                `Notizen von **${vUser.firstname} ${vUser.lastname}**  (${vUser.identifier})\n\nID: **${
+                `Notizen von **${vPlayer.playerdata.fullname}**  (${vPlayer.identifiers.steam})\n\nID: **${
                     data.id
                 }** | Erstellt von: **${data.noterName}** | Erstellt am **${data.created_at.toLocaleString(
                     'de-DE',

@@ -3,17 +3,9 @@ import { RegisterCommand } from '@commands/CommandHandler'
 import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
 import { GameDB } from '@sql/Database'
+import { IPhoneOwnerResponse } from '@sql/schema/Phone.schema'
 import LogManager from '@utils/Logger'
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
-import { RowDataPacket } from 'mysql2'
-
-interface phoneOwnerResponse extends RowDataPacket {
-    firstname: string
-    lastname: string
-    steamID: string
-    phoneNumber: string
-    timestamp: string
-}
 
 // TODO: REFACTOR
 export class CheckImageOwner extends Command {
@@ -57,7 +49,7 @@ export class CheckImageOwner extends Command {
             }
             LogManager.debug(n_link)
 
-            const [response] = await GameDB.query<phoneOwnerResponse[]>(
+            const [response] = await GameDB.query<IPhoneOwnerResponse[]>(
                 `
 				SELECT u.firstname, u.lastname, phones.id AS steamID, photos.phone_number, photos.timestamp AS img_timestamp
 				FROM phone_photos photos

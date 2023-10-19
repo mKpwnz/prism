@@ -51,3 +51,19 @@ export interface IPhoneInstagramAccounts extends RowDataPacket {
     verified: boolean | null
     date_joined: Date
 }
+
+/**
+ * @description
+ * @author mKpwnz
+ * @date 19.10.2023
+ * @export
+ * @interface IPhoneOwnerResponse
+ * @extends {RowDataPacket}
+ */
+export interface IPhoneOwnerResponse extends RowDataPacket {
+    firstname: string
+    lastname: string
+    steamID: string
+    phoneNumber: string
+    timestamp: string
+}

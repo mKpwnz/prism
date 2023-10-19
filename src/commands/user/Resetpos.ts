@@ -1,12 +1,12 @@
 import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
+import { Player } from '@controller/Player.controller'
 import { EENV } from '@enums/EENV'
 import Config from '@proot/Config'
 import { GameDB } from '@sql/Database'
 import LogManager from '@utils/Logger'
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
 import { RowDataPacket } from 'mysql2'
-import { WhoIs } from './WhoIs'
 
 export class Resetpos extends Command {
     constructor() {
@@ -36,9 +36,9 @@ export class Resetpos extends Command {
     }
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         let steam = interaction.options.get('steam')?.value?.toString() ?? ''
-        const vUser = await WhoIs.validateUser(steam ?? '')
+        const vPlayer = await Player.validatePlayer(steam)
         let embed = this.getEmbedTemplate(interaction)
-        if (!vUser) {
+        if (!vPlayer) {
             await interaction.reply('Es konnte kein Spieler mit dieser SteamID gefunden werden!')
             return
         }
@@ -47,18 +47,12 @@ export class Resetpos extends Command {
             let query = 'UPDATE users SET position = ? WHERE identifier = ?'
             let result = (await GameDB.execute(query, [
                 JSON.stringify(newPosition),
-                vUser.identifier,
+                vPlayer.identifiers.steam,
             ])) as RowDataPacket[]
             if (result[0]['rowsChanged'] !== 0) {
                 embed.setTitle('Position zurückgesetzt')
                 embed.setDescription(
-                    'Die Position von ' +
-                        vUser.firstname +
-                        ' ' +
-                        vUser.lastname +
-                        ' (`' +
-                        vUser.identifier +
-                        '`) wurde zurückgesetzt.',
+                    `Die Position von ${vPlayer.playerdata.fullname} (${vPlayer.identifiers.steam}) wurde zurückgesetzt.`,
                 )
                 await interaction.reply({ embeds: [embed] })
             } else {
