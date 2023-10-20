@@ -29,11 +29,11 @@ EventHandler.init(client)
 client.login(token)
 client.once(Events.ClientReady, () => {
     new ExpressApp()
-    CronManager.initCronManager({
-        'fraktionen.finance': new CronJob('*/10 * * * * *', () => {
-            LogManager.debug('Cronjob started: fraktionen.finance')
-        }),
-    })
+    // CronManager.initCronManager({
+    //     'fraktionen.finance': new CronJob('*/10 * * * * *', () => {
+    //         LogManager.debug('Cronjob started: fraktionen.finance')
+    //     }),
+    // })
 })
 
 export const BotClient = client
