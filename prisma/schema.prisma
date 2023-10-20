@@ -28,3 +28,14 @@ model team_notes {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 }
+
+model society_finance {
+  id         Int      @id @default(autoincrement())
+  job        String
+  label      String
+  bank       Decimal  @db.Decimal
+  money      Decimal  @db.Decimal
+  black      Decimal  @db.Decimal
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
