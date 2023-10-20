@@ -6,6 +6,6 @@ WORKDIR /usr/src/app
 # Install app dependencies
 COPY . .
 
-RUN npm i
+RUN npm install --build-from-source
 
 CMD [ "npm", "run",  "start" ]
