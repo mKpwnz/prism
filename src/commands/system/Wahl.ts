@@ -186,14 +186,9 @@ export class Wahl extends Command {
             )
             embed.setTitle('Wahl erstellt')
             embed.setDescription(
-                'Wahl ' +
-                    options.getString('name') +
-                    ' erstellt!\nJob: ' +
-                    options.getString('job') +
-                    '\nEnthaltung: ' +
-                    options.getBoolean('enthaltung') +
-                    '\nID: ' +
-                    queryResult[0].id,
+                `Wahl ${options.getString('name')} erstellt!\nJob: ${options.getString(
+                    'job',
+                )}\nEnthaltung: ${options.getBoolean('enthaltung')}\nID: ${queryResult[0].id}`,
             )
             const channel = await interaction.guild?.channels.fetch(Config.Discord.LogChannel.S1_WAHLEN)
             if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] })
@@ -237,14 +232,9 @@ export class Wahl extends Command {
             }
             embed.setTitle('Wahlstatus geändert')
             embed.setDescription(
-                'Wahlstatus für ' +
-                    query[0].name +
-                    ' (' +
-                    query[0].id +
-                    ')' +
-                    ' auf ' +
-                    status[options.getNumber('option_status') ?? 0] +
-                    ' geändert!',
+                `Wahlstatus für ${query[0].name} (${query[0].id}) auf ${
+                    status[options.getNumber('option_status') ?? 0]
+                } geändert!`,
             )
             const channel = await interaction.guild?.channels.fetch(Config.Discord.LogChannel.S1_WAHLEN)
             if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] })
@@ -295,17 +285,9 @@ export class Wahl extends Command {
             )
             embed.setTitle('Nutzer hinzugefügt')
             embed.setDescription(
-                'Nutzer ' +
-                    vPlayer.playerdata.fullname +
-                    ' zur Wahl ' +
-                    election.name +
-                    ' (' +
-                    election.id +
-                    ') hinzugefügt!\nSteamID: `' +
-                    vPlayer.identifiers.steam +
-                    '`\nParticipantID: ' +
-                    response[0].id,
+                `Nutzer ${vPlayer.playerdata.fullname} zur Wahl ${election.name} (${election.id}) hinzugefügt!\nSteamID: \`${vPlayer.identifiers.steam}\`\nParticipantID: ${response[0].id}`,
             )
+
             const channel = await interaction.guild?.channels.fetch(Config.Discord.LogChannel.S1_WAHLEN)
             if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] })
             await interaction.reply({ embeds: [embed] })
@@ -321,16 +303,9 @@ export class Wahl extends Command {
                 LogManager.debug(res)
                 embed.setTitle('Nutzer hinzugefügt')
                 embed.setDescription(
-                    'Nutzer ' +
-                        vPlayer.playerdata.fullname +
-                        ' von Wahl ' +
-                        election.name +
-                        ' (' +
-                        election.id +
-                        ') entfernt!\nSteamID: `' +
-                        steamid +
-                        '`',
+                    `Nutzer ${vPlayer.playerdata.fullname} von Wahl ${election.name} (${election.id}) entfernt!\nSteamID: \`${steamid}\``,
                 )
+
                 const channel = await interaction.guild?.channels.fetch(Config.Discord.LogChannel.S1_WAHLEN)
                 if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] })
                 await interaction.reply({ embeds: [embed] })
@@ -360,11 +335,16 @@ export class Wahl extends Command {
             }
 
             const [votes] = await GameDB.query<IVote[]>(
-                'SELECT ep.name as name, COUNT(ev.id) AS vote_count ' +
-                    'FROM immo_elections_participants ep ' +
-                    'LEFT JOIN immo_elections_votes ev ON ev.participantid = ep.id AND ev.electionid = ? ' +
-                    'WHERE ep.electionid = ? GROUP BY ep.id ORDER BY vote_count DESC',
-                [options.getNumber('wahlid'), options.getNumber('wahlid')],
+                `--sql
+                    SELECT
+                        ep.name as name,
+                        COUNT(ev.id) AS vote_count
+                    FROM
+                        immo_elections_participants ep
+                    LEFT JOIN immo_elections_votes ev ON ev.participantid = ep.id AND ev.electionid = ?
+                    WHERE ep.electionid = ? GROUP BY ep.id ORDER BY vote_count DESC
+                `,
+                [(options.getNumber('wahlid'), options.getNumber('wahlid'))],
             )
             // Change the Query to a graph created with Chart.js and send it to the channel
             const width = 800
@@ -469,8 +449,6 @@ export class Wahl extends Command {
                 await interaction.channel.send({ files: [image] })
             embed.setTitle('Wahlergebnis')
             embed.setDescription('Wahlergebnis für ' + query[0].name + ' (' + query[0].id + ')')
-            //post image to channel
-
             await interaction.reply({ embeds: [embed] })
         } catch (error) {
             LogManager.error(error)
@@ -492,19 +470,9 @@ export class Wahl extends Command {
             for (const election of elections) {
                 fields.push({
                     name: election.name + ' (' + election.id + ')',
-                    value:
-                        'Status: ' +
-                        status[election.status] +
-                        '\nJobs: ' +
-                        election.job +
-                        '\nErstellt: ' +
-                        election.created.toLocaleDateString() +
-                        ' ' +
-                        election.updated.toLocaleTimeString() +
-                        '\nAktualisiert: ' +
-                        election.updated.toLocaleDateString() +
-                        ' ' +
-                        election.updated.toLocaleTimeString(),
+                    value: `Status: ${status[election.status]}\nJobs: ${
+                        election.job
+                    }\nErstellt: ${election.created.toLocaleDateString()} ${election.created.toLocaleTimeString()}\nAktualisiert: ${election.updated.toLocaleDateString()} ${election.updated.toLocaleTimeString()}`,
                 })
             }
             embed.setTitle('Verfügbare Wahlen')
@@ -605,8 +573,9 @@ export class Wahl extends Command {
                 LogManager.debug(response)
                 embed.setTitle('Wahl manipuliert!')
                 embed.setDescription(
-                    anzahl + ' Stimmen für ' + participant[0].name + ' zur Wahl ' + name + ' (' + id + ') hinzugefügt!',
+                    `${anzahl} Stimmen für ${participant[0].name} von Wahl ${name} (${id}) hinzugefügt!`,
                 )
+
                 const channel = await interaction.guild?.channels.fetch(Config.Discord.LogChannel.S1_WAHLEN)
                 //if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] })
                 await interaction.reply({ embeds: [embed] })
@@ -619,14 +588,9 @@ export class Wahl extends Command {
                 LogManager.debug(response)
                 embed.setTitle('Wahl manipuliert!')
                 embed.setDescription(
-                    options.getNumber('stimmen') +
-                        ' Stimmen für ' +
-                        participant[0].name +
-                        ' von Wahl ' +
-                        name +
-                        ' (' +
-                        id +
-                        ') entfernt!',
+                    `${options.getNumber('stimmen')} Stimmen für ${
+                        participant[0].name
+                    } von Wahl ${name} (${id}) entfernt!`,
                 )
                 const channel = await interaction.guild?.channels.fetch(Config.Discord.LogChannel.S1_WAHLEN)
                 if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] })

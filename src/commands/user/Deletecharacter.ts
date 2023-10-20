@@ -1,7 +1,6 @@
 import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
 import { EENV } from '@enums/EENV'
-
 import { Player } from '@controller/Player.controller'
 import { ValidatedPlayer } from '@ctypes/ValidatedPlayer'
 import { ELicenses } from '@enums/ELicenses'
