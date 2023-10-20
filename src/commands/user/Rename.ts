@@ -74,18 +74,9 @@ export class Rename extends Command {
             if (result[0]['rowsChanged'] !== 0) {
                 embed.setTitle('Spieler umbenannt')
                 embed.setDescription(
-                    'Der Spieler mit dem Namen "' +
-                        vPlayer.playerdata.firstname +
-                        ' ' +
-                        vPlayer.playerdata.lastname +
-                        '" (`' +
-                        vPlayer.identifiers.steam +
-                        '`) hat nun den Namen "' +
-                        firstname +
-                        ' ' +
-                        lastname +
-                        '".',
+                    `Der Spieler mit dem Namen ${vPlayer.playerdata.fullname} (${vPlayer.identifiers.steam}) hat nun den Namen "${firstname} ${lastname}".`,
                 )
+
                 await interaction.reply({ embeds: [embed] })
             } else {
                 await interaction.reply({

@@ -37,6 +37,15 @@ export class Player {
         return livePlayers
     }
 
+    /**
+     * @description Check if a player ist Online
+     * @author mKpwnz
+     * @date 20.10.2023
+     * @static
+     * @param {string} identifier
+     * @returns {*}  {Promise<boolean>}
+     * @memberof Player
+     */
     public static async isPlayerOnline(identifier: string): Promise<boolean> {
         var livePlayers = await Player.getAllLivePlayers()
         return livePlayers.find((p) => p.identifiers.indexOf(identifier) > -1) ? true : false
@@ -62,7 +71,7 @@ export class Player {
             [EUniqueIdentifier.LICENSE, `LOWER( baninfo.license ) = '${searchString}'`],
             [EUniqueIdentifier.PHONENUMBER, `phone_phones.phone_number = '${searchString}'`],
         ])
-        var query = `
+        var [user] = await GameDB.query<IValidatedPlayerResponse[]>(`
             SELECT
                 baninfo.playername AS steamnames_current,
                 users.name AS steamnames_atFirstLogin,
@@ -97,8 +106,7 @@ export class Player {
                 LEFT JOIN baninfo ON users.identifier = baninfo.identifier
                 JOIN phone_phones ON users.identifier = phone_phones.id
             WHERE ${filterMap.get(type)}
-        `
-        var [user] = await GameDB.query<IValidatedPlayerResponse[]>(query)
+        `)
 
         if (user === null) return null
         if (user.length != 1) return null

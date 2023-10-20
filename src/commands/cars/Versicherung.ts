@@ -122,14 +122,9 @@ export class Versicherung extends Command {
             if (versicherung.ts > new Date()) status = '**Versichert**'
             embed.addFields({
                 name: versicherung.plate,
-                value:
-                    status +
-                    '\nVersichert bis: ' +
-                    versicherung.ts.toLocaleDateString() +
-                    ' ' +
-                    versicherung.ts.toLocaleTimeString() +
-                    '\nPremium: ' +
-                    versicherung.premium,
+                value: `${status}\nVersichert bis: ${versicherung.ts.toLocaleDateString()} ${versicherung.ts.toLocaleTimeString()}\nPremium: ${
+                    versicherung.premium
+                }`,
             })
             await interaction.reply({ embeds: [embed] })
             return
@@ -166,13 +161,9 @@ export class Versicherung extends Command {
             embed.setTitle('Versicherung Hinzufügen')
             embed.addFields({
                 name: kennzeichen ?? 'Fehler',
-                value:
-                    'Versichert bis: ' +
-                    ts.toLocaleDateString() +
-                    ' ' +
-                    ts.toLocaleTimeString() +
-                    '\nPremium: ' +
-                    (premium ? 'Ja' : 'Nein'),
+                value: `Versichert bis: ${ts.toLocaleDateString()} ${ts.toLocaleTimeString()}\nPremium: ${
+                    premium ? 'Ja' : 'Nein'
+                }`,
             })
             await interaction.reply({ embeds: [embed] })
         } catch (error) {
@@ -208,14 +199,9 @@ export class Versicherung extends Command {
             embed.setTitle('Versicherung Entfernen')
             embed.addFields({
                 name: kennzeichen,
-                value:
-                    'Versicherung entfernt' +
-                    '\nPremium: ' +
-                    (versicherung.premium ? 'Ja' : 'Nein') +
-                    '\nVersichert bis: ' +
-                    versicherung.ts.toLocaleDateString() +
-                    ' ' +
-                    versicherung.ts.toLocaleTimeString(),
+                value: `Versicherung entfernt\nPremium: ${
+                    versicherung.premium ? 'Ja' : 'Nein'
+                }\nVersichert bis: ${versicherung.ts.toLocaleDateString()} ${versicherung.ts.toLocaleTimeString()}`,
             })
             await interaction.reply({ embeds: [embed] })
         } catch (error) {

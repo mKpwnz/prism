@@ -189,24 +189,16 @@ export class Rechnung extends Command {
             // Falls Pagination verfügbar, zeige String an
             let pageString = ''
             if (rechnungen.length > limit) {
-                pageString =
-                    '\nSeite ' +
-                    page +
-                    '/' +
-                    Math.ceil(rechnungen.length / limit) +
-                    `\n${rechnungen.length - fields.length} weitere Ergebnisse sind ausgeblendet!`
+                pageString = `\nSeite ${page}/${Math.ceil(rechnungen.length / limit)}\n${
+                    rechnungen.length - fields.length
+                } weitere Ergebnisse sind ausgeblendet!`
             }
             // Generiere das Embed
             embed.setTitle('Rechnungsübersicht')
             embed.setDescription(
-                'Rechnungen für Empfänger: ' +
-                    rechnungen[0].receiver_name +
-                    ' (`' +
-                    rechnungen[0].receiver_identifier +
-                    '`)' +
-                    pageString,
+                `Rechnungen für Empfänger: ${rechnungen[0].receiver_name} (${rechnungen[0].receiver_identifier}) ${pageString}`,
             )
-            // Rückgabe des Embeds
+
             embed.setFields(fields)
             await interaction.reply({ embeds: [embed] })
             return

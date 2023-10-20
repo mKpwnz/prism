@@ -137,11 +137,9 @@ export class Fraksperre extends Command {
         var embed = this.getEmbedTemplate(interaction)
         embed.setTitle('Fraktionssperre gesetzt')
         embed.setDescription(
-            `Die Fraktionssperre von ${vPlayer.playerdata.fullname} (${vPlayer.identifiers.steam})` +
-                ' wurde gesetzt!\nDauer: ' +
-                days +
-                ' Tage\nEndet am: ' +
-                ts.toLocaleDateString(),
+            `Die Fraktionssperre von ${vPlayer.playerdata.fullname} (${
+                vPlayer.identifiers.steam
+            }) wurde gesetzt!\nDauer: ${days} Tage\nEndet am: ${ts.toLocaleDateString()}`,
         )
         await interaction.reply({ embeds: [embed] })
     }

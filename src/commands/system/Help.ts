@@ -81,85 +81,9 @@ export class Help extends Command {
     }
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const { channel, user, guild } = interaction
-        // if (!channel) return
-        // var betaEmote = await Helper.getEmote('pbot_beta')
-        // LogManager.debug(betaEmote)
-        // var cmds = Help.getCommands()
-        // var fields: { name: string; value: string }[] = []
-        // var embeds: EmbedBuilder[] = []
-        // cmds.forEach((cmd) => {
-        //     // if (!cmd.production) return
-        //     var groupString = ''
-        //     if (cmd.allowedGroups) {
-        //         cmd.allowedGroups.forEach((group) => {
-        //             if (group == Config.Discord.Groups.DEV_BOTTESTER) return
-        //             if (
-        //                 group == Config.Discord.Groups.DEV_SERVERENGINEER &&
-        //                 channel.id != Config.Discord.Channel.WHOIS_TESTI
-        //             )
-        //                 return
-        //             groupString += `[**${BotClient.guilds.cache
-        //                 .get(Config.Discord.ServerID)
-        //                 ?.roles.cache.get(group)
-        //                 ?.name.replace('ic | ', '')}**] `
-        //         })
-        //     }
-
-        //     if (cmd.subCommands && cmd.subCommands.length > 0) {
-        //         cmd.subCommands.forEach((subcmd) => {
-        //             fields.push({
-        //                 name: `${cmd.isBeta && betaEmote ? `${betaEmote} ` : ''}**/${cmd.commandName} ${
-        //                     subcmd.commandName
-        //                 } ${subcmd.commandOptions
-        //                     .map((opt) => (opt.required ? `[${opt.name}]` : `<${opt.name}>`))
-        //                     .join(' ')}**`,
-        //                 value: `*${subcmd.description}*\n${
-        //                     cmd.allowedChannels
-        //                         ? `${cmd.allowedChannels.map((channel) => `<#${channel}>`).join(' ')}`
-        //                         : ''
-        //                 }\n${groupString}\n`,
-        //             })
-        //         })
-        //     } else {
-        //         fields.push({
-        //             name: `${cmd.isBeta && betaEmote ? `${betaEmote} ` : ''}**/${cmd.commandName} ${cmd.commandOptions
-        //                 .map((opt) => (opt.required ? `<${opt.name}>` : `[${opt.name}]`))
-        //                 .join(' ')}**`,
-        //             value: `*${cmd.description}*\n${
-        //                 cmd.allowedChannels ? `${cmd.allowedChannels.map((channel) => `<#${channel}>`).join(' ')}` : ''
-        //             }\n${groupString}\n`,
-        //         })
-        //     }
-        // })
-        // fields.push({
-        //     name: '### Hinweis',
-        //     value: `Die Befehle mit dem ${betaEmote} sind aktuell in der BETA phase!`,
-        // })
-        // const MAX_LENGHT = 15
-        // var embedCount = Math.ceil(fields.length / MAX_LENGHT)
-
-        // for (let i = 0; i < embedCount; i++) {
-        //     let localEmbed = this.getEmbedTemplate(interaction)
-        //     localEmbed.setTitle(`**Befehlsübersicht** ${embedCount > 1 ? `${i + 1} / ${embedCount}` : ''}`)
-
-        //     var des = ''
-        //     for (let j = 0; j < MAX_LENGHT; j++) {
-        //         if (fields[i * MAX_LENGHT + j]) {
-        //             des += `${fields[i * MAX_LENGHT + j].name}\n${fields[i * MAX_LENGHT + j].value}\n`
-        //         } else {
-        //             break
-        //         }
-        //     }
-        //     localEmbed.setDescription(des)
-        //     localEmbed.setImage(Config.Pictures.WHITESPACE)
-        //     embeds.push(localEmbed)
-        // }
         await interaction.reply({
             content: 'Die Hilfe findest du auf folgender Seite: [Bot Hilfe](https://brand.immortaldev.eu/discordbot)',
             ephemeral: true,
         })
-        // embeds.forEach(async (embed) => {
-        //     await channel.send({ embeds: [embed] })
-        // })
     }
 }

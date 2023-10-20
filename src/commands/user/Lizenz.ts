@@ -142,8 +142,7 @@ export class Lizenz extends Command {
         }
         embed.setTitle('Lizenz entfernt')
         embed.setDescription(
-            `
-                Es wurde/n ${response.affectedRows} Lizenz/en von ${vPlayer.playerdata.fullname} (\`${vPlayer.identifiers.steam}\`) entfernt!`,
+            `Es wurde/n ${response.affectedRows} Lizenz/en von ${vPlayer.playerdata.fullname} (\`${vPlayer.identifiers.steam}\`) entfernt!`,
         )
         await interaction.reply({ embeds: [embed] })
     }

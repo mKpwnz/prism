@@ -154,18 +154,9 @@ export class Setjob extends Command {
             }
             embed.setTitle('Job geändert (offline)')
             embed.setDescription(
-                'Der Job von ' +
-                    vPlayer.playerdata.firstname +
-                    ' ' +
-                    vPlayer.playerdata.lastname +
-                    ' (`' +
-                    vPlayer.identifiers.steam +
-                    '`)' +
-                    ' wurde geändert!\nNeuer Job: ' +
-                    jobquery[0].label +
-                    '\nGrade: ' +
-                    grade,
+                `Der Job von ${vPlayer.playerdata.fullname} (${vPlayer.identifiers.steam}) wurde auf ${jobquery[0].label}\nGrade ${grade} gesetzt!`,
             )
+
             await interaction.reply({ embeds: [embed] })
         } catch (error) {
             LogManager.error(error)
