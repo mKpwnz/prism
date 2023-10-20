@@ -7,11 +7,11 @@ import { GameDB } from '@sql/Database'
 import { IElection } from '@sql/schema/Election.schema'
 import { IElectionParticipant } from '@sql/schema/ElectionParticipant.schema'
 import LogManager from '@utils/Logger'
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
+import { RowDataPacket } from 'mysql2'
 import { Chart, ChartConfiguration } from 'chart.js'
 import { ChartJSNodeCanvas } from 'chartjs-node-canvas'
 import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels'
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
-import { RowDataPacket } from 'mysql2'
 
 declare module 'chartjs-plugin-datalabels' {
     interface Context {
@@ -198,7 +198,6 @@ export class Wahl extends Command {
             await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true })
         }
     }
-
     private async showStatus(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction
         const embed = this.getEmbedTemplate(interaction)
@@ -244,7 +243,6 @@ export class Wahl extends Command {
             await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true })
         }
     }
-
     public async manageUser(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction
         const embed = this.getEmbedTemplate(interaction)
@@ -287,7 +285,6 @@ export class Wahl extends Command {
             embed.setDescription(
                 `Nutzer ${vPlayer.playerdata.fullname} zur Wahl ${election.name} (${election.id}) hinzugefügt!\nSteamID: \`${vPlayer.identifiers.steam}\`\nParticipantID: ${response[0].id}`,
             )
-
             const channel = await interaction.guild?.channels.fetch(Config.Discord.LogChannel.S1_WAHLEN)
             if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] })
             await interaction.reply({ embeds: [embed] })
@@ -305,7 +302,6 @@ export class Wahl extends Command {
                 embed.setDescription(
                     `Nutzer ${vPlayer.playerdata.fullname} von Wahl ${election.name} (${election.id}) entfernt!\nSteamID: \`${steamid}\``,
                 )
-
                 const channel = await interaction.guild?.channels.fetch(Config.Discord.LogChannel.S1_WAHLEN)
                 if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] })
                 await interaction.reply({ embeds: [embed] })
@@ -318,7 +314,6 @@ export class Wahl extends Command {
             }
         }
     }
-
     public async showResult(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction
         const embed = this.getEmbedTemplate(interaction)
@@ -333,17 +328,16 @@ export class Wahl extends Command {
                 })
                 return
             }
-
             const [votes] = await GameDB.query<IVote[]>(
                 `--sql
-                    SELECT
-                        ep.name as name,
-                        COUNT(ev.id) AS vote_count
-                    FROM
-                        immo_elections_participants ep
-                    LEFT JOIN immo_elections_votes ev ON ev.participantid = ep.id AND ev.electionid = ?
-                    WHERE ep.electionid = ? GROUP BY ep.id ORDER BY vote_count DESC
-                `,
+                SELECT
+                    ep.name as name,
+                    COUNT(ev.id) AS vote_count
+                FROM
+                    immo_elections_participants ep
+                LEFT JOIN immo_elections_votes ev ON ev.participantid = ep.id AND ev.electionid = ?
+                WHERE ep.electionid = ? GROUP BY ep.id ORDER BY vote_count DESC
+            `,
                 [(options.getNumber('wahlid'), options.getNumber('wahlid'))],
             )
             // Change the Query to a graph created with Chart.js and send it to the channel
@@ -436,7 +430,6 @@ export class Wahl extends Command {
                                 // if there is not enough space, skip
                                 const percentage = (data[index] / data.reduce((acc, val) => acc + val, 0)) * 100
                                 if (percentage < 5) return ''
-
                                 return `${percentage.toFixed(0)}%`
                             },
                         },
@@ -444,7 +437,6 @@ export class Wahl extends Command {
                 },
             }
             const image = await chart.renderToBuffer(config)
-
             if (interaction.channel && interaction.channel.isTextBased())
                 await interaction.channel.send({ files: [image] })
             embed.setTitle('Wahlergebnis')
@@ -455,7 +447,6 @@ export class Wahl extends Command {
             await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true })
         }
     }
-
     public async listElections(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction
         const embed = this.getEmbedTemplate(interaction)
@@ -484,7 +475,6 @@ export class Wahl extends Command {
             await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true })
         }
     }
-
     public async listCandidates(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction
         const embed = this.getEmbedTemplate(interaction)
@@ -497,7 +487,6 @@ export class Wahl extends Command {
                 return
             }
             let election = query[0]
-
             const [participants] = await GameDB.query<IElectionParticipant[]>(
                 'SELECT * FROM immo_elections_participants WHERE electionid = ?',
                 [options.getNumber('wahlid')],
@@ -518,7 +507,6 @@ export class Wahl extends Command {
             await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true })
         }
     }
-
     public async manipulateElection(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction
         const embed = this.getEmbedTemplate(interaction)
@@ -575,7 +563,6 @@ export class Wahl extends Command {
                 embed.setDescription(
                     `${anzahl} Stimmen für ${participant[0].name} von Wahl ${name} (${id}) hinzugefügt!`,
                 )
-
                 const channel = await interaction.guild?.channels.fetch(Config.Discord.LogChannel.S1_WAHLEN)
                 //if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] })
                 await interaction.reply({ embeds: [embed] })

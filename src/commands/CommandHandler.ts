@@ -72,8 +72,9 @@ export class CommandHandler {
         new SchufaCheck()
 
         new Rechnung()
-        // Wahl
+
         new Wahl()
+
         new TeamNote()
 
         new ValidateTrunk()
