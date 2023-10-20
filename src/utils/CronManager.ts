@@ -43,7 +43,7 @@ export class CronManager {
     }
 
     /**
-     * @description Stops all crons in the crons map object. This will not remove the crons from the map object. To remove a cron use removeCronByName(name: string) method. This will stop and remove the cron from the map object. If you want to stop and remove all crons use stopAll() method. This will stop and remove all crons from the map object. If you want to stop all crons but keep them in the map object use stopAll() method. This will stop all crons but keep them in the map object. If you want to stop all crons but keep them in the map object use stopAll() method. This will stop all crons but keep them in the map object. If you want to stop all crons but keep them in the map object use stopAll() method. This will stop all crons but keep them in the map object. If you want to stop all crons but keep them in the map object use stopAll() method. This will stop all crons but keep them in the map object. If you want to stop all crons but keep them in the map object use stopAll() method. This will stop all crons but keep them in the map object. If you want to stop all crons but keep them in the map object use stopAll() method. This will stop all crons but keep them in the map object. If you want to stop all crons but keep them in the map object use stopAll() method. This will stop all crons but keep them in the map object.
+     * @description Stops all crons in the crons map object. This will not remove the crons from the map object.
      * @author mKpwnz
      * @date 20.10.2023
      * @static
