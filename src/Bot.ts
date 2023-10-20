@@ -31,7 +31,7 @@ client.login(token)
 client.once(Events.ClientReady, async () => {
     new ExpressApp()
     CronManager.initCronManager({
-        'fraktionen.finance': new CronJob('0 0 0/2 ? * * *', () => CronJobs.logSocietyFinance()),
+        'fraktionen.finance': new CronJob('0 0 0/2 * * *', () => CronJobs.logSocietyFinance()),
     })
 })
 
