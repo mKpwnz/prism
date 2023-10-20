@@ -1,4 +1,4 @@
-FROM node
+FROM node:lts
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -6,6 +6,6 @@ WORKDIR /usr/src/app
 # Install app dependencies
 COPY . .
 
-RUN npm ci
+RUN npm i
 
 CMD [ "npm", "run",  "start" ]
