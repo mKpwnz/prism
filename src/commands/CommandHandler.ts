@@ -6,7 +6,7 @@ import { ValidateTrunk } from './cars'
 import { SchufaCheck } from './housing'
 import { Nvhx, NvhxBan } from './nvhx'
 import { CheckImageOwner } from './phone'
-import { BotStats, CachePerformance, Help, Ping, ServerStatus } from './system'
+import { BotStats, CachePerformance, Help, Ping, ServerStatus, Wahl } from './system'
 import {
     ChangeBirthday,
     Fraksperre,
@@ -72,6 +72,9 @@ export class CommandHandler {
         new SchufaCheck()
 
         new Rechnung()
+
+        new Wahl()
+
         new TeamNote()
 
         new ValidateTrunk()
