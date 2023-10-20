@@ -1,10 +1,13 @@
 import { Command } from '@class/Command'
 import { RegisterCommand } from '@commands/CommandHandler'
+import { Player } from '@controller/Player.controller'
 import { EENV } from '@enums/EENV'
+import { EmbedColors } from '@enums/EmbedColors'
 import Config from '@proot/Config'
 import { GameDB } from '@sql/Database'
+import LogManager from '@utils/Logger'
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
-import { RowDataPacket } from 'mysql2'
+import { ResultSetHeader, RowDataPacket } from 'mysql2'
 
 export class ChangeBirthday extends Command {
     constructor() {
@@ -39,39 +42,65 @@ export class ChangeBirthday extends Command {
             this,
         )
     }
-    // TODO: Refactor Command
+
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const birthday = interaction.options.get('datum')?.value?.toString() ?? ''
-        let steam = interaction.options.get('steam')?.value?.toString() ?? ''
-        //Regex for date
-        const regex = new RegExp(/^\d{1,2}\.\d{1,2}\.\d{4}$/)
-        if (regex.test(birthday)) {
-            let query = 'SELECT identifier FROM users WHERE identifier = '
-            if (!steam.startsWith('steam:')) {
-                query += `'steam:${steam}' LIMIT 1`
-            } else {
-                query += `'${steam}' LIMIT 1`
-            }
-            try {
-                let result = await GameDB.query(query)
-                let datarow = result[0] as RowDataPacket[]
-                if (datarow.length > 0) {
-                    query = 'UPDATE users SET dateofbirth = ' + `'${birthday}' WHERE identifier = '${steam}'`
-                    result = await GameDB.execute(query)
-                    if (result) {
-                        await interaction.reply('Geburtstag erfolgreich geändert')
-                    } else {
-                        await interaction.reply('Es konnte kein Geburtstag geändert werden!')
-                    }
+        const { options } = interaction
+        const birthday = options.getString('datum')
+        const steamID = options.getString('steam')
+        const embed = this.getEmbedTemplate(interaction)
+        if (!birthday) {
+            await interaction.reply({
+                content: 'Es wurde kein Geburtstag angegeben!',
+                ephemeral: true,
+            })
+            return
+        }
+        if (!steamID) {
+            await interaction.reply({
+                content: 'Es wurde keine SteamID angegeben!',
+                ephemeral: true,
+            })
+            return
+        }
+        const vPlayer = await Player.validatePlayer(steamID)
+        if (!vPlayer) {
+            await interaction.reply({
+                content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
+                ephemeral: true,
+            })
+            return
+        }
+
+        try {
+            if (new RegExp(/^\d{1,2}\.\d{1,2}\.\d{4}$/).test(birthday)) {
+                const [res] = await GameDB.execute<ResultSetHeader>(
+                    `UPDATE users SET dateofbirth = ? WHERE identifier = ?`,
+                    [birthday, vPlayer.identifiers.steam],
+                )
+                if (res.affectedRows > 0) {
+                    embed.setTitle('Geburtstag geändert')
+                    embed.setColor(EmbedColors.SUCCESS)
+                    embed.setDescription(
+                        `Der Geburtstag des Spielers **${vPlayer.playerdata.fullname}** (${vPlayer.identifiers.steam}) wurde auf **${birthday}** geändert.`,
+                    )
+                    await interaction.reply({ embeds: [embed] })
                 } else {
-                    await interaction.reply('Es konnte kein Nutzer gefunden werden!')
+                    embed.setTitle('Geburtstag nicht geändert')
+                    embed.setColor(EmbedColors.ALERT)
+                    embed.setDescription(
+                        `Der Geburtstag des Spielers **${vPlayer.playerdata.fullname}** (${vPlayer.identifiers.steam}) konnte nicht auf **${birthday}** geändert werden.`,
+                    )
+                    await interaction.reply({ embeds: [embed] })
                 }
-            } catch (error) {
+            } else {
                 await interaction.reply({
-                    content: 'Es ist ein Fehler aufgetreten!',
+                    content: 'Das Format des Geburtstags ist nicht korrekt!',
                     ephemeral: true,
                 })
             }
+        } catch (error) {
+            LogManager.error(error)
+            await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true })
         }
     }
 }
