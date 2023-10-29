@@ -10,13 +10,16 @@ export class RestartDropbox extends Command {
     constructor() {
         super()
         this.RunEnvironment = EENV.PRODUCTION
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_TEBEX]
+        this.AllowedChannels = [
+            Config.Discord.Channel.WHOIS_TESTI,
+            Config.Discord.Channel.WHOIS_TEBEX,
+        ]
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
             Config.Discord.Groups.IC_SUPERADMIN,
-		]
-		this.AllowedUsers = [Config.Discord.Users.List.EFORCE, Config.Discord.Users.List.SCHLAUCHI]
+        ]
+        this.AllowedUsers = [Config.Discord.Users.List.EFORCE, Config.Discord.Users.List.SCHLAUCHI]
         this.IsBetaCommand = true
         RegisterCommand(
             new SlashCommandBuilder()
@@ -24,14 +27,12 @@ export class RestartDropbox extends Command {
                 .setDescription('Startet die Tebexausgabe neu'),
             this,
         )
-        this.IsBetaCommand = true
     }
+
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction
-        const embed = this.getEmbedTemplate(interaction)
         try {
-			let response = await RconClient.sendCommand('restart immo_store')
-			LogManager.log(response)
+            let response = await RconClient.sendCommand('restart immo_store')
+            LogManager.log(response)
             await interaction.reply({
                 content: 'Neustart wurde ausgelöst!',
                 ephemeral: true,
@@ -39,7 +40,9 @@ export class RestartDropbox extends Command {
         } catch (error) {
             console.log(error)
             await interaction.reply({
-                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(error)}\`\`\``,
+                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(
+                    error,
+                )}\`\`\``,
                 ephemeral: true,
             })
         }
