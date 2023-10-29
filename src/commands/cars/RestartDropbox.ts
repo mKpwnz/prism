@@ -10,21 +10,16 @@ export class RestartDropbox extends Command {
     constructor() {
         super()
         this.RunEnvironment = EENV.PRODUCTION
-        this.AllowedChannels = [
-            Config.Discord.Channel.WHOIS_TESTI,
-            Config.Discord.Channel.WHOIS_TEBEX,
-        ]
+        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_TEBEX]
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
             Config.Discord.Groups.IC_SUPERADMIN,
         ]
-        this.AllowedUsers = [Config.Discord.Users.List.EFORCE, Config.Discord.Users.List.SCHLAUCHI]
+        this.AllowedUsers = [Config.Discord.Users.List.SCHLAUCHI]
         this.IsBetaCommand = true
         RegisterCommand(
-            new SlashCommandBuilder()
-                .setName('restartdropbox')
-                .setDescription('Startet die Tebexausgabe neu'),
+            new SlashCommandBuilder().setName('restartdropbox').setDescription('Startet die Tebexausgabe neu'),
             this,
         )
     }
@@ -42,9 +37,7 @@ export class RestartDropbox extends Command {
         } catch (error) {
             console.log(error)
             await interaction.reply({
-                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(
-                    error,
-                )}\`\`\``,
+                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(error)}\`\`\``,
                 ephemeral: true,
             })
         }
