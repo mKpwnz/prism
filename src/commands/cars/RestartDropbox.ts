@@ -30,12 +30,14 @@ export class RestartDropbox extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+        const embed = this.getEmbedTemplate(interaction)
         try {
-            let response = await RconClient.sendCommand('restart immo_store')
+            let response = await RconClient.sendCommand('ensure immo_store')
             LogManager.log(response)
+            embed.setTitle(`Dropbox neugestartet`)
+            embed.setDescription(`Dropbox wurde neugestartet.`)
             await interaction.reply({
-                content: 'Neustart wurde ausgelöst!',
-                ephemeral: true,
+                embeds: [embed],
             })
         } catch (error) {
             console.log(error)
