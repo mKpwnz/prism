@@ -8,6 +8,7 @@ import { Client, Events, IntentsBitField } from 'discord.js'
 import { CronManager } from '@utils/CronManager'
 import { CronJob } from 'cron'
 import { CronJobs } from '@controller/CronJobs.controller'
+import { BotDB } from '@sql/Database'
 LogManager.configure()
 
 const token = process.env.NODE_ENV === 'production' ? process.env.DISCORD_TOKEN_PROD : process.env.DISCORD_TOKEN_DEV
@@ -30,9 +31,13 @@ EventHandler.init(client)
 client.login(token)
 client.once(Events.ClientReady, async () => {
     new ExpressApp()
-    CronManager.initCronManager({
-        'fraktionen.finance': new CronJob('0 0 */8 * * *', () => CronJobs.logSocietyFinance()),
-    })
+    if (process.env.NODE_ENV === 'production') {
+        CronManager.initCronManager({
+            'fraktionen.finance': new CronJob('0 0 */8 * * *', () => CronJobs.logSocietyFinance()),
+        })
+    } else {
+        LogManager.debug('CronManager is disabled in DEV mode')
+    }
 })
 
 export const BotClient = client

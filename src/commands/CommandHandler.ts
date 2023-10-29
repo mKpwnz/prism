@@ -6,7 +6,7 @@ import { ValidateTrunk } from './cars'
 import { SchufaCheck } from './housing'
 import { Nvhx, NvhxBan } from './nvhx'
 import { CheckImageOwner } from './phone'
-import { BotStats, CachePerformance, Help, Ping, ServerStatus, Wahl } from './system'
+import { BotStats, CachePerformance, Help, Ping, ServerStatus, TestCommand, Wahl } from './system'
 import {
     ChangeBirthday,
     Fraksperre,
@@ -82,6 +82,7 @@ export class CommandHandler {
         // new Versicherung()
         new BotStats()
         new CachePerformance()
+        new TestCommand()
         LogManager.info('CommandManager: All commands initialized!')
         LogManager.info('Commands [PROD]:', CommandHandler.prodCommands)
         LogManager.info('Commands [DEV]:', CommandHandler.devCommands)
