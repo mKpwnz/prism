@@ -23,7 +23,7 @@ export class RestartDropbox extends Command {
         this.IsBetaCommand = true
         RegisterCommand(
             new SlashCommandBuilder()
-                .setName('restartDropbox')
+                .setName('restartdropbox')
                 .setDescription('Startet die Tebexausgabe neu'),
             this,
         )
