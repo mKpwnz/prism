@@ -33,6 +33,19 @@ export interface IPhoneDarkchatAccounts extends RowDataPacket {
     username: string
 }
 
+export interface IPhoneDarkchatMessages extends RowDataPacket {
+    id: number
+    channel: string
+    sender: string
+    content: string | null
+    timestamp: Date
+}
+
+export interface IPhoneDarkchatMembers extends RowDataPacket {
+    channel_name: string
+    username: string
+}
+
 /**
  * @description
  * @author mKpwnz
