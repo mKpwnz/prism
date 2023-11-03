@@ -129,7 +129,7 @@ export interface IPhoneTinderAccounts extends RowDataPacket {
     phone_number: string
     photos: string | null
     bio: string | null
-    dob: Date
+    dob: string
     is_male: boolean
     interested_men: boolean
     interested_women: boolean
