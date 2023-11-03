@@ -10,7 +10,7 @@ import { RowDataPacket } from 'mysql2'
  */
 export interface IPhone extends RowDataPacket {
     id: string
-    phone_number: number
+    phone_number: string
     name: string | null
     pin: string | null
     face_id: string | null
@@ -67,7 +67,7 @@ export interface IPhoneInstagramAccounts extends RowDataPacket {
 
 export interface IPhoneInstagramPosts extends RowDataPacket {
     id: string
-    media: string
+    media: string | null
     caption: string
     like_count: number
     comment_count: number
@@ -93,18 +93,18 @@ export interface IPhoneOwnerResponse extends RowDataPacket {
 
 export interface IPhoneTiktokAccounts extends RowDataPacket {
     name: string
-    bio: string
-    avatar: string
+    bio: string | null
+    avatar: string | null
     username: string
     password: string
-    verified: boolean
+    verified: boolean | null
     follower_count: number
     following_count: number
     like_count: number
     video_count: number
-    twitter: string
-    instagram: string
-    show_likes: boolean
+    twitter: string | null
+    instagram: string | null
+    show_likes: boolean | null
     phone_number: string
     date_joined: Date
 }
@@ -113,13 +113,67 @@ export interface IPhoneTiktokVideos extends RowDataPacket {
     id: string
     username: string
     src: string
-    caption: string
-    metadata: string
-    music: string
+    caption: string | null
+    metadata: string | null
+    music: string | null
     likes: number
     comments: number
     views: number
     saves: number
-    pinned_comment: string
+    pinned_comment: string | null
+    timestamp: Date
+}
+
+export interface IPhoneTinderAccounts extends RowDataPacket {
+    name: string
+    phone_number: string
+    photos: string | null
+    bio: string | null
+    dob: Date
+    is_male: boolean
+    interested_men: boolean
+    interested_women: boolean
+}
+
+export interface IPhoneTwitterAccounts extends RowDataPacket {
+    display_name: string
+    username: string
+    password: string
+    phone_number: string
+    bio: string | null
+    profile_image: string | null
+    profile_header: string | null
+    pinned_tweet: string | null
+    verified: boolean | null
+    follower_count: number
+    following_count: number
+    date_joined: Date
+}
+
+export interface IPhoneTwitterTweets extends RowDataPacket {
+    id: string
+    username: string
+    content: string | null
+    attachments: string | null
+    reply_to: string | null
+    like_count: number | null
+    reply_count: number | null
+    retweet_count: number | null
+    timestamp: Date
+}
+
+export interface IPhonePhotos extends RowDataPacket {
+    phone_number: string
+    link: string
+    is_video: boolean | null
+    size: number
+    timestamp: Date
+}
+
+export interface IPhoneNotes extends RowDataPacket {
+    id: string
+    phone_number: string
+    title: string
+    content: string
     timestamp: Date
 }

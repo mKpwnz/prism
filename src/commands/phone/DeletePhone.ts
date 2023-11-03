@@ -11,8 +11,13 @@ import {
     IPhoneDarkchatMessages,
     IPhoneInstagramAccounts,
     IPhoneInstagramPosts,
+    IPhoneNotes,
+    IPhonePhotos,
     IPhoneTiktokAccounts,
     IPhoneTiktokVideos,
+    IPhoneTinderAccounts,
+    IPhoneTwitterAccounts,
+    IPhoneTwitterTweets,
 } from '@sql/schema/Phone.schema'
 import LogManager from '@utils/Logger'
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
@@ -58,10 +63,17 @@ export class DeletePhone extends Command {
             'SELECT * FROM phone_phones WHERE id = ? LIMIT 1',
             [steamid],
         )
+        if (phonequery.length === 0) {
+            return Error('No Phone found')
+        }
         let phone = phonequery[0]
-        let darkchatAnswer = await this.deleteDarkchat(steamid)
-        let instagramAnswer = await this.deleteInstagram(steamid)
-        let tiktokAnswer = await this.deleteTiktok(steamid)
+        let darkchatAnswer = await this.deleteDarkchat(phone.phone_number)
+        let instagramAnswer = await this.deleteInstagram(phone.phone_number)
+        let tiktokAnswer = await this.deleteTiktok(phone.phone_number)
+        let tinderAnswer = await this.deleteTinder(phone.phone_number)
+        let twitterAnswer = await this.deleteTwitter(phone.phone_number)
+        let photosAnswer = await this.deletePhotos(phone.phone_number)
+        let notesAnswer = await this.deleteNotes(phone.phone_number)
         
         
         insertCollection.push('INSERT INTO phone_phones (id, phone_number, name, pin, face_id, settings, is_setup, assigned, battery) VALUES (' + phone.id + ', ' + phone.phone_number + ', ' + phone.name + ', ' + phone.pin + ', ' + phone.face_id + ', ' + phone.settings + ', ' + phone.is_setup + ', ' + phone.assinged + ', ' + phone.battery + ');')
@@ -74,7 +86,18 @@ export class DeletePhone extends Command {
         if (typeof tiktokAnswer === 'string') {
             insertCollection.push(tiktokAnswer)
         }
-
+        if (typeof tinderAnswer === 'string') {
+            insertCollection.push(tinderAnswer)
+        }
+        if (typeof twitterAnswer === 'string') {
+            insertCollection.push(twitterAnswer)
+        }
+        if (typeof photosAnswer === 'string') {
+            insertCollection.push(photosAnswer)
+        }
+        if (typeof notesAnswer === 'string') {
+            insertCollection.push(notesAnswer)
+        }
         return insertCollection.join('\n')
     }
 
@@ -180,7 +203,7 @@ export class DeletePhone extends Command {
             return returnstring.join('\n')
         } catch (error) {
             LogManager.error(error)
-            return Error('Error while deleting Darkchat Account')
+            return Error('Error while deleting Instagram Account')
         }
     }
 
@@ -232,7 +255,146 @@ export class DeletePhone extends Command {
             return returnstring.join('\n')
         } catch (error) {
             LogManager.error(error)
-            return Error('Error while deleting Darkchat Account')
+            return Error('Error while deleting Tiktok Account')
+        }
+    }
+
+    async deleteTinder(phonenumber: string): Promise<string | Error> {
+        try {
+            // Query Data, save Data as Insert String and Delete
+            let [query] = await GameDB.query<IPhoneTinderAccounts[]>(
+                'SELECT * FROM phone_tinder_accounts WHERE phone_number = ? LIMIT 1',
+                [phonenumber],
+            )
+            let returnstring: String[] = []
+            if(query.length === 0) {
+                return '#No Tinder Account found'
+            }
+            let account = query[0]
+            //Delete Account and Messages
+            await GameDB.execute('DELETE FROM phone_tinder_accounts WHERE phone_number = ?', [
+                phonenumber,
+            ])
+            return 'INSERT INTO phone_tinder_accounts (name, phone_number, photos, bio, dob, is_male, interested_men, interested_women) VALUES (' +
+            account.name +
+            ', ' +
+            account.phone_number +
+            ', ' +
+            account.photos + ', ' + account.bio + ', ' + account.dob + ', ' + account.is_male + ', ' + account.interested_men + ', ' + account.interested_women + 
+            ');'
+        } catch (error) {
+            LogManager.error(error)
+            return Error('Error while deleting Tinder Account')
+        }
+    }
+
+    async deleteTwitter(phonenumber: string): Promise<string | Error> {
+        try {
+            // Query Data, save Data as Insert String and Delete
+            let [query] = await GameDB.query<IPhoneTwitterAccounts[]>(
+                'SELECT * FROM phone_twitter_accounts WHERE phone_number = ? LIMIT 1',
+                [phonenumber],
+            )
+            let returnstring: String[] = []
+            if(query.length === 0) {
+                return '#No Twitter Account found'
+            }
+            let account = query[0]
+            returnstring.push(
+                'INSERT INTO phone_twitter_accounts (display_name, username, password, phone_number, bio, profile_image, profile_header, pinned_tweet, verified, follower_count, following_count, date_joined) VALUES (' +
+                    account.displayname +
+                    ', ' +
+                    account.username +
+                    ', ' +
+                    account.password + ', ' + account.phone_number + ', ' + account.bio + ', ' + account.profile_image + ', ' + account.profile_header + ', ' + account.pinned_tweet + ', ' + account.verified + ', ' + account.follower_count + ', ' + account.following_count + ', ' + account.date_joined +
+                    ');',
+            )
+            let [tweets] = await GameDB.query<IPhoneTwitterTweets[]>(
+                'SELECT * FROM phone_twitter_tweets WHERE username = ?',
+                [account.username],
+            )
+            if (tweets.length === 0) {
+                await GameDB.execute('DELETE FROM phone_twitter_tweets WHERE phone_number = ?', [
+                    phonenumber,
+                ])
+                return returnstring.join('\n')
+            }
+            for (let tweet of tweets) {
+                returnstring.push(
+                    'INSERT INTO phone_twitter_tweets (id, username, content, attachments, reply_to, like_count, reply_count, retweet_count, timestamp) VALUES (' +
+                    tweet.id +
+                        ', ' +
+                        tweet.username + ', ' + tweet.content + ', ' + tweet.attachments + ', ' + tweet.reply_to + ', ' + tweet.like_count + ', ' + tweet.reply_count + ', ' + tweet.retweet_count + ', ' + tweet.timestamp +
+                        ');',
+                )
+            }
+            //Delete Account and Messages
+            await GameDB.execute('DELETE FROM phone_twitter_accounts WHERE phone_number = ?', [
+                phonenumber,
+            ])
+            await GameDB.execute('DELETE FROM phone_twitter_tweets WHERE username = ?', [account.username])
+            return returnstring.join('\n')
+        } catch (error) {
+            LogManager.error(error)
+            return Error('Error while deleting Twitter Account')
+        }
+    }
+
+    async deletePhotos(phonenumber: string): Promise<string | Error> {
+        try {
+            let [photos] = await GameDB.query<IPhonePhotos[]>(
+                'SELECT * FROM phone_photos WHERE phone_number = ?',
+                [phonenumber],
+            )
+            let returnstring: String[] = []
+            if(photos.length === 0) {
+                return '#No Photos found'
+            }
+            for (let photo of photos) {
+                returnstring.push(
+                    'INSERT INTO phone_photos (phone_number, link, is_video, size, time_stamp) VALUES (' +
+                    photo.phone_number +
+                        ', ' +
+                        photo.link + ', ' + photo.is_video + ', ' + photo.size + ', ' + photo.timestamp + 
+                        ');',
+                )
+            }
+            await GameDB.execute('DELETE FROM phone_photos WHERE phone_number = ?', [
+                phonenumber,
+            ])
+            return returnstring.join('\n')
+        } catch (error) {
+            LogManager.error(error)
+            return Error('Error while deleting Photos')
+        }
+    }
+
+    async deleteNotes(phonenumber: string): Promise<string | Error> {
+        try {
+            let [notes] = await GameDB.query<IPhoneNotes[]>(
+                'SELECT * FROM phone_notes WHERE phone_number = ?',
+                [phonenumber],
+            )
+            let returnstring: String[] = []
+            if(notes.length === 0) {
+                return '#No Notes found'
+            }
+            for (let note of notes) {
+                returnstring.push(
+                    'INSERT INTO phone_notes (id, phone_number, title, content, timestamp) VALUES (' +
+                    note.id +
+                        ', ' +
+                        note.phone_number + ', ' + note.title + ', ' + note.content + ', ' + note.timestamp + 
+                        ');',
+                )
+            }
+            await GameDB.execute('DELETE FROM phone_photos WHERE phone_number = ?', [
+                phonenumber,
+            ])
+            return returnstring.join('\n')
+        } catch (error) {
+            LogManager.error(error)
+            return Error('Error while deleting Notes')
         }
     }
 
