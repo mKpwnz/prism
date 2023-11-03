@@ -7,6 +7,7 @@ import { RestartDropbox } from './cars/RestartDropbox'
 import { SchufaCheck } from './housing'
 import { Nvhx, NvhxBan } from './nvhx'
 import { CheckImageOwner } from './phone'
+import { DeletePhone } from './phone/DeletePhone'
 import { BotStats, CachePerformance, Help, Ping, ServerStatus, TestCommand, Wahl } from './system'
 import {
     ChangeBirthday,
@@ -59,6 +60,8 @@ export class CommandHandler {
 
         new Nvhx() //Funktionsfähig RCON
         new NvhxBan() //Funktionsfähig RCON
+
+        new DeletePhone()
 
         new ChangeBirthday() //Funktionsfähig
         new Rename() //Funktionsfähig

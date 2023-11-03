@@ -8,7 +8,6 @@ import {
     IPhone,
     IPhoneDarkchatAccounts,
     IPhoneDarkchatMembers,
-    IPhoneDarkchatMessages,
     IPhoneInstagramAccounts,
     IPhoneInstagramPosts,
     IPhoneNotes,
@@ -20,7 +19,8 @@ import {
     IPhoneTwitterTweets,
 } from '@sql/schema/Phone.schema'
 import LogManager from '@utils/Logger'
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
+import { AttachmentBuilder, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
+import { readFileSync, writeFileSync } from 'fs'
 
 export class DeletePhone extends Command {
     constructor() {
@@ -40,8 +40,14 @@ export class DeletePhone extends Command {
             new SlashCommandBuilder()
                 .setName('deletephone')
                 .setDescription('Löscht ein Handy')
-                .addStringOption((option) => option.setName('steamid').setDescription('SteamID').setRequired(true))
-                .addBooleanOption((option) => option.setName('reset').setDescription('Nummer bleibt, Accounts werden gelöscht')),
+                .addStringOption((option) =>
+                    option.setName('steamid').setDescription('SteamID').setRequired(true),
+                )
+                .addBooleanOption((option) =>
+                    option
+                        .setName('reset')
+                        .setDescription('Nummer bleibt, Accounts werden gelöscht'),
+                ),
             this,
         )
     }
@@ -49,12 +55,39 @@ export class DeletePhone extends Command {
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction
         const vPlayer = await Player.validatePlayer(options.getString('steamid') ?? '')
+        const reset = options.getBoolean('reset') ?? false
         let embed = this.getEmbedTemplate(interaction)
         if (!vPlayer) {
             await interaction.reply('Es konnte kein Spieler mit dieser SteamID gefunden werden!')
             return
         }
-        let phone = await this.deletePhone(vPlayer.identifiers.steam)
+        let phone
+        if (reset) {
+            phone = await this.resetPhone(vPlayer.identifiers.steam)
+        } else {
+            phone = await this.deletePhone(vPlayer.identifiers.steam)
+        }
+        // write phone into file
+        if (typeof phone === 'string') {
+            writeFileSync(vPlayer.identifiers.steam + '.sql', phone)
+            let attachment = new AttachmentBuilder(
+                readFileSync(vPlayer.identifiers.steam + '.sql'),
+                {
+                    name: vPlayer.identifiers.steam + '.sql',
+                },
+            )
+            embed.setTitle('Handy gelöscht')
+            if (reset) {
+                embed.setTitle('Handy zurückgesetzt')
+            }
+            embed.setDescription(
+                'Owner: ' +
+                    vPlayer.steamnames.current +
+                    '\nIdentifier: ' +
+                    vPlayer.identifiers.steam,
+            )
+            await interaction.reply({ embeds: [embed], files: [attachment] })
+        }
     }
 
     async deletePhone(steamid: string): Promise<string | Error> {
@@ -74,9 +107,24 @@ export class DeletePhone extends Command {
         let twitterAnswer = await this.deleteTwitter(phone.phone_number)
         let photosAnswer = await this.deletePhotos(phone.phone_number)
         let notesAnswer = await this.deleteNotes(phone.phone_number)
-        
-        
-        insertCollection.push('INSERT INTO phone_phones (id, phone_number, name, pin, face_id, settings, is_setup, assigned, battery) VALUES (' + phone.id + ', ' + phone.phone_number + ', ' + phone.name + ', ' + phone.pin + ', ' + phone.face_id + ', ' + phone.settings + ', ' + phone.is_setup + ', ' + phone.assinged + ', ' + phone.battery + ');')
+        if (phone.assinged == undefined) {
+            phone.assinged = false
+        }
+
+        insertCollection.push(
+            `INSERT INTO phone_phones (id, phone_number, name, pin, face_id, settings, is_setup, assigned, battery) VALUES (
+                '${phone.id}',
+                '${phone.phone_number}',
+                ${phone.name !== null ? `"${phone.name}"` : 'null'},
+                ${phone.pin !== null ? `'${phone.pin}'` : 'null'},
+                ${phone.face_id !== null ? `'${phone.face_id}'` : 'null'},
+                ${phone.settings !== null ? `'${phone.settings}'` : 'null'},
+                ${phone.is_setup !== null ? phone.is_setup : 'null'},
+                ${phone.assinged !== null ? phone.assinged : 'null'},
+                ${phone.battery}
+            );`,
+        )
+
         if (typeof darkchatAnswer === 'string') {
             insertCollection.push(darkchatAnswer)
         }
@@ -98,11 +146,60 @@ export class DeletePhone extends Command {
         if (typeof notesAnswer === 'string') {
             insertCollection.push(notesAnswer)
         }
+
+        try {
+            await GameDB.execute('DELETE FROM phone_phones WHERE id = ?', [steamid])
+        } catch (error) {
+            LogManager.error(error)
+            return Error('Error while deleting Phone')
+        }
         return insertCollection.join('\n')
     }
 
     async resetPhone(steamid: string): Promise<string | Error> {
-        return Error('Not implemented yet')
+        let insertCollection: string[] = []
+        let [phonequery] = await GameDB.query<IPhone[]>(
+            'SELECT * FROM phone_phones WHERE id = ? LIMIT 1',
+            [steamid],
+        )
+        if (phonequery.length === 0) {
+            return Error('No Phone found')
+        }
+        let phone = phonequery[0]
+        let darkchatAnswer = await this.deleteDarkchat(phone.phone_number)
+        let instagramAnswer = await this.deleteInstagram(phone.phone_number)
+        let tiktokAnswer = await this.deleteTiktok(phone.phone_number)
+        let tinderAnswer = await this.deleteTinder(phone.phone_number)
+        let twitterAnswer = await this.deleteTwitter(phone.phone_number)
+        let photosAnswer = await this.deletePhotos(phone.phone_number)
+        let notesAnswer = await this.deleteNotes(phone.phone_number)
+
+        if (typeof darkchatAnswer === 'string') {
+            insertCollection.push(darkchatAnswer)
+        }
+        if (typeof instagramAnswer === 'string') {
+            insertCollection.push(instagramAnswer)
+        }
+        if (typeof tiktokAnswer === 'string') {
+            insertCollection.push(tiktokAnswer)
+        }
+        if (typeof tinderAnswer === 'string') {
+            insertCollection.push(tinderAnswer)
+        }
+        if (typeof twitterAnswer === 'string') {
+            insertCollection.push(twitterAnswer)
+        }
+        if (typeof photosAnswer === 'string') {
+            insertCollection.push(photosAnswer)
+        }
+        if (typeof notesAnswer === 'string') {
+            insertCollection.push(notesAnswer)
+        }
+        await GameDB.execute(
+            `UPDATE phone_phones SET pin = null, face_id = null, settings = '{"apps": [["Phone", "Messages", "Camera", "Photos"], ["Settings", "AppStore", "Notes", "LB_APP_IMMO_WARNING", "LB_APP_IMMO_DISPATCH", "LB_APP_IMMO_GARAGE", "LB_APP_IMMO_BANK"]], "display": {"automatic": false, "theme": "dark", "brightness": 1, "size": 0.8}, "streamerMode": false, "locale": "de", "name": "Harry Hirsch", "doNotDisturb": false, "sound": {"volume": 0.5, "ringtone": "default", "silent": false}, "weather": {"celcius": true}, "time": {"twelveHourClock": false}, "security": {"pinCode": false, "faceId": false}, "airplaneMode": false, "storage": {"total": 128000000, "used": 8576331}, "wallpaper": {"background": "immo_0"}, "notifications": [], "phone": {"showCallerId": true}}', is_setup = 0, assigned = 0, battery = 100 WHERE id = ?`,
+            [steamid],
+        )
+        return insertCollection.join('\n')
     }
 
     async deleteDarkchat(phonenumber: string): Promise<string | Error> {
@@ -113,7 +210,7 @@ export class DeletePhone extends Command {
                 [phonenumber],
             )
             let returnstring: String[] = []
-            if(query.length === 0) {
+            if (query.length === 0) {
                 return '#No Darkchat Account found'
             }
             let account = query[0]
@@ -147,7 +244,9 @@ export class DeletePhone extends Command {
             await GameDB.execute('DELETE FROM phone_darkchat_accounts WHERE phone_number = ?', [
                 phonenumber,
             ])
-            await GameDB.execute('DELETE FROM phone_darkchat_messages WHERE sender = ?', [account.username])
+            await GameDB.execute('DELETE FROM phone_darkchat_messages WHERE sender = ?', [
+                account.username,
+            ])
             return returnstring.join('\n')
         } catch (error) {
             LogManager.error(error)
@@ -163,43 +262,54 @@ export class DeletePhone extends Command {
                 [phonenumber],
             )
             let returnstring: String[] = []
-            if(query.length === 0) {
+            if (query.length === 0) {
                 return '#No Instagram Account found'
             }
             let account = query[0]
             returnstring.push(
-                'INSERT INTO phone_instagram_accounts (displayname, username, password, profile_image, bio, phone_number, verified, date_joined) VALUES (' +
-                    account.displayname +
-                    ', ' +
-                    account.username +
-                    ', ' +
-                    account.password + ', ' + account.profile_image + ', ' + account.bio + ', ' + account.phone_number + ', ' + account.verified + ', ' + account.date_joined +
-                    ');',
+                `INSERT INTO phone_instagram_accounts (displayname, username, password, profile_image, bio, phone_number, verified, date_joined) VALUES (
+                '${account.displayname}',
+                '${account.username}',
+                ${account.password},
+                ${account.profile_image !== null ? `'${account.profile_image}'` : 'null'},
+                ${account.bio !== null ? `'${account.bio}'` : 'null'},
+                ${account.phone_number},
+                ${account.verified !== null ? account.verified : 'null'},
+                '${account.date_joined}'
+                );`,
             )
+
             let [posts] = await GameDB.query<IPhoneInstagramPosts[]>(
                 'SELECT * FROM phone_instagram_posts WHERE username = ?',
                 [account.username],
             )
             if (posts.length === 0) {
-                await GameDB.execute('DELETE FROM phone_instagram_accounts WHERE phone_number = ?', [
-                    phonenumber,
-                ])
+                await GameDB.execute(
+                    'DELETE FROM phone_instagram_accounts WHERE phone_number = ?',
+                    [phonenumber],
+                )
                 return returnstring.join('\n')
             }
             for (let post of posts) {
                 returnstring.push(
-                    'INSERT INTO phone_instagram_posts (id, media, caption, like_count, comment_count, username, timestamp) VALUES (' +
-                        post.id +
-                        ', ' +
-                        post.media + ', ' + post.caption + ', ' + post.like_count + ', ' + post.comment_count + ', ' + post.username + ', ' + post.timestamp +
-                        ');',
+                    `INSERT INTO phone_instagram_posts (id, media, caption, like_count, comment_count, username, timestamp) VALUES (
+                        '${post.id}',
+                        ${post.media !== null ? `'${post.media}'` : 'null'},
+                        '${post.caption}',
+                        ${post.like_count},
+                        ${post.comment_count},
+                        '${post.username}',
+                        '${post.timestamp}'
+                    );`,
                 )
             }
             //Delete Account and Messages
             await GameDB.execute('DELETE FROM phone_instagram_accounts WHERE phone_number = ?', [
                 phonenumber,
             ])
-            await GameDB.execute('DELETE FROM phone_instagram_posts WHERE username = ?', [account.username])
+            await GameDB.execute('DELETE FROM phone_instagram_posts WHERE username = ?', [
+                account.username,
+            ])
             return returnstring.join('\n')
         } catch (error) {
             LogManager.error(error)
@@ -215,19 +325,30 @@ export class DeletePhone extends Command {
                 [phonenumber],
             )
             let returnstring: String[] = []
-            if(query.length === 0) {
+            if (query.length === 0) {
                 return '#No Tiktok Account found'
             }
             let account = query[0]
             returnstring.push(
-                'INSERT INTO phone_tiktok_accounts (name, bio, avatar, username, password, verified, follower_count, following_count, like_count, video_count, twitter, instagram, show_likes, phone_number, date_joined) VALUES (' +
-                    account.name +
-                    ', ' +
-                    account.bio +
-                    ', ' +
-                    account.avatar + ', ' + account.username + ', ' + account.password + ', ' + account.verified + ', ' + account.follower_count + ', ' + account.following_count + ', ' + account.like_count + ', ' + account.video_count + ', ' + account.twitter + ', ' + account.instagram + ', ' + account.show_likes + ', ' + account.phone_number + ', ' + account.date_joined +
-                    ');',
+                `INSERT INTO phone_tiktok_accounts (name, bio, avatar, username, password, verified, follower_count, following_count, like_count, video_count, twitter, instagram, show_likes, phone_number, date_joined) VALUES (
+                '${account.name}',
+                ${account.bio !== null ? `'${account.bio}'` : 'null'},
+                ${account.avatar !== null ? `'${account.avatar}'` : 'null'},
+                '${account.username}',
+                '${account.password}',
+                ${account.verified !== null ? account.verified : 'null'},
+                ${account.follower_count},
+                ${account.following_count},
+                ${account.like_count},
+                ${account.video_count},
+                ${account.twitter !== null ? `'${account.twitter}'` : 'null'},
+                ${account.instagram !== null ? `'${account.instagram}'` : 'null'},
+                ${account.show_likes !== null ? account.show_likes : 'null'},
+                '${account.phone_number}',
+                '${account.date_joined.toISOString()}'
+                );`,
             )
+
             let [videos] = await GameDB.query<IPhoneTiktokVideos[]>(
                 'SELECT * FROM phone_tiktok_videos WHERE username = ?',
                 [account.username],
@@ -240,18 +361,29 @@ export class DeletePhone extends Command {
             }
             for (let video of videos) {
                 returnstring.push(
-                    'INSERT INTO phone_tiktok_videos (id, username, src, caption, metadata, music, likes, comments, views, saves, pinned_comments, timestamp) VALUES (' +
-                    video.id +
-                        ', ' +
-                        video.username + ', ' + video.src + ', ' + video.caption + ', ' + video.metadata + ', ' + video.music + ', ' + video.likes + ', ' + video.comments + ', ' + video.views + ', ' + video.saves + ', ' + video.pinned_comment + ', ' + video.timestamp +
-                        ');',
+                    `INSERT INTO phone_tiktok_videos (id, username, src, caption, metadata, music, likes, comments, views, saves, pinned_comments, timestamp) VALUES (
+                    '${video.id}',
+                    '${video.username}',
+                    '${video.src}',
+                    ${video.caption !== null ? `'${video.caption}'` : 'null'},
+                    ${video.metadata !== null ? `'${video.metadata}'` : 'null'},
+                    ${video.music !== null ? `'${video.music}'` : 'null'},
+                    ${video.likes},
+                    ${video.comments},
+                    ${video.views},
+                    ${video.saves},
+                    ${video.pinned_comment !== null ? `'${video.pinned_comment}'` : 'null'},
+                    '${video.timestamp}'
+                    );`,
                 )
             }
             //Delete Account and Messages
             await GameDB.execute('DELETE FROM phone_tiktok_accounts WHERE phone_number = ?', [
                 phonenumber,
             ])
-            await GameDB.execute('DELETE FROM phone_tiktok_videos WHERE username = ?', [account.username])
+            await GameDB.execute('DELETE FROM phone_tiktok_videos WHERE username = ?', [
+                account.username,
+            ])
             return returnstring.join('\n')
         } catch (error) {
             LogManager.error(error)
@@ -267,7 +399,7 @@ export class DeletePhone extends Command {
                 [phonenumber],
             )
             let returnstring: String[] = []
-            if(query.length === 0) {
+            if (query.length === 0) {
                 return '#No Tinder Account found'
             }
             let account = query[0]
@@ -275,13 +407,16 @@ export class DeletePhone extends Command {
             await GameDB.execute('DELETE FROM phone_tinder_accounts WHERE phone_number = ?', [
                 phonenumber,
             ])
-            return 'INSERT INTO phone_tinder_accounts (name, phone_number, photos, bio, dob, is_male, interested_men, interested_women) VALUES (' +
-            account.name +
-            ', ' +
-            account.phone_number +
-            ', ' +
-            account.photos + ', ' + account.bio + ', ' + account.dob + ', ' + account.is_male + ', ' + account.interested_men + ', ' + account.interested_women + 
-            ');'
+            return `INSERT INTO phone_tinder_accounts (name, phone_number, photos, bio, dob, is_male, interested_men, interested_women) VALUES (
+            '${account.name}',
+            '${account.phone_number}',
+            ${account.photos !== null ? `'${account.photos}'` : 'null'},
+            ${account.bio !== null ? `'${account.bio}'` : 'null'},
+            '${account.dob.toISOString()}',
+            ${account.is_male},
+            ${account.interested_men},
+            ${account.interested_women}
+            );`
         } catch (error) {
             LogManager.error(error)
             return Error('Error while deleting Tinder Account')
@@ -296,43 +431,59 @@ export class DeletePhone extends Command {
                 [phonenumber],
             )
             let returnstring: String[] = []
-            if(query.length === 0) {
+            if (query.length === 0) {
                 return '#No Twitter Account found'
             }
             let account = query[0]
             returnstring.push(
-                'INSERT INTO phone_twitter_accounts (display_name, username, password, phone_number, bio, profile_image, profile_header, pinned_tweet, verified, follower_count, following_count, date_joined) VALUES (' +
-                    account.displayname +
-                    ', ' +
-                    account.username +
-                    ', ' +
-                    account.password + ', ' + account.phone_number + ', ' + account.bio + ', ' + account.profile_image + ', ' + account.profile_header + ', ' + account.pinned_tweet + ', ' + account.verified + ', ' + account.follower_count + ', ' + account.following_count + ', ' + account.date_joined +
-                    ');',
+                `INSERT INTO phone_twitter_accounts (display_name, username, password, phone_number, bio, profile_image, profile_header, pinned_tweet, verified, follower_count, following_count, date_joined) VALUES (
+                '${account.display_name}',
+                '${account.username}',
+                '${account.password}',
+                '${account.phone_number}',
+                ${account.bio !== null ? `'${account.bio}'` : 'null'},
+                ${account.profile_image !== null ? `'${account.profile_image}'` : 'null'},
+                ${account.profile_header !== null ? `'${account.profile_header}'` : 'null'},
+                ${account.pinned_tweet !== null ? `'${account.pinned_tweet}'` : 'null'},
+                ${account.verified !== null ? account.verified : 'null'},
+                ${account.follower_count},
+                ${account.following_count},
+                '${account.date_joined.toISOString()}'
+                );`,
             )
+
             let [tweets] = await GameDB.query<IPhoneTwitterTweets[]>(
                 'SELECT * FROM phone_twitter_tweets WHERE username = ?',
                 [account.username],
             )
             if (tweets.length === 0) {
-                await GameDB.execute('DELETE FROM phone_twitter_tweets WHERE phone_number = ?', [
-                    phonenumber,
+                await GameDB.execute('DELETE FROM phone_twitter_tweets WHERE username = ?', [
+                    account.username,
                 ])
                 return returnstring.join('\n')
             }
             for (let tweet of tweets) {
                 returnstring.push(
-                    'INSERT INTO phone_twitter_tweets (id, username, content, attachments, reply_to, like_count, reply_count, retweet_count, timestamp) VALUES (' +
-                    tweet.id +
-                        ', ' +
-                        tweet.username + ', ' + tweet.content + ', ' + tweet.attachments + ', ' + tweet.reply_to + ', ' + tweet.like_count + ', ' + tweet.reply_count + ', ' + tweet.retweet_count + ', ' + tweet.timestamp +
-                        ');',
+                    `INSERT INTO phone_twitter_tweets (id, username, content, attachments, reply_to, like_count, reply_count, retweet_count, timestamp) VALUES (
+                    '${tweet.id}',
+                    '${tweet.username}',
+                    ${tweet.content !== null ? `'${tweet.content}'` : 'null'},
+                    ${tweet.attachments !== null ? `'${tweet.attachments}'` : 'null'},
+                    ${tweet.reply_to !== null ? `'${tweet.reply_to}'` : 'null'},
+                    ${tweet.like_count !== null ? tweet.like_count : 'null'},
+                    ${tweet.reply_count !== null ? tweet.reply_count : 'null'},
+                    ${tweet.retweet_count !== null ? tweet.retweet_count : 'null'},
+                    '${tweet.timestamp}'
+                    );`,
                 )
             }
             //Delete Account and Messages
             await GameDB.execute('DELETE FROM phone_twitter_accounts WHERE phone_number = ?', [
                 phonenumber,
             ])
-            await GameDB.execute('DELETE FROM phone_twitter_tweets WHERE username = ?', [account.username])
+            await GameDB.execute('DELETE FROM phone_twitter_tweets WHERE username = ?', [
+                account.username,
+            ])
             return returnstring.join('\n')
         } catch (error) {
             LogManager.error(error)
@@ -347,21 +498,21 @@ export class DeletePhone extends Command {
                 [phonenumber],
             )
             let returnstring: String[] = []
-            if(photos.length === 0) {
+            if (photos.length === 0) {
                 return '#No Photos found'
             }
             for (let photo of photos) {
                 returnstring.push(
-                    'INSERT INTO phone_photos (phone_number, link, is_video, size, time_stamp) VALUES (' +
-                    photo.phone_number +
-                        ', ' +
-                        photo.link + ', ' + photo.is_video + ', ' + photo.size + ', ' + photo.timestamp + 
-                        ');',
+                    `INSERT INTO phone_photos (phone_number, link, is_video, size, timestamp) VALUES (
+                    '${photo.phone_number}',
+                    '${photo.link}',
+                    ${photo.is_video !== null ? photo.is_video : 'null'},
+                    ${photo.size},
+                    '${photo.timestamp}'
+                    );`,
                 )
             }
-            await GameDB.execute('DELETE FROM phone_photos WHERE phone_number = ?', [
-                phonenumber,
-            ])
+            await GameDB.execute('DELETE FROM phone_photos WHERE phone_number = ?', [phonenumber])
             return returnstring.join('\n')
         } catch (error) {
             LogManager.error(error)
@@ -376,26 +527,25 @@ export class DeletePhone extends Command {
                 [phonenumber],
             )
             let returnstring: String[] = []
-            if(notes.length === 0) {
+            if (notes.length === 0) {
                 return '#No Notes found'
             }
             for (let note of notes) {
                 returnstring.push(
-                    'INSERT INTO phone_notes (id, phone_number, title, content, timestamp) VALUES (' +
-                    note.id +
-                        ', ' +
-                        note.phone_number + ', ' + note.title + ', ' + note.content + ', ' + note.timestamp + 
-                        ');',
+                    `INSERT INTO phone_notes (id, phone_number, title, content, timestamp) VALUES (
+                    '${note.id}',
+                    '${note.phone_number}',
+                    '${note.title}',
+                    '${note.content}',
+                    '${note.timestamp}'
+                    );`,
                 )
             }
-            await GameDB.execute('DELETE FROM phone_photos WHERE phone_number = ?', [
-                phonenumber,
-            ])
+            await GameDB.execute('DELETE FROM phone_photos WHERE phone_number = ?', [phonenumber])
             return returnstring.join('\n')
         } catch (error) {
             LogManager.error(error)
             return Error('Error while deleting Notes')
         }
     }
-
 }

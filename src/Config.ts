@@ -28,7 +28,9 @@ const Config = {
                 EFORCE: '418762151881211907',
                 SCHLAUCHI: '621081555804094484',
             },
-            GlobalBlocked: [],
+            GlobalBlocked: [
+                '487678405412782082', // Justim
+            ],
             GlobalWhitelist: [
                 '388818838189375491', // Sparta
                 '548588225455849483', // Rigu
