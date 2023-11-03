@@ -275,7 +275,7 @@ export class DeletePhone extends Command {
                 ${account.bio !== null ? `'${account.bio}'` : 'null'},
                 ${account.phone_number},
                 ${account.verified !== null ? account.verified : 'null'},
-                '${account.date_joined}'
+                '${this.formatTimestamp(account.date_joined)}'
                 );`,
             )
 
@@ -345,7 +345,7 @@ export class DeletePhone extends Command {
                 ${account.instagram !== null ? `'${account.instagram}'` : 'null'},
                 ${account.show_likes !== null ? account.show_likes : 'null'},
                 '${account.phone_number}',
-                '${account.date_joined.toISOString()}'
+                '${this.formatTimestamp(account.date_joined)}'
                 );`,
             )
 
@@ -412,7 +412,7 @@ export class DeletePhone extends Command {
             '${account.phone_number}',
             ${account.photos !== null ? `'${account.photos}'` : 'null'},
             ${account.bio !== null ? `'${account.bio}'` : 'null'},
-            '${account.dob.toISOString()}',
+            '${account.dob}',
             ${account.is_male},
             ${account.interested_men},
             ${account.interested_women}
@@ -448,7 +448,7 @@ export class DeletePhone extends Command {
                 ${account.verified !== null ? account.verified : 'null'},
                 ${account.follower_count},
                 ${account.following_count},
-                '${account.date_joined.toISOString()}'
+                '${this.formatTimestamp(account.date_joined)}'
                 );`,
             )
 
