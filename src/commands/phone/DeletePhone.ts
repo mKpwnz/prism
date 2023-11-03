@@ -299,7 +299,7 @@ export class DeletePhone extends Command {
                         ${post.like_count},
                         ${post.comment_count},
                         '${post.username}',
-                        '${post.timestamp}'
+                        '${this.formatTimestamp(post.timestamp)}'
                     );`,
                 )
             }
@@ -373,7 +373,7 @@ export class DeletePhone extends Command {
                     ${video.views},
                     ${video.saves},
                     ${video.pinned_comment !== null ? `'${video.pinned_comment}'` : 'null'},
-                    '${video.timestamp}'
+                    '${this.formatTimestamp(video.timestamp)}'
                     );`,
                 )
             }
@@ -473,7 +473,7 @@ export class DeletePhone extends Command {
                     ${tweet.like_count !== null ? tweet.like_count : 'null'},
                     ${tweet.reply_count !== null ? tweet.reply_count : 'null'},
                     ${tweet.retweet_count !== null ? tweet.retweet_count : 'null'},
-                    '${tweet.timestamp}'
+                    '${this.formatTimestamp(tweet.timestamp)}'
                     );`,
                 )
             }
@@ -508,7 +508,7 @@ export class DeletePhone extends Command {
                     '${photo.link}',
                     ${photo.is_video !== null ? photo.is_video : 'null'},
                     ${photo.size},
-                    '${photo.timestamp}'
+                    '${this.formatTimestamp(photo.timestamp)}'
                     );`,
                 )
             }
@@ -537,7 +537,7 @@ export class DeletePhone extends Command {
                     '${note.phone_number}',
                     '${note.title}',
                     '${note.content}',
-                    '${note.timestamp}'
+                    '${this.formatTimestamp(note.timestamp)}'
                     );`,
                 )
             }
@@ -547,5 +547,16 @@ export class DeletePhone extends Command {
             LogManager.error(error)
             return Error('Error while deleting Notes')
         }
+    }
+
+    formatTimestamp(timestamp: Date): string {
+        const year = timestamp.getFullYear()
+        const month = (timestamp.getMonth() + 1).toString().padStart(2, '0') // Monate sind nullbasiert
+        const day = timestamp.getDate().toString().padStart(2, '0')
+        const hours = timestamp.getHours().toString().padStart(2, '0')
+        const minutes = timestamp.getMinutes().toString().padStart(2, '0')
+        const seconds = timestamp.getSeconds().toString().padStart(2, '0')
+
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
     }
 }
