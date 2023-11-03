@@ -191,7 +191,9 @@ export class Helper {
         itemName = itemName.toLowerCase()
         itemName = '%' + itemName + '%'
         try {
-            let [item] = await GameDB.query<IItem[]>('SELECT * FROM items WHERE name LIKE ?', [itemName])
+            let [item] = await GameDB.query<IItem[]>('SELECT * FROM items WHERE name LIKE ?', [
+                itemName,
+            ])
             if (item.length > 0) {
                 return item[0].name
             }
@@ -215,7 +217,9 @@ export class Helper {
     static async doesItemExists(itemName: string): Promise<boolean> {
         itemName = itemName.toLowerCase()
         try {
-            let [item] = await GameDB.query<IItem[]>('SELECT * FROM items WHERE name = ?', [itemName])
+            let [item] = await GameDB.query<IItem[]>('SELECT * FROM items WHERE name = ?', [
+                itemName,
+            ])
             if (item.length > 0) {
                 return true
             }
