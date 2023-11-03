@@ -11,6 +11,8 @@ import {
     IPhoneDarkchatMessages,
     IPhoneInstagramAccounts,
     IPhoneInstagramPosts,
+    IPhoneTiktokAccounts,
+    IPhoneTiktokVideos,
 } from '@sql/schema/Phone.schema'
 import LogManager from '@utils/Logger'
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
@@ -59,6 +61,7 @@ export class DeletePhone extends Command {
         let phone = phonequery[0]
         let darkchatAnswer = await this.deleteDarkchat(steamid)
         let instagramAnswer = await this.deleteInstagram(steamid)
+        let tiktokAnswer = await this.deleteTiktok(steamid)
         
         
         insertCollection.push('INSERT INTO phone_phones (id, phone_number, name, pin, face_id, settings, is_setup, assigned, battery) VALUES (' + phone.id + ', ' + phone.phone_number + ', ' + phone.name + ', ' + phone.pin + ', ' + phone.face_id + ', ' + phone.settings + ', ' + phone.is_setup + ', ' + phone.assinged + ', ' + phone.battery + ');')
@@ -67,6 +70,9 @@ export class DeletePhone extends Command {
         }
         if (typeof instagramAnswer === 'string') {
             insertCollection.push(instagramAnswer)
+        }
+        if (typeof tiktokAnswer === 'string') {
+            insertCollection.push(tiktokAnswer)
         }
 
         return insertCollection.join('\n')
@@ -179,7 +185,55 @@ export class DeletePhone extends Command {
     }
 
     async deleteTiktok(phonenumber: string): Promise<string | Error> {
-        return Error('Not implemented yet')
+        try {
+            // Query Data, save Data as Insert String and Delete
+            let [query] = await GameDB.query<IPhoneTiktokAccounts[]>(
+                'SELECT * FROM phone_tiktok_accounts WHERE phone_number = ? LIMIT 1',
+                [phonenumber],
+            )
+            let returnstring: String[] = []
+            if(query.length === 0) {
+                return '#No Tiktok Account found'
+            }
+            let account = query[0]
+            returnstring.push(
+                'INSERT INTO phone_tiktok_accounts (name, bio, avatar, username, password, verified, follower_count, following_count, like_count, video_count, twitter, instagram, show_likes, phone_number, date_joined) VALUES (' +
+                    account.name +
+                    ', ' +
+                    account.bio +
+                    ', ' +
+                    account.avatar + ', ' + account.username + ', ' + account.password + ', ' + account.verified + ', ' + account.follower_count + ', ' + account.following_count + ', ' + account.like_count + ', ' + account.video_count + ', ' + account.twitter + ', ' + account.instagram + ', ' + account.show_likes + ', ' + account.phone_number + ', ' + account.date_joined +
+                    ');',
+            )
+            let [videos] = await GameDB.query<IPhoneTiktokVideos[]>(
+                'SELECT * FROM phone_tiktok_videos WHERE username = ?',
+                [account.username],
+            )
+            if (videos.length === 0) {
+                await GameDB.execute('DELETE FROM phone_tiktok_accounts WHERE phone_number = ?', [
+                    phonenumber,
+                ])
+                return returnstring.join('\n')
+            }
+            for (let video of videos) {
+                returnstring.push(
+                    'INSERT INTO phone_tiktok_videos (id, username, src, caption, metadata, music, likes, comments, views, saves, pinned_comments, timestamp) VALUES (' +
+                    video.id +
+                        ', ' +
+                        video.username + ', ' + video.src + ', ' + video.caption + ', ' + video.metadata + ', ' + video.music + ', ' + video.likes + ', ' + video.comments + ', ' + video.views + ', ' + video.saves + ', ' + video.pinned_comment + ', ' + video.timestamp +
+                        ');',
+                )
+            }
+            //Delete Account and Messages
+            await GameDB.execute('DELETE FROM phone_tiktok_accounts WHERE phone_number = ?', [
+                phonenumber,
+            ])
+            await GameDB.execute('DELETE FROM phone_tiktok_videos WHERE username = ?', [account.username])
+            return returnstring.join('\n')
+        } catch (error) {
+            LogManager.error(error)
+            return Error('Error while deleting Darkchat Account')
+        }
     }
 
 }
