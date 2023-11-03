@@ -65,6 +65,16 @@ export interface IPhoneInstagramAccounts extends RowDataPacket {
     date_joined: Date
 }
 
+export interface IPhoneInstagramPosts extends RowDataPacket {
+    id: string
+    media: string
+    caption: string
+    like_count: number
+    comment_count: number
+    username: string
+    timestamp: Date
+}
+
 /**
  * @description
  * @author mKpwnz
@@ -79,4 +89,37 @@ export interface IPhoneOwnerResponse extends RowDataPacket {
     steamID: string
     phoneNumber: string
     timestamp: string
+}
+
+export interface IPhoneTiktokAccounts extends RowDataPacket {
+    name: string
+    bio: string
+    avatar: string
+    username: string
+    password: string
+    verified: boolean
+    follower_count: number
+    following_count: number
+    like_count: number
+    video_count: number
+    twitter: string
+    instagram: string
+    show_likes: boolean
+    phone_number: string
+    date_joined: Date
+}
+
+export interface IPhoneTiktokVideos extends RowDataPacket {
+    id: string
+    username: string
+    src: string
+    caption: string
+    metadata: string
+    music: string
+    likes: number
+    comments: number
+    views: number
+    saves: number
+    pinned_comment: string
+    timestamp: Date
 }
