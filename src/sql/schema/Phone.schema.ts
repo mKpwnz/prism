@@ -109,6 +109,14 @@ export interface IPhoneTiktokAccounts extends RowDataPacket {
     date_joined: Date
 }
 
+export interface IPhoneTiktokMessages extends RowDataPacket {
+    id: string
+    channel_id: string
+    sender: string
+    content: string
+    timestamp: Date
+}
+
 export interface IPhoneTiktokVideos extends RowDataPacket {
     id: string
     username: string
@@ -133,6 +141,15 @@ export interface IPhoneTinderAccounts extends RowDataPacket {
     is_male: boolean
     interested_men: boolean
     interested_women: boolean
+}
+
+export interface IPhoneTinderMessages extends RowDataPacket {
+    id: string
+    sender: string
+    recipient: string
+    content: string
+    attachments: string | null
+    timestamp: Date
 }
 
 export interface IPhoneTwitterAccounts extends RowDataPacket {
@@ -175,5 +192,26 @@ export interface IPhoneNotes extends RowDataPacket {
     phone_number: string
     title: string
     content: string
+    timestamp: Date
+}
+
+export interface IPhoneMailMessages extends RowDataPacket {
+    id: string
+    recipient: string
+    sender: string
+    subject: string
+    content: string
+    attachments: string | null
+    actions: string | null
+    read: boolean
+    timestamp: Date
+}
+
+export interface IPhoneMessages extends RowDataPacket {
+    id: string
+    channel_id: string
+    sender: string
+    content: string
+    attachments: string | null
     timestamp: Date
 }
