@@ -32,6 +32,7 @@ export class ValidateTrunk extends Command {
             this,
         )
     }
+
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction
         const embed = this.getEmbedTemplate(interaction).setTitle('Validiere Kofferraum')
