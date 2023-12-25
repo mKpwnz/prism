@@ -1,4 +1,4 @@
-import { RowDataPacket } from 'mysql2'
+import { RowDataPacket } from 'mysql2';
 
 /**
  * @description
@@ -9,10 +9,10 @@ import { RowDataPacket } from 'mysql2'
  * @extends {RowDataPacket}
  */
 export interface IElection extends RowDataPacket {
-    id: number
-    name: string
-    job: string | null
-    status: number
-    created: Date
-    updated: Date
+    id: number;
+    name: string;
+    job: string | null;
+    status: number;
+    created: Date;
+    updated: Date;
 }

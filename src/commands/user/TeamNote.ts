@@ -1,16 +1,16 @@
-import { Command } from '@class/Command'
-import { RegisterCommand } from '@commands/CommandHandler'
-import { Player } from '@controller/Player.controller'
-import { EENV } from '@enums/EENV'
-import Config from '@proot/Config'
-import { BotDB } from '@sql/Database'
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
+import { Command } from '@class/Command';
+import { RegisterCommand } from '@commands/CommandHandler';
+import { Player } from '@controller/Player.controller';
+import { EENV } from '@enums/EENV';
+import Config from '@proot/Config';
+import { BotDB } from '@sql/Database';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class TeamNote extends Command {
     constructor() {
-        super()
-        this.RunEnvironment = EENV.PRODUCTION
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
+        super();
+        this.RunEnvironment = EENV.PRODUCTION;
+        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -18,7 +18,7 @@ export class TeamNote extends Command {
             Config.Discord.Groups.IC_HADMIN,
             Config.Discord.Groups.IC_ADMIN,
             Config.Discord.Groups.IC_MOD,
-        ]
+        ];
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('teamnote')
@@ -51,46 +51,46 @@ export class TeamNote extends Command {
                         ),
                 ),
             this,
-        )
-        this.IsBetaCommand = true
+        );
+        this.IsBetaCommand = true;
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         if (interaction.options.getSubcommand() === 'hinzufügen') {
-            await this.addNote(interaction)
+            await this.addNote(interaction);
         } else if (interaction.options.getSubcommand() === 'auflisten') {
-            await this.listNotes(interaction)
+            await this.listNotes(interaction);
         } else if (interaction.options.getSubcommand() === 'anzeigen') {
-            await this.viewNote(interaction)
+            await this.viewNote(interaction);
         } else {
-            await interaction.reply({ content: 'Command nicht gefunden.', ephemeral: true })
+            await interaction.reply({ content: 'Command nicht gefunden.', ephemeral: true });
         }
     }
 
     private async addNote(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction
-        const embed = this.getEmbedTemplate(interaction)
-        const steamid = options.getString('steamid')
-        const note = options.getString('notiz')
+        const { options } = interaction;
+        const embed = this.getEmbedTemplate(interaction);
+        const steamid = options.getString('steamid');
+        const note = options.getString('notiz');
 
         if (!steamid) {
-            embed.setTitle('Teamnote | Fehler')
-            embed.setDescription('Es wurde keine SteamID angegeben.')
-            await interaction.reply({ embeds: [embed] })
-            return
+            embed.setTitle('Teamnote | Fehler');
+            embed.setDescription('Es wurde keine SteamID angegeben.');
+            await interaction.reply({ embeds: [embed] });
+            return;
         }
-        const vPlayer = await Player.validatePlayer(steamid)
+        const vPlayer = await Player.validatePlayer(steamid);
         if (!vPlayer) {
-            embed.setTitle('Teamnote | Fehler')
-            embed.setDescription('Die angegebene SteamID ist ungültig.')
-            await interaction.reply({ embeds: [embed] })
-            return
+            embed.setTitle('Teamnote | Fehler');
+            embed.setDescription('Die angegebene SteamID ist ungültig.');
+            await interaction.reply({ embeds: [embed] });
+            return;
         }
         if (!note) {
-            embed.setTitle('Teamnote | Fehler')
-            embed.setDescription('Es wurde keine Notiz angegeben.')
-            await interaction.reply({ embeds: [embed] })
-            return
+            embed.setTitle('Teamnote | Fehler');
+            embed.setDescription('Es wurde keine Notiz angegeben.');
+            await interaction.reply({ embeds: [embed] });
+            return;
         }
 
         const data = await BotDB.team_notes.create({
@@ -98,10 +98,10 @@ export class TeamNote extends Command {
                 user: vPlayer.identifiers.steam,
                 noterId: interaction.user.id,
                 noterName: interaction.user.username,
-                note: note,
+                note,
             },
-        })
-        embed.setTitle('Teamnote | Hinzugefügt (ID: ' + data.id + ')')
+        });
+        embed.setTitle(`Teamnote | Hinzugefügt (ID: ${data.id})`);
         embed.setFields([
             {
                 name: 'User (IC Name)',
@@ -116,7 +116,7 @@ export class TeamNote extends Command {
             { name: '\u200B', value: '\u200B', inline: true },
             {
                 name: 'Hinzugefügt von',
-                value: data.noterName + ' (' + data.noterId + ')',
+                value: `${data.noterName} (${data.noterId})`,
                 inline: true,
             },
             {
@@ -128,26 +128,27 @@ export class TeamNote extends Command {
                 name: 'Notiz',
                 value: data.note,
             },
-        ])
-        await interaction.reply({ embeds: [embed] })
+        ]);
+        await interaction.reply({ embeds: [embed] });
     }
+
     private async listNotes(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction
-        const embed = this.getEmbedTemplate(interaction)
-        const steamid = options.getString('steamid')
+        const { options } = interaction;
+        const embed = this.getEmbedTemplate(interaction);
+        const steamid = options.getString('steamid');
 
         if (!steamid) {
-            embed.setTitle('Teamnote | Fehler')
-            embed.setDescription('Es wurde keine SteamID angegeben.')
-            await interaction.reply({ embeds: [embed] })
-            return
+            embed.setTitle('Teamnote | Fehler');
+            embed.setDescription('Es wurde keine SteamID angegeben.');
+            await interaction.reply({ embeds: [embed] });
+            return;
         }
-        const vPlayer = await Player.validatePlayer(steamid)
+        const vPlayer = await Player.validatePlayer(steamid);
         if (!vPlayer) {
-            embed.setTitle('Teamnote | Fehler')
-            embed.setDescription('Die angegebene SteamID ist ungültig.')
-            await interaction.reply({ embeds: [embed] })
-            return
+            embed.setTitle('Teamnote | Fehler');
+            embed.setDescription('Die angegebene SteamID ist ungültig.');
+            await interaction.reply({ embeds: [embed] });
+            return;
         }
 
         const data = await BotDB.team_notes.findMany({
@@ -157,13 +158,13 @@ export class TeamNote extends Command {
             orderBy: {
                 created_at: 'desc',
             },
-        })
-        var notes = ''
+        });
+        let notes = '';
         data.slice(0, 5).forEach((note) => {
             notes += `ID: **${note.id}** | Erstellt von: **${
                 note.noterName
-            }** | Erstellt am **${note.created_at.toLocaleString('de-DE')}**\n\`\`\`${note.note}\`\`\`\n`
-        })
+            }** | Erstellt am **${note.created_at.toLocaleString('de-DE')}**\n\`\`\`${note.note}\`\`\`\n`;
+        });
         embed.setDescription(
             `Notizen (${data.length > 5 ? 5 : data.length}/${data.length}) von **${vPlayer.playerdata.fullname}**  (${
                 vPlayer.identifiers.steam
@@ -175,32 +176,33 @@ export class TeamNote extends Command {
                           .join(', ')}**`
                     : ''
             }\n\n${notes}`,
-        )
-        await interaction.reply({ embeds: [embed] })
+        );
+        await interaction.reply({ embeds: [embed] });
     }
+
     private async viewNote(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction
-        const embed = this.getEmbedTemplate(interaction)
-        const id = options.getInteger('id')
+        const { options } = interaction;
+        const embed = this.getEmbedTemplate(interaction);
+        const id = options.getInteger('id');
 
         if (!id) {
-            embed.setTitle('Teamnote | Fehler')
-            embed.setDescription('Es wurde keine ID angegeben.')
-            await interaction.reply({ embeds: [embed] })
-            return
+            embed.setTitle('Teamnote | Fehler');
+            embed.setDescription('Es wurde keine ID angegeben.');
+            await interaction.reply({ embeds: [embed] });
+            return;
         }
         const data = await BotDB.team_notes.findUnique({
             where: {
-                id: id,
+                id,
             },
-        })
+        });
         if (!data) {
-            embed.setTitle('Teamnote | Fehler')
-            embed.setDescription('Die angegebene ID ist ungültig.')
-            await interaction.reply({ embeds: [embed] })
-            return
+            embed.setTitle('Teamnote | Fehler');
+            embed.setDescription('Die angegebene ID ist ungültig.');
+            await interaction.reply({ embeds: [embed] });
+            return;
         }
-        const vPlayer = await Player.validatePlayer(data.user)
+        const vPlayer = await Player.validatePlayer(data.user);
         if (vPlayer) {
             embed.setDescription(
                 `Notizen von **${vPlayer.playerdata.fullname}**  (${vPlayer.identifiers.steam})\n\nID: **${
@@ -208,7 +210,7 @@ export class TeamNote extends Command {
                 }** | Erstellt von: **${data.noterName}** | Erstellt am **${data.created_at.toLocaleString(
                     'de-DE',
                 )}**\n\`\`\`${data.note}\`\`\`\n`,
-            )
+            );
         } else {
             embed.setDescription(
                 `*Die SteamID konnte keinem Nutzer zugewiesen werden!*\n\nNotizen von **${data.user}** \n\nID: **${
@@ -216,8 +218,8 @@ export class TeamNote extends Command {
                 }** | Erstellt von: **${data.noterName}** | Erstellt am **${data.created_at.toLocaleString(
                     'de-DE',
                 )}**\n\`\`\`${data.note}\`\`\`\n`,
-            )
+            );
         }
-        await interaction.reply({ embeds: [embed] })
+        await interaction.reply({ embeds: [embed] });
     }
 }

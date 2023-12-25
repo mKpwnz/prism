@@ -1,20 +1,20 @@
-import { Command } from '@class/Command'
-import { RegisterCommand } from '@commands/CommandHandler'
-import { NvhxData } from '@controller/NvhxData.controller'
-import { EENV } from '@enums/EENV'
-import { ESearchType } from '@enums/ESearchType'
-import Config from '@proot/Config'
-import { BotDB, GameDB } from '@sql/Database'
-import { IFindUser } from '@sql/schema/User.schema'
-import { Helper } from '@utils/Helper'
-import LogManager from '@utils/Logger'
-import { AttachmentBuilder, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
+import { Command } from '@class/Command';
+import { RegisterCommand } from '@commands/CommandHandler';
+import { NvhxData } from '@controller/NvhxData.controller';
+import { EENV } from '@enums/EENV';
+import { ESearchType } from '@enums/ESearchType';
+import Config from '@proot/Config';
+import { BotDB, GameDB } from '@sql/Database';
+import { IFindUser } from '@sql/schema/User.schema';
+import { Helper } from '@utils/Helper';
+import LogManager from '@utils/Logger';
+import { AttachmentBuilder, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class WhoIs extends Command {
     constructor() {
-        super()
-        this.RunEnvironment = EENV.PRODUCTION
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
+        super();
+        this.RunEnvironment = EENV.PRODUCTION;
+        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -22,12 +22,12 @@ export class WhoIs extends Command {
             Config.Discord.Groups.IC_HADMIN,
             Config.Discord.Groups.IC_ADMIN,
             Config.Discord.Groups.IC_MOD,
-        ]
+        ];
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('whois')
                 .setDescription('Suche nach Spielern')
-                //add string option
+                // add string option
                 .setDMPermission(true)
                 .addStringOption((option) =>
                     option.setName('input').setDescription('Identifier des Spielers').setRequired(true),
@@ -56,280 +56,229 @@ export class WhoIs extends Command {
                         ),
                 ),
             this,
-        )
+        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { channel, user, guild } = interaction
-        const identifierValue = interaction.options.get('input')?.value?.toString()
-        const pageSize = 18
-        let page = interaction.options.get('seite')?.value as number
-        let spalte = interaction.options.get('spalte')?.value?.toString()
-        let filter = '\nFilter: '
-        let embed = this.getEmbedTemplate(interaction)
+        const { channel } = interaction;
+        const identifierValue = interaction.options.get('input')?.value?.toString();
+        const pageSize = 18;
+        let page = interaction.options.get('seite')?.value as number;
+        let spalte = interaction.options.get('spalte')?.value?.toString();
+        let filter = '\nFilter: ';
+        const embed = this.getEmbedTemplate(interaction);
         if (identifierValue) {
             if (spalte === undefined || spalte === null) {
-                spalte = ESearchType.ALL
-                filter = ''
+                spalte = ESearchType.ALL;
+                filter = '';
             } else {
-                filter = filter + spalte
+                filter += spalte;
             }
-            const finduser: IFindUser[] = await WhoIs.searchUsers(identifierValue, spalte)
+            const finduser: IFindUser[] = await WhoIs.searchUsers(identifierValue, spalte);
             if (finduser === null) {
-                await interaction.reply({ content: 'User nicht gefunden', ephemeral: true })
+                await interaction.reply({ content: 'User nicht gefunden', ephemeral: true });
             } else {
-                if (page == undefined || page == null) {
-                    page = 1
+                if (page === undefined || page == null) {
+                    page = 1;
                 }
-                let fields = []
-                var bannedEmote = await Helper.getEmote('pbot_banned')
+                const fields = [];
+                const bannedEmote = await Helper.getEmote('pbot_banned');
                 if (finduser.length > 0) {
                     for (let i = pageSize * (page - 1); i < finduser.length; i++) {
-                        let identifier = finduser[i].identifier ? finduser[i].identifier : 'Unbekannt'
-                        let steamId
+                        let steamId;
                         if (finduser[i].identifier) {
-                            const hexString = '0x' + finduser[i].identifier.replace('steam:', '')
+                            const hexString = `0x${finduser[i].identifier.replace('steam:', '')}`;
                             if (/^0x[0-9A-Fa-f]+$/g.test(hexString)) {
-                                steamId = BigInt(hexString)
+                                steamId = BigInt(hexString);
                             } else {
-                                steamId = BigInt(0) // Fallback-Wert, wenn die Zeichenfolge ungültig ist
+                                steamId = BigInt(0); // Fallback-Wert, wenn die Zeichenfolge ungültig ist
                             }
                         } else {
-                            steamId = BigInt(0) // Fallback-Wert, wenn identifier nicht vorhanden ist
+                            steamId = BigInt(0); // Fallback-Wert, wenn identifier nicht vorhanden ist
                         }
 
                         if (fields.length >= pageSize) {
-                            break
+                            break;
                         } else {
-                            let fraksperrestring = ''
+                            let fraksperrestring = '';
                             if (finduser[i].fraksperre) {
-                                let now = Math.floor(Date.now() / 1000)
-                                let expiration = new Date(finduser[i].fraksperre).getTime() / 1000
-                                let diff = expiration - now
+                                const now = Math.floor(Date.now() / 1000);
+                                const expiration = new Date(finduser[i].fraksperre).getTime() / 1000;
+                                const diff = expiration - now;
                                 if (diff > 0) {
-                                    fraksperrestring =
-                                        fraksperrestring +
-                                        '\nFraksperre Verbleibend: ' +
-                                        Helper.secondsToTimeString(diff)
+                                    fraksperrestring = `${fraksperrestring}\nFraksperre Verbleibend: ${Helper.secondsToTimeString(
+                                        diff,
+                                    )}`;
                                 }
                             }
-                            let levelString = ''
+                            let levelString = '';
                             if (finduser[i].crafting_level) {
-                                levelString =
-                                    '\nCrafting Level: ' +
+                                levelString = `\nCrafting Level: ${
                                     (finduser[i].crafting_level - (finduser[i].crafting_level % 100)) / 100
+                                }`;
                             }
-                            var teamNoteCount = await BotDB.team_notes.count({
+                            const teamNoteCount = await BotDB.team_notes.count({
                                 where: {
                                     user: finduser[i].identifier,
                                 },
-                            })
-                            var nvhxBanned = await NvhxData.CheckIfUserIsBanned([
+                            });
+                            const nvhxBanned = await NvhxData.CheckIfUserIsBanned([
                                 finduser[i].identifier,
                                 finduser[i].discord,
-                            ])
+                            ]);
                             fields.push({
                                 name: `${finduser[i].playername} (${finduser[i].name})`,
                                 value:
                                     `${
                                         nvhxBanned ? `${bannedEmote} **NVHX Global Ban Detected** ${bannedEmote}` : ''
                                     }` +
-                                    '\nSteamID: [' +
-                                    finduser[i].identifier +
-                                    '](https://steamid.pro/de/lookup/' +
-                                    steamId +
-                                    ')\nDiscord: ' +
-                                    (finduser[i].discord
-                                        ? '<@' + finduser[i].discord?.replace('discord:', '') + '>'
-                                        : 'Nicht Vorhanden') +
-                                    '\nJob: ' +
-                                    finduser[i].job +
-                                    ' (' +
-                                    finduser[i].job_grade +
-                                    ')\nGroup: ' +
-                                    finduser[i].group +
-                                    '\nIC Name: ' +
-                                    finduser[i].firstname +
-                                    ' ' +
-                                    finduser[i].lastname +
-                                    '\nBank: ' +
-                                    finduser[i].bank.toLocaleString('de-DE') +
-                                    '€\nHand: ' +
-                                    finduser[i].money.toLocaleString('de-DE') +
-                                    '€\nSchwarzgeld: ' +
-                                    finduser[i].black_money.toLocaleString('de-DE') +
-                                    '€\nNummer: ' +
-                                    finduser[i].phone_number +
-                                    '' +
-                                    fraksperrestring +
-                                    levelString +
-                                    `${teamNoteCount > 0 ? '\n**Es ist eine Teamnote vorhanden**' : ''}` +
+                                    `\nSteamID: [${
+                                        finduser[i].identifier
+                                    }](https://steamid.pro/de/lookup/${steamId})\nDiscord: ${
+                                        finduser[i].discord
+                                            ? `<@${finduser[i].discord?.replace('discord:', '')}>`
+                                            : 'Nicht Vorhanden'
+                                    }\nJob: ${finduser[i].job} (${finduser[i].job_grade})\nGroup: ${
+                                        finduser[i].group
+                                    }\nIC Name: ${finduser[i].firstname} ${finduser[i].lastname}\nBank: ${finduser[
+                                        i
+                                    ].bank.toLocaleString('de-DE')}€\nHand: ${finduser[i].money.toLocaleString(
+                                        'de-DE',
+                                    )}€\nSchwarzgeld: ${finduser[i].black_money.toLocaleString('de-DE')}€\nNummer: ${
+                                        finduser[i].phone_number
+                                    }${fraksperrestring}${levelString}${
+                                        teamNoteCount > 0 ? '\n**Es ist eine Teamnote vorhanden**' : ''
+                                    }` +
                                     `\n${fields.length < pageSize - 1 ? '-----' : ''}`,
                                 inline: false,
-                            })
+                            });
                         }
                     }
                 }
 
                 if (fields.length === 0) {
                     await interaction.reply({
-                        content: `Keine Daten für "${identifierValue}"gefunden!` + filter,
+                        content: `Keine Daten für "${identifierValue}"gefunden!${filter}`,
                         ephemeral: true,
-                    })
+                    });
                 } else {
-                    const file = interaction.options.get('export')?.value
+                    const file = interaction.options.get('export')?.value;
                     if (file === true) {
-                        //create JSON File and send it to client
-                        const jsonString = JSON.stringify(finduser, null, 4)
-                        const buffer = Buffer.from(jsonString, 'utf-8')
+                        // create JSON File and send it to client
+                        const jsonString = JSON.stringify(finduser, null, 4);
+                        const buffer = Buffer.from(jsonString, 'utf-8');
                         const attachment = new AttachmentBuilder(buffer, {
-                            name: identifierValue + '.json',
-                        })
+                            name: `${identifierValue}.json`,
+                        });
                         channel?.send({
                             content: `${interaction.user.toString()}`,
                             files: [attachment],
-                        })
+                        });
                         await interaction.reply({
                             content: 'Daten gefunden und im Chat hinterlegt!',
                             ephemeral: true,
-                        })
+                        });
                     } else {
-                        let pageString = ''
+                        let pageString = '';
                         if (finduser.length > pageSize) {
-                            pageString = '\nSeite ' + page + '/' + Math.ceil(finduser.length / pageSize)
+                            pageString = `\nSeite ${page}/${Math.ceil(finduser.length / pageSize)}`;
                         }
-                        let additionalString = ''
-                        if (fields.length == pageSize || page > 1) {
+                        let additionalString = '';
+                        if (fields.length === pageSize || page > 1) {
                             additionalString = `\n${
                                 finduser.length - fields.length
-                            } weitere Ergebnisse sind ausgeblendet!`
+                            } weitere Ergebnisse sind ausgeblendet!`;
                         }
-                        embed.setTitle('Suchergebnisse')
+                        embed.setTitle('Suchergebnisse');
                         embed.setDescription(
-                            `Hier sind ${fields.length}/${finduser.length} Suchergebnisse für "${identifierValue}":${additionalString}` +
-                                pageString,
-                        )
-                        embed.setFields(fields)
+                            `Hier sind ${fields.length}/${finduser.length} Suchergebnisse für "${identifierValue}":${additionalString}${pageString}`,
+                        );
+                        embed.setFields(fields);
                         channel?.send({
                             content: `${interaction.user.toString()}`,
                             embeds: [embed],
-                        })
+                        });
                         await interaction.reply({
                             content: 'Daten gefunden und im Chat hinterlegt!',
                             ephemeral: true,
-                        })
+                        });
                     }
                 }
             }
             // Verarbeiten Sie finduser hier weiter
         } else {
             // Wenn identifierValue null oder undefined ist
-            await interaction.reply('Die Option "identifier" enthält keinen gültigen Wert.')
+            await interaction.reply('Die Option "identifier" enthält keinen gültigen Wert.');
         }
     }
 
     private static async searchUsers(searchText: string, column: string): Promise<IFindUser[]> {
-        let columns = new Map<string, string>([
-            [ESearchType.IDENTIFIER, 'LOWER( users.identifier ) LIKE LOWER( "%' + searchText + '%" )'],
-            [ESearchType.STEAMID, 'LOWER( users.steamid ) LIKE LOWER( "%' + searchText + '%" )'],
-            [ESearchType.LICENSE, 'LOWER( baninfo.`license` ) LIKE LOWER( "%' + searchText + '%" )'],
-            [ESearchType.LIVEID, 'LOWER( baninfo.`liveid` ) LIKE LOWER( "%' + searchText + '%" )'],
-            [ESearchType.XBLID, 'LOWER( baninfo.`xblid` ) LIKE LOWER( "%' + searchText + '%" )'],
-            [ESearchType.DISCORD, 'LOWER( baninfo.`discord` ) LIKE LOWER( "%' + searchText + '%" )'],
-            [ESearchType.PLAYERIP, 'LOWER( baninfo.`playerip` ) LIKE LOWER( "%' + searchText + '%" )'],
-            [ESearchType.NAME, 'LOWER( users.`name` ) LIKE LOWER( "%' + searchText + '%" )'],
-            [ESearchType.PLAYERNAME, 'LOWER( baninfo.playername) LIKE LOWER("%' + searchText + '%")'],
-            [ESearchType.FIRSTNAME, 'LOWER( users.`firstname` ) LIKE LOWER( "%' + searchText + '%" )'],
-            [ESearchType.LASTNAME, 'LOWER( users.`lastname` ) LIKE LOWER( "%' + searchText + '%" )'],
-            [ESearchType.JOB, 'LOWER( users.`job` ) LIKE LOWER( "%' + searchText + '%" )'],
-            [ESearchType.GROUP, 'LOWER( users.`group` ) LIKE LOWER( "%' + searchText + '%" )'],
-            [ESearchType.PHONENUMBER, 'phone_phones.phone_number LIKE "%' + searchText + '%"'],
+        const columns = new Map<string, string>([
+            [ESearchType.IDENTIFIER, `LOWER( users.identifier ) LIKE LOWER( "%${searchText}%" )`],
+            [ESearchType.STEAMID, `LOWER( users.steamid ) LIKE LOWER( "%${searchText}%" )`],
+            [ESearchType.LICENSE, `LOWER( baninfo.\`license\` ) LIKE LOWER( "%${searchText}%" )`],
+            [ESearchType.LIVEID, `LOWER( baninfo.\`liveid\` ) LIKE LOWER( "%${searchText}%" )`],
+            [ESearchType.XBLID, `LOWER( baninfo.\`xblid\` ) LIKE LOWER( "%${searchText}%" )`],
+            [ESearchType.DISCORD, `LOWER( baninfo.\`discord\` ) LIKE LOWER( "%${searchText}%" )`],
+            [ESearchType.PLAYERIP, `LOWER( baninfo.\`playerip\` ) LIKE LOWER( "%${searchText}%" )`],
+            [ESearchType.NAME, `LOWER( users.\`name\` ) LIKE LOWER( "%${searchText}%" )`],
+            [ESearchType.PLAYERNAME, `LOWER( baninfo.playername) LIKE LOWER("%${searchText}%")`],
+            [ESearchType.FIRSTNAME, `LOWER( users.\`firstname\` ) LIKE LOWER( "%${searchText}%" )`],
+            [ESearchType.LASTNAME, `LOWER( users.\`lastname\` ) LIKE LOWER( "%${searchText}%" )`],
+            [ESearchType.JOB, `LOWER( users.\`job\` ) LIKE LOWER( "%${searchText}%" )`],
+            [ESearchType.GROUP, `LOWER( users.\`group\` ) LIKE LOWER( "%${searchText}%" )`],
+            [ESearchType.PHONENUMBER, `phone_phones.phone_number LIKE "%${searchText}%"`],
             [
                 ESearchType.ALL,
-                'LOWER( users.`identifier` ) LIKE (SELECT owned_vehicles.`owner` FROM owned_vehicles WHERE LOWER(owned_vehicles.`plate`) LIKE LOWER("%' +
-                    searchText +
-                    '%") LIMIT 1) OR ' +
-                    'LOWER( users.`steamId` ) LIKE (SELECT owned_vehicles.`owner` FROM owned_vehicles WHERE LOWER(owned_vehicles.`plate`) LIKE LOWER("%' +
-                    searchText +
-                    '%") LIMIT 1) OR ' +
-                    'LOWER( baninfo.`license` ) LIKE LOWER( "%' +
-                    searchText +
-                    '%" ) OR ' +
-                    'LOWER( baninfo.`liveid` ) LIKE LOWER( "%' +
-                    searchText +
-                    '%" ) OR ' +
-                    'LOWER( baninfo.`xblid` ) LIKE LOWER( "%' +
-                    searchText +
-                    '%" ) OR ' +
-                    'LOWER( baninfo.`discord` ) LIKE LOWER( "%' +
-                    searchText +
-                    '%" ) OR ' +
-                    'LOWER( baninfo.`playerip` ) LIKE LOWER( "%' +
-                    searchText +
-                    '%" ) OR ' +
-                    'LOWER( users.`name` ) LIKE LOWER( "%' +
-                    searchText +
-                    '%" ) OR ' +
-                    'LOWER( baninfo.playername) LIKE LOWER("%' +
-                    searchText +
-                    '%") OR ' +
-                    'LOWER( users.identifier ) LIKE LOWER( "%' +
-                    searchText +
-                    '%" ) OR ' +
-                    'LOWER( users.steamId ) LIKE LOWER( "%' +
-                    searchText +
-                    '%" ) OR ' +
-                    'LOWER( users.`firstname` ) LIKE LOWER( "%' +
-                    searchText +
-                    '%" ) OR ' +
-                    'LOWER( users.`lastname` ) LIKE LOWER( "%' +
-                    searchText +
-                    '%" ) OR ' +
-                    'LOWER( users.`job` ) LIKE LOWER( "%' +
-                    searchText +
-                    '%" ) OR ' +
-                    'LOWER( users.`group` ) LIKE LOWER( "%' +
-                    searchText +
-                    '%" ) OR ' +
-                    "LOWER( CONCAT(users.firstname, ' ', users.lastname) ) LIKE LOWER ( \"%" +
-                    searchText +
-                    '%" ) OR ' +
-                    'phone_phones.phone_number LIKE "%' +
-                    searchText +
-                    '%"',
+                `LOWER( users.\`identifier\` ) LIKE (SELECT owned_vehicles.\`owner\` FROM owned_vehicles WHERE LOWER(owned_vehicles.\`plate\`) LIKE LOWER("%${searchText}%") LIMIT 1) OR ` +
+                    `LOWER( users.\`steamId\` ) LIKE (SELECT owned_vehicles.\`owner\` FROM owned_vehicles WHERE LOWER(owned_vehicles.\`plate\`) LIKE LOWER("%${searchText}%") LIMIT 1) OR ` +
+                    `LOWER( baninfo.\`license\` ) LIKE LOWER( "%${searchText}%" ) OR ` +
+                    `LOWER( baninfo.\`liveid\` ) LIKE LOWER( "%${searchText}%" ) OR ` +
+                    `LOWER( baninfo.\`xblid\` ) LIKE LOWER( "%${searchText}%" ) OR ` +
+                    `LOWER( baninfo.\`discord\` ) LIKE LOWER( "%${searchText}%" ) OR ` +
+                    `LOWER( baninfo.\`playerip\` ) LIKE LOWER( "%${searchText}%" ) OR ` +
+                    `LOWER( users.\`name\` ) LIKE LOWER( "%${searchText}%" ) OR ` +
+                    `LOWER( baninfo.playername) LIKE LOWER("%${searchText}%") OR ` +
+                    `LOWER( users.identifier ) LIKE LOWER( "%${searchText}%" ) OR ` +
+                    `LOWER( users.steamId ) LIKE LOWER( "%${searchText}%" ) OR ` +
+                    `LOWER( users.\`firstname\` ) LIKE LOWER( "%${searchText}%" ) OR ` +
+                    `LOWER( users.\`lastname\` ) LIKE LOWER( "%${searchText}%" ) OR ` +
+                    `LOWER( users.\`job\` ) LIKE LOWER( "%${searchText}%" ) OR ` +
+                    `LOWER( users.\`group\` ) LIKE LOWER( "%${searchText}%" ) OR ` +
+                    `LOWER( CONCAT(users.firstname, ' ', users.lastname) ) LIKE LOWER ( "%${searchText}%" ) OR ` +
+                    `phone_phones.phone_number LIKE "%${searchText}%"`,
             ],
-        ])
+        ]);
 
-        let query =
-            'SELECT ' +
-            'baninfo.playername, ' +
-            'baninfo.discord, ' +
-            'users.`name`, ' +
-            'users.identifier, ' +
-            "CONCAT(users.firstname, ' ', users.lastname) as fullname, " +
-            'users.firstname, ' +
-            'users.lastname, ' +
-            'users.`group`, ' +
-            'users.job, ' +
-            'users.job_grade, ' +
-            'phone_phones.phone_number, ' +
-            "cast( json_extract( `users`.`accounts`, '$.bank' ) AS signed ) AS bank, " +
-            "cast( json_extract( `users`.`accounts`, '$.money' ) AS signed ) AS money, " +
-            "cast( json_extract( `users`.`accounts`, '$.black_money' ) AS signed ) AS black_money, " +
-            'users.fraksperre, ' +
-            'users.crafting_level ' +
-            'FROM users ' +
-            'LEFT JOIN baninfo ON users.identifier = baninfo.identifier ' +
-            'JOIN phone_phones ON users.identifier = phone_phones.id ' +
-            'WHERE ' +
-            columns.get(column)
+        const query =
+            `SELECT ` +
+            `baninfo.playername, ` +
+            `baninfo.discord, ` +
+            `users.\`name\`, ` +
+            `users.identifier, ` +
+            `CONCAT(users.firstname, ' ', users.lastname) as fullname, ` +
+            `users.firstname, ` +
+            `users.lastname, ` +
+            `users.\`group\`, ` +
+            `users.job, ` +
+            `users.job_grade, ` +
+            `phone_phones.phone_number, ` +
+            `cast( json_extract( \`users\`.\`accounts\`, '$.bank' ) AS signed ) AS bank, ` +
+            `cast( json_extract( \`users\`.\`accounts\`, '$.money' ) AS signed ) AS money, ` +
+            `cast( json_extract( \`users\`.\`accounts\`, '$.black_money' ) AS signed ) AS black_money, ` +
+            `users.fraksperre, ` +
+            `users.crafting_level ` +
+            `FROM users ` +
+            `LEFT JOIN baninfo ON users.identifier = baninfo.identifier ` +
+            `JOIN phone_phones ON users.identifier = phone_phones.id ` +
+            `WHERE ${columns.get(column)}`;
 
         try {
-            const [rows] = await GameDB.execute(query) // Verwenden Sie await und die execute-Funktion
-            return rows as IFindUser[] // Casten Sie das Ergebnis in das gewünschte Format
+            const [rows] = await GameDB.execute(query); // Verwenden Sie await und die execute-Funktion
+            return rows as IFindUser[]; // Casten Sie das Ergebnis in das gewünschte Format
         } catch (error) {
-            LogManager.error(error)
-            return []
+            LogManager.error(error);
+            return [];
         }
     }
 }

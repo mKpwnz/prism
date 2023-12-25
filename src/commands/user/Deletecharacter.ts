@@ -1,27 +1,27 @@
-import { Command } from '@class/Command'
-import { RegisterCommand } from '@commands/CommandHandler'
-import { EENV } from '@enums/EENV'
-import { Player } from '@controller/Player.controller'
-import { ValidatedPlayer } from '@ctypes/ValidatedPlayer'
-import { ELicenses } from '@enums/ELicenses'
-import Config from '@proot/Config'
-import { GameDB } from '@sql/Database'
-import { IUser } from '@sql/schema/User.schema'
-import LogManager from '@utils/Logger'
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
-import { Lizenz } from './Lizenz'
+import { Command } from '@class/Command';
+import { RegisterCommand } from '@commands/CommandHandler';
+import { EENV } from '@enums/EENV';
+import { Player } from '@controller/Player.controller';
+import { ValidatedPlayer } from '@ctypes/ValidatedPlayer';
+import { ELicenses } from '@enums/ELicenses';
+import Config from '@proot/Config';
+import { GameDB } from '@sql/Database';
+import { IUser } from '@sql/schema/User.schema';
+import LogManager from '@utils/Logger';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { Lizenz } from './Lizenz';
 
 export class Deletecharacter extends Command {
     constructor() {
-        super()
-        this.RunEnvironment = EENV.DEVELOPMENT
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
+        super();
+        this.RunEnvironment = EENV.DEVELOPMENT;
+        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
             Config.Discord.Groups.IC_SUPERADMIN,
-        ]
-        this.IsBetaCommand = true
+        ];
+        this.IsBetaCommand = true;
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('deletecharacter')
@@ -30,98 +30,95 @@ export class Deletecharacter extends Command {
                     option.setName('steamid').setDescription('SteamID des zu löschenden Spielers').setRequired(true),
                 ),
             this,
-        )
+        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction
-        await this.delete(interaction)
+        await this.delete(interaction);
     }
 
     public async delete(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction
-        const embed = this.getEmbedTemplate(interaction)
+        const { options } = interaction;
         try {
-            let steamid = options.getString('steamid')
+            const steamid = options.getString('steamid');
             if (!steamid) {
-                await interaction.reply({ content: 'Bitte gib eine SteamID an!', ephemeral: true })
-                return
+                await interaction.reply({ content: 'Bitte gib eine SteamID an!', ephemeral: true });
+                return;
             }
-            const vPlayer = await Player.validatePlayer(steamid)
+            const vPlayer = await Player.validatePlayer(steamid);
             if (!vPlayer) {
                 await interaction.reply({
                     content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
                     ephemeral: true,
-                })
-                return
+                });
+                return;
             }
-            let phone = await this.deletePhone(vPlayer.identifiers.steam)
+            const phone = await this.deletePhone(vPlayer.identifiers.steam);
             if (!phone) {
                 await interaction.reply({
                     content: 'Es ist ein Fehler beim Löschen des Telefons aufgetreten!',
                     ephemeral: true,
-                })
-                return
+                });
+                return;
             }
-            let licenses = await Lizenz.deleteLicense(vPlayer, ELicenses.ALL)
+            const licenses = await Lizenz.deleteLicense(vPlayer, ELicenses.ALL);
             if (licenses instanceof Error) {
-                LogManager.error(licenses)
+                LogManager.error(licenses);
                 await interaction.reply({
                     content: `Es ist ein Fehler beim Löschen der Lizenzen aufgetreten!\`\`\`json${JSON.stringify(
                         licenses,
                     )}\`\`\``,
                     ephemeral: true,
-                })
-                return
+                });
+                return;
             }
-            let archive = await this.moveCharacterToArchive(vPlayer)
+            const archive = await this.moveCharacterToArchive(vPlayer);
             if (!archive) {
                 await interaction.reply({
                     content: 'Es ist ein Fehler beim Archivieren des Charakters aufgetreten!',
                     ephemeral: true,
-                })
-                return
+                });
             }
         } catch (error) {
-            LogManager.error(error)
-            await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true })
+            LogManager.error(error);
+            await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true });
         }
     }
 
     public async deletePhone(itendifier: string): Promise<boolean> {
         try {
             // TODO: ADD Return Handling
-            await GameDB.query('DELETE FROM phone_phones WHERE identifier = ?', [itendifier])
-            return true
+            await GameDB.query('DELETE FROM phone_phones WHERE identifier = ?', [itendifier]);
+            return true;
         } catch (error) {
-            LogManager.error(error)
-            return false
+            LogManager.error(error);
+            return false;
         }
     }
 
     private async moveCharacterToArchive(vPlayer: ValidatedPlayer): Promise<boolean> {
         try {
-            let newIdentifier = vPlayer.identifiers.steam.replace('steam', 'deleted')
+            const newIdentifier = vPlayer.identifiers.steam.replace('steam', 'deleted');
             // TODO: Add Return Handler
             await GameDB.query('UPDATE users SET identifier = ? WHERE identifier = ?', [
                 newIdentifier,
                 vPlayer.identifiers.steam,
-            ])
+            ]);
             // Move to Archive
-            let [response] = await GameDB.query<IUser[]>(
+            const [response] = await GameDB.query<IUser[]>(
                 'INSERT INTO users_deleted SELECT * FROM users WHERE identifier = ? RETURNING *',
                 [vPlayer.identifiers.steam],
-            )
+            );
             /* Löschen des Charakters
             await Database.query('DELETE FROM users WHERE identifier = ?', [user.identifier])
             */
             if (response.length > 0) {
-                return true
+                return true;
             }
-            return false
+            return false;
         } catch (error) {
-            LogManager.error(error)
-            return false
+            LogManager.error(error);
+            return false;
         }
     }
 }

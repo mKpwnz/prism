@@ -15,5 +15,5 @@ export abstract class DCEvent {
      * @returns {*}  {Promise<void>}
      * @memberof DCEvent
      */
-    abstract process(...args: any[]): Promise<void>
+    abstract process(...args: any[]): Promise<void>;
 }

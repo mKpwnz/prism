@@ -1,4 +1,4 @@
-import EStatusCode from '@enums/EStatusCode'
+import EStatusCode from '@enums/EStatusCode';
 
 /**
  * @description Custom Error Klasse für die WebAPI.
@@ -17,7 +17,7 @@ export class CustomError extends Error {
      * @type {EStatusCode}
      * @memberof CustomError
      */
-    private readonly _code: EStatusCode
+    private readonly _code: EStatusCode;
 
     /**
      * @description Gibt an, ob der Fehler geloggt werden soll oder nicht. (Standard: false) (Nur in Production true)
@@ -27,7 +27,7 @@ export class CustomError extends Error {
      * @type {boolean}
      * @memberof CustomError
      */
-    private readonly _logging: boolean
+    private readonly _logging: boolean;
 
     /**
      * @description Gibt den Kontext des Fehlers zurück. (z.B. { user: { id: 123, name: 'mKpwnz' } }) (Standard: {}) (Nur in Production true)
@@ -37,7 +37,7 @@ export class CustomError extends Error {
      * @type {{ [key: string]: any }}
      * @memberof CustomError
      */
-    private readonly _context: { [key: string]: any }
+    private readonly _context: { [key: string]: any };
 
     /**
      * Creates an instance of CustomError.
@@ -47,16 +47,16 @@ export class CustomError extends Error {
      * @memberof CustomError
      */
     constructor(params?: {
-        code?: EStatusCode
-        message?: string
-        logging?: boolean
-        context?: { [key: string]: any }
+        code?: EStatusCode;
+        message?: string;
+        logging?: boolean;
+        context?: { [key: string]: any };
     }) {
-        const { code, message, logging } = params || {}
-        super(message || EStatusCode[code ?? EStatusCode.ServerErrorInternal])
-        this._code = code || EStatusCode.ServerErrorInternal
-        this._logging = logging || false
-        this._context = params?.context || {}
+        const { code, message, logging } = params || {};
+        super(message || EStatusCode[code ?? EStatusCode.ServerErrorInternal]);
+        this._code = code || EStatusCode.ServerErrorInternal;
+        this._logging = logging || false;
+        this._context = params?.context || {};
     }
 
     /**
@@ -67,7 +67,7 @@ export class CustomError extends Error {
      * @memberof CustomError
      */
     get errors() {
-        return [{ message: this.message, context: this._context }]
+        return [{ message: this.message, context: this._context }];
     }
 
     /**
@@ -78,7 +78,7 @@ export class CustomError extends Error {
      * @memberof CustomError
      */
     get statusCode() {
-        return this._code
+        return this._code;
     }
 
     /**
@@ -89,6 +89,6 @@ export class CustomError extends Error {
      * @memberof CustomError
      */
     get logging() {
-        return this._logging
+        return this._logging;
     }
 }

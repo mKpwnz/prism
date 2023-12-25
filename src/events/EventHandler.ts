@@ -1,8 +1,8 @@
-import { CommandHandler } from '@commands/CommandHandler'
-import { CustomImageUpload } from '@features/phone/CustomImageUpload'
-import { Client, Interaction, Message } from 'discord.js'
-import { onMessageCreate } from './onMessageCreate'
-import { onReady } from './onReady'
+import { CommandHandler } from '@commands/CommandHandler';
+import { CustomImageUpload } from '@features/phone/CustomImageUpload';
+import { Client, Interaction, Message } from 'discord.js';
+import { OnReady } from './_OnReady';
+import { OnMessageCreate } from './_OnMessageCreate';
 
 /**
  * @description Handles all events
@@ -13,20 +13,22 @@ import { onReady } from './onReady'
  */
 export class EventHandler {
     static init(client: Client) {
-        client.on('ready', async () => await this.onReady(client))
-        client.on('messageCreate', async (message) => this.onMessageCreate(message))
-        client.on('interactionCreate', async (interaction) => this.onInteractionCreate(interaction))
+        client.on('ready', async () => this.onReady(client));
+        client.on('messageCreate', async (message) => this.onMessageCreate(message));
+        client.on('interactionCreate', async (interaction) => this.onInteractionCreate(interaction));
 
-        new CustomImageUpload(client)
+        new CustomImageUpload(client);
     }
 
     private static onReady(client: Client) {
-        new onReady().process(client)
+        new OnReady().process(client);
     }
+
     private static onInteractionCreate(interaction: Interaction) {
-        CommandHandler.onInteraction(interaction)
+        CommandHandler.onInteraction(interaction);
     }
+
     private static onMessageCreate(message: Message) {
-        new onMessageCreate().process(message)
+        new OnMessageCreate().process(message);
     }
 }

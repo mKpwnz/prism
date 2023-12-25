@@ -1,8 +1,6 @@
-import { GameDB } from '@sql/Database'
-import { IItem } from '@sql/schema/Item.schema'
-import { Cache } from '@utils/Cache'
-import LogManager from '@utils/Logger'
-import axios from 'axios'
+import { Cache } from '@utils/Cache';
+import LogManager from '@utils/Logger';
+import axios from 'axios';
 
 /**
  * @description Class to get data from the NVHX API
@@ -21,19 +19,18 @@ export class NvhxData {
      * @memberof NvhxData
      */
     public static async GetAllGlobalBans(): Promise<String[]> {
-        var nvhxGlobalBans = await Cache.get<String[]>('nvhxGlobalBans')
+        const nvhxGlobalBans = await Cache.get<String[]>('nvhxGlobalBans');
         if (!nvhxGlobalBans) {
-            var data = await axios.get('https://content.aniblur.games/ag/nvhx/gbn.txt')
-            if (data.status == 200) {
-                var nvhxResponse = data.data.split('\r\n')
-                await Cache.set('nvhxGlobalBans', nvhxResponse)
-                return nvhxResponse
-            } else {
-                LogManager.error('Error while fetching nvhx global bans')
-                return []
+            const data = await axios.get('https://content.aniblur.games/ag/nvhx/gbn.txt');
+            if (data.status === 200) {
+                const nvhxResponse = data.data.split('\r\n');
+                await Cache.set('nvhxGlobalBans', nvhxResponse);
+                return nvhxResponse;
             }
+            LogManager.error('Error while fetching nvhx global bans');
+            return [];
         }
-        return nvhxGlobalBans
+        return nvhxGlobalBans;
     }
 
     /**
@@ -46,12 +43,12 @@ export class NvhxData {
      * @memberof NvhxData
      */
     public static async CheckIfUserIsBanned(userIds: string[]): Promise<boolean> {
-        var nvhxGlobalBans = await NvhxData.GetAllGlobalBans()
+        const nvhxGlobalBans = await NvhxData.GetAllGlobalBans();
         for (const id of userIds) {
             if (nvhxGlobalBans.indexOf(id) > -1) {
-                return true
+                return true;
             }
         }
-        return false
+        return false;
     }
 }

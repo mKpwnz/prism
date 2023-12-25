@@ -1,4 +1,4 @@
-import { RowDataPacket } from 'mysql2'
+import { RowDataPacket } from 'mysql2';
 
 /**
  * @description
@@ -9,7 +9,7 @@ import { RowDataPacket } from 'mysql2'
  * @extends {RowDataPacket}
  */
 export interface IVersicherung extends RowDataPacket {
-    plate: string
-    ts: Date
-    premium: boolean
+    plate: string;
+    ts: Date;
+    premium: boolean;
 }

@@ -6,11 +6,11 @@
  * @interface ICmdPrintInformationOption
  */
 export interface ICmdPrintInformationOption {
-    name: string
-    description: string
-    required: boolean
+    name: string;
+    description: string;
+    required: boolean;
     choices?: {
-        name: string
-        value: string
-    }[]
+        name: string;
+        value: string;
+    }[];
 }
