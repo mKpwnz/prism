@@ -225,4 +225,3 @@ export abstract class Command {
         });
     }
 }
-

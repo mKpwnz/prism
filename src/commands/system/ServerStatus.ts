@@ -122,4 +122,3 @@ export class ServerStatus extends Command {
         interaction.reply({ content: ' ', embeds: [embed] });
     }
 }
-

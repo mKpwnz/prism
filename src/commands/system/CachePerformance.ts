@@ -31,4 +31,3 @@ export class CachePerformance extends Command {
         );
     }
 }
-
