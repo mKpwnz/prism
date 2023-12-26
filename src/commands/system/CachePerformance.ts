@@ -1,6 +1,6 @@
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
-import { NvhxData } from '@controller/NvhxData.controller';
+import { Items } from '@controller/Item.controller';
 import Config from '@proot/Config';
 import { Cache } from '@utils/Cache';
 import LogManager from '@utils/Logger';
@@ -27,15 +27,10 @@ export class CachePerformance extends Command {
         await Cache.testPerformance(
             interaction,
             async () => {
-                const NvhxGlobalBans = await NvhxData.GetAllGlobalBans();
-                const players = await NvhxData.CheckIfUserIsBanned(
-                    ['steam:11000010ea14dfd'],
-                    NvhxGlobalBans,
-                );
-                LogManager.debug(players);
-                return players;
+                const res = await Items.doesItemExists('fixkit');
+                LogManager.debug(res);
             },
-            'nvhxGlobalBans',
+            'items',
         );
     }
 }

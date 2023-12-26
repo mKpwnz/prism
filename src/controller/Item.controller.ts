@@ -27,4 +27,14 @@ export class Items {
         }
         return cItems;
     }
+
+    public static async doesItemExists(itemName: string): Promise<boolean> {
+        const items = await this.getAllItems();
+        return items.some((item) => item.name === itemName);
+    }
+
+    public static async validateItemName(itemName: string): Promise<string> {
+        const items = await this.getAllItems();
+        return items.find((item) => item.name.toLowerCase() === itemName.toLowerCase())?.name ?? '';
+    }
 }
