@@ -26,7 +26,10 @@ export class DeletePhone extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_LIMITED];
+        this.AllowedChannels = [
+            Config.Discord.Channel.WHOIS_TESTI,
+            Config.Discord.Channel.WHOIS_LIMITED,
+        ];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -37,9 +40,13 @@ export class DeletePhone extends Command {
             new SlashCommandBuilder()
                 .setName('deletephone')
                 .setDescription('Löscht ein Handy')
-                .addStringOption((option) => option.setName('steamid').setDescription('SteamID').setRequired(true))
+                .addStringOption((option) =>
+                    option.setName('steamid').setDescription('SteamID').setRequired(true),
+                )
                 .addBooleanOption((option) =>
-                    option.setName('reset').setDescription('Nummer bleibt, Accounts werden gelöscht'),
+                    option
+                        .setName('reset')
+                        .setDescription('Nummer bleibt, Accounts werden gelöscht'),
                 ),
             this,
         );
@@ -63,21 +70,29 @@ export class DeletePhone extends Command {
         // write phone into file
         if (typeof phone === 'string') {
             writeFileSync(`${vPlayer.identifiers.steam}.sql`, phone);
-            const attachment = new AttachmentBuilder(readFileSync(`${vPlayer.identifiers.steam}.sql`), {
-                name: `${vPlayer.identifiers.steam}.sql`,
-            });
+            const attachment = new AttachmentBuilder(
+                readFileSync(`${vPlayer.identifiers.steam}.sql`),
+                {
+                    name: `${vPlayer.identifiers.steam}.sql`,
+                },
+            );
             embed.setTitle('Handy gelöscht');
             if (reset) {
                 embed.setTitle('Handy zurückgesetzt');
             }
-            embed.setDescription(`Owner: ${vPlayer.steamnames.current}\nIdentifier: ${vPlayer.identifiers.steam}`);
+            embed.setDescription(
+                `Owner: ${vPlayer.steamnames.current}\nIdentifier: ${vPlayer.identifiers.steam}`,
+            );
             await interaction.reply({ embeds: [embed], files: [attachment] });
         }
     }
 
     async deletePhone(steamid: string): Promise<string | Error> {
         const insertCollection: string[] = [];
-        const [phonequery] = await GameDB.query<IPhone[]>('SELECT * FROM phone_phones WHERE id = ? LIMIT 1', [steamid]);
+        const [phonequery] = await GameDB.query<IPhone[]>(
+            'SELECT * FROM phone_phones WHERE id = ? LIMIT 1',
+            [steamid],
+        );
         if (phonequery.length === 0) {
             return Error('No Phone found');
         }
@@ -140,7 +155,10 @@ export class DeletePhone extends Command {
 
     async resetPhone(steamid: string): Promise<string | Error> {
         const insertCollection: string[] = [];
-        const [phonequery] = await GameDB.query<IPhone[]>('SELECT * FROM phone_phones WHERE id = ? LIMIT 1', [steamid]);
+        const [phonequery] = await GameDB.query<IPhone[]>(
+            'SELECT * FROM phone_phones WHERE id = ? LIMIT 1',
+            [steamid],
+        );
         if (phonequery.length === 0) {
             return Error('No Phone found');
         }
@@ -201,7 +219,9 @@ export class DeletePhone extends Command {
                 [account.username],
             );
             if (channels.length === 0) {
-                await GameDB.execute('DELETE FROM phone_darkchat_accounts WHERE phone_number = ?', [phonenumber]);
+                await GameDB.execute('DELETE FROM phone_darkchat_accounts WHERE phone_number = ?', [
+                    phonenumber,
+                ]);
                 return returnstring.join('\n');
             }
             for (const channel of channels) {
@@ -210,8 +230,12 @@ export class DeletePhone extends Command {
                 );
             }
             // Delete Account and Messages
-            await GameDB.execute('DELETE FROM phone_darkchat_accounts WHERE phone_number = ?', [phonenumber]);
-            await GameDB.execute('DELETE FROM phone_darkchat_messages WHERE sender = ?', [account.username]);
+            await GameDB.execute('DELETE FROM phone_darkchat_accounts WHERE phone_number = ?', [
+                phonenumber,
+            ]);
+            await GameDB.execute('DELETE FROM phone_darkchat_messages WHERE sender = ?', [
+                account.username,
+            ]);
             return returnstring.join('\n');
         } catch (error) {
             LogManager.error(error);
@@ -249,7 +273,10 @@ export class DeletePhone extends Command {
                 [account.username],
             );
             if (posts.length === 0) {
-                await GameDB.execute('DELETE FROM phone_instagram_accounts WHERE phone_number = ?', [phonenumber]);
+                await GameDB.execute(
+                    'DELETE FROM phone_instagram_accounts WHERE phone_number = ?',
+                    [phonenumber],
+                );
                 return returnstring.join('\n');
             }
             for (const post of posts) {
@@ -266,8 +293,12 @@ export class DeletePhone extends Command {
                 );
             }
             // Delete Account and Messages
-            await GameDB.execute('DELETE FROM phone_instagram_accounts WHERE phone_number = ?', [phonenumber]);
-            await GameDB.execute('DELETE FROM phone_instagram_posts WHERE username = ?', [account.username]);
+            await GameDB.execute('DELETE FROM phone_instagram_accounts WHERE phone_number = ?', [
+                phonenumber,
+            ]);
+            await GameDB.execute('DELETE FROM phone_instagram_posts WHERE username = ?', [
+                account.username,
+            ]);
             return returnstring.join('\n');
         } catch (error) {
             LogManager.error(error);
@@ -312,7 +343,9 @@ export class DeletePhone extends Command {
                 [account.username],
             );
             if (videos.length === 0) {
-                await GameDB.execute('DELETE FROM phone_tiktok_accounts WHERE phone_number = ?', [phonenumber]);
+                await GameDB.execute('DELETE FROM phone_tiktok_accounts WHERE phone_number = ?', [
+                    phonenumber,
+                ]);
                 return returnstring.join('\n');
             }
             for (const video of videos) {
@@ -334,8 +367,12 @@ export class DeletePhone extends Command {
                 );
             }
             // Delete Account and Messages
-            await GameDB.execute('DELETE FROM phone_tiktok_accounts WHERE phone_number = ?', [phonenumber]);
-            await GameDB.execute('DELETE FROM phone_tiktok_videos WHERE username = ?', [account.username]);
+            await GameDB.execute('DELETE FROM phone_tiktok_accounts WHERE phone_number = ?', [
+                phonenumber,
+            ]);
+            await GameDB.execute('DELETE FROM phone_tiktok_videos WHERE username = ?', [
+                account.username,
+            ]);
             return returnstring.join('\n');
         } catch (error) {
             LogManager.error(error);
@@ -355,7 +392,9 @@ export class DeletePhone extends Command {
             }
             const account = query[0];
             // Delete Account and Messages
-            await GameDB.execute('DELETE FROM phone_tinder_accounts WHERE phone_number = ?', [phonenumber]);
+            await GameDB.execute('DELETE FROM phone_tinder_accounts WHERE phone_number = ?', [
+                phonenumber,
+            ]);
             return `INSERT INTO phone_tinder_accounts (name, phone_number, photos, bio, dob, is_male, interested_men, interested_women) VALUES (
             '${account.name}',
             '${account.phone_number}',
@@ -406,7 +445,9 @@ export class DeletePhone extends Command {
                 [account.username],
             );
             if (tweets.length === 0) {
-                await GameDB.execute('DELETE FROM phone_twitter_tweets WHERE username = ?', [account.username]);
+                await GameDB.execute('DELETE FROM phone_twitter_tweets WHERE username = ?', [
+                    account.username,
+                ]);
                 return returnstring.join('\n');
             }
             for (const tweet of tweets) {
@@ -425,8 +466,12 @@ export class DeletePhone extends Command {
                 );
             }
             // Delete Account and Messages
-            await GameDB.execute('DELETE FROM phone_twitter_accounts WHERE phone_number = ?', [phonenumber]);
-            await GameDB.execute('DELETE FROM phone_twitter_tweets WHERE username = ?', [account.username]);
+            await GameDB.execute('DELETE FROM phone_twitter_accounts WHERE phone_number = ?', [
+                phonenumber,
+            ]);
+            await GameDB.execute('DELETE FROM phone_twitter_tweets WHERE username = ?', [
+                account.username,
+            ]);
             return returnstring.join('\n');
         } catch (error) {
             LogManager.error(error);
@@ -436,9 +481,10 @@ export class DeletePhone extends Command {
 
     async deletePhotos(phonenumber: string): Promise<string | Error> {
         try {
-            const [photos] = await GameDB.query<IPhonePhotos[]>('SELECT * FROM phone_photos WHERE phone_number = ?', [
-                phonenumber,
-            ]);
+            const [photos] = await GameDB.query<IPhonePhotos[]>(
+                'SELECT * FROM phone_photos WHERE phone_number = ?',
+                [phonenumber],
+            );
             const returnstring: String[] = [];
             if (photos.length === 0) {
                 return '#No Photos found';
@@ -464,9 +510,10 @@ export class DeletePhone extends Command {
 
     async deleteNotes(phonenumber: string): Promise<string | Error> {
         try {
-            const [notes] = await GameDB.query<IPhoneNotes[]>('SELECT * FROM phone_notes WHERE phone_number = ?', [
-                phonenumber,
-            ]);
+            const [notes] = await GameDB.query<IPhoneNotes[]>(
+                'SELECT * FROM phone_notes WHERE phone_number = ?',
+                [phonenumber],
+            );
             const returnstring: String[] = [];
             if (notes.length === 0) {
                 return '#No Notes found';

@@ -126,7 +126,10 @@ export abstract class Command {
         if (this.RunEnvironment !== EENV.PRODUCTION) {
             this.DoNotCountUse = true;
             this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI];
-            this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER, Config.Discord.Groups.DEV_BOTTESTER];
+            this.AllowedGroups = [
+                Config.Discord.Groups.DEV_SERVERENGINEER,
+                Config.Discord.Groups.DEV_BOTTESTER,
+            ];
         }
         if (process.env.NODE_ENV !== 'production') {
             this.DoNotCountUse = true;
@@ -159,9 +162,13 @@ export abstract class Command {
             options: inputFields,
         };
         LogManager.discordActionLog(
-            `\` ${interaction.user.displayName} (${user.id}) \` hat im Kanal <#${interaction.channelId}> den Befehl \`${
-                interaction.commandName
-            }\` ausgeführt:\`\`\`json\n${JSON.stringify(cmdPrint, null, 4)}\`\`\``,
+            `\` ${interaction.user.displayName} (${user.id}) \` hat im Kanal <#${
+                interaction.channelId
+            }> den Befehl \`${interaction.commandName}\` ausgeführt:\`\`\`json\n${JSON.stringify(
+                cmdPrint,
+                null,
+                4,
+            )}\`\`\``,
         );
         let { commandName } = interaction;
         if (!this.DoNotCountUse) {
@@ -218,7 +225,8 @@ export abstract class Command {
 
     addCommandBenchmark(embed: EmbedBuilder): void {
         this.CmdPerformanceStop = new Date();
-        const executionTime = this.CmdPerformanceStop.getTime() - this.CmdPerformanceStart!.getTime();
+        const executionTime =
+            this.CmdPerformanceStop.getTime() - this.CmdPerformanceStart!.getTime();
         embed.setFooter({
             text: `${embed.data.footer?.text} | Executiontime: ${executionTime}ms`,
             iconURL: embed.data.footer?.icon_url,

@@ -47,7 +47,13 @@ export class RconClient {
                 resolve(response);
             });
 
-            RconClient.socket!.send(buffer, 0, buffer.length, RconClient.options.port, RconClient.options.host);
+            RconClient.socket!.send(
+                buffer,
+                0,
+                buffer.length,
+                RconClient.options.port,
+                RconClient.options.host,
+            );
         });
     }
 

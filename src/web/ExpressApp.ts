@@ -15,16 +15,14 @@ export class ExpressApp {
         this.config();
         this.app.use(cors());
         this.app.set('trust proxy', true);
-        // this.app.use(this.handlePermissions)
 
         this.app.get('/commandhelplist', async (req, res) => {
-            const cmd = await Help.getCommands();
+            const [cmd, grp, chan] = await Promise.all([
+                Help.getCommands(),
+                Help.getGroups(),
+                Help.getChannel(),
+            ]);
 
-            // Soll sein Map<string, string> (groupid, group display name)
-            const grp = await Help.getGroups();
-
-            // Soll sein Map<string, string> (channelid, channel display name)
-            const chan = await Help.getChannel();
             res.send({ commands: cmd, channel: chan, groups: grp });
         });
         this.app.use(() => {

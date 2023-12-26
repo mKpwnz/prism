@@ -10,7 +10,10 @@ export class RequestToSupport extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED];
+        this.AllowedChannels = [
+            Config.Discord.Channel.WHOIS_TESTI,
+            Config.Discord.Channel.WHOIS_UNLIMITED,
+        ];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -24,12 +27,17 @@ export class RequestToSupport extends Command {
                 .setName('rts')
                 .setDescription('Request to Support')
                 .addBooleanOption((option) =>
-                    option.setName('anzeigen').setDescription('True = Anzeigen | False = Ausblenden').setRequired(true),
+                    option
+                        .setName('anzeigen')
+                        .setDescription('True = Anzeigen | False = Ausblenden')
+                        .setRequired(true),
                 )
                 .addIntegerOption((option) =>
                     option.setName('spielerid').setDescription('ID des Spielers').setRequired(true),
                 )
-                .addStringOption((option) => option.setName('nachricht').setDescription('Nachricht an den Spieler')),
+                .addStringOption((option) =>
+                    option.setName('nachricht').setDescription('Nachricht an den Spieler'),
+                ),
             this,
         );
         this.IsBetaCommand = true;
@@ -70,7 +78,9 @@ export class RequestToSupport extends Command {
         } catch (error) {
             LogManager.error(error);
             await interaction.reply({
-                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(error)}\`\`\``,
+                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(
+                    error,
+                )}\`\`\``,
                 ephemeral: true,
             });
         }

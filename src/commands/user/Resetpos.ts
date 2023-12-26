@@ -12,7 +12,10 @@ export class Resetpos extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED];
+        this.AllowedChannels = [
+            Config.Discord.Channel.WHOIS_TESTI,
+            Config.Discord.Channel.WHOIS_UNLIMITED,
+        ];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -29,7 +32,10 @@ export class Resetpos extends Command {
                 // add string option
                 .setDMPermission(true)
                 .addStringOption((option) =>
-                    option.setName('steam').setDescription('Steam ID des Nutzers').setRequired(true),
+                    option
+                        .setName('steam')
+                        .setDescription('Steam ID des Nutzers')
+                        .setRequired(true),
                 ),
             this,
         );

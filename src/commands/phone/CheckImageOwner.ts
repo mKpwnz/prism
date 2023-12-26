@@ -12,7 +12,10 @@ export class CheckImageOwner extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED];
+        this.AllowedChannels = [
+            Config.Discord.Channel.WHOIS_TESTI,
+            Config.Discord.Channel.WHOIS_UNLIMITED,
+        ];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -25,7 +28,9 @@ export class CheckImageOwner extends Command {
             new SlashCommandBuilder()
                 .setName('pcheckimageowner')
                 .setDescription('Check who created an Ingame image')
-                .addStringOption((option) => option.setName('imageurl').setDescription('Image URL').setRequired(true)),
+                .addStringOption((option) =>
+                    option.setName('imageurl').setDescription('Image URL').setRequired(true),
+                ),
             this,
         );
     }
@@ -40,7 +45,9 @@ export class CheckImageOwner extends Command {
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         try {
-            const nLink = this.normalizeLink(interaction.options.get('imageurl')?.value?.toString() as string);
+            const nLink = this.normalizeLink(
+                interaction.options.get('imageurl')?.value?.toString() as string,
+            );
             if (!nLink) {
                 interaction.reply({
                     content: `Der link konnte nicht validiert werden.`,

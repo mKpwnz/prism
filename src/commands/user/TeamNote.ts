@@ -10,7 +10,10 @@ export class TeamNote extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED];
+        this.AllowedChannels = [
+            Config.Discord.Channel.WHOIS_TESTI,
+            Config.Discord.Channel.WHOIS_UNLIMITED,
+        ];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -28,7 +31,10 @@ export class TeamNote extends Command {
                         .setName('hinzufügen')
                         .setDescription('Fügt eine Notiz hinzu')
                         .addStringOption((option) =>
-                            option.setName('steamid').setDescription('SteamID des Spielers').setRequired(true),
+                            option
+                                .setName('steamid')
+                                .setDescription('SteamID des Spielers')
+                                .setRequired(true),
                         )
                         .addStringOption((option) =>
                             option.setName('notiz').setDescription('Die Notiz').setRequired(true),
@@ -39,7 +45,10 @@ export class TeamNote extends Command {
                         .setName('auflisten')
                         .setDescription('Zeigt alle Notizen eines Spielers an')
                         .addStringOption((option) =>
-                            option.setName('steamid').setDescription('SteamID des Spielers').setRequired(true),
+                            option
+                                .setName('steamid')
+                                .setDescription('SteamID des Spielers')
+                                .setRequired(true),
                         ),
                 )
                 .addSubcommand((subcommand) =>
@@ -163,12 +172,14 @@ export class TeamNote extends Command {
         data.slice(0, 5).forEach((note) => {
             notes += `ID: **${note.id}** | Erstellt von: **${
                 note.noterName
-            }** | Erstellt am **${note.created_at.toLocaleString('de-DE')}**\n\`\`\`${note.note}\`\`\`\n`;
+            }** | Erstellt am **${note.created_at.toLocaleString('de-DE')}**\n\`\`\`${
+                note.note
+            }\`\`\`\n`;
         });
         embed.setDescription(
-            `Notizen (${data.length > 5 ? 5 : data.length}/${data.length}) von **${vPlayer.playerdata.fullname}**  (${
-                vPlayer.identifiers.steam
-            })\n${
+            `Notizen (${data.length > 5 ? 5 : data.length}/${data.length}) von **${
+                vPlayer.playerdata.fullname
+            }**  (${vPlayer.identifiers.steam})\n${
                 data.length > 5
                     ? `Ausgeblendete IDs: **${data
                           .slice(5)
@@ -205,19 +216,23 @@ export class TeamNote extends Command {
         const vPlayer = await Player.validatePlayer(data.user);
         if (vPlayer) {
             embed.setDescription(
-                `Notizen von **${vPlayer.playerdata.fullname}**  (${vPlayer.identifiers.steam})\n\nID: **${
-                    data.id
-                }** | Erstellt von: **${data.noterName}** | Erstellt am **${data.created_at.toLocaleString(
-                    'de-DE',
-                )}**\n\`\`\`${data.note}\`\`\`\n`,
+                `Notizen von **${vPlayer.playerdata.fullname}**  (${
+                    vPlayer.identifiers.steam
+                })\n\nID: **${data.id}** | Erstellt von: **${
+                    data.noterName
+                }** | Erstellt am **${data.created_at.toLocaleString('de-DE')}**\n\`\`\`${
+                    data.note
+                }\`\`\`\n`,
             );
         } else {
             embed.setDescription(
-                `*Die SteamID konnte keinem Nutzer zugewiesen werden!*\n\nNotizen von **${data.user}** \n\nID: **${
-                    data.id
-                }** | Erstellt von: **${data.noterName}** | Erstellt am **${data.created_at.toLocaleString(
-                    'de-DE',
-                )}**\n\`\`\`${data.note}\`\`\`\n`,
+                `*Die SteamID konnte keinem Nutzer zugewiesen werden!*\n\nNotizen von **${
+                    data.user
+                }** \n\nID: **${data.id}** | Erstellt von: **${
+                    data.noterName
+                }** | Erstellt am **${data.created_at.toLocaleString('de-DE')}**\n\`\`\`${
+                    data.note
+                }\`\`\`\n`,
             );
         }
         await interaction.reply({ embeds: [embed] });

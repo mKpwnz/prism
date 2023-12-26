@@ -13,7 +13,10 @@ export class Nvhx extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED];
+        this.AllowedChannels = [
+            Config.Discord.Channel.WHOIS_TESTI,
+            Config.Discord.Channel.WHOIS_UNLIMITED,
+        ];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -40,7 +43,10 @@ export class Nvhx extends Command {
                         .setName('unban')
                         .setDescription('Entbanne einen Nutzer')
                         .addStringOption((option) =>
-                            option.setName('banid').setDescription('BanID des Banns').setRequired(true),
+                            option
+                                .setName('banid')
+                                .setDescription('BanID des Banns')
+                                .setRequired(true),
                         ),
                 )
                 .addSubcommand((subcommand) =>
@@ -117,7 +123,9 @@ export class Nvhx extends Command {
         const livePlayers = await Player.getAllLivePlayers();
         const globalBans = await NvhxData.GetAllGlobalBans();
 
-        return livePlayers.filter((player) => NvhxData.CheckIfUserIsBanned(player.identifiers, globalBans));
+        return livePlayers.filter((player) =>
+            NvhxData.CheckIfUserIsBanned(player.identifiers, globalBans),
+        );
     }
 
     private async formatBannedPlayersDescription(bannedPlayers: ILivePlayer[]): Promise<string> {
@@ -126,9 +134,9 @@ export class Nvhx extends Command {
             desc += '\nAktuell gebannte Spieler:\n';
             const bannedEmote = await Helper.getEmote('pbot_banned');
             bannedPlayers.forEach((player) => {
-                desc += `\n${bannedEmote} **${player.name} | ServerID: ${player.id}** \`\`\`${player.identifiers.join(
-                    '\n',
-                )}\`\`\``;
+                desc += `\n${bannedEmote} **${player.name} | ServerID: ${
+                    player.id
+                }** \`\`\`${player.identifiers.join('\n')}\`\`\``;
             });
         }
         return desc;
@@ -145,9 +153,14 @@ export class Nvhx extends Command {
         await interaction.reply({ embeds: [embed] });
     }
 
-    private async handleInteractionError(error: any, interaction: ChatInputCommandInteraction): Promise<void> {
+    private async handleInteractionError(
+        error: any,
+        interaction: ChatInputCommandInteraction,
+    ): Promise<void> {
         await interaction.reply({
-            content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(error)}\`\`\``,
+            content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(
+                error,
+            )}\`\`\``,
             ephemeral: true,
         });
     }

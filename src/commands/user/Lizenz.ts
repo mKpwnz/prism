@@ -17,7 +17,10 @@ export class Lizenz extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED];
+        this.AllowedChannels = [
+            Config.Discord.Channel.WHOIS_TESTI,
+            Config.Discord.Channel.WHOIS_UNLIMITED,
+        ];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -35,7 +38,10 @@ export class Lizenz extends Command {
                         .setName('entfernen')
                         .setDescription('Entferne die Lizenz eines Spielers')
                         .addStringOption((option) =>
-                            option.setName('steamid').setDescription('SteamID des Spielers').setRequired(true),
+                            option
+                                .setName('steamid')
+                                .setDescription('SteamID des Spielers')
+                                .setRequired(true),
                         )
                         .addStringOption((option) =>
                             option
@@ -62,7 +68,10 @@ export class Lizenz extends Command {
                         .setName('hinzufügen')
                         .setDescription('Füge dem Spieler eine Lizenz hinzu')
                         .addStringOption((option) =>
-                            option.setName('steamid').setDescription('SteamID des Spielers').setRequired(true),
+                            option
+                                .setName('steamid')
+                                .setDescription('SteamID des Spielers')
+                                .setRequired(true),
                         )
                         .addStringOption((option) =>
                             option
@@ -173,7 +182,9 @@ export class Lizenz extends Command {
             if (license !== 'all') {
                 query += ` AND type = "${license}"`;
             }
-            const [lizenzen] = await GameDB.query<IUserLicense[]>(query, [vPlayer.identifiers.steam]);
+            const [lizenzen] = await GameDB.query<IUserLicense[]>(query, [
+                vPlayer.identifiers.steam,
+            ]);
             if (lizenzen.length !== 0) {
                 await interaction.reply({
                     content: 'Der Spieler hat diese Lizenz bereits!',

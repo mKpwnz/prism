@@ -10,7 +10,10 @@ import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 export class Versicherung extends Command {
     constructor() {
         super();
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED];
+        this.AllowedChannels = [
+            Config.Discord.Channel.WHOIS_TESTI,
+            Config.Discord.Channel.WHOIS_UNLIMITED,
+        ];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -111,8 +114,10 @@ export class Versicherung extends Command {
             );
             if (versicherungen.length !== 1) {
                 let message;
-                if (versicherungen.length === 0) message = `Keine Versicherung für ${kennzeichen} gefunden!`;
-                else message = `Es wurden ${versicherungen.length} Versicherungen für ${kennzeichen} gefunden!`;
+                if (versicherungen.length === 0)
+                    message = `Keine Versicherung für ${kennzeichen} gefunden!`;
+                else
+                    message = `Es wurden ${versicherungen.length} Versicherungen für ${kennzeichen} gefunden!`;
                 await interaction.reply({ content: message, ephemeral: true });
                 return;
             }
@@ -188,13 +193,17 @@ export class Versicherung extends Command {
             );
             if (versicherungen.length !== 1) {
                 let message;
-                if (versicherungen.length === 0) message = `Keine Versicherung für ${kennzeichen} gefunden!`;
-                else message = `Es wurden ${versicherungen.length} Versicherungen für ${kennzeichen} gefunden!`;
+                if (versicherungen.length === 0)
+                    message = `Keine Versicherung für ${kennzeichen} gefunden!`;
+                else
+                    message = `Es wurden ${versicherungen.length} Versicherungen für ${kennzeichen} gefunden!`;
                 await interaction.reply({ content: message, ephemeral: true });
                 return;
             }
             const versicherung = versicherungen[0];
-            await GameDB.query('DELETE FROM `versicherungen` WHERE `plate` = ?', [versicherung.plate]);
+            await GameDB.query('DELETE FROM `versicherungen` WHERE `plate` = ?', [
+                versicherung.plate,
+            ]);
             embed.setTitle('Versicherung Entfernen');
             embed.addFields({
                 name: kennzeichen,

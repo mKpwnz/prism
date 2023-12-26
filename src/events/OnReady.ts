@@ -9,15 +9,23 @@ import { Client, Routes } from 'discord.js';
 export class OnReady extends DCEvent {
     async process(client: Client) {
         const token =
-            process.env.NODE_ENV === 'production' ? process.env.DISCORD_TOKEN_PROD : process.env.DISCORD_TOKEN_DEV;
+            process.env.NODE_ENV === 'production'
+                ? process.env.DISCORD_TOKEN_PROD
+                : process.env.DISCORD_TOKEN_DEV;
 
         const rest = new REST({ version: '9' }).setToken(token as string);
         CommandHandler.initAll();
         new RconClient();
         const commandData = CommandHandler.commands.map((command) => command.scb.toJSON());
-        await rest.put(Routes.applicationGuildCommands(client.user?.id ?? 'missing id', Config.Discord.ServerID), {
-            body: commandData,
-        });
+        await rest.put(
+            Routes.applicationGuildCommands(
+                client.user?.id ?? 'missing id',
+                Config.Discord.ServerID,
+            ),
+            {
+                body: commandData,
+            },
+        );
         await this.updateEmotes(client);
         LogManager.info('Discord ready!');
     }
@@ -38,7 +46,10 @@ export class OnReady extends DCEvent {
             });
         }
         for (const configEmote of Config.Discord.Emotes) {
-            const newEmote = await guild.emojis.create({ name: configEmote.name, attachment: configEmote.link });
+            const newEmote = await guild.emojis.create({
+                name: configEmote.name,
+                attachment: configEmote.link,
+            });
             LogManager.info(`Added/Updated emote ${newEmote.name} (${newEmote.id})`);
         }
 
