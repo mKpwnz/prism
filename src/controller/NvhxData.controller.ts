@@ -27,13 +27,15 @@ export class NvhxData {
                     bans = new Set(response.data.split('\r\n'));
                     await Cache.set('nvhxGlobalBans', bans);
                 } else {
-                    LogManager.error('Non-200 status code received while fetching NVHX global bans');
+                    LogManager.error(
+                        'Non-200 status code received while fetching NVHX global bans',
+                    );
                 }
             } catch (error: any) {
                 LogManager.error(`Error while fetching NVHX global bans: ${error.message}`);
             }
         }
-        return bans || new Set();
+        return bans ?? new Set();
     }
 
     /**

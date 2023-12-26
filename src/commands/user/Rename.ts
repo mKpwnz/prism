@@ -12,7 +12,10 @@ export class Rename extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_RENAME];
+        this.AllowedChannels = [
+            Config.Discord.Channel.WHOIS_TESTI,
+            Config.Discord.Channel.WHOIS_RENAME,
+        ];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -28,10 +31,17 @@ export class Rename extends Command {
                 .setName('rename')
                 .setDescription('Suche nach Spielern')
                 .addStringOption((option) =>
-                    option.setName('steam').setDescription('Steam ID des Nutzers').setRequired(true),
+                    option
+                        .setName('steam')
+                        .setDescription('Steam ID des Nutzers')
+                        .setRequired(true),
                 )
-                .addStringOption((option) => option.setName('vorname').setDescription('Vorname des Spielers'))
-                .addStringOption((option) => option.setName('nachname').setDescription('Nachname des Spielers')),
+                .addStringOption((option) =>
+                    option.setName('vorname').setDescription('Vorname des Spielers'),
+                )
+                .addStringOption((option) =>
+                    option.setName('nachname').setDescription('Nachname des Spielers'),
+                ),
             this,
         );
     }
@@ -45,8 +55,10 @@ export class Rename extends Command {
             await interaction.reply('Es konnte kein Spieler mit dieser SteamID gefunden werden!');
             return;
         }
-        const firstname = interaction.options.get('vorname')?.value?.toString() ?? vPlayer.playerdata.firstname;
-        const lastname = interaction.options.get('nachname')?.value?.toString() ?? vPlayer.playerdata.lastname;
+        const firstname =
+            interaction.options.get('vorname')?.value?.toString() ?? vPlayer.playerdata.firstname;
+        const lastname =
+            interaction.options.get('nachname')?.value?.toString() ?? vPlayer.playerdata.lastname;
         // eslint-disable-next-line eqeqeq
         if (firstname == '' && lastname == '') {
             await interaction.reply({

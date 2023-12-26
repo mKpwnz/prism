@@ -27,7 +27,10 @@ export class Deletecharacter extends Command {
                 .setName('deletecharacter')
                 .setDescription('Löscht einen Charakter von einem Spieler')
                 .addStringOption((option) =>
-                    option.setName('steamid').setDescription('SteamID des zu löschenden Spielers').setRequired(true),
+                    option
+                        .setName('steamid')
+                        .setDescription('SteamID des zu löschenden Spielers')
+                        .setRequired(true),
                 ),
             this,
         );

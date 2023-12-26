@@ -11,7 +11,10 @@ export class Fraksperre extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED];
+        this.AllowedChannels = [
+            Config.Discord.Channel.WHOIS_TESTI,
+            Config.Discord.Channel.WHOIS_UNLIMITED,
+        ];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -29,7 +32,10 @@ export class Fraksperre extends Command {
                         .setName('entfernen')
                         .setDescription('Entferne die Fraktionssperre eines Spielers')
                         .addStringOption((option) =>
-                            option.setName('steamid').setDescription('SteamID des Spielers').setRequired(true),
+                            option
+                                .setName('steamid')
+                                .setDescription('SteamID des Spielers')
+                                .setRequired(true),
                         ),
                 )
                 .addSubcommand((subcommand) =>
@@ -37,10 +43,15 @@ export class Fraksperre extends Command {
                         .setName('setzen')
                         .setDescription('Setze dem Spieler eine Fraksperre')
                         .addStringOption((option) =>
-                            option.setName('steamid').setDescription('SteamID des Spielers').setRequired(true),
+                            option
+                                .setName('steamid')
+                                .setDescription('SteamID des Spielers')
+                                .setRequired(true),
                         )
                         .addIntegerOption((option) =>
-                            option.setName('zeit').setDescription('Setze die Zeit in Tagen (Default: 5 Tage)'),
+                            option
+                                .setName('zeit')
+                                .setDescription('Setze die Zeit in Tagen (Default: 5 Tage)'),
                         ),
                 ),
             this,
@@ -83,9 +94,10 @@ export class Fraksperre extends Command {
         }
         try {
             // TODO: Response verarbeiten und auswerten
-            const dbResponse = await GameDB.query('UPDATE users SET fraksperre = NOW() WHERE identifier = ?', [
-                vPlayer.identifiers.steam,
-            ]);
+            const dbResponse = await GameDB.query(
+                'UPDATE users SET fraksperre = NOW() WHERE identifier = ?',
+                [vPlayer.identifiers.steam],
+            );
             LogManager.debug(dbResponse);
         } catch (error) {
             LogManager.error(error);
@@ -98,7 +110,9 @@ export class Fraksperre extends Command {
         embed.setTitle('Fraktionssperre entfernt');
         embed.setDescription(
             `
-                Die Fraktionssperre von ${vPlayer.playerdata.fullname} (${vPlayer.identifiers.steam}) wurde entfernt!\n
+                Die Fraktionssperre von ${vPlayer.playerdata.fullname} (${
+                    vPlayer.identifiers.steam
+                }) wurde entfernt!\n
                 Altes Datum: ${vPlayer.playerdata.job.fraksperre.toLocaleDateString()}`,
         );
         await interaction.reply({ embeds: [embed] });

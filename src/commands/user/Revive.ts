@@ -10,7 +10,10 @@ export class Revive extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED];
+        this.AllowedChannels = [
+            Config.Discord.Channel.WHOIS_TESTI,
+            Config.Discord.Channel.WHOIS_UNLIMITED,
+        ];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -26,7 +29,9 @@ export class Revive extends Command {
                 .setDescription('Suche nach Spielern')
                 // add string option
                 .setDMPermission(true)
-                .addIntegerOption((option) => option.setName('id').setDescription('ID des Spielers').setRequired(true))
+                .addIntegerOption((option) =>
+                    option.setName('id').setDescription('ID des Spielers').setRequired(true),
+                )
                 .addBooleanOption((option) =>
                     option.setName('kampfunfähig').setDescription('Kampfunfähigkeit hinzufügen?'),
                 ),
@@ -57,7 +62,9 @@ export class Revive extends Command {
         } catch (error) {
             LogManager.error(error);
             await interaction.reply({
-                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(error)}\`\`\``,
+                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(
+                    error,
+                )}\`\`\``,
                 ephemeral: true,
             });
         }

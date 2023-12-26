@@ -10,7 +10,10 @@ export class Give extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_LIMITED];
+        this.AllowedChannels = [
+            Config.Discord.Channel.WHOIS_TESTI,
+            Config.Discord.Channel.WHOIS_LIMITED,
+        ];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -27,13 +30,19 @@ export class Give extends Command {
                         .setName('item')
                         .setDescription('Gib einem Spieler ein Item')
                         .addIntegerOption((option) =>
-                            option.setName('id').setDescription('ID des Spielers').setRequired(true),
+                            option
+                                .setName('id')
+                                .setDescription('ID des Spielers')
+                                .setRequired(true),
                         )
                         .addStringOption((option) =>
                             option.setName('item').setDescription('Itemname').setRequired(true),
                         )
                         .addIntegerOption((option) =>
-                            option.setName('anzahl').setDescription('Anzahl der Items').setRequired(true),
+                            option
+                                .setName('anzahl')
+                                .setDescription('Anzahl der Items')
+                                .setRequired(true),
                         ),
                 )
                 .addSubcommand((subcommand) =>
@@ -41,13 +50,18 @@ export class Give extends Command {
                         .setName('weapon')
                         .setDescription('Gib einem Spieler eine Waffe')
                         .addIntegerOption((option) =>
-                            option.setName('id').setDescription('ID des Spielers').setRequired(true),
+                            option
+                                .setName('id')
+                                .setDescription('ID des Spielers')
+                                .setRequired(true),
                         )
                         .addStringOption((option) =>
                             option.setName('waffe').setDescription('Waffenname').setRequired(true),
                         )
                         .addIntegerOption((option) =>
-                            option.setName('munition').setDescription('Anzahl der Munition (Default: 250)'),
+                            option
+                                .setName('munition')
+                                .setDescription('Anzahl der Munition (Default: 250)'),
                         ),
                 ),
             this,
@@ -99,7 +113,9 @@ export class Give extends Command {
                 await interaction.reply({ content: 'Waffe nicht gefunden!', ephemeral: true });
                 return;
             }
-            const response = await RconClient.sendCommand(`giveweapon ${id} ${validateWeapon} ${munition}`);
+            const response = await RconClient.sendCommand(
+                `giveweapon ${id} ${validateWeapon} ${munition}`,
+            );
             if (response.includes('Invalid weapon')) {
                 await interaction.reply({
                     content: 'Waffe existiert nicht!',
@@ -115,11 +131,15 @@ export class Give extends Command {
                 return;
             }
             embed.setTitle('Give Weapon');
-            embed.setDescription(`Spieler ${id} sollte ${validateWeapon} mit ${munition} Munition erhalten haben!`);
+            embed.setDescription(
+                `Spieler ${id} sollte ${validateWeapon} mit ${munition} Munition erhalten haben!`,
+            );
             await interaction.reply({ embeds: [embed] });
         } catch (error) {
             await interaction.reply({
-                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(error)}\`\`\``,
+                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(
+                    error,
+                )}\`\`\``,
                 ephemeral: true,
             });
         }

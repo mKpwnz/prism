@@ -10,7 +10,10 @@ export class Kick extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED];
+        this.AllowedChannels = [
+            Config.Discord.Channel.WHOIS_TESTI,
+            Config.Discord.Channel.WHOIS_UNLIMITED,
+        ];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -24,8 +27,12 @@ export class Kick extends Command {
             new SlashCommandBuilder()
                 .setName('kick')
                 .setDescription('Kickt einen Spieler')
-                .addIntegerOption((option) => option.setName('id').setDescription('ID des Spielers').setRequired(true))
-                .addStringOption((option) => option.setName('grund').setDescription('Grund des Kicks')),
+                .addIntegerOption((option) =>
+                    option.setName('id').setDescription('ID des Spielers').setRequired(true),
+                )
+                .addStringOption((option) =>
+                    option.setName('grund').setDescription('Grund des Kicks'),
+                ),
             this,
         );
     }
@@ -47,7 +54,9 @@ export class Kick extends Command {
             if (response.includes('Disconnected')) {
                 embed.setTitle('Kick Player');
                 embed.setDescription(
-                    `SpielerID ${id} gekickt\nAntwort vom Server:\n\`${response.replace('print ', '').trim()}\``,
+                    `SpielerID ${id} gekickt\nAntwort vom Server:\n\`${response
+                        .replace('print ', '')
+                        .trim()}\``,
                 );
                 await interaction.reply({ embeds: [embed] });
             } else {
@@ -59,7 +68,9 @@ export class Kick extends Command {
         } catch (error) {
             LogManager.error(error);
             await interaction.reply({
-                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(error)}\`\`\``,
+                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(
+                    error,
+                )}\`\`\``,
                 ephemeral: true,
             });
         }

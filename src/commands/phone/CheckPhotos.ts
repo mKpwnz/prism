@@ -9,7 +9,10 @@ export class CheckPhotos extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_LIMITED];
+        this.AllowedChannels = [
+            Config.Discord.Channel.WHOIS_TESTI,
+            Config.Discord.Channel.WHOIS_LIMITED,
+        ];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -21,7 +24,9 @@ export class CheckPhotos extends Command {
             new SlashCommandBuilder()
                 .setName('checkphotos')
                 .setDescription('Check Photos!')
-                .addBooleanOption((option) => option.setName('delete').setDescription('Bilder auch löschen?'))
+                .addBooleanOption((option) =>
+                    option.setName('delete').setDescription('Bilder auch löschen?'),
+                )
                 .addNumberOption((option) =>
                     option
                         .addChoices(
@@ -45,9 +50,14 @@ export class CheckPhotos extends Command {
                     option
                         .setName('year')
                         .setDescription('Jahr')
-                        .addChoices({ name: '2023', value: '2023' }, { name: '2024', value: '2024' }),
+                        .addChoices(
+                            { name: '2023', value: '2023' },
+                            { name: '2024', value: '2024' },
+                        ),
                 )
-                .addBooleanOption((option) => option.setName('selectall').setDescription('Alle auswählen?')),
+                .addBooleanOption((option) =>
+                    option.setName('selectall').setDescription('Alle auswählen?'),
+                ),
 
             this,
         );
@@ -92,7 +102,9 @@ export class CheckPhotos extends Command {
         }
 
         if (embeds.length === 0) {
-            interaction.editReply('▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰ 100% / 100% | Check completed, no illegal photos found!');
+            interaction.editReply(
+                '▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰ 100% / 100% | Check completed, no illegal photos found!',
+            );
         } else {
             interaction.editReply({ embeds });
         }

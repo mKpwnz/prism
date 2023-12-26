@@ -14,7 +14,10 @@ export class Setjob extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED];
+        this.AllowedChannels = [
+            Config.Discord.Channel.WHOIS_TESTI,
+            Config.Discord.Channel.WHOIS_UNLIMITED,
+        ];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -33,13 +36,21 @@ export class Setjob extends Command {
                         .setName('online')
                         .setDescription('Setze den Job eines Spieler, der online ist')
                         .addIntegerOption((option) =>
-                            option.setName('id').setDescription('ID des Spielers').setRequired(true),
+                            option
+                                .setName('id')
+                                .setDescription('ID des Spielers')
+                                .setRequired(true),
                         )
                         .addStringOption((option) =>
-                            option.setName('jobname').setDescription('Name des Jobs').setRequired(true),
+                            option
+                                .setName('jobname')
+                                .setDescription('Name des Jobs')
+                                .setRequired(true),
                         )
                         .addIntegerOption((option) =>
-                            option.setName('grade').setDescription('Grade des Spielers (Startet ab 0) (Default: 0)'),
+                            option
+                                .setName('grade')
+                                .setDescription('Grade des Spielers (Startet ab 0) (Default: 0)'),
                         ),
                 )
                 .addSubcommand((subcommand) =>
@@ -47,13 +58,21 @@ export class Setjob extends Command {
                         .setName('offline')
                         .setDescription('Setze den Job eines Spieler, der offline ist')
                         .addStringOption((option) =>
-                            option.setName('steamid').setDescription('SteamID des Spielers').setRequired(true),
+                            option
+                                .setName('steamid')
+                                .setDescription('SteamID des Spielers')
+                                .setRequired(true),
                         )
                         .addStringOption((option) =>
-                            option.setName('jobname').setDescription('Name des Jobs').setRequired(true),
+                            option
+                                .setName('jobname')
+                                .setDescription('Name des Jobs')
+                                .setRequired(true),
                         )
                         .addIntegerOption((option) =>
-                            option.setName('grade').setDescription('Grade des Spielers (Startet ab 0) (Default: 0)'),
+                            option
+                                .setName('grade')
+                                .setDescription('Grade des Spielers (Startet ab 0) (Default: 0)'),
                         ),
                 ),
             this,
@@ -82,7 +101,9 @@ export class Setjob extends Command {
             return;
         }
         try {
-            const [jobquery] = await GameDB.query<IJob[]>('SELECT * FROM jobs WHERE name = ?', [job.toLowerCase()]);
+            const [jobquery] = await GameDB.query<IJob[]>('SELECT * FROM jobs WHERE name = ?', [
+                job.toLowerCase(),
+            ]);
             if (jobquery.length === 0) {
                 await interaction.reply({
                     content: 'Es wurde kein Job mit diesem Namen gefunden!',
@@ -90,13 +111,21 @@ export class Setjob extends Command {
                 });
                 return;
             }
-            await RconClient.sendCommand(`setjob ${options.getInteger('id')} ${job.toLowerCase()} ${grade}`);
+            await RconClient.sendCommand(
+                `setjob ${options.getInteger('id')} ${job.toLowerCase()} ${grade}`,
+            );
             embed.setTitle('Job geändert (online)');
-            embed.setDescription(`Der Job von ID ${options.getInteger('id')} wurde auf ${job} Grade ${grade} gesetzt!`);
+            embed.setDescription(
+                `Der Job von ID ${options.getInteger(
+                    'id',
+                )} wurde auf ${job} Grade ${grade} gesetzt!`,
+            );
             await interaction.reply({ embeds: [embed] });
         } catch (error) {
             await interaction.reply({
-                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(error)}\`\`\``,
+                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(
+                    error,
+                )}\`\`\``,
                 ephemeral: true,
             });
         }
@@ -109,7 +138,10 @@ export class Setjob extends Command {
         const job = options.getString('jobname');
         const grade = options.getInteger('grade') ?? 0;
         if (!steamid) {
-            await interaction.reply({ content: 'Es wurde keine SteamID angegeben!', ephemeral: true });
+            await interaction.reply({
+                content: 'Es wurde keine SteamID angegeben!',
+                ephemeral: true,
+            });
             return;
         }
         if (!job) {
@@ -125,7 +157,9 @@ export class Setjob extends Command {
             return;
         }
         try {
-            const [jobquery] = await GameDB.query<IJob[]>('SELECT * FROM jobs WHERE name = ?', [job.toLowerCase()]);
+            const [jobquery] = await GameDB.query<IJob[]>('SELECT * FROM jobs WHERE name = ?', [
+                job.toLowerCase(),
+            ]);
             LogManager.debug(jobquery);
             if (jobquery.length === 0) {
                 await interaction.reply({
@@ -135,11 +169,10 @@ export class Setjob extends Command {
                 return;
             }
             // TODO: Update zu "affectedRows" mit Database.query<T>
-            const query = (await GameDB.query('UPDATE users SET job = ?, job_grade = ? WHERE identifier = ?', [
-                job.toLowerCase(),
-                grade,
-                vPlayer.identifiers.steam,
-            ])) as RowDataPacket[];
+            const query = (await GameDB.query(
+                'UPDATE users SET job = ?, job_grade = ? WHERE identifier = ?',
+                [job.toLowerCase(), grade, vPlayer.identifiers.steam],
+            )) as RowDataPacket[];
 
             if (query[0].affectedRows === 0) {
                 await interaction.reply({

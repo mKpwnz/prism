@@ -15,7 +15,10 @@ export class ServerStatus extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED];
+        this.AllowedChannels = [
+            Config.Discord.Channel.WHOIS_TESTI,
+            Config.Discord.Channel.WHOIS_UNLIMITED,
+        ];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -25,7 +28,9 @@ export class ServerStatus extends Command {
             Config.Discord.Groups.IC_MOD,
         ];
         RegisterCommand(
-            new SlashCommandBuilder().setName('serverstatus').setDescription('Gibt den aktuellen Serverstatus zurück!'),
+            new SlashCommandBuilder()
+                .setName('serverstatus')
+                .setDescription('Gibt den aktuellen Serverstatus zurück!'),
             this,
         );
     }
@@ -64,9 +69,12 @@ export class ServerStatus extends Command {
                 return [];
             });
         const hbdRes: HeartbeatResponse = await axios
-            .get('https://status.immortaldev.eu/api/status-page/heartbeat/9t7abvczql56qa629fkejnfg2dyl072r', {
-                timeout: 2500,
-            })
+            .get(
+                'https://status.immortaldev.eu/api/status-page/heartbeat/9t7abvczql56qa629fkejnfg2dyl072r',
+                {
+                    timeout: 2500,
+                },
+            )
             .then((heartbeatRes) => heartbeatRes.data)
             .catch((err) => {
                 LogManager.error(err);

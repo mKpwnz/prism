@@ -8,13 +8,21 @@ import { BotDB, GameDB } from '@sql/Database';
 import { IFindUser } from '@sql/schema/User.schema';
 import { Helper } from '@utils/Helper';
 import LogManager from '@utils/Logger';
-import { AttachmentBuilder, ChatInputCommandInteraction, GuildEmoji, SlashCommandBuilder } from 'discord.js';
+import {
+    AttachmentBuilder,
+    ChatInputCommandInteraction,
+    GuildEmoji,
+    SlashCommandBuilder,
+} from 'discord.js';
 
 export class WhoIs extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED];
+        this.AllowedChannels = [
+            Config.Discord.Channel.WHOIS_TESTI,
+            Config.Discord.Channel.WHOIS_UNLIMITED,
+        ];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -30,9 +38,14 @@ export class WhoIs extends Command {
                 // add string option
                 .setDMPermission(true)
                 .addStringOption((option) =>
-                    option.setName('input').setDescription('Identifier des Spielers').setRequired(true),
+                    option
+                        .setName('input')
+                        .setDescription('Identifier des Spielers')
+                        .setRequired(true),
                 )
-                .addBooleanOption((option) => option.setName('export').setDescription('Gibt eine JSON Datei aus'))
+                .addBooleanOption((option) =>
+                    option.setName('export').setDescription('Gibt eine JSON Datei aus'),
+                )
                 .addIntegerOption((option) => option.setName('seite').setDescription('Seitenzahl'))
                 .addStringOption((option) =>
                     option
@@ -151,7 +164,9 @@ export class WhoIs extends Command {
             }
             let additionalString = '';
             if (embedFields.length === pageSize || page > 1) {
-                additionalString = `\n${findUsers.length - embedFields.length} weitere Ergebnisse sind ausgeblendet!`;
+                additionalString = `\n${
+                    findUsers.length - embedFields.length
+                } weitere Ergebnisse sind ausgeblendet!`;
             }
 
             embed.setTitle('Suchergebnisse');
@@ -185,16 +200,24 @@ export class WhoIs extends Command {
         return {
             name: `${user.playername} (${user.name})`,
             value:
-                `${nvhxBanned ? `${bannedEmote} **NVHX Global Ban Detected** ${bannedEmote}` : ''}` +
-                `\nSteamID: [${user.identifier}](https://steamid.pro/de/lookup/${steamId})\nDiscord: ${
+                `${
+                    nvhxBanned ? `${bannedEmote} **NVHX Global Ban Detected** ${bannedEmote}` : ''
+                }` +
+                `\nSteamID: [${
+                    user.identifier
+                }](https://steamid.pro/de/lookup/${steamId})\nDiscord: ${
                     user.discord ? `<@${user.discord?.replace('discord:', '')}>` : 'Nicht Vorhanden'
-                }\nJob: ${user.job} (${user.job_grade})\nGroup: ${user.group}\nIC Name: ${user.firstname} ${
-                    user.lastname
-                }\nBank: ${user.bank.toLocaleString('de-DE')}€\nHand: ${user.money.toLocaleString(
+                }\nJob: ${user.job} (${user.job_grade})\nGroup: ${user.group}\nIC Name: ${
+                    user.firstname
+                } ${user.lastname}\nBank: ${user.bank.toLocaleString(
+                    'de-DE',
+                )}€\nHand: ${user.money.toLocaleString(
                     'de-DE',
                 )}€\nSchwarzgeld: ${user.black_money.toLocaleString('de-DE')}€\nNummer: ${
                     user.phone_number
-                }${fraksperreString}${levelString}${teamNoteCount > 0 ? '\n**Es ist eine Teamnote vorhanden**' : ''}` +
+                }${fraksperreString}${levelString}${
+                    teamNoteCount > 0 ? '\n**Es ist eine Teamnote vorhanden**' : ''
+                }` +
                 `\n${embedFieldLength < pageSize - 1 ? '-----' : ''}`,
             inline: false,
         };
@@ -203,7 +226,9 @@ export class WhoIs extends Command {
     private getLevelByUser(user: IFindUser) {
         let levelString = '';
         if (user.crafting_level) {
-            levelString = `\nCrafting Level: ${(user.crafting_level - (user.crafting_level % 100)) / 100}`;
+            levelString = `\nCrafting Level: ${
+                (user.crafting_level - (user.crafting_level % 100)) / 100
+            }`;
         }
         return levelString;
     }
@@ -215,7 +240,9 @@ export class WhoIs extends Command {
             const expiration = new Date(user.fraksperre).getTime() / 1000;
             const diff = expiration - now;
             if (diff > 0) {
-                fraksperrestring = `${fraksperrestring}\nFraksperre Verbleibend: ${Helper.secondsToTimeString(diff)}`;
+                fraksperrestring = `${fraksperrestring}\nFraksperre Verbleibend: ${Helper.secondsToTimeString(
+                    diff,
+                )}`;
             }
         }
         return fraksperrestring;

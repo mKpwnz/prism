@@ -10,9 +10,14 @@ export class CachePerformance extends Command {
     constructor() {
         super();
         this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI];
-        this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER, Config.Discord.Groups.DEV_BOTTESTER];
+        this.AllowedGroups = [
+            Config.Discord.Groups.DEV_SERVERENGINEER,
+            Config.Discord.Groups.DEV_BOTTESTER,
+        ];
         RegisterCommand(
-            new SlashCommandBuilder().setName('cacheperformance').setDescription('Performance Test für den Cache.'),
+            new SlashCommandBuilder()
+                .setName('cacheperformance')
+                .setDescription('Performance Test für den Cache.'),
             this,
         );
         this.DoNotCountUse = true;
@@ -23,7 +28,10 @@ export class CachePerformance extends Command {
             interaction,
             async () => {
                 const NvhxGlobalBans = await NvhxData.GetAllGlobalBans();
-                const players = await NvhxData.CheckIfUserIsBanned(['steam:11000010ea14dfd'], NvhxGlobalBans);
+                const players = await NvhxData.CheckIfUserIsBanned(
+                    ['steam:11000010ea14dfd'],
+                    NvhxGlobalBans,
+                );
                 LogManager.debug(players);
                 return players;
             },

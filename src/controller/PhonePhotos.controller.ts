@@ -52,7 +52,9 @@ export class PhonePhotosController {
         return messages;
     }
 
-    public static async deleteDarkchatMessages(messages: IPhoneDarkchatMessages[]): Promise<number> {
+    public static async deleteDarkchatMessages(
+        messages: IPhoneDarkchatMessages[],
+    ): Promise<number> {
         let affectedRows = 0;
         for (const message of messages) {
             const [ret] = await GameDB.execute<ResultSetHeader>(
@@ -255,7 +257,9 @@ export class PhonePhotosController {
 
     public static async deletePicture(picture: string): Promise<number> {
         let affectedRows = 0;
-        const [ret] = await GameDB.execute<ResultSetHeader>(`DELETE FROM phone_photos WHERE link = '${picture}'`);
+        const [ret] = await GameDB.execute<ResultSetHeader>(
+            `DELETE FROM phone_photos WHERE link = '${picture}'`,
+        );
         affectedRows += ret.affectedRows;
         const [ret2] = await GameDB.execute<ResultSetHeader>(
             `DELETE FROM phone_instagram_posts WHERE media LIKE '%${picture}%'`,
@@ -385,9 +389,13 @@ export class PhonePhotosController {
             deleted += await this.deleteTiktokPosts(tiktok);
             deleted += await this.deleteTinderMessages(tinder);
 
-            await interaction.editReply(`▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰ 100% / 100% | Done with Check, Deleted ${deleted} pictures`);
+            await interaction.editReply(
+                `▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰ 100% / 100% | Done with Check, Deleted ${deleted} pictures`,
+            );
         } else {
-            await interaction.editReply('▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰ 100% / 100% | Check completed, returning owners');
+            await interaction.editReply(
+                '▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰ 100% / 100% | Check completed, returning owners',
+            );
         }
 
         const owners = [
