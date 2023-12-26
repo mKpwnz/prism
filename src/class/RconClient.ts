@@ -20,7 +20,7 @@ export class RconClient {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     private onMessage(msg: Buffer, rinfo: RemoteInfo) {
         const response = msg.toString('ascii');
-        LogManager.log(`RCON Response: ${response}`);
+        LogManager.debug(`RCON Response: ${response}`);
     }
 
     public static async sendCommand(command: string): Promise<string> {
@@ -58,3 +58,4 @@ export class RconClient {
         }
     }
 }
+

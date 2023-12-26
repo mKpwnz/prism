@@ -118,6 +118,8 @@ export class ServerStatus extends Command {
             });
             embed.setImage(Config.Pictures.WHITESPACE);
         }
+        this.addCommandBenchmark(embed);
         interaction.reply({ content: ' ', embeds: [embed] });
     }
 }
+

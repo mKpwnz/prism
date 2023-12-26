@@ -87,6 +87,20 @@ export abstract class Command {
     DoNotCountUse: boolean = false;
 
     /**
+     * @description Gibt an, wann der Command ausgeführt wurde. (Timestamp)
+     * @type {Date}
+     * @memberof Command
+     */
+    CmdPerformanceStart: Date | undefined = undefined;
+
+    /**
+     * @description Gibt an, wann der Command fertig ausgeführt wurde. (Timestamp)
+     * @type {Date}
+     * @memberof Command
+     */
+    CmdPerformanceStop: Date | undefined = undefined;
+
+    /**
      * @description Führt den Command aus. Muss in der Klasse, die von Command erbt, implementiert werden. (execute() { ... })
      * @author mKpwnz
      * @date 14.10.2023
@@ -170,6 +184,7 @@ export abstract class Command {
         }
         // LogManager.debug(logEntry)
         try {
+            this.CmdPerformanceStart = new Date();
             await this.execute(interaction);
         } catch (error) {
             LogManager.error(error);
@@ -200,4 +215,14 @@ export abstract class Command {
             .setTimestamp(new Date())
             .setImage(Config.Pictures.WHITESPACE);
     }
+
+    addCommandBenchmark(embed: EmbedBuilder): void {
+        this.CmdPerformanceStop = new Date();
+        const executionTime = this.CmdPerformanceStop.getTime() - this.CmdPerformanceStart!.getTime();
+        embed.setFooter({
+            text: `${embed.data.footer?.text} | Executiontime: ${executionTime}ms`,
+            iconURL: embed.data.footer?.icon_url,
+        });
+    }
 }
+

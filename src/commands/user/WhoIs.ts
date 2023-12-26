@@ -61,6 +61,7 @@ export class WhoIs extends Command {
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const { channel } = interaction;
+        const embed = this.getEmbedTemplate(interaction);
 
         const identifierValue = interaction.options.getString('input');
 
@@ -77,63 +78,53 @@ export class WhoIs extends Command {
 
         const findUsers: IFindUser[] = await WhoIs.searchUsers(identifierValue, spalte);
 
-        // @TODO Are you sure this can happen? Or does searchUsers always return at least an empty array?
-        if (!findUsers) {
-            await interaction.reply({ content: 'User nicht gefunden', ephemeral: true });
-            return;
-        }
-
         const embedFields = [];
         const bannedEmote = await Helper.getEmote('pbot_banned');
 
-        // @TODO is this if even necessary? We previously checked findUsers already.
-        if (findUsers.length > 0) {
-            const globalBans = await NvhxData.GetAllGlobalBans();
-
-            for (let i = pageSize * (page - 1); i < findUsers.length; i++) {
-                // Pagination
-                if (embedFields.length >= pageSize) {
-                    break;
-                }
-
-                const steamId: bigint = this.getSteamIdOrDefaultByUser(findUsers[i]);
-                const fraksperreString = this.getFraksperreByUser(findUsers[i]);
-                const levelString = this.getLevelByUser(findUsers[i]);
-
-                const teamNoteCount = await BotDB.team_notes.count({
-                    where: {
-                        user: findUsers[i].identifier,
-                    },
-                });
-
-                const nvhxBanned = NvhxData.CheckIfUserIsBanned(
-                    [findUsers[i].identifier, findUsers[i].discord],
-                    globalBans,
-                );
-
-                embedFields.push(
-                    this.EmbedFieldsBuilder(
-                        findUsers[i],
-                        nvhxBanned,
-                        bannedEmote,
-                        steamId,
-                        fraksperreString,
-                        levelString,
-                        teamNoteCount,
-                        pageSize,
-                        embedFields.length,
-                    ),
-                );
-            }
-        }
-
-        // @TODO is this code even reachable?
-        if (embedFields.length === 0) {
+        if (findUsers.length === 0) {
             await interaction.reply({
-                content: `Keine Daten für "${identifierValue}"gefunden!${filter}`,
+                content: `Keine Daten für "${identifierValue}" gefunden!${filter}`,
                 ephemeral: true,
             });
             return;
+        }
+
+        const globalBans = await NvhxData.GetAllGlobalBans();
+
+        for (let i = pageSize * (page - 1); i < findUsers.length; i++) {
+            // Pagination
+            if (embedFields.length >= pageSize) {
+                break;
+            }
+
+            const steamId: bigint = this.getSteamIdOrDefaultByUser(findUsers[i]);
+            const fraksperreString = this.getFraksperreByUser(findUsers[i]);
+            const levelString = this.getLevelByUser(findUsers[i]);
+
+            const teamNoteCount = await BotDB.team_notes.count({
+                where: {
+                    user: findUsers[i].identifier,
+                },
+            });
+
+            const nvhxBanned = NvhxData.CheckIfUserIsBanned(
+                [findUsers[i].identifier, findUsers[i].discord],
+                globalBans,
+            );
+
+            embedFields.push(
+                this.EmbedFieldsBuilder(
+                    findUsers[i],
+                    nvhxBanned,
+                    bannedEmote,
+                    steamId,
+                    fraksperreString,
+                    levelString,
+                    teamNoteCount,
+                    pageSize,
+                    embedFields.length,
+                ),
+            );
         }
 
         const file = interaction.options.getBoolean('export');
@@ -163,20 +154,20 @@ export class WhoIs extends Command {
                 additionalString = `\n${findUsers.length - embedFields.length} weitere Ergebnisse sind ausgeblendet!`;
             }
 
-            const embed = this.getEmbedTemplate(interaction);
             embed.setTitle('Suchergebnisse');
             embed.setDescription(
                 `Hier sind ${embedFields.length}/${findUsers.length} Suchergebnisse für "${identifierValue}":${additionalString}${pageString}`,
             );
             embed.setFields(embedFields);
-            channel?.send({
+            this.addCommandBenchmark(embed);
+            await interaction.reply({
                 content: `${interaction.user.toString()}`,
                 embeds: [embed],
             });
-            await interaction.reply({
-                content: 'Daten gefunden und im Chat hinterlegt!',
-                ephemeral: true,
-            });
+            // channel?.send({
+            //     content: `${interaction.user.toString()}`,
+            //     embeds: [embed],
+            // });
         }
     }
 
@@ -301,7 +292,6 @@ export class WhoIs extends Command {
             `LEFT JOIN baninfo ON users.identifier = baninfo.identifier ` +
             `JOIN phone_phones ON users.identifier = phone_phones.id ` +
             `WHERE ${columns.get(column)}`;
-
         try {
             const [rows] = await GameDB.execute(query); // Verwenden Sie await und die execute-Funktion
             return rows as IFindUser[]; // Casten Sie das Ergebnis in das gewünschte Format
