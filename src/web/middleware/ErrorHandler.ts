@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import LogManager from '@utils/Logger';
 import { CustomError } from '@web/CustomError';
-import { Express, NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 
 /**
  * @description Errorhandler für die API. Wird immer aufgerufen, wenn ein Fehler auftritt. (z.B. 404) (Wird auch in der Konsole geloggt, wenn der Fehler geloggt werden soll.)

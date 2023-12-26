@@ -8,6 +8,7 @@ import { ILivePlayer } from '@interfaces/ILivePlayer';
 import Config from '@proot/Config';
 import { Helper } from '@utils/Helper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { CommandHelper } from '@commands/CommandHelper';
 
 export class Nvhx extends Command {
     constructor() {
@@ -87,7 +88,7 @@ export class Nvhx extends Command {
                 `Triggere Neverhax Screenshot für SpielerID ${id}`,
             );
         } catch (error) {
-            await this.handleInteractionError(error, interaction);
+            await CommandHelper.handleInteractionError(error, interaction);
         }
     }
 
@@ -105,7 +106,7 @@ export class Nvhx extends Command {
                 });
             }
         } catch (error) {
-            await this.handleInteractionError(error, interaction);
+            await CommandHelper.handleInteractionError(error, interaction);
         }
     }
 
@@ -115,7 +116,7 @@ export class Nvhx extends Command {
             const description = await this.formatBannedPlayersDescription(bannedPlayers);
             await this.replyWithEmbed(interaction, 'Gebannte Spieler', description);
         } catch (error) {
-            await this.handleInteractionError(error, interaction);
+            await CommandHelper.handleInteractionError(error, interaction);
         }
     }
 
@@ -151,17 +152,5 @@ export class Nvhx extends Command {
         embed.setTitle(title);
         embed.setDescription(description);
         await interaction.reply({ embeds: [embed] });
-    }
-
-    private async handleInteractionError(
-        error: any,
-        interaction: ChatInputCommandInteraction,
-    ): Promise<void> {
-        await interaction.reply({
-            content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(
-                error,
-            )}\`\`\``,
-            ephemeral: true,
-        });
     }
 }

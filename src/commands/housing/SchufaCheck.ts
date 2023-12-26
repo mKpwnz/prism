@@ -2,12 +2,12 @@ import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import Config from '@proot/Config';
-import { GameDB } from '@sql/Database';
 import { ISchufaUser } from '@sql/schema/User.schema';
-import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { GameDbService } from '@proot/services/GameDb.service';
+import { CommandHelper } from '@commands/CommandHelper';
 
-// TODO: REFACTOR
+// @TODO should we reply with Embed?
 export class SchufaCheck extends Command {
     constructor() {
         super();
@@ -34,13 +34,13 @@ export class SchufaCheck extends Command {
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         try {
-            const [schufaUsers] = await GameDB.query<ISchufaUser[]>(
-                `SELECT firstname, lastname, steamId, accounts FROM users u JOIN player_houses ph ON u.identifier = ph.identifier WHERE JSON_EXTRACT(u.accounts, '$.bank') < 0;`,
-            );
+            const schufaUsers: ISchufaUser[] = await GameDbService.getSchufaUsers();
+
             for (const user of schufaUsers) {
                 schufaUsers[schufaUsers.indexOf(user)].accounts = JSON.parse(user.accounts);
             }
-            interaction.reply({
+
+            await interaction.reply({
                 content: `**${
                     schufaUsers.length
                 }** Hausbesitzer mit negativem Kontostand gefunden.\`\`\`json\n${JSON.stringify(
@@ -49,12 +49,8 @@ export class SchufaCheck extends Command {
                     4,
                 )}\`\`\``,
             });
-        } catch (e) {
-            LogManager.error(e);
-            interaction.reply({
-                content: `Fehler beim ausführen des Befeheles.`,
-                ephemeral: true,
-            });
+        } catch (error) {
+            await CommandHelper.handleInteractionError(error, interaction);
         }
     }
 }

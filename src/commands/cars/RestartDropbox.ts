@@ -5,7 +5,10 @@ import { EENV } from '@enums/EENV';
 import Config from '@proot/Config';
 import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { CommandHelper } from '@commands/CommandHelper';
 
+// @TODO add docs for this file
+// @TODO does this belong in the cars folder?
 export class RestartDropbox extends Command {
     constructor() {
         super();
@@ -40,13 +43,10 @@ export class RestartDropbox extends Command {
                 embeds: [embed],
             });
         } catch (error) {
-            console.log(error);
-            await interaction.reply({
-                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(
-                    error,
-                )}\`\`\``,
-                ephemeral: true,
-            });
+            // Error Handling does not work like that
+            // If you want to catch this specific error, you should do it in RconClient.ts
+            // A custom error type may be required
+            await CommandHelper.handleInteractionError(error, interaction);
         }
     }
 }

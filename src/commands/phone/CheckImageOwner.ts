@@ -2,10 +2,10 @@ import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import Config from '@proot/Config';
-import { GameDB } from '@sql/Database';
-import { IPhoneOwnerResponse } from '@sql/schema/Phone.schema';
 import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { CommandHelper } from '@commands/CommandHelper';
+import { GameDbService } from '@proot/services/GameDb.service';
 
 // TODO: REFACTOR
 export class CheckImageOwner extends Command {
@@ -43,47 +43,29 @@ export class CheckImageOwner extends Command {
         return null;
     }
 
-    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+    public async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         try {
+            // We should have a better solution for input validation
             const nLink = this.normalizeLink(
                 interaction.options.get('imageurl')?.value?.toString() as string,
             );
             if (!nLink) {
-                interaction.reply({
+                await interaction.reply({
                     content: `Der link konnte nicht validiert werden.`,
                     ephemeral: true,
                 });
                 return;
             }
+            // @TODO why?
             LogManager.debug(nLink);
 
-            const [response] = await GameDB.query<IPhoneOwnerResponse[]>(
-                `
-                SELECT
-                    u.firstname,
-                    u.lastname,
-                    phones.id AS steamID,
-                    photos.phone_number,
-                    photos.timestamp AS img_timestamp
-				FROM phone_photos photos
-				JOIN phone_phones phones ON photos.phone_number = phones.phone_number
-				JOIN users u ON u.identifier = phones.id
-				WHERE
-                    photos.link LIKE ?
-				ORDER BY
-                    img_timestamp;
-			`,
-                [`%${nLink}%`],
-            );
-            interaction.reply({
-                content: `\`\`\`json\n${JSON.stringify(response[0], null, 4)}\`\`\``,
+            const phoneOwner = await GameDbService.getPhoneOwnerByImageLink(nLink);
+
+            await interaction.reply({
+                content: `\`\`\`json\n${JSON.stringify(phoneOwner, null, 4)}\`\`\``,
             });
-        } catch (e) {
-            LogManager.error(e);
-            interaction.reply({
-                content: `Fehler beim ausführen des Befeheles.`,
-                ephemeral: true,
-            });
+        } catch (error) {
+            await CommandHelper.handleInteractionError(error, interaction);
         }
     }
 }

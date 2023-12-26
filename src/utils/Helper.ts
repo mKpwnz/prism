@@ -150,6 +150,7 @@ export class Helper {
      * @returns {*}  {string}
      * @memberof Helper
      */
+    // @TODO this is weird & it does 2 jobs in 1 - formatting & validating
     static validateNumberplate(platetext: string): string {
         platetext = platetext.toUpperCase().replace(/[^A-Z0-9 ]*/g, '');
         if (platetext.length === 0) {

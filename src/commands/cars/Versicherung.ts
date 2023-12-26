@@ -4,9 +4,10 @@ import Config from '@proot/Config';
 import { GameDB } from '@sql/Database';
 import { IVersicherung } from '@sql/schema/Versicherung.schema';
 import { Helper } from '@utils/Helper';
-import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { CommandHelper } from '@commands/CommandHelper';
 
+// @TODO unused class Versicherung
 export class Versicherung extends Command {
     constructor() {
         super();
@@ -106,16 +107,24 @@ export class Versicherung extends Command {
                 await interaction.reply('Kein Kennzeichen angegeben!');
                 return;
             }
-            kennzeichen = Helper.validateNumberplate(kennzeichen);
 
+            kennzeichen = Helper.validateNumberplate(kennzeichen);
+            // @TODO
+            // What if kennzeichen is not valid?
+            // Currently we still check in sql
+            // but it think it would be better to let the user know that the plate is not valid
+
+            // @TODO move to service
             const [versicherungen] = await GameDB.query<IVersicherung[]>(
                 'SELECT * FROM `versicherungen` WHERE `plate` = ?',
                 [kennzeichen],
             );
+
             if (versicherungen.length !== 1) {
                 let message;
                 if (versicherungen.length === 0)
                     message = `Keine Versicherung für ${kennzeichen} gefunden!`;
+                // @TODO why don't we show all insurances in the embed?
                 else
                     message = `Es wurden ${versicherungen.length} Versicherungen für ${kennzeichen} gefunden!`;
                 await interaction.reply({ content: message, ephemeral: true });
@@ -133,8 +142,7 @@ export class Versicherung extends Command {
             });
             await interaction.reply({ embeds: [embed] });
         } catch (error) {
-            LogManager.error(error);
-            await interaction.reply('Es ist ein Fehler aufgetreten!');
+            await CommandHelper.handleInteractionError(error, interaction);
         }
     }
 
@@ -171,8 +179,7 @@ export class Versicherung extends Command {
             });
             await interaction.reply({ embeds: [embed] });
         } catch (error) {
-            LogManager.error(error);
-            await interaction.reply('Es ist ein Fehler aufgetreten!');
+            await CommandHelper.handleInteractionError(error, interaction);
         }
     }
 
@@ -213,8 +220,7 @@ export class Versicherung extends Command {
             });
             await interaction.reply({ embeds: [embed] });
         } catch (error) {
-            LogManager.error(error);
-            await interaction.reply('Es ist ein Fehler aufgetreten!');
+            await CommandHelper.handleInteractionError(error, interaction);
         }
     }
 }

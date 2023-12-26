@@ -7,8 +7,8 @@ import Config from '@proot/Config';
 import { GameDB } from '@sql/Database';
 import { IVehicle } from '@sql/schema/Vehicle.schema';
 import { Helper } from '@utils/Helper';
-import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { CommandHelper } from '@commands/CommandHelper';
 
 export class ValidateTrunk extends Command {
     constructor() {
@@ -45,15 +45,20 @@ export class ValidateTrunk extends Command {
         const embed = this.getEmbedTemplate(interaction).setTitle('Validiere Kofferraum');
         try {
             const plate = options.getString('plate');
+            // Do we really need this check?
             if (!plate) {
                 embed.setDescription(`Bitte gebe ein Kennzeichen an.`);
                 await interaction.reply({ embeds: [embed], ephemeral: true });
                 return;
             }
+
+            // Move to game-db.service.ts
+            // Is a vehicle unique to a plate?
             const [vehicles] = await GameDB.query<IVehicle[]>(
                 `SELECT * FROM owned_vehicles WHERE plate = ?`,
                 [Helper.validateNumberplate(plate)],
             );
+
             if (!vehicles.length) {
                 embed.setDescription(
                     `Es konnte kein Fahrzeug mit dem Kennzeichen ${plate} gefunden werden.`,
@@ -61,6 +66,9 @@ export class ValidateTrunk extends Command {
                 await interaction.reply({ embeds: [embed], ephemeral: true });
                 return;
             }
+
+            // Is a vehicle unique to a plate?
+            // Create Helper Method replyWithEmbed for these simple replies.
             const veh = vehicles[0];
             if (!veh.kofferraum) {
                 embed.setDescription(
@@ -69,7 +77,9 @@ export class ValidateTrunk extends Command {
                 await interaction.reply({ embeds: [embed] });
                 return;
             }
+
             const trunk = JSON.parse(veh.kofferraum);
+            // why can there be scuffed items? What does it mean exactly?
             const scuffedItems: { item: string; count: number }[] = [];
             const ignoreList = ['c_money_cash', 'c_money_black', 'weapon_weapons'];
             for (const item of Object.keys(trunk)) {
@@ -80,6 +90,7 @@ export class ValidateTrunk extends Command {
                     }
                 }
             }
+
             if (!scuffedItems.length) {
                 embed.setColor(EmbedColors.SUCCESS);
                 embed.setDescription(
@@ -99,12 +110,10 @@ export class ValidateTrunk extends Command {
                 );
                 await interaction.reply({ embeds: [embed] });
             }
-        } catch (e) {
-            LogManager.error(e);
-            interaction.reply({
-                content: `Fehler beim ausführen des Befeheles.`,
-                ephemeral: true,
-            });
+            // Error Handling should be done a level higher, where .execute is called.
+            // Here we should only catch very specific errors.
+        } catch (error) {
+            await CommandHelper.handleInteractionError(error, interaction);
         }
     }
 }

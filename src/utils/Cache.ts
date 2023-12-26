@@ -1,7 +1,7 @@
 import { EmbedColors } from '@enums/EmbedColors';
 import Config from '@proot/Config';
 import { AlignmentEnum, AsciiTable3 } from 'ascii-table3';
-import { MemoryCache, MemoryStore, caching } from 'cache-manager';
+import { caching, MemoryCache, MemoryStore } from 'cache-manager';
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 import * as prettier from 'prettier';
 

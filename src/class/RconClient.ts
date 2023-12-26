@@ -1,5 +1,5 @@
 import LogManager from '@utils/Logger';
-import { RemoteInfo, Socket, createSocket } from 'dgram';
+import { createSocket, RemoteInfo, Socket } from 'dgram';
 
 export class RconClient {
     private static socket: Socket | null = null;

@@ -37,7 +37,7 @@ export class Player {
     }
 
     /**
-     * @description Check if a player ist Online
+     * @description Check if a player is Online
      * @author mKpwnz
      * @date 20.10.2023
      * @static
@@ -47,7 +47,7 @@ export class Player {
      */
     public static async isPlayerOnline(identifier: string): Promise<boolean> {
         const livePlayers = await Player.getAllLivePlayers();
-        return !!livePlayers.find((p) => p.identifiers.indexOf(identifier) > -1);
+        return livePlayers.some((p) => p.identifiers.indexOf(identifier) > -1);
     }
 
     /**

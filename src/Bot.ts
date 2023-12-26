@@ -1,5 +1,4 @@
 import 'dotenv/config'; // THIS NEED TO BE AT THE TOP !!!IMPORTANT
-
 import { EventHandler } from '@events/EventHandler';
 import { Cache } from '@utils/Cache';
 import LogManager from '@utils/Logger';
