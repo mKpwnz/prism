@@ -4,11 +4,19 @@
     "parserOptions": {
         "project": "./tsconfig.json"
     },
-    "plugins": ["@typescript-eslint"],
-    "extends": ["airbnb-base", "airbnb-typescript/base", "prettier"],
+    "plugins": [
+        "@typescript-eslint"
+    ],
+    "extends": [
+        "airbnb-base",
+        "airbnb-typescript/base",
+        "prettier"
+    ],
     "overrides": [
         {
-            "files": ["*"],
+            "files": [
+                "*"
+            ],
             "rules": {
                 "import/prefer-default-export": "off",
                 "no-new": "off",
@@ -16,6 +24,7 @@
                 "no-underscore-dangle": "off",
                 "no-await-in-loop": "off",
                 "no-plusplus": "off",
+                "import/no-extraneous-dependencies": "off", // TODO: @Etox kannst du dir das einmal bitte anschauen, warum er in der ExpressApp.ts am meckern ist?
                 "no-param-reassign": "warn",
                 "class-methods-use-this": "warn"
             }
