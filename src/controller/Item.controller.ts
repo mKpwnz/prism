@@ -28,11 +28,29 @@ export class Items {
         return cItems;
     }
 
+    /**
+     * @description
+     * @author mKpwnz
+     * @date 26.12.2023
+     * @static
+     * @param {string} itemName
+     * @returns {*}  {Promise<boolean>}
+     * @memberof Items
+     */
     public static async doesItemExists(itemName: string): Promise<boolean> {
         const items = await this.getAllItems();
         return items.some((item) => item.name === itemName);
     }
 
+    /**
+     * @description
+     * @author mKpwnz
+     * @date 26.12.2023
+     * @static
+     * @param {string} itemName
+     * @returns {*}  {Promise<string>}
+     * @memberof Items
+     */
     public static async validateItemName(itemName: string): Promise<string> {
         const items = await this.getAllItems();
         return items.find((item) => item.name.toLowerCase() === itemName.toLowerCase())?.name ?? '';
