@@ -1,7 +1,5 @@
 import { BotClient } from '@proot/Bot';
 import Config from '@proot/Config';
-import { GameDB } from '@sql/Database';
-import { IItem } from '@sql/schema/Item.schema';
 import { CommandInteraction, GuildEmoji, TextChannel } from 'discord.js';
 import LogManager from './Logger';
 
@@ -175,59 +173,6 @@ export class Helper {
         }
 
         return platetext;
-    }
-
-    // TODO: Move to Item.controller.ts
-    /**
-     * @description
-     * @author sirjxsh
-     * @date 09.10.2023
-     * @static
-     * @param {string} itemName
-     * @returns {*}  {Promise<string>}
-     * @memberof Helper
-     */
-    static async validateItemName(itemName: string): Promise<string> {
-        itemName = itemName.toLowerCase();
-        itemName = `%${itemName}%`;
-        try {
-            const [item] = await GameDB.query<IItem[]>('SELECT * FROM items WHERE name LIKE ?', [
-                itemName,
-            ]);
-            if (item.length > 0) {
-                return item[0].name;
-            }
-            return '';
-        } catch (error) {
-            LogManager.error(error);
-            return '';
-        }
-    }
-
-    // TODO: Move to Item.controller.ts
-    /**
-     * @description
-     * @author mKpwnz
-     * @date 14.10.2023
-     * @static
-     * @param {string} itemName
-     * @returns {*}  {Promise<boolean>}
-     * @memberof Helper
-     */
-    static async doesItemExists(itemName: string): Promise<boolean> {
-        itemName = itemName.toLowerCase();
-        try {
-            const [item] = await GameDB.query<IItem[]>('SELECT * FROM items WHERE name = ?', [
-                itemName,
-            ]);
-            if (item.length > 0) {
-                return true;
-            }
-            return false;
-        } catch (error) {
-            LogManager.error(error);
-            return false;
-        }
     }
 
     /**

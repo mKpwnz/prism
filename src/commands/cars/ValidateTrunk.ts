@@ -1,5 +1,6 @@
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
+import { Items } from '@controller/Item.controller';
 import { EENV } from '@enums/EENV';
 import { EmbedColors } from '@enums/EmbedColors';
 import Config from '@proot/Config';
@@ -73,7 +74,7 @@ export class ValidateTrunk extends Command {
             const ignoreList = ['c_money_cash', 'c_money_black', 'weapon_weapons'];
             for (const item of Object.keys(trunk)) {
                 if (!ignoreList.includes(item)) {
-                    const found = await Helper.doesItemExists(item);
+                    const found = await Items.doesItemExists(item);
                     if (!found) {
                         scuffedItems.push({ item, count: trunk[item] });
                     }
