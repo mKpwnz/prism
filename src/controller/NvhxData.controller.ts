@@ -15,22 +15,25 @@ export class NvhxData {
      * @author mKpwnz
      * @date 18.10.2023
      * @static
-     * @returns {*}  {Promise<String[]>}
+     * @returns {*}  {Promise<Set<String>>}
      * @memberof NvhxData
      */
-    public static async GetAllGlobalBans(): Promise<String[]> {
-        const nvhxGlobalBans = await Cache.get<String[]>('nvhxGlobalBans');
-        if (!nvhxGlobalBans) {
-            const data = await axios.get('https://content.aniblur.games/ag/nvhx/gbn.txt');
-            if (data.status === 200) {
-                const nvhxResponse = data.data.split('\r\n');
-                await Cache.set('nvhxGlobalBans', nvhxResponse);
-                return nvhxResponse;
+    public static async GetAllGlobalBans(): Promise<Set<string>> {
+        let bans = await Cache.get<Set<string>>('nvhxGlobalBans');
+        if (!bans) {
+            try {
+                const response = await axios.get('https://content.aniblur.games/ag/nvhx/gbn.txt');
+                if (response.status === 200 && response.data) {
+                    bans = new Set(response.data.split('\r\n'));
+                    await Cache.set('nvhxGlobalBans', bans);
+                } else {
+                    LogManager.error('Non-200 status code received while fetching NVHX global bans');
+                }
+            } catch (error: any) {
+                LogManager.error(`Error while fetching NVHX global bans: ${error.message}`);
             }
-            LogManager.error('Error while fetching nvhx global bans');
-            return [];
         }
-        return nvhxGlobalBans;
+        return bans || new Set();
     }
 
     /**
@@ -39,16 +42,11 @@ export class NvhxData {
      * @date 18.10.2023
      * @static
      * @param {string[]} userIds
+     * @param globalBans
      * @returns {*}  {Promise<boolean>}
      * @memberof NvhxData
      */
-    public static async CheckIfUserIsBanned(userIds: string[]): Promise<boolean> {
-        const nvhxGlobalBans = await NvhxData.GetAllGlobalBans();
-        for (const id of userIds) {
-            if (nvhxGlobalBans.indexOf(id) > -1) {
-                return true;
-            }
-        }
-        return false;
+    public static CheckIfUserIsBanned(userIds: string[], globalBans: Set<string>): boolean {
+        return userIds.some((id) => globalBans.has(id));
     }
 }

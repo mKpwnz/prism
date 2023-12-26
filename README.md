@@ -4,8 +4,8 @@
 
 ### Prerequisites
 
-- Node.js >= 18.0.0 - for running the application
-- Docker - for running the containers
+-   Node.js >= 18.0.0 - for running the application
+-   Docker - for running the containers
 
 ## Contributing
 

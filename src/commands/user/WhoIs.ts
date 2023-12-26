@@ -8,7 +8,7 @@ import { BotDB, GameDB } from '@sql/Database';
 import { IFindUser } from '@sql/schema/User.schema';
 import { Helper } from '@utils/Helper';
 import LogManager from '@utils/Logger';
-import { AttachmentBuilder, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { AttachmentBuilder, ChatInputCommandInteraction, GuildEmoji, SlashCommandBuilder } from 'discord.js';
 
 export class WhoIs extends Command {
     constructor() {
@@ -61,155 +61,184 @@ export class WhoIs extends Command {
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const { channel } = interaction;
-        const identifierValue = interaction.options.get('input')?.value?.toString();
-        const pageSize = 18;
-        let page = interaction.options.get('seite')?.value as number;
-        let spalte = interaction.options.get('spalte')?.value?.toString();
-        let filter = '\nFilter: ';
-        const embed = this.getEmbedTemplate(interaction);
-        if (identifierValue) {
-            if (spalte === undefined || spalte === null) {
-                spalte = ESearchType.ALL;
-                filter = '';
-            } else {
-                filter += spalte;
-            }
-            const finduser: IFindUser[] = await WhoIs.searchUsers(identifierValue, spalte);
-            if (finduser === null) {
-                await interaction.reply({ content: 'User nicht gefunden', ephemeral: true });
-            } else {
-                if (page === undefined || page == null) {
-                    page = 1;
-                }
-                const fields = [];
-                const bannedEmote = await Helper.getEmote('pbot_banned');
-                if (finduser.length > 0) {
-                    for (let i = pageSize * (page - 1); i < finduser.length; i++) {
-                        let steamId;
-                        if (finduser[i].identifier) {
-                            const hexString = `0x${finduser[i].identifier.replace('steam:', '')}`;
-                            if (/^0x[0-9A-Fa-f]+$/g.test(hexString)) {
-                                steamId = BigInt(hexString);
-                            } else {
-                                steamId = BigInt(0); // Fallback-Wert, wenn die Zeichenfolge ungültig ist
-                            }
-                        } else {
-                            steamId = BigInt(0); // Fallback-Wert, wenn identifier nicht vorhanden ist
-                        }
 
-                        if (fields.length >= pageSize) {
-                            break;
-                        } else {
-                            let fraksperrestring = '';
-                            if (finduser[i].fraksperre) {
-                                const now = Math.floor(Date.now() / 1000);
-                                const expiration = new Date(finduser[i].fraksperre).getTime() / 1000;
-                                const diff = expiration - now;
-                                if (diff > 0) {
-                                    fraksperrestring = `${fraksperrestring}\nFraksperre Verbleibend: ${Helper.secondsToTimeString(
-                                        diff,
-                                    )}`;
-                                }
-                            }
-                            let levelString = '';
-                            if (finduser[i].crafting_level) {
-                                levelString = `\nCrafting Level: ${
-                                    (finduser[i].crafting_level - (finduser[i].crafting_level % 100)) / 100
-                                }`;
-                            }
-                            const teamNoteCount = await BotDB.team_notes.count({
-                                where: {
-                                    user: finduser[i].identifier,
-                                },
-                            });
-                            const nvhxBanned = await NvhxData.CheckIfUserIsBanned([
-                                finduser[i].identifier,
-                                finduser[i].discord,
-                            ]);
-                            fields.push({
-                                name: `${finduser[i].playername} (${finduser[i].name})`,
-                                value:
-                                    `${
-                                        nvhxBanned ? `${bannedEmote} **NVHX Global Ban Detected** ${bannedEmote}` : ''
-                                    }` +
-                                    `\nSteamID: [${
-                                        finduser[i].identifier
-                                    }](https://steamid.pro/de/lookup/${steamId})\nDiscord: ${
-                                        finduser[i].discord
-                                            ? `<@${finduser[i].discord?.replace('discord:', '')}>`
-                                            : 'Nicht Vorhanden'
-                                    }\nJob: ${finduser[i].job} (${finduser[i].job_grade})\nGroup: ${
-                                        finduser[i].group
-                                    }\nIC Name: ${finduser[i].firstname} ${finduser[i].lastname}\nBank: ${finduser[
-                                        i
-                                    ].bank.toLocaleString('de-DE')}€\nHand: ${finduser[i].money.toLocaleString(
-                                        'de-DE',
-                                    )}€\nSchwarzgeld: ${finduser[i].black_money.toLocaleString('de-DE')}€\nNummer: ${
-                                        finduser[i].phone_number
-                                    }${fraksperrestring}${levelString}${
-                                        teamNoteCount > 0 ? '\n**Es ist eine Teamnote vorhanden**' : ''
-                                    }` +
-                                    `\n${fields.length < pageSize - 1 ? '-----' : ''}`,
-                                inline: false,
-                            });
-                        }
-                    }
-                }
+        const identifierValue = interaction.options.getString('input');
 
-                if (fields.length === 0) {
-                    await interaction.reply({
-                        content: `Keine Daten für "${identifierValue}"gefunden!${filter}`,
-                        ephemeral: true,
-                    });
-                } else {
-                    const file = interaction.options.get('export')?.value;
-                    if (file === true) {
-                        // create JSON File and send it to client
-                        const jsonString = JSON.stringify(finduser, null, 4);
-                        const buffer = Buffer.from(jsonString, 'utf-8');
-                        const attachment = new AttachmentBuilder(buffer, {
-                            name: `${identifierValue}.json`,
-                        });
-                        channel?.send({
-                            content: `${interaction.user.toString()}`,
-                            files: [attachment],
-                        });
-                        await interaction.reply({
-                            content: 'Daten gefunden und im Chat hinterlegt!',
-                            ephemeral: true,
-                        });
-                    } else {
-                        let pageString = '';
-                        if (finduser.length > pageSize) {
-                            pageString = `\nSeite ${page}/${Math.ceil(finduser.length / pageSize)}`;
-                        }
-                        let additionalString = '';
-                        if (fields.length === pageSize || page > 1) {
-                            additionalString = `\n${
-                                finduser.length - fields.length
-                            } weitere Ergebnisse sind ausgeblendet!`;
-                        }
-                        embed.setTitle('Suchergebnisse');
-                        embed.setDescription(
-                            `Hier sind ${fields.length}/${finduser.length} Suchergebnisse für "${identifierValue}":${additionalString}${pageString}`,
-                        );
-                        embed.setFields(fields);
-                        channel?.send({
-                            content: `${interaction.user.toString()}`,
-                            embeds: [embed],
-                        });
-                        await interaction.reply({
-                            content: 'Daten gefunden und im Chat hinterlegt!',
-                            ephemeral: true,
-                        });
-                    }
-                }
-            }
-            // Verarbeiten Sie finduser hier weiter
-        } else {
-            // Wenn identifierValue null oder undefined ist
+        if (!identifierValue) {
             await interaction.reply('Die Option "identifier" enthält keinen gültigen Wert.');
+            return;
         }
+
+        const pageSize = 18;
+
+        const page = interaction.options.getNumber('seite') ?? 1;
+        const spalte = interaction.options.getString('spalte') ?? ESearchType.ALL;
+        const filter = spalte ? `\nFilter: ${spalte}` : '';
+
+        const findUsers: IFindUser[] = await WhoIs.searchUsers(identifierValue, spalte);
+
+        // @TODO Are you sure this can happen? Or does searchUsers always return at least an empty array?
+        if (!findUsers) {
+            await interaction.reply({ content: 'User nicht gefunden', ephemeral: true });
+            return;
+        }
+
+        const embedFields = [];
+        const bannedEmote = await Helper.getEmote('pbot_banned');
+
+        // @TODO is this if even necessary? We previously checked findUsers already.
+        if (findUsers.length > 0) {
+            const globalBans = await NvhxData.GetAllGlobalBans();
+
+            for (let i = pageSize * (page - 1); i < findUsers.length; i++) {
+                // Pagination
+                if (embedFields.length >= pageSize) {
+                    break;
+                }
+
+                const steamId: bigint = this.getSteamIdOrDefaultByUser(findUsers[i]);
+                const fraksperreString = this.getFraksperreByUser(findUsers[i]);
+                const levelString = this.getLevelByUser(findUsers[i]);
+
+                const teamNoteCount = await BotDB.team_notes.count({
+                    where: {
+                        user: findUsers[i].identifier,
+                    },
+                });
+
+                const nvhxBanned = NvhxData.CheckIfUserIsBanned(
+                    [findUsers[i].identifier, findUsers[i].discord],
+                    globalBans,
+                );
+
+                embedFields.push(
+                    this.EmbedFieldsBuilder(
+                        findUsers[i],
+                        nvhxBanned,
+                        bannedEmote,
+                        steamId,
+                        fraksperreString,
+                        levelString,
+                        teamNoteCount,
+                        pageSize,
+                        embedFields.length,
+                    ),
+                );
+            }
+        }
+
+        // @TODO is this code even reachable?
+        if (embedFields.length === 0) {
+            await interaction.reply({
+                content: `Keine Daten für "${identifierValue}"gefunden!${filter}`,
+                ephemeral: true,
+            });
+            return;
+        }
+
+        const file = interaction.options.getBoolean('export');
+
+        if (file === true) {
+            // create JSON File and send it to client
+            const jsonString = JSON.stringify(findUsers, null, 4);
+            const buffer = Buffer.from(jsonString, 'utf-8');
+            const attachment = new AttachmentBuilder(buffer, {
+                name: `${identifierValue}.json`,
+            });
+            channel?.send({
+                content: `${interaction.user.toString()}`,
+                files: [attachment],
+            });
+            await interaction.reply({
+                content: 'Daten gefunden und im Chat hinterlegt!',
+                ephemeral: true,
+            });
+        } else {
+            let pageString = '';
+            if (findUsers.length > pageSize) {
+                pageString = `\nSeite ${page}/${Math.ceil(findUsers.length / pageSize)}`;
+            }
+            let additionalString = '';
+            if (embedFields.length === pageSize || page > 1) {
+                additionalString = `\n${findUsers.length - embedFields.length} weitere Ergebnisse sind ausgeblendet!`;
+            }
+
+            const embed = this.getEmbedTemplate(interaction);
+            embed.setTitle('Suchergebnisse');
+            embed.setDescription(
+                `Hier sind ${embedFields.length}/${findUsers.length} Suchergebnisse für "${identifierValue}":${additionalString}${pageString}`,
+            );
+            embed.setFields(embedFields);
+            channel?.send({
+                content: `${interaction.user.toString()}`,
+                embeds: [embed],
+            });
+            await interaction.reply({
+                content: 'Daten gefunden und im Chat hinterlegt!',
+                ephemeral: true,
+            });
+        }
+    }
+
+    private EmbedFieldsBuilder(
+        user: IFindUser,
+        nvhxBanned: boolean,
+        bannedEmote: GuildEmoji | null,
+        steamId: bigint,
+        fraksperreString: string,
+        levelString: string,
+        teamNoteCount: number,
+        pageSize: number,
+        embedFieldLength: number,
+    ) {
+        return {
+            name: `${user.playername} (${user.name})`,
+            value:
+                `${nvhxBanned ? `${bannedEmote} **NVHX Global Ban Detected** ${bannedEmote}` : ''}` +
+                `\nSteamID: [${user.identifier}](https://steamid.pro/de/lookup/${steamId})\nDiscord: ${
+                    user.discord ? `<@${user.discord?.replace('discord:', '')}>` : 'Nicht Vorhanden'
+                }\nJob: ${user.job} (${user.job_grade})\nGroup: ${user.group}\nIC Name: ${user.firstname} ${
+                    user.lastname
+                }\nBank: ${user.bank.toLocaleString('de-DE')}€\nHand: ${user.money.toLocaleString(
+                    'de-DE',
+                )}€\nSchwarzgeld: ${user.black_money.toLocaleString('de-DE')}€\nNummer: ${
+                    user.phone_number
+                }${fraksperreString}${levelString}${teamNoteCount > 0 ? '\n**Es ist eine Teamnote vorhanden**' : ''}` +
+                `\n${embedFieldLength < pageSize - 1 ? '-----' : ''}`,
+            inline: false,
+        };
+    }
+
+    private getLevelByUser(user: IFindUser) {
+        let levelString = '';
+        if (user.crafting_level) {
+            levelString = `\nCrafting Level: ${(user.crafting_level - (user.crafting_level % 100)) / 100}`;
+        }
+        return levelString;
+    }
+
+    private getFraksperreByUser(user: IFindUser) {
+        let fraksperrestring = '';
+        if (user.fraksperre) {
+            const now = Math.floor(Date.now() / 1000);
+            const expiration = new Date(user.fraksperre).getTime() / 1000;
+            const diff = expiration - now;
+            if (diff > 0) {
+                fraksperrestring = `${fraksperrestring}\nFraksperre Verbleibend: ${Helper.secondsToTimeString(diff)}`;
+            }
+        }
+        return fraksperrestring;
+    }
+
+    private getSteamIdOrDefaultByUser(user: IFindUser) {
+        if (user.identifier) {
+            const hexString = `0x${user.identifier.replace('steam:', '')}`;
+            if (/^0x[0-9A-Fa-f]+$/g.test(hexString)) {
+                return BigInt(hexString);
+            }
+            return BigInt(0); // Fallback-Wert, wenn die Zeichenfolge ungültig ist
+        }
+        return BigInt(0); // Fallback-Wert, wenn identifier nicht vorhanden ist
     }
 
     private static async searchUsers(searchText: string, column: string): Promise<IFindUser[]> {
