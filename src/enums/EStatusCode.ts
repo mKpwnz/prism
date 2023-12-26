@@ -478,4 +478,4 @@ export enum EStatusCode {
 /**
  * @public
  */
-export default EStatusCode
+export default EStatusCode;

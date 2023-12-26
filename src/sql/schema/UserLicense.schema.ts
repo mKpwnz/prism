@@ -1,4 +1,4 @@
-import { RowDataPacket } from 'mysql2'
+import { RowDataPacket } from 'mysql2';
 
 /**
  * @description
@@ -9,8 +9,8 @@ import { RowDataPacket } from 'mysql2'
  * @extends {RowDataPacket}
  */
 export interface IUserLicense extends RowDataPacket {
-    id: number
-    type: string
-    owner: string
-    character_id: number | null
+    id: number;
+    type: string;
+    owner: string;
+    character_id: number | null;
 }

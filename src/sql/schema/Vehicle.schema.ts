@@ -1,4 +1,4 @@
-import { RowDataPacket } from 'mysql2'
+import { RowDataPacket } from 'mysql2';
 
 /**
  * @description
@@ -9,15 +9,15 @@ import { RowDataPacket } from 'mysql2'
  * @extends {RowDataPacket}
  */
 export interface IVehicle extends RowDataPacket {
-    owner: string
-    plate: string
-    garage: number
-    impounder: number
-    vehicle: string
-    type: string
-    job: string | null
-    kofferraum: string | null
-    handschuhfach: string | null
-    inserted: Date
-    updated: Date
+    owner: string;
+    plate: string;
+    garage: number;
+    impounder: number;
+    vehicle: string;
+    type: string;
+    job: string | null;
+    kofferraum: string | null;
+    handschuhfach: string | null;
+    inserted: Date;
+    updated: Date;
 }

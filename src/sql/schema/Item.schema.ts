@@ -1,4 +1,4 @@
-import { RowDataPacket } from 'mysql2'
+import { RowDataPacket } from 'mysql2';
 
 /**
  * @description
@@ -9,12 +9,12 @@ import { RowDataPacket } from 'mysql2'
  * @extends {RowDataPacket}
  */
 export interface IItem extends RowDataPacket {
-    name: string
-    label: string
-    weight: number
-    rare: boolean
-    imglink: string
-    can_remove: boolean
-    can_stack: boolean
-    limit: number
+    name: string;
+    label: string;
+    weight: number;
+    rare: boolean;
+    imglink: string;
+    can_remove: boolean;
+    can_stack: boolean;
+    limit: number;
 }

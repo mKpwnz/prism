@@ -1,11 +1,11 @@
-import { ValidatedPlayer } from '@ctypes/ValidatedPlayer'
-import { EUniqueIdentifier } from '@enums/ESearchType'
-import { ILivePlayer } from '@interfaces/ILivePlayer'
-import { GameDB } from '@sql/Database'
-import { IValidatedPlayerResponse } from '@sql/schema/Player.schema'
-import { Cache } from '@utils/Cache'
-import LogManager from '@utils/Logger'
-import axios from 'axios'
+import { ValidatedPlayer } from '@ctypes/ValidatedPlayer';
+import { EUniqueIdentifier } from '@enums/ESearchType';
+import { ILivePlayer } from '@interfaces/ILivePlayer';
+import { GameDB } from '@sql/Database';
+import { IValidatedPlayerResponse } from '@sql/schema/Player.schema';
+import { Cache } from '@utils/Cache';
+import LogManager from '@utils/Logger';
+import axios from 'axios';
 
 /**
  * @author mKpwnz
@@ -23,18 +23,17 @@ export class Player {
      * @memberof Player
      */
     public static async getAllLivePlayers(): Promise<ILivePlayer[]> {
-        var livePlayers = await Cache.get<ILivePlayer[]>('livePlayers')
+        const livePlayers = await Cache.get<ILivePlayer[]>('livePlayers');
         if (!livePlayers) {
-            var data = await axios.get('http://gs01.immortaldev.eu:30120/players.json')
-            if (data.status == 200) {
-                await Cache.set('livePlayers', data.data, 5 * 60 * 1000)
-                return data.data
-            } else {
-                LogManager.error('Error while fetching live players from server.')
-                return []
+            const data = await axios.get('http://gs01.immortaldev.eu:30120/players.json');
+            if (data.status === 200) {
+                await Cache.set('livePlayers', data.data, 5 * 60 * 1000);
+                return data.data;
             }
+            LogManager.error('Error while fetching live players from server.');
+            return [];
         }
-        return livePlayers
+        return livePlayers;
     }
 
     /**
@@ -47,8 +46,8 @@ export class Player {
      * @memberof Player
      */
     public static async isPlayerOnline(identifier: string): Promise<boolean> {
-        var livePlayers = await Player.getAllLivePlayers()
-        return livePlayers.find((p) => p.identifiers.indexOf(identifier) > -1) ? true : false
+        const livePlayers = await Player.getAllLivePlayers();
+        return !!livePlayers.find((p) => p.identifiers.indexOf(identifier) > -1);
     }
 
     /**
@@ -65,13 +64,13 @@ export class Player {
         searchString: string,
         type: EUniqueIdentifier = EUniqueIdentifier.IDENTIFIER,
     ): Promise<ValidatedPlayer | null> {
-        let filterMap = new Map<string, string>([
+        const filterMap = new Map<string, string>([
             [EUniqueIdentifier.IDENTIFIER, `LOWER( users.identifier ) = '${searchString}'`],
             [EUniqueIdentifier.STEAMID, `LOWER( users.steamid ) = '${searchString}'`],
             [EUniqueIdentifier.LICENSE, `LOWER( baninfo.license ) = '${searchString}'`],
             [EUniqueIdentifier.PHONENUMBER, `phone_phones.phone_number = '${searchString}'`],
-        ])
-        var [user] = await GameDB.query<IValidatedPlayerResponse[]>(`
+        ]);
+        const [user] = await GameDB.query<IValidatedPlayerResponse[]>(`
             SELECT
                 baninfo.playername AS steamnames_current,
                 users.name AS steamnames_atFirstLogin,
@@ -106,16 +105,16 @@ export class Player {
                 LEFT JOIN baninfo ON users.identifier = baninfo.identifier
                 JOIN phone_phones ON users.identifier = phone_phones.id
             WHERE ${filterMap.get(type)}
-        `)
+        `);
 
-        if (user === null) return null
-        if (user.length != 1) return null
+        if (user === null) return null;
+        if (user.length !== 1) return null;
 
-        var usr = user[0]
-        var iPO = await this.isPlayerOnline(usr.identifiers_steam)
+        const usr = user[0];
+        const iPO = await this.isPlayerOnline(usr.identifiers_steam);
 
-        var accountData = JSON.parse(usr.playerdata_accounts_raw)
-        var userObject: ValidatedPlayer = {
+        const accountData = JSON.parse(usr.playerdata_accounts_raw);
+        const userObject: ValidatedPlayer = {
             steamnames: {
                 current: usr.steamnames_current,
                 atFirstLogin: usr.steamnames_atFirstLogin,
@@ -123,9 +122,9 @@ export class Player {
             identifiers: {
                 steam: usr.identifiers_steam,
                 license: usr.identifiers_license,
-                liveid: usr.identifiers_liveid == 'no info' ? null : usr.identifiers_liveid,
-                xblid: usr.identifiers_xblid == 'no info' ? null : usr.identifiers_xblid,
-                discord: usr.identifiers_discord == 'no info' ? null : usr.identifiers_discord,
+                liveid: usr.identifiers_liveid === 'no info' ? null : usr.identifiers_liveid,
+                xblid: usr.identifiers_xblid === 'no info' ? null : usr.identifiers_xblid,
+                discord: usr.identifiers_discord === 'no info' ? null : usr.identifiers_discord,
                 playerip: usr.identifiers_playerip,
             },
             metadata: {
@@ -140,9 +139,9 @@ export class Player {
                 craftingLevel: usr.playerdata_craftingLevel,
                 phonenumber: usr.playerdata_phonenumber,
                 accounts: {
-                    bank: accountData['bank'],
-                    money: accountData['money'],
-                    black_money: accountData['black_money'],
+                    bank: accountData.bank,
+                    money: accountData.money,
+                    black_money: accountData.black_money,
                 },
                 job: {
                     name: usr.playerdata_job_name,
@@ -152,8 +151,8 @@ export class Player {
                     fraksperre: usr.playerdata_job_fraksperre,
                 },
             },
-        }
+        };
 
-        return userObject
+        return userObject;
     }
 }

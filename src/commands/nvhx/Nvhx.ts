@@ -1,19 +1,19 @@
-import { Command } from '@class/Command'
-import { RconClient } from '@class/RconClient'
-import { RegisterCommand } from '@commands/CommandHandler'
-import { NvhxData } from '@controller/NvhxData.controller'
-import { Player } from '@controller/Player.controller'
-import { EENV } from '@enums/EENV'
-import { ILivePlayer } from '@interfaces/ILivePlayer'
-import Config from '@proot/Config'
-import { Helper } from '@utils/Helper'
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
+import { Command } from '@class/Command';
+import { RconClient } from '@class/RconClient';
+import { RegisterCommand } from '@commands/CommandHandler';
+import { NvhxData } from '@controller/NvhxData.controller';
+import { Player } from '@controller/Player.controller';
+import { EENV } from '@enums/EENV';
+import { ILivePlayer } from '@interfaces/ILivePlayer';
+import Config from '@proot/Config';
+import { Helper } from '@utils/Helper';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class Nvhx extends Command {
     constructor() {
-        super()
-        this.RunEnvironment = EENV.PRODUCTION
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
+        super();
+        this.RunEnvironment = EENV.PRODUCTION;
+        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -21,8 +21,8 @@ export class Nvhx extends Command {
             Config.Discord.Groups.IC_HADMIN,
             Config.Discord.Groups.IC_ADMIN,
             Config.Discord.Groups.IC_MOD,
-        ]
-        this.IsBetaCommand = true
+        ];
+        this.IsBetaCommand = true;
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('nvhx')
@@ -47,92 +47,108 @@ export class Nvhx extends Command {
                     subcommand.setName('checkplayerbans').setDescription('Triggert Neverhax Info'),
                 ),
             this,
-        )
+        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction
+        const subcommand = interaction.options.getSubcommand();
 
-        switch (options.getSubcommand()) {
+        switch (subcommand) {
             case 'sc':
-                await this.nvhxSc(interaction)
-                break
+                await this.captureScreenByPlayerId(interaction);
+                break;
             case 'unban':
-                await this.nvhxUnban(interaction)
-                break
+                await this.unbanPlayerById(interaction);
+                break;
             case 'checkplayerbans':
-                await this.nvhxCheckPlayerBans(interaction)
-                break
+                await this.getBannedLivePlayers(interaction);
+                break;
             default:
-                await interaction.reply({ content: 'Command nicht gefunden.', ephemeral: true })
+                await interaction.reply({
+                    content: 'Command nicht gefunden.',
+                    ephemeral: true,
+                });
         }
     }
 
-    public async nvhxSc(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction
-        const embed = this.getEmbedTemplate(interaction)
+    private async captureScreenByPlayerId(interaction: ChatInputCommandInteraction): Promise<void> {
         try {
-            const id = options.getInteger('id', true)
-            let response = await RconClient.sendCommand(`nvhx sc ${id}`)
-            embed.setTitle('Neverhax Screenshot')
-            embed.setDescription(`Triggere Neverhax Screenshot für SpielerID ${id}`)
-            await interaction.reply({ embeds: [embed] })
+            const id = interaction.options.getInteger('id', true);
+            await RconClient.sendCommand(`nvhx sc ${id}`);
+            await this.replyWithEmbed(
+                interaction,
+                'Neverhax Screenshot',
+                `Triggere Neverhax Screenshot für SpielerID ${id}`,
+            );
         } catch (error) {
-            await interaction.reply({
-                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(error)}\`\`\``,
-                ephemeral: true,
-            })
+            await this.handleInteractionError(error, interaction);
         }
     }
 
-    public async nvhxUnban(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction
-        const embed = this.getEmbedTemplate(interaction)
+    private async unbanPlayerById(interaction: ChatInputCommandInteraction): Promise<void> {
         try {
-            const banid = options.getString('banid', true)
-            let response = await RconClient.sendCommand(`nvhx unban ${banid}`)
+            const banId = interaction.options.getString('banid', true);
+            const response = await RconClient.sendCommand(`nvhx unban ${banId}`);
+
             if (response.includes('Unbanned: ')) {
-                embed.setTitle('Neverhax Unban')
-                embed.setDescription(`Entbanne BanID ${banid}`)
-                await interaction.reply({ embeds: [embed] })
+                await this.replyWithEmbed(interaction, 'Neverhax Unban', `Entbanne BanID ${banId}`);
             } else {
-                await interaction.reply({ content: 'BanID nicht gefunden!', ephemeral: true })
+                await interaction.reply({
+                    content: 'BanID nicht gefunden!',
+                    ephemeral: true,
+                });
             }
         } catch (error) {
-            await interaction.reply({
-                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(error)}\`\`\``,
-                ephemeral: true,
-            })
+            await this.handleInteractionError(error, interaction);
         }
     }
 
-    public async nvhxCheckPlayerBans(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction
-        const embed = this.getEmbedTemplate(interaction)
+    private async getBannedLivePlayers(interaction: ChatInputCommandInteraction): Promise<void> {
         try {
-            var bannedEmote = await Helper.getEmote('pbot_banned')
-            var bannedPlayers: ILivePlayer[] = []
-            var livePlayers = await Player.getAllLivePlayers()
-            for (const [key, value] of livePlayers.entries()) {
-                var isBanned = await NvhxData.CheckIfUserIsBanned(value.identifiers)
-                if (isBanned) {
-                    bannedPlayers.push(value)
-                }
-            }
-            var desc = `Es sind aktuell **${bannedPlayers.length}** von NVHX Global gebannte Spieler auf dem Server.\n`
-            if (bannedPlayers.length > 0) desc += '\nAktuell gebannte Spieler:\n'
+            const bannedPlayers = await this.fetchBannedLivePlayers();
+            const description = await this.formatBannedPlayersDescription(bannedPlayers);
+            await this.replyWithEmbed(interaction, 'Gebannte Spieler', description);
+        } catch (error) {
+            await this.handleInteractionError(error, interaction);
+        }
+    }
+
+    private async fetchBannedLivePlayers(): Promise<ILivePlayer[]> {
+        const livePlayers = await Player.getAllLivePlayers();
+        const globalBans = await NvhxData.GetAllGlobalBans();
+
+        return livePlayers.filter((player) => NvhxData.CheckIfUserIsBanned(player.identifiers, globalBans));
+    }
+
+    private async formatBannedPlayersDescription(bannedPlayers: ILivePlayer[]): Promise<string> {
+        let desc = `Es sind aktuell **${bannedPlayers.length}** von NVHX Global gebannte Spieler auf dem Server.\n`;
+        if (bannedPlayers.length > 0) {
+            desc += '\nAktuell gebannte Spieler:\n';
+            const bannedEmote = await Helper.getEmote('pbot_banned');
             bannedPlayers.forEach((player) => {
                 desc += `\n${bannedEmote} **${player.name} | ServerID: ${player.id}** \`\`\`${player.identifiers.join(
                     '\n',
-                )}\`\`\``
-            })
-            embed.setDescription(desc)
-            await interaction.reply({ embeds: [embed] })
-        } catch (error) {
-            await interaction.reply({
-                content: `Probleme mit der Serverkommunikation:\`\`\`json\n${JSON.stringify(error)}\`\`\``,
-                ephemeral: true,
-            })
+                )}\`\`\``;
+            });
         }
+        return desc;
+    }
+
+    private async replyWithEmbed(
+        interaction: ChatInputCommandInteraction,
+        title: string,
+        description: string,
+    ): Promise<void> {
+        const embed = this.getEmbedTemplate(interaction);
+        embed.setTitle(title);
+        embed.setDescription(description);
+        await interaction.reply({ embeds: [embed] });
+    }
+
+    private async handleInteractionError(error: any, interaction: ChatInputCommandInteraction): Promise<void> {
+        await interaction.reply({
+            content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(error)}\`\`\``,
+            ephemeral: true,
+        });
     }
 }

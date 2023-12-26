@@ -1,1 +1,1 @@
-export * from './SchufaCheck'
+export * from './SchufaCheck';

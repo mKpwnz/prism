@@ -73,18 +73,13 @@ const Config = {
             LOGO_BLUE: 'https://i.imgur.com/NkZDE8l.png',
         },
         WHITESPACE: 'https://i.imgur.com/pdkIDFc.png',
-        AllowedChannels: [
-            '1158521623448666112',
-            '1000335817853636649',
-            '1115622919511474176',
-            '1140733564963528704',
-        ],
+        AllowedChannels: ['1158521623448666112', '1000335817853636649', '1115622919511474176', '1140733564963528704'],
     },
     Commands: {
         Resetpos: {
             DefaultPosition: { x: 229.28, heading: 0.0, z: 30.5, y: -886.76 },
         },
     },
-}
+};
 
-export default Config
+export default Config;

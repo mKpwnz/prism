@@ -1,4 +1,4 @@
-import { ICmdPrintInformationOption } from './ICmdPrintInformationOption'
+import { ICmdPrintInformationOption } from './ICmdPrintInformationOption';
 
 /**
  * @description
@@ -8,12 +8,12 @@ import { ICmdPrintInformationOption } from './ICmdPrintInformationOption'
  * @interface ICmdPrintInformation
  */
 export interface ICmdPrintInformation {
-    commandName: string
-    description: string
-    production: boolean
-    isBeta: boolean
-    commandOptions: ICmdPrintInformationOption[]
-    subCommands?: ICmdPrintInformation[]
-    allowedChannels?: string[]
-    allowedGroups?: string[]
+    commandName: string;
+    description: string;
+    production: boolean;
+    isBeta: boolean;
+    commandOptions: ICmdPrintInformationOption[];
+    subCommands?: ICmdPrintInformation[];
+    allowedChannels?: string[];
+    allowedGroups?: string[];
 }
