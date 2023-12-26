@@ -1,10 +1,10 @@
-import { EENV } from '@enums/EENV'
-import { EmbedColors } from '@enums/EmbedColors'
-import Config from '@proot/Config'
-import { BotDB } from '@sql/Database'
-import { Helper } from '@utils/Helper'
-import LogManager from '@utils/Logger'
-import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js'
+import { EENV } from '@enums/EENV';
+import { EmbedColors } from '@enums/EmbedColors';
+import Config from '@proot/Config';
+import { BotDB } from '@sql/Database';
+import { Helper } from '@utils/Helper';
+import LogManager from '@utils/Logger';
+import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 
 /**
  * @author mKpwnz
@@ -21,7 +21,7 @@ export abstract class Command {
      * @type {string[]}
      * @memberof Command
      */
-    AllowedChannels: string[] = []
+    AllowedChannels: string[] = [];
 
     /**
      * @description Gibt an, welche Gruppen den Command ausgeführt dürfen (Discord) (ID)
@@ -30,7 +30,7 @@ export abstract class Command {
      * @type {string[]}
      * @memberof Command
      */
-    AllowedGroups: string[] = []
+    AllowedGroups: string[] = [];
 
     /**
      * @description Gibt an, welche User den Command ausführen dürfen (Unabhängig von Gruppenrechten) (Discord) (ID)
@@ -39,7 +39,7 @@ export abstract class Command {
      * @type {string[]}
      * @memberof Command
      */
-    AllowedUsers: string[] = []
+    AllowedUsers: string[] = [];
 
     /**
      * @description Gibt an, welche User den Command nicht ausführen dürfen (Unabhängig von Gruppenrechten) (Discord) (ID)
@@ -48,7 +48,7 @@ export abstract class Command {
      * @type {string[]}
      * @memberof Command
      */
-    BlockedUsers: string[] = []
+    BlockedUsers: string[] = [];
 
     /**
      * @description Gibt an, ob die Permissions geprüft werden sollen oder nicht.
@@ -57,7 +57,7 @@ export abstract class Command {
      * @type {Boolean} [CheckPermissions=true]
      * @memberof Command
      */
-    CheckPermissions: Boolean = true
+    CheckPermissions: Boolean = true;
 
     /**
      * @description Gibt an, in welcher Umgebung der Command ausgeführt werden darf.
@@ -66,7 +66,7 @@ export abstract class Command {
      * @type {EENV} [RunEnvironment=EENV.DEVELOPMENT]
      * @memberof Command
      */
-    RunEnvironment: EENV = EENV.DEVELOPMENT
+    RunEnvironment: EENV = EENV.DEVELOPMENT;
 
     /**
      * @description Gibt an, ob der Command ein Beta Command ist oder nicht.
@@ -75,7 +75,7 @@ export abstract class Command {
      * @type {boolean} [IsBetaCommand=false]
      * @memberof Command
      */
-    IsBetaCommand: boolean = false
+    IsBetaCommand: boolean = false;
 
     /**
      * @description Gibt an, ob der Command nicht gezählt werden soll (Statistik)
@@ -84,9 +84,21 @@ export abstract class Command {
      * @type {boolean} [DoNotCountUse=false]
      * @memberof Command
      */
-    DoNotCountUse: boolean = false
+    DoNotCountUse: boolean = false;
 
-    constructor() {}
+    /**
+     * @description Gibt an, wann der Command ausgeführt wurde. (Timestamp)
+     * @type {Date}
+     * @memberof Command
+     */
+    CmdPerformanceStart: Date | undefined = undefined;
+
+    /**
+     * @description Gibt an, wann der Command fertig ausgeführt wurde. (Timestamp)
+     * @type {Date}
+     * @memberof Command
+     */
+    CmdPerformanceStop: Date | undefined = undefined;
 
     /**
      * @description Führt den Command aus. Muss in der Klasse, die von Command erbt, implementiert werden. (execute() { ... })
@@ -97,7 +109,7 @@ export abstract class Command {
      * @returns {*}  {Promise<void>}
      * @memberof Command
      */
-    abstract execute(interaction: ChatInputCommandInteraction): Promise<void>
+    abstract execute(interaction: ChatInputCommandInteraction): Promise<void>;
 
     /**
      * @description Wird vom CommandHandler ausgeführt
@@ -108,16 +120,16 @@ export abstract class Command {
      * @memberof Command
      */
     async run(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options, user } = interaction
+        const { options, user } = interaction;
 
         // Override Channel in Devmode
-        if (this.RunEnvironment != EENV.PRODUCTION) {
-            this.DoNotCountUse = true
-            this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI]
-            this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER, Config.Discord.Groups.DEV_BOTTESTER]
+        if (this.RunEnvironment !== EENV.PRODUCTION) {
+            this.DoNotCountUse = true;
+            this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI];
+            this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER, Config.Discord.Groups.DEV_BOTTESTER];
         }
         if (process.env.NODE_ENV !== 'production') {
-            this.DoNotCountUse = true
+            this.DoNotCountUse = true;
         }
         if (this.CheckPermissions) {
             // Check Permissions
@@ -130,35 +142,35 @@ export abstract class Command {
                     this.BlockedUsers,
                 )) === false
             )
-                return
+                return;
         }
 
-        let inputFields: { name: string; value: string }[] = []
+        const inputFields: { name: string; value: string }[] = [];
         options.data.forEach((input) => {
-            var d = JSON.parse(JSON.stringify(input))
-            inputFields.push({ name: d['name'], value: d['value'] })
-        })
-        var cmdPrint = {
+            const d = JSON.parse(JSON.stringify(input));
+            inputFields.push({ name: d.name, value: d.value });
+        });
+        const cmdPrint = {
             user: {
                 displayame: user.displayName,
                 id: user.id,
             },
             command: interaction.commandName,
             options: inputFields,
-        }
+        };
         LogManager.discordActionLog(
             `\` ${interaction.user.displayName} (${user.id}) \` hat im Kanal <#${interaction.channelId}> den Befehl \`${
                 interaction.commandName
             }\` ausgeführt:\`\`\`json\n${JSON.stringify(cmdPrint, null, 4)}\`\`\``,
-        )
-        var commandName = interaction.commandName
+        );
+        let { commandName } = interaction;
         if (!this.DoNotCountUse) {
             try {
                 if (interaction.options.getSubcommand()) {
-                    commandName += ` ${interaction.options.getSubcommand()}`
+                    commandName += ` ${interaction.options.getSubcommand()}`;
                 }
             } catch (e) {
-                commandName = interaction.commandName
+                commandName = interaction.commandName;
             }
             await BotDB.command_log.create({
                 data: {
@@ -168,17 +180,18 @@ export abstract class Command {
                     options: cmdPrint.options,
                     jsonData: cmdPrint,
                 },
-            })
+            });
         }
         // LogManager.debug(logEntry)
         try {
-            await this.execute(interaction)
+            this.CmdPerformanceStart = new Date();
+            await this.execute(interaction);
         } catch (error) {
-            LogManager.error(error)
+            LogManager.error(error);
             await interaction.reply({
                 content: `Es ist ein Fehler aufgetreten!\`\`\`json${JSON.stringify(error)}\`\`\``,
                 ephemeral: true,
-            })
+            });
         }
     }
 
@@ -200,6 +213,16 @@ export abstract class Command {
                 iconURL: interaction.user.avatarURL() ?? '',
             })
             .setTimestamp(new Date())
-            .setImage(Config.Pictures.WHITESPACE)
+            .setImage(Config.Pictures.WHITESPACE);
+    }
+
+    addCommandBenchmark(embed: EmbedBuilder): void {
+        this.CmdPerformanceStop = new Date();
+        const executionTime = this.CmdPerformanceStop.getTime() - this.CmdPerformanceStart!.getTime();
+        embed.setFooter({
+            text: `${embed.data.footer?.text} | Executiontime: ${executionTime}ms`,
+            iconURL: embed.data.footer?.icon_url,
+        });
     }
 }
+

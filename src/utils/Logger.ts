@@ -1,9 +1,9 @@
-import { BotClient } from '@proot/Bot'
-import Config from '@proot/Config'
-import chalk from 'chalk'
-import colorize from 'json-colorizer'
-import winston, { createLogger, format, transports } from 'winston'
-import LokiTransport from 'winston-loki'
+import { BotClient } from '@proot/Bot';
+import Config from '@proot/Config';
+import chalk from 'chalk';
+import colorize from 'json-colorizer';
+import winston, { createLogger, format, transports } from 'winston';
+import LokiTransport from 'winston-loki';
 
 /**
  * @description Logger class for logging to console and loki
@@ -13,26 +13,27 @@ import LokiTransport from 'winston-loki'
  * @class LogManager
  */
 export default class LogManager {
-    private static logger: winston.Logger
+    private static logger: winston.Logger;
 
     private static formatLoglevel(loglevel: string): string {
-        var uLevel = loglevel.toUpperCase()
+        const uLevel = loglevel.toUpperCase();
         switch (loglevel.toLowerCase()) {
             case 'warn':
-                loglevel = chalk.bgHex('#ffc632').hex('#0e0e10')(` ${uLevel} `)
-                break
+                loglevel = chalk.bgHex('#ffc632').hex('#0e0e10')(` ${uLevel} `);
+                break;
             case 'error':
-                loglevel = chalk.bgHex('#e91916').hex('#efeff1')(` ${uLevel} `)
-                break
+                loglevel = chalk.bgHex('#e91916').hex('#efeff1')(` ${uLevel} `);
+                break;
             case 'debug':
-                loglevel = chalk.hex('#da5dfa')(uLevel)
-                break
+                loglevel = chalk.hex('#da5dfa')(uLevel);
+                break;
             default:
-                loglevel = chalk.hex('#0792f1')(uLevel)
-                break
+                loglevel = chalk.hex('#0792f1')(uLevel);
+                break;
         }
-        return loglevel
+        return loglevel;
     }
+
     private static formatMessage(message: any, loglevel: string): any {
         if (typeof message === 'object') {
             return colorize(message, {
@@ -48,21 +49,22 @@ export default class LogManager {
                     BOOLEAN_LITERAL: '#8270fa',
                     NULL_LITERAL: '#e91916',
                 },
-            })
-        } else if (typeof message === 'string') {
+            });
+        }
+        if (typeof message === 'string') {
             switch (loglevel.toLowerCase()) {
                 case 'error':
-                    return chalk.hex('#e91916')(message)
+                    return chalk.hex('#e91916')(message);
                 default:
-                    return message
+                    return message;
             }
         } else {
-            return message
+            return message;
         }
     }
 
     public static async configure() {
-        var logTransports: winston.transport[] = [new transports.Console()]
+        const logTransports: winston.transport[] = [new transports.Console()];
 
         if (process.env.NODE_ENV === 'production') {
             logTransports.push(
@@ -74,7 +76,7 @@ export default class LogManager {
                     format: format.json(),
                     onConnectionError: (err) => this.error(err),
                 }),
-            )
+            );
         }
 
         this.logger = createLogger({
@@ -85,14 +87,15 @@ export default class LogManager {
                 }),
                 format.errors({ stack: true }),
                 format.splat(),
-                format.printf((info) => {
-                    return `${chalk.hex('#adb5ae')(info.timestamp)} ${this.formatLoglevel(
-                        info.level,
-                    )}: ${this.formatMessage(info.message, info.level)}`
-                }),
+                format.printf(
+                    (info) =>
+                        `${chalk.hex('#adb5ae')(info.timestamp)} ${this.formatLoglevel(
+                            info.level,
+                        )}: ${this.formatMessage(info.message, info.level)}`,
+                ),
             ),
             transports: logTransports,
-        })
+        });
     }
 
     /**
@@ -105,8 +108,8 @@ export default class LogManager {
      */
     public static log(...args: any[]) {
         args.forEach((arg) => {
-            this.logger.debug(arg)
-        })
+            this.logger.debug(arg);
+        });
     }
 
     /**
@@ -119,8 +122,8 @@ export default class LogManager {
      */
     public static error(...args: any[]) {
         args.forEach((arg) => {
-            this.logger.error(arg)
-        })
+            this.logger.error(arg);
+        });
     }
 
     /**
@@ -133,8 +136,8 @@ export default class LogManager {
      */
     public static warn(...args: any[]) {
         args.forEach((arg) => {
-            this.logger.warn(arg)
-        })
+            this.logger.warn(arg);
+        });
     }
 
     /**
@@ -147,8 +150,8 @@ export default class LogManager {
      */
     public static info(...args: any[]) {
         args.forEach((arg) => {
-            this.logger.info(arg)
-        })
+            this.logger.info(arg);
+        });
     }
 
     /**
@@ -161,8 +164,8 @@ export default class LogManager {
      */
     public static debug(...args: any[]) {
         args.forEach((arg) => {
-            this.logger.debug(arg)
-        })
+            this.logger.debug(arg);
+        });
     }
 
     /**
@@ -174,9 +177,9 @@ export default class LogManager {
      * @memberof LogManager
      */
     public static discordActionLog(message: string) {
-        var channel = BotClient.channels.cache.get(Config.Discord.LogChannel.BOT_LOG)
+        const channel = BotClient.channels.cache.get(Config.Discord.LogChannel.BOT_LOG);
         if (channel && channel.isTextBased()) {
-            channel.send(message)
+            channel.send(message);
         }
     }
 }

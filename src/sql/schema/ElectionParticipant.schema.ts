@@ -1,4 +1,4 @@
-import { RowDataPacket } from 'mysql2'
+import { RowDataPacket } from 'mysql2';
 
 /**
  * @description
@@ -9,8 +9,8 @@ import { RowDataPacket } from 'mysql2'
  * @extends {RowDataPacket}
  */
 export interface IElectionParticipant extends RowDataPacket {
-    id: number
-    electionid: number
-    identifier: string
-    name: string
+    id: number;
+    electionid: number;
+    identifier: string;
+    name: string;
 }

@@ -1,9 +1,9 @@
-import { BotClient } from '@proot/Bot'
-import Config from '@proot/Config'
-import { GameDB } from '@sql/Database'
-import { IItem } from '@sql/schema/Item.schema'
-import { CommandInteraction, GuildEmoji, TextChannel } from 'discord.js'
-import LogManager from './Logger'
+import { BotClient } from '@proot/Bot';
+import Config from '@proot/Config';
+import { GameDB } from '@sql/Database';
+import { IItem } from '@sql/schema/Item.schema';
+import { CommandInteraction, GuildEmoji, TextChannel } from 'discord.js';
+import LogManager from './Logger';
 
 export class Helper {
     /**
@@ -26,27 +26,27 @@ export class Helper {
         allowedUsers: string[] = [],
         blockedUsers: string[] = [],
     ): Promise<boolean> {
-        const { channel, user, guild } = interaction
-        if (!guild) return false
+        const { channel, user, guild } = interaction;
+        if (!guild) return false;
 
-        const userRoleCache = guild.members.cache.get(user.id)
-        var userIsAllowed = false
+        const userRoleCache = guild.members.cache.get(user.id);
+        let userIsAllowed = false;
 
-        if (allowedUsers.length == 0) {
-            userIsAllowed = true
+        if (allowedUsers.length === 0) {
+            userIsAllowed = true;
         } else if (allowedGroups.some((roleID) => userRoleCache?.roles.cache.has(roleID))) {
-            userIsAllowed = true
+            userIsAllowed = true;
         } else if (allowedUsers.includes(user.id)) {
-            userIsAllowed = true
+            userIsAllowed = true;
         }
         if (blockedUsers.includes(user.id)) {
-            userIsAllowed = false
+            userIsAllowed = false;
         }
         if (Config.Discord.Users.GlobalBlocked.includes(user.id)) {
-            userIsAllowed = false
+            userIsAllowed = false;
         }
         if (Config.Discord.Users.GlobalWhitelist.includes(user.id)) {
-            userIsAllowed = true
+            userIsAllowed = true;
         }
 
         if (channel instanceof TextChannel) {
@@ -54,24 +54,23 @@ export class Helper {
                 await interaction.reply({
                     content: 'Dieser Command kann in diesem Channel nicht ausgeführt werden.',
                     ephemeral: true,
-                })
-                return false
+                });
+                return false;
             }
             if (!userIsAllowed) {
                 await interaction.reply({
                     content: 'Du hast leider keine Berechtigungen für den Command',
                     ephemeral: true,
-                })
-                return false
+                });
+                return false;
             }
-            return true
-        } else {
-            await interaction.reply({
-                content: 'Dieser Command kann in diesem Channel nicht ausgeführt werden.',
-                ephemeral: true,
-            })
-            return false
+            return true;
         }
+        await interaction.reply({
+            content: 'Dieser Command kann in diesem Channel nicht ausgeführt werden.',
+            ephemeral: true,
+        });
+        return false;
     }
 
     /**
@@ -85,10 +84,9 @@ export class Helper {
      */
     static numberWithCommas(input: number): string {
         if (input.toString()) {
-            return input.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, '.')
-        } else {
-            return input.toString()
+            return input.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, '.');
         }
+        return input.toString();
     }
 
     /**
@@ -102,9 +100,9 @@ export class Helper {
      */
     static decimalToHexString(number: number): string {
         if (number < 0) {
-            number = 0xffffffff + number + 1
+            number = 0xffffffff + number + 1;
         }
-        return number.toString(16)
+        return number.toString(16);
     }
 
     /**
@@ -117,18 +115,18 @@ export class Helper {
      * @memberof Helper
      */
     static secondsToTimeString(seconds: number): string {
-        const days = Math.floor(seconds / (3600 * 24))
-        seconds -= days * 3600 * 24
-        const hours = Math.floor(seconds / 3600)
-        seconds -= hours * 3600
-        const minutes = Math.floor(seconds / 60)
-        seconds -= minutes * 60
-        const tmp = []
-        days && tmp.push(days + 'd')
-        ;(days || hours) && tmp.push(hours + 'h')
-        ;(days || hours || minutes) && tmp.push(minutes + 'm')
-        tmp.push(seconds + 's')
-        return tmp.join(' ')
+        const days = Math.floor(seconds / (3600 * 24));
+        seconds -= days * 3600 * 24;
+        const hours = Math.floor(seconds / 3600);
+        seconds -= hours * 3600;
+        const minutes = Math.floor(seconds / 60);
+        seconds -= minutes * 60;
+        const tmp = [];
+        if (days) tmp.push(`${days}d`);
+        if (days || hours) tmp.push(`${hours}h`);
+        if (days || hours || minutes) tmp.push(`${minutes}m`);
+        tmp.push(`${seconds}s`);
+        return tmp.join(' ');
     }
 
     /**
@@ -140,9 +138,9 @@ export class Helper {
      * @memberof Helper
      */
     static getUniqueId(): string {
-        let dateStr = Date.now().toString(36)
-        let randomStr = Math.random().toString(36).substring(2, 8)
-        return `${dateStr}-${randomStr}`
+        const dateStr = Date.now().toString(36);
+        const randomStr = Math.random().toString(36).substring(2, 8);
+        return `${dateStr}-${randomStr}`;
     }
 
     /**
@@ -155,26 +153,28 @@ export class Helper {
      * @memberof Helper
      */
     static validateNumberplate(platetext: string): string {
-        platetext = platetext.toUpperCase().replace(/[^A-Z0-9 ]*/g, '')
-        if (platetext.length == 0) {
-            return '        '
-        } else if (platetext.length == 8) {
-            return platetext
-        } else if (platetext.length > 8) {
-            return platetext.slice(0, 8)
-        } else {
-            while (platetext.length < 8) {
-                if (platetext.length % 2 == 0) {
-                    platetext = ' ' + platetext
-                } else {
-                    platetext += ' '
-                }
-                if (platetext.length == 8) {
-                    return platetext
-                }
+        platetext = platetext.toUpperCase().replace(/[^A-Z0-9 ]*/g, '');
+        if (platetext.length === 0) {
+            return '        ';
+        }
+        if (platetext.length === 8) {
+            return platetext;
+        }
+        if (platetext.length > 8) {
+            return platetext.slice(0, 8);
+        }
+        while (platetext.length < 8) {
+            if (platetext.length % 2 === 0) {
+                platetext = ` ${platetext}`;
+            } else {
+                platetext += ' ';
+            }
+            if (platetext.length === 8) {
+                return platetext;
             }
         }
-        return platetext
+
+        return platetext;
     }
 
     // TODO: Move to Item.controller.ts
@@ -188,19 +188,17 @@ export class Helper {
      * @memberof Helper
      */
     static async validateItemName(itemName: string): Promise<string> {
-        itemName = itemName.toLowerCase()
-        itemName = '%' + itemName + '%'
+        itemName = itemName.toLowerCase();
+        itemName = `%${itemName}%`;
         try {
-            let [item] = await GameDB.query<IItem[]>('SELECT * FROM items WHERE name LIKE ?', [
-                itemName,
-            ])
+            const [item] = await GameDB.query<IItem[]>('SELECT * FROM items WHERE name LIKE ?', [itemName]);
             if (item.length > 0) {
-                return item[0].name
+                return item[0].name;
             }
-            return ''
+            return '';
         } catch (error) {
-            LogManager.error(error)
-            return ''
+            LogManager.error(error);
+            return '';
         }
     }
 
@@ -215,18 +213,16 @@ export class Helper {
      * @memberof Helper
      */
     static async doesItemExists(itemName: string): Promise<boolean> {
-        itemName = itemName.toLowerCase()
+        itemName = itemName.toLowerCase();
         try {
-            let [item] = await GameDB.query<IItem[]>('SELECT * FROM items WHERE name = ?', [
-                itemName,
-            ])
+            const [item] = await GameDB.query<IItem[]>('SELECT * FROM items WHERE name = ?', [itemName]);
             if (item.length > 0) {
-                return true
+                return true;
             }
-            return false
+            return false;
         } catch (error) {
-            LogManager.error(error)
-            return false
+            LogManager.error(error);
+            return false;
         }
     }
 
@@ -240,12 +236,12 @@ export class Helper {
      * @memberof Helper
      */
     static validateWeaponName(weaponName: string): string {
-        LogManager.log(weaponName)
+        LogManager.log(weaponName);
         if (!weaponName.startsWith('WEAPON_')) {
-            weaponName = `WEAPON_${weaponName.toUpperCase()}`
+            weaponName = `WEAPON_${weaponName.toUpperCase()}`;
         }
-        LogManager.log(weaponName)
-        let weaponList = [
+        LogManager.log(weaponName);
+        const weaponList = [
             'WEAPON_DAGGER',
             'WEAPON_BAT',
             'WEAPON_BOTTLE',
@@ -330,15 +326,14 @@ export class Helper {
             'WEAPON_PETROLCAN',
             'WEAPON_HARZARDCAN',
             'WEAPON_STUNSHOT',
-        ]
-        LogManager.debug(weaponList.includes(weaponName))
+        ];
+        LogManager.debug(weaponList.includes(weaponName));
         if (!weaponList.includes(weaponName)) {
-            LogManager.log('Weapon not found')
-            return ''
-        } else {
-            LogManager.log('Weapon found')
-            return weaponName
+            LogManager.log('Weapon not found');
+            return '';
         }
+        LogManager.log('Weapon found');
+        return weaponName;
     }
 
     /**
@@ -351,10 +346,10 @@ export class Helper {
      * @memberof Helper
      */
     static async getEmote(emoteName: string): Promise<GuildEmoji | null> {
-        const guild = BotClient.guilds.cache.get(Config.Discord.ServerID)
-        if (!guild) return null
-        var emoteData = await guild.emojis.fetch()
-        return emoteData.find((e) => e.name === emoteName) ?? null
+        const guild = BotClient.guilds.cache.get(Config.Discord.ServerID);
+        if (!guild) return null;
+        const emoteData = await guild.emojis.fetch();
+        return emoteData.find((e) => e.name === emoteName) ?? null;
     }
 
     /**
@@ -367,8 +362,8 @@ export class Helper {
      * @memberof Helper
      */
     static enumFromValue = <T extends Record<string, string>>(val: string, _enum: T) => {
-        const enumName = (Object.keys(_enum) as Array<keyof T>).find((k) => _enum[k] === val)
-        if (!enumName) throw Error()
-        return _enum[enumName]
-    }
+        const enumName = (Object.keys(_enum) as Array<keyof T>).find((k) => _enum[k] === val);
+        if (!enumName) throw Error();
+        return _enum[enumName];
+    };
 }

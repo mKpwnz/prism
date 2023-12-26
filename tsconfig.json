@@ -1,55 +1,27 @@
 {
-  "compilerOptions": {
-    "target": "ESnext",
-    "module": "NodeNext",
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "strict": true,
-    "moduleResolution": "NodeNext",
-    "allowJs": true,
-    "paths": {
-      "@class/*": [
-        "./src/class/*"
-      ],
-      "@commands/*": [
-        "./src/commands/*"
-      ],
-      "@interfaces/*": [
-        "./src/interfaces/*"
-      ],
-      "@utils/*": [
-        "./src/utils/*"
-      ],
-      "@listeners/*": [
-        "./src/listeners/*"
-      ],
-      "@events/*": [
-        "./src/events/*"
-      ],
-      "@ctypes/*": [
-        "./src/ctypes/*"
-      ],
-      "@sql/*": [
-        "./src/sql/*"
-      ],
-      "@features/*": [
-        "./src/features/*"
-      ],
-      "@enums/*": [
-        "./src/enums/*"
-      ],
-      "@web/*": [
-        "./src/web/*"
-      ],
-      "@controller/*": [
-        "./src/controller/*"
-      ],
-      "@proot/*": [
-        "./src/*"
-      ],
+    "compilerOptions": {
+        "target": "ESnext",
+        "module": "NodeNext",
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "strict": true,
+        "moduleResolution": "NodeNext",
+        "allowJs": true,
+        "paths": {
+            "@class/*": ["./src/class/*"],
+            "@commands/*": ["./src/commands/*"],
+            "@interfaces/*": ["./src/interfaces/*"],
+            "@utils/*": ["./src/utils/*"],
+            "@listeners/*": ["./src/listeners/*"],
+            "@events/*": ["./src/events/*"],
+            "@ctypes/*": ["./src/ctypes/*"],
+            "@sql/*": ["./src/sql/*"],
+            "@features/*": ["./src/features/*"],
+            "@enums/*": ["./src/enums/*"],
+            "@web/*": ["./src/web/*"],
+            "@controller/*": ["./src/controller/*"],
+            "@proot/*": ["./src/*"]
+        }
     },
-  },
-  "include": [
-    "./src"
-  ],
+    "include": ["./src"]
 }

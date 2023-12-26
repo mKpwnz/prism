@@ -1,5 +1,5 @@
-import { CronJob } from 'cron'
-import LogManager from './Logger'
+import { CronJob } from 'cron';
+import LogManager from './Logger';
 
 /**
  * @description CronManager is a class to manage all crons in the bot.
@@ -9,7 +9,7 @@ import LogManager from './Logger'
  * @class CronManager
  */
 export class CronManager {
-    private static crons: Map<string, CronJob>
+    private static crons: Map<string, CronJob>;
 
     /**
      * @description
@@ -20,13 +20,13 @@ export class CronManager {
      * @memberof CronManager
      */
     public static initCronManager(initCronMap: { [key: string]: CronJob }) {
-        CronManager.crons = new Map<string, CronJob>()
-        LogManager.info('CronManager is starting...')
+        CronManager.crons = new Map<string, CronJob>();
+        LogManager.info('CronManager is starting...');
         Object.keys(initCronMap).forEach((key) => {
-            CronManager.addCron(key, initCronMap[key])
-            LogManager.info('CronManager added: ' + key)
-        })
-        LogManager.info('CronManager is ready!')
+            CronManager.addCron(key, initCronMap[key]);
+            LogManager.info(`CronManager added: ${key}`);
+        });
+        LogManager.info('CronManager is ready!');
     }
 
     /**
@@ -38,8 +38,8 @@ export class CronManager {
      */
     public static startAll(): void {
         CronManager.crons.forEach((cron) => {
-            cron.start()
-        })
+            cron.start();
+        });
     }
 
     /**
@@ -51,8 +51,8 @@ export class CronManager {
      */
     public static stopAll(): void {
         CronManager.crons.forEach((cron) => {
-            cron.stop()
-        })
+            cron.stop();
+        });
     }
 
     /**
@@ -64,7 +64,7 @@ export class CronManager {
      * @memberof CronManager
      */
     public static getCrons(): Map<string, CronJob> {
-        return CronManager.crons
+        return CronManager.crons;
     }
 
     /**
@@ -78,10 +78,10 @@ export class CronManager {
      */
     public static addCron(name: string, cron: CronJob) {
         if (CronManager.crons.has(name)) {
-            CronManager.crons.get(name)?.stop()
+            CronManager.crons.get(name)?.stop();
         }
-        CronManager.crons.set(name, cron)
-        CronManager.crons.get(name)?.start()
+        CronManager.crons.set(name, cron);
+        CronManager.crons.get(name)?.start();
     }
 
     /**
@@ -94,8 +94,8 @@ export class CronManager {
      */
     public static removeCronByName(name: string) {
         if (CronManager.crons.has(name)) {
-            CronManager.crons.get(name)?.stop()
-            CronManager.crons.delete(name)
+            CronManager.crons.get(name)?.stop();
+            CronManager.crons.delete(name);
         }
     }
 }

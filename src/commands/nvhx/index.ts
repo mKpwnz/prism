@@ -1,2 +1,2 @@
-export * from './Nvhx'
-export * from './NvhxBan'
+export * from './Nvhx';
+export * from './NvhxBan';

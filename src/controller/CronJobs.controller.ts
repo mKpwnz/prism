@@ -1,13 +1,13 @@
-import { BotDB, GameDB } from '@sql/Database'
-import LogManager from '@utils/Logger'
-import { RowDataPacket } from 'mysql2'
+import { BotDB, GameDB } from '@sql/Database';
+import LogManager from '@utils/Logger';
+import { RowDataPacket } from 'mysql2';
 
 interface ISocietyFinanceResponse extends RowDataPacket {
-    job: string
-    label: string
-    bank: number
-    money: number
-    black: number
+    job: string;
+    label: string;
+    bank: number;
+    money: number;
+    black: number;
 }
 
 export class CronJobs {
@@ -23,10 +23,10 @@ export class CronJobs {
             FROM jobs AS j
             JOIN addon_account_data AS aad ON aad.account_name = CONCAT('society_', j.name);
             `,
-        )
+        );
         await BotDB.society_finance.createMany({
             data: [...data],
-        })
-        LogManager.debug('CronJobs: logSocietyFinance() done.')
+        });
+        LogManager.debug('CronJobs: logSocietyFinance() done.');
     }
 }

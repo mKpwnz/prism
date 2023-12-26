@@ -1,4 +1,4 @@
-import { RowDataPacket } from 'mysql2'
+import { RowDataPacket } from 'mysql2';
 
 /**
  * @description
@@ -9,9 +9,9 @@ import { RowDataPacket } from 'mysql2'
  * @extends {RowDataPacket}
  */
 export interface IJob extends RowDataPacket {
-    name: string
-    label: string
-    armory: string
-    money: number
-    blackmoney: number
+    name: string;
+    label: string;
+    armory: string;
+    money: number;
+    blackmoney: number;
 }

@@ -1,21 +1,21 @@
-import { Command } from '@class/Command'
-import { RegisterCommand } from '@commands/CommandHandler'
-import { DiscordResponse } from '@ctypes/DiscordResponse'
-import { DiscordResponseGroupe } from '@ctypes/DiscordResponseGroupe'
-import { HeartbeatResponse } from '@ctypes/HeartbeatResponse'
-import { PublicGroupListEntry } from '@ctypes/PublicGroupListEntry'
-import { EENV } from '@enums/EENV'
-import { EServerStatus } from '@enums/EServerStatus'
-import Config from '@proot/Config'
-import LogManager from '@utils/Logger'
-import axios from 'axios'
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js'
+import { Command } from '@class/Command';
+import { RegisterCommand } from '@commands/CommandHandler';
+import { DiscordResponse } from '@ctypes/DiscordResponse';
+import { DiscordResponseGroupe } from '@ctypes/DiscordResponseGroupe';
+import { HeartbeatResponse } from '@ctypes/HeartbeatResponse';
+import { PublicGroupListEntry } from '@ctypes/PublicGroupListEntry';
+import { EENV } from '@enums/EENV';
+import { EServerStatus } from '@enums/EServerStatus';
+import Config from '@proot/Config';
+import LogManager from '@utils/Logger';
+import axios from 'axios';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class ServerStatus extends Command {
     constructor() {
-        super()
-        this.RunEnvironment = EENV.PRODUCTION
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED]
+        super();
+        this.RunEnvironment = EENV.PRODUCTION;
+        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -23,76 +23,82 @@ export class ServerStatus extends Command {
             Config.Discord.Groups.IC_HADMIN,
             Config.Discord.Groups.IC_ADMIN,
             Config.Discord.Groups.IC_MOD,
-        ]
+        ];
         RegisterCommand(
             new SlashCommandBuilder().setName('serverstatus').setDescription('Gibt den aktuellen Serverstatus zurück!'),
             this,
-        )
+        );
     }
+
     getEmoteForStatus(status: EServerStatus): string {
-        var emote = ''
+        let emote = '';
         switch (status) {
             case EServerStatus.DOWN:
-                emote = ':red_circle:'
-                break
+                emote = ':red_circle:';
+                break;
             case EServerStatus.UP:
-                emote = ':green_circle:'
-                break
+                emote = ':green_circle:';
+                break;
             case EServerStatus.PENDING:
-                emote = ':yellow_circle:'
-                break
+                emote = ':yellow_circle:';
+                break;
             case EServerStatus.MAINTENANCE:
-                emote = ':blue_circle:'
-                break
+                emote = ':blue_circle:';
+                break;
+            default:
+                emote = ':question:';
+                break;
         }
-        return emote
+        return emote;
     }
+
     async getAgregatedData(): Promise<DiscordResponseGroupe[]> {
-        var res: DiscordResponseGroupe[] = []
+        const res: DiscordResponseGroupe[] = [];
         const pglRes: PublicGroupListEntry[] = await axios
             .get('https://status.immortaldev.eu/api/status-page/9t7abvczql56qa629fkejnfg2dyl072r', {
                 timeout: 2500,
             })
-            .then((res) => res.data['publicGroupList'])
+            .then((statusRes) => statusRes.data.publicGroupList)
             .catch((err) => {
-                LogManager.error(err)
-                return []
-            })
+                LogManager.error(err);
+                return [];
+            });
         const hbdRes: HeartbeatResponse = await axios
             .get('https://status.immortaldev.eu/api/status-page/heartbeat/9t7abvczql56qa629fkejnfg2dyl072r', {
                 timeout: 2500,
             })
-            .then((res) => res.data)
+            .then((heartbeatRes) => heartbeatRes.data)
             .catch((err) => {
-                LogManager.error(err)
-                return []
-            })
+                LogManager.error(err);
+                return [];
+            });
 
         pglRes.forEach((pglEntry) => {
-            var DiscordResponseList: DiscordResponse[] = []
+            const DiscordResponseList: DiscordResponse[] = [];
             pglEntry.monitorList.forEach((monitor) => {
-                var hbdEntry = hbdRes.heartbeatList[monitor.id]
-                var dr: DiscordResponse = {
+                const hbdEntry = hbdRes.heartbeatList[monitor.id];
+                const dr: DiscordResponse = {
                     name: monitor.name,
                     status: hbdEntry[hbdEntry.length - 1].status,
                     uptime: Number((hbdRes.uptimeList[`${monitor.id}_24`] * 100).toFixed(2)),
                     print: '',
-                }
-                dr.print = `${this.getEmoteForStatus(dr.status)} ${dr.name} - ${dr.uptime}%\n`
-                DiscordResponseList.push(dr)
-            })
-            res.push({ name: pglEntry.name, member: DiscordResponseList })
-        })
+                };
+                dr.print = `${this.getEmoteForStatus(dr.status)} ${dr.name} - ${dr.uptime}%\n`;
+                DiscordResponseList.push(dr);
+            });
+            res.push({ name: pglEntry.name, member: DiscordResponseList });
+        });
 
-        return res
+        return res;
     }
-    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        var embed = this.getEmbedTemplate(interaction)
-        const EmbedData = await this.getAgregatedData()
 
-        embed.setTitle('Serverstatus')
+    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+        const embed = this.getEmbedTemplate(interaction);
+        const EmbedData = await this.getAgregatedData();
+
+        embed.setTitle('Serverstatus');
         if (EmbedData.length === 0) {
-            embed.setDescription('Es ist ein Fehler beim Abrufen der Daten aufgetreten!')
+            embed.setDescription('Es ist ein Fehler beim Abrufen der Daten aufgetreten!');
         } else {
             embed.setDescription(
                 `${this.getEmoteForStatus(EServerStatus.UP)} = Online\n${this.getEmoteForStatus(
@@ -102,16 +108,18 @@ export class ServerStatus extends Command {
                 )} = Wird gestartet / Fehlerhaft\n${this.getEmoteForStatus(
                     EServerStatus.MAINTENANCE,
                 )} = Im Wartungsmodus\n\n`,
-            )
+            );
             EmbedData.forEach((group) => {
-                var print = ''
+                let print = '';
                 group.member.forEach((member) => {
-                    print += member.print
-                })
-                embed.addFields({ name: group.name, value: print })
-            })
-            embed.setImage(Config.Pictures.WHITESPACE)
+                    print += member.print;
+                });
+                embed.addFields({ name: group.name, value: print });
+            });
+            embed.setImage(Config.Pictures.WHITESPACE);
         }
-        interaction.reply({ content: ' ', embeds: [embed] })
+        this.addCommandBenchmark(embed);
+        interaction.reply({ content: ' ', embeds: [embed] });
     }
 }
+

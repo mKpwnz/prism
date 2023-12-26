@@ -1,2 +1,2 @@
-export * from './Versicherung'
-export * from './ValidateTrunk'
+export * from './Versicherung';
+export * from './ValidateTrunk';
