@@ -11,9 +11,9 @@ import axios from 'axios';
  * @author mKpwnz
  * @date 18.10.2023
  * @export
- * @class Player
+ * @class PlayerService
  */
-export class Player {
+export class PlayerService {
     /**
      * @description Get all live players from the server and cache them for 5 minutes.
      * @author mKpwnz
@@ -37,7 +37,7 @@ export class Player {
     }
 
     /**
-     * @description Check if a player ist Online
+     * @description Check if a player is Online
      * @author mKpwnz
      * @date 20.10.2023
      * @static
@@ -46,8 +46,8 @@ export class Player {
      * @memberof Player
      */
     public static async isPlayerOnline(identifier: string): Promise<boolean> {
-        const livePlayers = await Player.getAllLivePlayers();
-        return !!livePlayers.find((p) => p.identifiers.indexOf(identifier) > -1);
+        const livePlayers = await PlayerService.getAllLivePlayers();
+        return livePlayers.some((p) => p.identifiers.indexOf(identifier) > -1);
     }
 
     /**

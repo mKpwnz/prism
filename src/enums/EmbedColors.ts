@@ -4,7 +4,7 @@
  * @export
  * @enum {number}
  */
-export enum EmbedColors {
+export enum EEmbedColors {
     DEFAULT = 0x0792f1,
     SUCCESS = 0x17bf6b,
     WARNING = 0xffc632,

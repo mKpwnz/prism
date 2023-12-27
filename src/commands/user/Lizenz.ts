@@ -1,11 +1,11 @@
 import { Command } from '@class/Command';
 import { NonEmptyArray } from '@class/NonEmptyArray';
 import { RegisterCommand } from '@commands/CommandHandler';
-import { Player } from '@controller/Player.controller';
+import { PlayerService } from '@services/PlayerService';
 import { ValidatedPlayer } from '@ctypes/ValidatedPlayer';
 import { EENV } from '@enums/EENV';
 import { ELicenses } from '@enums/ELicenses';
-import Config from '@proot/Config';
+import Config from '@Config';
 import { GameDB } from '@sql/Database';
 import { IUserLicense } from '@sql/schema/UserLicense.schema';
 import { Helper } from '@utils/Helper';
@@ -17,7 +17,10 @@ export class Lizenz extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED];
+        this.AllowedChannels = [
+            Config.Discord.Channel.WHOIS_TESTI,
+            Config.Discord.Channel.WHOIS_UNLIMITED,
+        ];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -35,7 +38,10 @@ export class Lizenz extends Command {
                         .setName('entfernen')
                         .setDescription('Entferne die Lizenz eines Spielers')
                         .addStringOption((option) =>
-                            option.setName('steamid').setDescription('SteamID des Spielers').setRequired(true),
+                            option
+                                .setName('steamid')
+                                .setDescription('SteamID des Spielers')
+                                .setRequired(true),
                         )
                         .addStringOption((option) =>
                             option
@@ -62,7 +68,10 @@ export class Lizenz extends Command {
                         .setName('hinzufügen')
                         .setDescription('Füge dem Spieler eine Lizenz hinzu')
                         .addStringOption((option) =>
-                            option.setName('steamid').setDescription('SteamID des Spielers').setRequired(true),
+                            option
+                                .setName('steamid')
+                                .setDescription('SteamID des Spielers')
+                                .setRequired(true),
                         )
                         .addStringOption((option) =>
                             option
@@ -99,7 +108,7 @@ export class Lizenz extends Command {
 
     private async removeLicense(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         const lizenzStr = options.getString('lizenz');
         if (!lizenzStr) {
             await interaction.reply({ content: 'Bitte gib eine Lizenz an!', ephemeral: true });
@@ -121,7 +130,7 @@ export class Lizenz extends Command {
             await interaction.reply({ content: 'Bitte gib eine SteamID an!', ephemeral: true });
             return;
         }
-        const vPlayer = await Player.validatePlayer(steamid);
+        const vPlayer = await PlayerService.validatePlayer(steamid);
         if (!vPlayer) {
             await interaction.reply({
                 content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
@@ -149,7 +158,7 @@ export class Lizenz extends Command {
 
     private async addLicense(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         const license = options.getString('lizenz');
         const steamid = options.getString('steamid');
         if (!steamid) {
@@ -160,7 +169,7 @@ export class Lizenz extends Command {
             await interaction.reply({ content: 'Bitte gib eine Lizenz an!', ephemeral: true });
             return;
         }
-        const vPlayer = await Player.validatePlayer(steamid);
+        const vPlayer = await PlayerService.validatePlayer(steamid);
         if (!vPlayer) {
             await interaction.reply({
                 content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
@@ -173,7 +182,9 @@ export class Lizenz extends Command {
             if (license !== 'all') {
                 query += ` AND type = "${license}"`;
             }
-            const [lizenzen] = await GameDB.query<IUserLicense[]>(query, [vPlayer.identifiers.steam]);
+            const [lizenzen] = await GameDB.query<IUserLicense[]>(query, [
+                vPlayer.identifiers.steam,
+            ]);
             if (lizenzen.length !== 0) {
                 await interaction.reply({
                     content: 'Der Spieler hat diese Lizenz bereits!',

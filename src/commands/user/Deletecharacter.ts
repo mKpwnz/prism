@@ -1,10 +1,10 @@
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
-import { Player } from '@controller/Player.controller';
+import { PlayerService } from '@services/PlayerService';
 import { ValidatedPlayer } from '@ctypes/ValidatedPlayer';
 import { ELicenses } from '@enums/ELicenses';
-import Config from '@proot/Config';
+import Config from '@Config';
 import { GameDB } from '@sql/Database';
 import { IUser } from '@sql/schema/User.schema';
 import LogManager from '@utils/Logger';
@@ -27,7 +27,10 @@ export class Deletecharacter extends Command {
                 .setName('deletecharacter')
                 .setDescription('Löscht einen Charakter von einem Spieler')
                 .addStringOption((option) =>
-                    option.setName('steamid').setDescription('SteamID des zu löschenden Spielers').setRequired(true),
+                    option
+                        .setName('steamid')
+                        .setDescription('SteamID des zu löschenden Spielers')
+                        .setRequired(true),
                 ),
             this,
         );
@@ -45,7 +48,7 @@ export class Deletecharacter extends Command {
                 await interaction.reply({ content: 'Bitte gib eine SteamID an!', ephemeral: true });
                 return;
             }
-            const vPlayer = await Player.validatePlayer(steamid);
+            const vPlayer = await PlayerService.validatePlayer(steamid);
             if (!vPlayer) {
                 await interaction.reply({
                     content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',

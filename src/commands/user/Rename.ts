@@ -1,8 +1,8 @@
+import Config from '@Config';
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
-import { Player } from '@controller/Player.controller';
 import { EENV } from '@enums/EENV';
-import Config from '@proot/Config';
+import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
 import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
@@ -12,7 +12,10 @@ export class Rename extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_RENAME];
+        this.AllowedChannels = [
+            Config.Discord.Channel.WHOIS_TESTI,
+            Config.Discord.Channel.WHOIS_RENAME,
+        ];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -28,10 +31,17 @@ export class Rename extends Command {
                 .setName('rename')
                 .setDescription('Suche nach Spielern')
                 .addStringOption((option) =>
-                    option.setName('steam').setDescription('Steam ID des Nutzers').setRequired(true),
+                    option
+                        .setName('steam')
+                        .setDescription('Steam ID des Nutzers')
+                        .setRequired(true),
                 )
-                .addStringOption((option) => option.setName('vorname').setDescription('Vorname des Spielers'))
-                .addStringOption((option) => option.setName('nachname').setDescription('Nachname des Spielers')),
+                .addStringOption((option) =>
+                    option.setName('vorname').setDescription('Vorname des Spielers'),
+                )
+                .addStringOption((option) =>
+                    option.setName('nachname').setDescription('Nachname des Spielers'),
+                ),
             this,
         );
     }
@@ -39,14 +49,16 @@ export class Rename extends Command {
     // TODO: Refactor
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const steam = interaction.options.get('steam')?.value?.toString() ?? '';
-        const vPlayer = await Player.validatePlayer(steam);
-        const embed = this.getEmbedTemplate(interaction);
+        const vPlayer = await PlayerService.validatePlayer(steam);
+        const embed = Command.getEmbedTemplate(interaction);
         if (!vPlayer) {
             await interaction.reply('Es konnte kein Spieler mit dieser SteamID gefunden werden!');
             return;
         }
-        const firstname = interaction.options.get('vorname')?.value?.toString() ?? vPlayer.playerdata.firstname;
-        const lastname = interaction.options.get('nachname')?.value?.toString() ?? vPlayer.playerdata.lastname;
+        const firstname =
+            interaction.options.get('vorname')?.value?.toString() ?? vPlayer.playerdata.firstname;
+        const lastname =
+            interaction.options.get('nachname')?.value?.toString() ?? vPlayer.playerdata.lastname;
         // eslint-disable-next-line eqeqeq
         if (firstname == '' && lastname == '') {
             await interaction.reply({

@@ -5,7 +5,12 @@
         "project": "./tsconfig.json"
     },
     "plugins": ["@typescript-eslint"],
-    "extends": ["airbnb-base", "airbnb-typescript/base", "prettier"],
+    "extends": [
+        "airbnb-base",
+        "airbnb-typescript/base",
+        "prettier",
+        "plugin:deprecation/recommended"
+    ],
     "overrides": [
         {
             "files": ["*"],
@@ -16,8 +21,9 @@
                 "no-underscore-dangle": "off",
                 "no-await-in-loop": "off",
                 "no-plusplus": "off",
-                "no-param-reassign": "warn",
-                "class-methods-use-this": "warn"
+                "no-param-reassign": "off", // no benefit
+                "class-methods-use-this": "warn",
+                "deprecation/deprecation": "warn"
             }
         }
     ]

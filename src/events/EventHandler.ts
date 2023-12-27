@@ -15,7 +15,9 @@ export class EventHandler {
     static init(client: Client) {
         client.on('ready', async () => this.onReady(client));
         client.on('messageCreate', async (message) => this.onMessageCreate(message));
-        client.on('interactionCreate', async (interaction) => this.onInteractionCreate(interaction));
+        client.on('interactionCreate', async (interaction) =>
+            this.onInteractionCreate(interaction),
+        );
 
         new CustomImageUpload(client);
     }

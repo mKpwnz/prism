@@ -1,19 +1,22 @@
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
-import { Player } from '@controller/Player.controller';
 import { EENV } from '@enums/EENV';
-import { EmbedColors } from '@enums/EmbedColors';
-import Config from '@proot/Config';
+import { EEmbedColors } from '@enums/EmbedColors';
+import Config from '@Config';
 import { GameDB } from '@sql/Database';
 import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
+import { PlayerService } from '@services/PlayerService';
 
 export class ChangeBirthday extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_RENAME];
+        this.AllowedChannels = [
+            Config.Discord.Channel.WHOIS_TESTI,
+            Config.Discord.Channel.WHOIS_RENAME,
+        ];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -31,7 +34,10 @@ export class ChangeBirthday extends Command {
                 // add string option
                 .setDMPermission(true)
                 .addStringOption((option) =>
-                    option.setName('steam').setDescription('Steam ID des Nutzers').setRequired(true),
+                    option
+                        .setName('steam')
+                        .setDescription('Steam ID des Nutzers')
+                        .setRequired(true),
                 )
                 .addStringOption((option) =>
                     option
@@ -47,7 +53,7 @@ export class ChangeBirthday extends Command {
         const { options } = interaction;
         const birthday = options.getString('datum');
         const steamID = options.getString('steam');
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         if (!birthday) {
             await interaction.reply({
                 content: 'Es wurde kein Geburtstag angegeben!',
@@ -62,7 +68,7 @@ export class ChangeBirthday extends Command {
             });
             return;
         }
-        const vPlayer = await Player.validatePlayer(steamID);
+        const vPlayer = await PlayerService.validatePlayer(steamID);
         if (!vPlayer) {
             await interaction.reply({
                 content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
@@ -79,14 +85,14 @@ export class ChangeBirthday extends Command {
                 );
                 if (res.affectedRows > 0) {
                     embed.setTitle('Geburtstag geändert');
-                    embed.setColor(EmbedColors.SUCCESS);
+                    embed.setColor(EEmbedColors.SUCCESS);
                     embed.setDescription(
                         `Der Geburtstag des Spielers **${vPlayer.playerdata.fullname}** (${vPlayer.identifiers.steam}) wurde auf **${birthday}** geändert.`,
                     );
                     await interaction.reply({ embeds: [embed] });
                 } else {
                     embed.setTitle('Geburtstag nicht geändert');
-                    embed.setColor(EmbedColors.ALERT);
+                    embed.setColor(EEmbedColors.ALERT);
                     embed.setDescription(
                         `Der Geburtstag des Spielers **${vPlayer.playerdata.fullname}** (${vPlayer.identifiers.steam}) konnte nicht auf **${birthday}** geändert werden.`,
                     );

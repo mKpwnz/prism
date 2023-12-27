@@ -1,7 +1,7 @@
-import { Player } from '@controller/Player.controller';
+import { PlayerService } from '@services/PlayerService';
 import { ValidatedPlayer } from '@ctypes/ValidatedPlayer';
 import { EUniqueIdentifier } from '@enums/ESearchType';
-import Config from '@proot/Config';
+import Config from '@Config';
 import { GameDB } from '@sql/Database';
 import { Helper } from '@utils/Helper';
 import LogManager from '@utils/Logger';
@@ -102,7 +102,9 @@ export class CustomImageUpload {
     }
 
     async onInteract(interaction: Interaction) {
-        const phoneCiuModal = new ModalBuilder().setCustomId('phone_ciu_modal').setTitle('Bild an Spieler zuweisen');
+        const phoneCiuModal = new ModalBuilder()
+            .setCustomId('phone_ciu_modal')
+            .setTitle('Bild an Spieler zuweisen');
         const phoneCiuInPhoneNumber = new TextInputBuilder()
             .setCustomId('phone_ciu_in_phoneNumber')
             .setLabel('Telefonnummer des Spielers')
@@ -196,10 +198,15 @@ export class CustomImageUpload {
             if (this.message_image_upload) await this.message_image_upload.delete();
         }
         if (interaction.isModalSubmit() && interaction.customId === 'phone_ciu_modal') {
-            this.input_phoneNumber = interaction.fields.getTextInputValue('phone_ciu_in_phoneNumber');
+            this.input_phoneNumber = interaction.fields.getTextInputValue(
+                'phone_ciu_in_phoneNumber',
+            );
             this.input_reason = interaction.fields.getTextInputValue('phone_ciu_in_reason');
 
-            this.vPlayer = await Player.validatePlayer(this.input_phoneNumber, EUniqueIdentifier.PHONENUMBER);
+            this.vPlayer = await PlayerService.validatePlayer(
+                this.input_phoneNumber,
+                EUniqueIdentifier.PHONENUMBER,
+            );
             const { success, messages } = this.validateInput();
             if (!success || !this.vPlayer) {
                 await interaction.reply({
@@ -237,19 +244,29 @@ export class CustomImageUpload {
         if (this.image_attachment) {
             const { height, width, size } = this.image_attachment;
             const url = this.image_attachment.url.split('?')[0];
-            if (!/(.*?)\\.(jpg|jpeg|webp|png)/.test(url)) {
-                response.messages.push('Das Bild muss eine .jpg, .jpeg, .webp oder .png Datei sein.');
+            if (!/(.*?)\.(jpg|jpeg|webp|png)/.test(url)) {
+                response.messages.push(
+                    'Das Bild muss eine .jpg, .jpeg, .webp oder .png Datei sein.',
+                );
             }
-            if (!height) response.messages.push('Die Höhe des Bildes konnte nicht ermittelt werden.');
-            if (!width) response.messages.push('Die Breite des Bildes konnte nicht ermittelt werden.');
-            if (!size) response.messages.push('Die Dateigröße des Bildes konnte nicht ermittelt werden.');
+            if (!height)
+                response.messages.push('Die Höhe des Bildes konnte nicht ermittelt werden.');
+            if (!width)
+                response.messages.push('Die Breite des Bildes konnte nicht ermittelt werden.');
+            if (!size)
+                response.messages.push('Die Dateigröße des Bildes konnte nicht ermittelt werden.');
 
-            if (size > this.imageLimitations.size) response.messages.push('Das Bild darf nicht größer als 800kb sein.');
+            if (size > this.imageLimitations.size)
+                response.messages.push('Das Bild darf nicht größer als 800kb sein.');
 
             if (width && width > this.imageLimitations.width)
-                response.messages.push(`Das Bild darf nicht breiter als ${this.imageLimitations.width} Pixel sein.`);
+                response.messages.push(
+                    `Das Bild darf nicht breiter als ${this.imageLimitations.width} Pixel sein.`,
+                );
             if (height && height > this.imageLimitations.height)
-                response.messages.push(`Das Bild darf nicht höher als ${this.imageLimitations.height} Pixel sein.`);
+                response.messages.push(
+                    `Das Bild darf nicht höher als ${this.imageLimitations.height} Pixel sein.`,
+                );
         } else {
             response.messages.push('Es wurde kein Bild angehängt.');
         }

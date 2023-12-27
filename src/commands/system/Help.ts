@@ -3,15 +3,18 @@ import { CommandHandler, RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { ICmdPrintInformation } from '@interfaces/ICmdPrintInformation';
 import { ICmdPrintInformationOption } from '@interfaces/ICmdPrintInformationOption';
-import { BotClient } from '@proot/Bot';
-import Config from '@proot/Config';
+import { BotClient } from '@Bot';
+import Config from '@Config';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class Help extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED];
+        this.AllowedChannels = [
+            Config.Discord.Channel.WHOIS_TESTI,
+            Config.Discord.Channel.WHOIS_UNLIMITED,
+        ];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -20,7 +23,10 @@ export class Help extends Command {
             Config.Discord.Groups.IC_ADMIN,
             Config.Discord.Groups.IC_MOD,
         ];
-        RegisterCommand(new SlashCommandBuilder().setName('help').setDescription('Liste aller Befehle!'), this);
+        RegisterCommand(
+            new SlashCommandBuilder().setName('help').setDescription('Liste aller Befehle!'),
+            this,
+        );
     }
 
     public static getCommands(): ICmdPrintInformation[] {
@@ -63,29 +69,32 @@ export class Help extends Command {
         return CmdPrintInformation;
     }
 
-    public static async getGroups(): Promise<{ [key: string]: string }> {
-        const res: { [key: string]: string } = {};
+    public static async getGroups(): Promise<Map<string, string>> {
+        const res = new Map<string, string>();
+
         const roles = await BotClient.guilds.cache.get(Config.Discord.ServerID)?.roles.cache;
         if (!roles) return res;
         for (const [key, value] of roles.entries()) {
-            res[key] = value.name;
+            res.set(key, value.name);
         }
         return res;
     }
 
-    public static async getChannel(): Promise<{ [key: string]: string }> {
-        const col: { [key: string]: string } = {};
-        const channel = await BotClient.guilds.cache.get(Config.Discord.ServerID)?.channels.cache;
-        if (!channel) return col;
-        for (const [key, value] of channel.entries()) {
-            col[key] = value.name;
+    public static async getChannel(): Promise<Map<string, string>> {
+        const channel = new Map<string, string>();
+        const channelApiResponse = await BotClient.guilds.cache.get(Config.Discord.ServerID)
+            ?.channels.cache;
+        if (!channelApiResponse) return channel;
+        for (const [key, value] of channelApiResponse.entries()) {
+            channel.set(key, value.name);
         }
-        return col;
+        return channel;
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         await interaction.reply({
-            content: 'Die Hilfe findest du auf folgender Seite: [Bot Hilfe](https://brand.immortaldev.eu/discordbot)',
+            content:
+                'Die Hilfe findest du auf folgender Seite: [Bot Hilfe](https://brand.immortaldev.eu/discordbot)',
             ephemeral: true,
         });
     }

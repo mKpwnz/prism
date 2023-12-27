@@ -9,3 +9,11 @@ export type DiscordResponse = {
     uptime: number;
     print: string;
 };
+
+/**
+ * @typedef DiscordResponseGroupe
+ */
+export type DiscordResponseGroupe = {
+    name: string;
+    member: DiscordResponse[];
+};

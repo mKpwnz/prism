@@ -1,8 +1,8 @@
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
-import { Player } from '@controller/Player.controller';
+import { PlayerService } from '@services/PlayerService';
 import { EENV } from '@enums/EENV';
-import Config from '@proot/Config';
+import Config from '@Config';
 import { GameDB } from '@sql/Database';
 import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
@@ -12,7 +12,10 @@ export class Resetpos extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED];
+        this.AllowedChannels = [
+            Config.Discord.Channel.WHOIS_TESTI,
+            Config.Discord.Channel.WHOIS_UNLIMITED,
+        ];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -29,7 +32,10 @@ export class Resetpos extends Command {
                 // add string option
                 .setDMPermission(true)
                 .addStringOption((option) =>
-                    option.setName('steam').setDescription('Steam ID des Nutzers').setRequired(true),
+                    option
+                        .setName('steam')
+                        .setDescription('Steam ID des Nutzers')
+                        .setRequired(true),
                 ),
             this,
         );
@@ -37,8 +43,8 @@ export class Resetpos extends Command {
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const steam = interaction.options.get('steam')?.value?.toString() ?? '';
-        const vPlayer = await Player.validatePlayer(steam);
-        const embed = this.getEmbedTemplate(interaction);
+        const vPlayer = await PlayerService.validatePlayer(steam);
+        const embed = Command.getEmbedTemplate(interaction);
         if (!vPlayer) {
             await interaction.reply('Es konnte kein Spieler mit dieser SteamID gefunden werden!');
             return;

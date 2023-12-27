@@ -3,7 +3,7 @@ import { RconClient } from '@class/RconClient';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 
-import Config from '@proot/Config';
+import Config from '@Config';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class NvhxBan extends Command {
@@ -22,38 +22,44 @@ export class NvhxBan extends Command {
             new SlashCommandBuilder()
                 .setName('nvhxban')
                 .setDescription('Bannt einen Nutzer')
-                .addIntegerOption((option) => option.setName('id').setDescription('SpielerID').setRequired(true)),
+                .addIntegerOption((option) =>
+                    option.setName('id').setDescription('SpielerID').setRequired(true),
+                ),
             this,
         );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        await this.nvhxBan(interaction);
-    }
-
-    public async nvhxBan(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
-        try {
-            const id = options.getInteger('id', true);
-            let response = await RconClient.sendCommand(`nvhx ban ${id}`);
-            response = response.replace('print ', '');
-            response = response.substring(4);
-            // response = response.replace('<-- NEVERHAX NVHX -->', '')
-            response = response.replace('Violation: Banned by **CONSOLE**', 'Violation: Banned by **CONSOLE**\n');
-            // response = response.trim()
-            if (response.includes('Banned: ')) {
-                embed.setTitle('Neverhax Ban');
-                embed.setDescription(`Bannt SpielerID ${id}\nAntwort vom Server:\n\`\`\`${response}\`\`\``);
-                await interaction.reply({ embeds: [embed] });
-            } else {
-                await interaction.reply({ content: 'Spieler nicht gefunden!', ephemeral: true });
-            }
-        } catch (error) {
-            await interaction.reply({
-                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(error)}\`\`\``,
+        const id = interaction.options.getInteger('id', true);
+        const response = await NvhxBan.banPlayerById(id);
+        if (response.includes('Banned: ')) {
+            await this.replyWithEmbed({
+                interaction,
+                title: 'Neverhax Ban',
+                description: `Bannt SpielerID ${id}\nAntwort vom Server:\n\`\`\`${response}\`\`\``,
+            });
+        } else {
+            await this.replyWithEmbed({
+                interaction,
+                title: 'Neverhax Ban',
+                description: `Spieler nicht gefunden!`,
                 ephemeral: true,
             });
         }
+    }
+
+    // @TODO move to another place that makes sense
+    // @TODO improve return value
+    private static async banPlayerById(playerId: number): Promise<string> {
+        let response = await RconClient.sendCommand(`nvhx ban ${playerId}`);
+        response = response.replace('print ', '');
+        response = response.substring(4);
+        // response = response.replace('<-- NEVERHAX NVHX -->', '')
+        response = response.replace(
+            'Violation: Banned by **CONSOLE**',
+            'Violation: Banned by **CONSOLE**\n',
+        );
+
+        return response;
     }
 }

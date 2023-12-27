@@ -1,6 +1,7 @@
 import { EENV } from '@enums/EENV';
-import { EmbedColors } from '@enums/EmbedColors';
-import Config from '@proot/Config';
+import { EEmbedColors } from '@enums/EmbedColors';
+import { IEmbedField } from '@interfaces/IEmbedField';
+import Config from '@Config';
 import { BotDB } from '@sql/Database';
 import { Helper } from '@utils/Helper';
 import LogManager from '@utils/Logger';
@@ -126,7 +127,10 @@ export abstract class Command {
         if (this.RunEnvironment !== EENV.PRODUCTION) {
             this.DoNotCountUse = true;
             this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI];
-            this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER, Config.Discord.Groups.DEV_BOTTESTER];
+            this.AllowedGroups = [
+                Config.Discord.Groups.DEV_SERVERENGINEER,
+                Config.Discord.Groups.DEV_BOTTESTER,
+            ];
         }
         if (process.env.NODE_ENV !== 'production') {
             this.DoNotCountUse = true;
@@ -159,9 +163,13 @@ export abstract class Command {
             options: inputFields,
         };
         LogManager.discordActionLog(
-            `\` ${interaction.user.displayName} (${user.id}) \` hat im Kanal <#${interaction.channelId}> den Befehl \`${
-                interaction.commandName
-            }\` ausgeführt:\`\`\`json\n${JSON.stringify(cmdPrint, null, 4)}\`\`\``,
+            `\` ${interaction.user.displayName} (${user.id}) \` hat im Kanal <#${
+                interaction.channelId
+            }> den Befehl \`${interaction.commandName}\` ausgeführt:\`\`\`json\n${JSON.stringify(
+                cmdPrint,
+                null,
+                4,
+            )}\`\`\``,
         );
         let { commandName } = interaction;
         if (!this.DoNotCountUse) {
@@ -182,15 +190,23 @@ export abstract class Command {
                 },
             });
         }
-        // LogManager.debug(logEntry)
         try {
             this.CmdPerformanceStart = new Date();
             await this.execute(interaction);
         } catch (error) {
-            LogManager.error(error);
-            await interaction.reply({
-                content: `Es ist ein Fehler aufgetreten!\`\`\`json${JSON.stringify(error)}\`\`\``,
-                ephemeral: true,
+            const errobj: { [k: string]: any } = {};
+            if (error instanceof Error) {
+                errobj.name = error.name;
+                errobj.message = error.message;
+            } else {
+                errobj.e = error;
+            }
+            LogManager.error(errobj);
+            await this.replyWithEmbed({
+                interaction,
+                title: 'Es ist ein Fehler aufgetreten!',
+                description: `\`\`\`json\n${JSON.stringify(errobj, null, 2)}\n\`\`\``,
+                color: EEmbedColors.ALERT,
             });
         }
     }
@@ -202,10 +218,11 @@ export abstract class Command {
      * @param {ChatInputCommandInteraction} interaction
      * @returns {*}  {EmbedBuilder}
      * @memberof Command
+     * @deprecated
      */
-    getEmbedTemplate(interaction: ChatInputCommandInteraction): EmbedBuilder {
+    static getEmbedTemplate(interaction: ChatInputCommandInteraction): EmbedBuilder {
         return new EmbedBuilder()
-            .setColor(EmbedColors.DEFAULT)
+            .setColor(EEmbedColors.DEFAULT)
             .setTimestamp()
             .setAuthor({ name: Config.Discord.BOT_NAME, iconURL: Config.Pictures.Prism.LOGO_BLUE })
             .setFooter({
@@ -216,13 +233,37 @@ export abstract class Command {
             .setImage(Config.Pictures.WHITESPACE);
     }
 
-    addCommandBenchmark(embed: EmbedBuilder): void {
+    async replyWithEmbed(opt: {
+        interaction: ChatInputCommandInteraction;
+        title: string;
+        description: string;
+        messageContent?: string;
+        fields?: IEmbedField[];
+        customImage?: string;
+        color?: EEmbedColors | number;
+        ephemeral?: boolean;
+    }): Promise<void> {
         this.CmdPerformanceStop = new Date();
-        const executionTime = this.CmdPerformanceStop.getTime() - this.CmdPerformanceStart!.getTime();
-        embed.setFooter({
-            text: `${embed.data.footer?.text} | Executiontime: ${executionTime}ms`,
-            iconURL: embed.data.footer?.icon_url,
+        const executionTime =
+            this.CmdPerformanceStop.getTime() - this.CmdPerformanceStart!.getTime();
+
+        const embed = new EmbedBuilder()
+            .setTitle(opt.title)
+            .setDescription(opt.description)
+            .setColor(opt.color ?? EEmbedColors.DEFAULT)
+            .setAuthor({ name: Config.Discord.BOT_NAME, iconURL: Config.Pictures.Prism.LOGO_BLUE })
+            .setFooter({
+                text: `${opt.interaction.user.displayName ?? ''} • ET: ${executionTime}ms`,
+                iconURL: opt.interaction.user.avatarURL() ?? '',
+            })
+            .setTimestamp(new Date())
+            .setFields(opt.fields ?? [])
+            .setImage(opt.customImage ?? Config.Pictures.WHITESPACE);
+
+        await opt.interaction.reply({
+            content: opt.messageContent ?? '',
+            embeds: [embed],
+            ephemeral: opt.ephemeral,
         });
     }
 }
-

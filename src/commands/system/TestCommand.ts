@@ -1,7 +1,7 @@
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
-import Config from '@proot/Config';
+import Config from '@Config';
 import { BotDB } from '@sql/Database';
 import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
@@ -11,8 +11,14 @@ export class TestCommand extends Command {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI];
-        this.AllowedGroups = [Config.Discord.Groups.DEV_SERVERENGINEER, Config.Discord.Groups.DEV_BOTTESTER];
-        RegisterCommand(new SlashCommandBuilder().setName('testcommand').setDescription('Test Command'), this);
+        this.AllowedGroups = [
+            Config.Discord.Groups.DEV_SERVERENGINEER,
+            Config.Discord.Groups.DEV_BOTTESTER,
+        ];
+        RegisterCommand(
+            new SlashCommandBuilder().setName('testcommand').setDescription('Test Command'),
+            this,
+        );
         this.DoNotCountUse = true;
     }
 

@@ -1,18 +1,20 @@
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
-import Config from '@proot/Config';
-import { GameDB } from '@sql/Database';
-import { IPhoneOwnerResponse } from '@sql/schema/Phone.schema';
+import Config from '@Config';
 import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { PhoneRepository } from '@sql/repositories/phone.repository';
 
 // TODO: REFACTOR
 export class CheckImageOwner extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED];
+        this.AllowedChannels = [
+            Config.Discord.Channel.WHOIS_TESTI,
+            Config.Discord.Channel.WHOIS_UNLIMITED,
+        ];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -25,7 +27,9 @@ export class CheckImageOwner extends Command {
             new SlashCommandBuilder()
                 .setName('pcheckimageowner')
                 .setDescription('Check who created an Ingame image')
-                .addStringOption((option) => option.setName('imageurl').setDescription('Image URL').setRequired(true)),
+                .addStringOption((option) =>
+                    option.setName('imageurl').setDescription('Image URL').setRequired(true),
+                ),
             this,
         );
     }
@@ -38,45 +42,25 @@ export class CheckImageOwner extends Command {
         return null;
     }
 
-    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        try {
-            const nLink = this.normalizeLink(interaction.options.get('imageurl')?.value?.toString() as string);
-            if (!nLink) {
-                interaction.reply({
-                    content: `Der link konnte nicht validiert werden.`,
-                    ephemeral: true,
-                });
-                return;
-            }
-            LogManager.debug(nLink);
-
-            const [response] = await GameDB.query<IPhoneOwnerResponse[]>(
-                `
-                SELECT
-                    u.firstname,
-                    u.lastname,
-                    phones.id AS steamID,
-                    photos.phone_number,
-                    photos.timestamp AS img_timestamp
-				FROM phone_photos photos
-				JOIN phone_phones phones ON photos.phone_number = phones.phone_number
-				JOIN users u ON u.identifier = phones.id
-				WHERE
-                    photos.link LIKE ?
-				ORDER BY
-                    img_timestamp;
-			`,
-                [`%${nLink}%`],
-            );
-            interaction.reply({
-                content: `\`\`\`json\n${JSON.stringify(response[0], null, 4)}\`\`\``,
-            });
-        } catch (e) {
-            LogManager.error(e);
-            interaction.reply({
-                content: `Fehler beim ausführen des Befeheles.`,
+    public async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+        // @TODO We should have a better solution for input validation
+        const nLink = this.normalizeLink(
+            interaction.options.get('imageurl')?.value?.toString() as string,
+        );
+        if (!nLink) {
+            await interaction.reply({
+                content: `Der link konnte nicht validiert werden.`,
                 ephemeral: true,
             });
+            return;
         }
+        // @TODO why log here?
+        LogManager.debug(nLink);
+
+        const phoneOwner = await PhoneRepository.getPhoneOwnerByImageLink(nLink);
+
+        await interaction.reply({
+            content: `\`\`\`json\n${JSON.stringify(phoneOwner, null, 4)}\`\`\``,
+        });
     }
 }

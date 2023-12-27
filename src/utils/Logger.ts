@@ -1,5 +1,5 @@
-import { BotClient } from '@proot/Bot';
-import Config from '@proot/Config';
+import { BotClient } from '@Bot';
+import Config from '@Config';
 import chalk from 'chalk';
 import colorize from 'json-colorizer';
 import winston, { createLogger, format, transports } from 'winston';
@@ -14,6 +14,10 @@ import LokiTransport from 'winston-loki';
  */
 export default class LogManager {
     private static logger: winston.Logger;
+
+    private static clone<T>(obj: T): T {
+        return JSON.parse(JSON.stringify(obj));
+    }
 
     private static formatLoglevel(loglevel: string): string {
         const uLevel = loglevel.toUpperCase();
@@ -107,9 +111,9 @@ export default class LogManager {
      * @memberof LogManager
      */
     public static log(...args: any[]) {
-        args.forEach((arg) => {
-            this.logger.debug(arg);
-        });
+        for (const arg of args) {
+            this.logger.log(arg);
+        }
     }
 
     /**
@@ -121,9 +125,9 @@ export default class LogManager {
      * @memberof LogManager
      */
     public static error(...args: any[]) {
-        args.forEach((arg) => {
+        for (const arg of args) {
             this.logger.error(arg);
-        });
+        }
     }
 
     /**
@@ -135,9 +139,9 @@ export default class LogManager {
      * @memberof LogManager
      */
     public static warn(...args: any[]) {
-        args.forEach((arg) => {
+        for (const arg of args) {
             this.logger.warn(arg);
-        });
+        }
     }
 
     /**
@@ -149,9 +153,9 @@ export default class LogManager {
      * @memberof LogManager
      */
     public static info(...args: any[]) {
-        args.forEach((arg) => {
+        for (const arg of args) {
             this.logger.info(arg);
-        });
+        }
     }
 
     /**
@@ -163,9 +167,9 @@ export default class LogManager {
      * @memberof LogManager
      */
     public static debug(...args: any[]) {
-        args.forEach((arg) => {
+        for (const arg of args) {
             this.logger.debug(arg);
-        });
+        }
     }
 
     /**

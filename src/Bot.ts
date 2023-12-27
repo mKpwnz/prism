@@ -1,5 +1,4 @@
 import 'dotenv/config'; // THIS NEED TO BE AT THE TOP !!!IMPORTANT
-
 import { EventHandler } from '@events/EventHandler';
 import { Cache } from '@utils/Cache';
 import LogManager from '@utils/Logger';
@@ -11,7 +10,10 @@ import { CronJobs } from '@controller/CronJobs.controller';
 
 LogManager.configure();
 
-const token = process.env.NODE_ENV === 'production' ? process.env.DISCORD_TOKEN_PROD : process.env.DISCORD_TOKEN_DEV;
+const token =
+    process.env.NODE_ENV === 'production'
+        ? process.env.DISCORD_TOKEN_PROD
+        : process.env.DISCORD_TOKEN_DEV;
 
 LogManager.info('Bot is starting...');
 

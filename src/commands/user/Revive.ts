@@ -2,15 +2,17 @@ import { Command } from '@class/Command';
 import { RconClient } from '@class/RconClient';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
-import Config from '@proot/Config';
-import LogManager from '@utils/Logger';
+import Config from '@Config';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class Revive extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI, Config.Discord.Channel.WHOIS_UNLIMITED];
+        this.AllowedChannels = [
+            Config.Discord.Channel.WHOIS_TESTI,
+            Config.Discord.Channel.WHOIS_UNLIMITED,
+        ];
         this.AllowedGroups = [
             Config.Discord.Groups.DEV_SERVERENGINEER,
             Config.Discord.Groups.DEV_BOTTESTER,
@@ -23,10 +25,10 @@ export class Revive extends Command {
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('revive')
-                .setDescription('Suche nach Spielern')
-                // add string option
-                .setDMPermission(true)
-                .addIntegerOption((option) => option.setName('id').setDescription('ID des Spielers').setRequired(true))
+                .setDescription('Revive einen Spieler')
+                .addIntegerOption((option) =>
+                    option.setName('id').setDescription('ID des Spielers').setRequired(true),
+                )
                 .addBooleanOption((option) =>
                     option.setName('kampfunfähig').setDescription('Kampfunfähigkeit hinzufügen?'),
                 ),
@@ -36,30 +38,14 @@ export class Revive extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction;
-        try {
-            const id = options.getInteger('id');
-            if (!id) {
-                await interaction.reply({
-                    content: 'ID wurde nicht gefunden!',
-                    ephemeral: true,
-                });
-                return;
-            }
-            const kampf = options.getBoolean('kampfunfähig') ?? false;
-            let command = `revive ${id}`;
-            if (kampf) command = `revive ${id} 1`;
-            await RconClient.sendCommand(command);
-            await interaction.reply({
-                content: `Revivebefehl für ID ${id} wurde ausgelöst!`,
-                ephemeral: true,
-            });
-        } catch (error) {
-            LogManager.error(error);
-            await interaction.reply({
-                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(error)}\`\`\``,
-                ephemeral: true,
-            });
-        }
+        const id = interaction.options.getInteger('id');
+        const incapacitated = interaction.options.getBoolean('kampfunfähig') ?? false;
+
+        await RconClient.sendCommand(`revive ${id}${incapacitated ? ' 1' : ''}`);
+        await this.replyWithEmbed({
+            interaction,
+            title: 'Revive',
+            description: `Der Spieler mit der ID **${id}** wurde revived!`,
+        });
     }
 }
