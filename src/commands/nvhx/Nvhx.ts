@@ -82,11 +82,11 @@ export class Nvhx extends Command {
         try {
             const id = interaction.options.getInteger('id', true);
             await RconClient.sendCommand(`nvhx sc ${id}`);
-            await this.replyWithEmbed(
+            await this.replyWithEmbed({
                 interaction,
-                'Neverhax Screenshot',
-                `Triggere Neverhax Screenshot für SpielerID ${id}`,
-            );
+                title: 'Neverhax Screenshot',
+                description: `Triggere Neverhax Screenshot für SpielerID ${id}`,
+            });
         } catch (error) {
             await CommandHelper.handleInteractionError(error, interaction);
         }
@@ -98,7 +98,11 @@ export class Nvhx extends Command {
             const response = await RconClient.sendCommand(`nvhx unban ${banId}`);
 
             if (response.includes('Unbanned: ')) {
-                await this.replyWithEmbed(interaction, 'Neverhax Unban', `Entbanne BanID ${banId}`);
+                await this.replyWithEmbed({
+                    interaction,
+                    title: 'Neverhax Unban',
+                    description: `Entbanne BanID ${banId}`,
+                });
             } else {
                 await interaction.reply({
                     content: 'BanID nicht gefunden!',
@@ -114,7 +118,11 @@ export class Nvhx extends Command {
         try {
             const bannedPlayers = await this.fetchBannedLivePlayers();
             const description = await this.formatBannedPlayersDescription(bannedPlayers);
-            await this.replyWithEmbed(interaction, 'Gebannte Spieler', description);
+            await this.replyWithEmbed({
+                interaction,
+                title: 'Neverhax Info',
+                description,
+            });
         } catch (error) {
             await CommandHelper.handleInteractionError(error, interaction);
         }

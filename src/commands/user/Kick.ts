@@ -40,7 +40,7 @@ export class Kick extends Command {
     // await interaction.reply({ content: 'Command nicht gefunden.', ephemeral: true })
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
 
         try {
             const id = options.getInteger('id');

@@ -2,12 +2,10 @@ import { Command } from '@class/Command';
 import { EENV } from '@enums/EENV';
 import LogManager from '@utils/Logger';
 import { Interaction, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js';
-import { ValidateTrunk } from './cars';
-import { RestartDropbox } from './cars/RestartDropbox';
+import { RestartDropbox, ValidateTrunk } from './cars';
 import { SchufaCheck } from './housing';
 import { Nvhx, NvhxBan } from './nvhx';
-import { CheckImageOwner, CheckPhotos } from './phone';
-import { DeletePhone } from './phone/DeletePhone';
+import { CheckImageOwner, CheckPhotos, DeletePhone } from './phone';
 import { BotStats, CachePerformance, Help, Ping, ServerStatus, TestCommand, Wahl } from './system';
 import {
     ChangeBirthday,
@@ -98,13 +96,13 @@ export class CommandHandler {
     }
 }
 
-export const RegisterCommand = (
+export function RegisterCommand(
     scb:
         | SlashCommandBuilder
         | SlashCommandSubcommandsOnlyBuilder
         | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'>,
     cmd: Command,
-) => {
+) {
     if (cmd.RunEnvironment === EENV.PRODUCTION) CommandHandler.prodCommands.push(scb.name);
     if (cmd.RunEnvironment === EENV.DEVELOPMENT) CommandHandler.devCommands.push(scb.name);
     CommandHandler.commands.push({
@@ -118,4 +116,4 @@ export const RegisterCommand = (
         allowedChannels: cmd.AllowedChannels,
         allowedGroups: cmd.AllowedGroups,
     });
-};
+}

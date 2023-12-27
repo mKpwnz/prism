@@ -108,7 +108,7 @@ export class Lizenz extends Command {
 
     private async removeLicense(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         const lizenzStr = options.getString('lizenz');
         if (!lizenzStr) {
             await interaction.reply({ content: 'Bitte gib eine Lizenz an!', ephemeral: true });
@@ -158,7 +158,7 @@ export class Lizenz extends Command {
 
     private async addLicense(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         const license = options.getString('lizenz');
         const steamid = options.getString('steamid');
         if (!steamid) {

@@ -50,7 +50,7 @@ export class Rename extends Command {
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const steam = interaction.options.get('steam')?.value?.toString() ?? '';
         const vPlayer = await Player.validatePlayer(steam);
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         if (!vPlayer) {
             await interaction.reply('Es konnte kein Spieler mit dieser SteamID gefunden werden!');
             return;

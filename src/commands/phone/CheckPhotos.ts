@@ -98,7 +98,7 @@ export class CheckPhotos extends Command {
         // Split userset into chunks of 25
         for (let i = 0; i < userset.length; i += 150) {
             const current = userset.slice(i, i + 150);
-            const embed = this.getEmbedTemplate(interaction)
+            const embed = Command.getEmbedTemplate(interaction)
                 .setTitle('Nutzer mit illegalen Fotos')
                 .setDescription(`${current.join('\n')}`);
             embeds.push(embed);

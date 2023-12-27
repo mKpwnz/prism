@@ -1,16 +1,15 @@
+import { ISocietyFinanceResponse } from '@interfaces/ISocietyFinanceResponse';
 import { BotDB, GameDB } from '@sql/Database';
 import LogManager from '@utils/Logger';
-import { RowDataPacket } from 'mysql2';
-
-interface ISocietyFinanceResponse extends RowDataPacket {
-    job: string;
-    label: string;
-    bank: number;
-    money: number;
-    black: number;
-}
 
 export class CronJobs {
+    /**
+     * @description Logs the society finance to the database.
+     * @author mKpwnz
+     * @date 27.12.2023
+     * @static
+     * @memberof CronJobs
+     */
     public static async logSocietyFinance() {
         const [data] = await GameDB.query<ISocietyFinanceResponse[]>(
             `

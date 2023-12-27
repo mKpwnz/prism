@@ -12,7 +12,7 @@ import {
     IPhonePhotos,
     IPhoneTiktokMessages,
     IPhoneTinderMessages,
-} from '../sql/schema/Phone.schema';
+} from '@sql/schema/Phone.schema';
 
 export class PhonePhotosController {
     public static async checkPhotos(start: Date, end: Date): Promise<IPhonePhotos[]> {

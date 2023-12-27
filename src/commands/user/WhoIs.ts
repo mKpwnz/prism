@@ -74,7 +74,7 @@ export class WhoIs extends Command {
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const { channel } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
 
         const identifierValue = interaction.options.getString('input');
 
@@ -174,7 +174,6 @@ export class WhoIs extends Command {
                 `Hier sind ${embedFields.length}/${findUsers.length} Suchergebnisse für "${identifierValue}":${additionalString}${pageString}`,
             );
             embed.setFields(embedFields);
-            this.addCommandBenchmark(embed);
             await interaction.reply({
                 content: `${interaction.user.toString()}`,
                 embeds: [embed],

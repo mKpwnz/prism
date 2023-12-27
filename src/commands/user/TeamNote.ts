@@ -78,7 +78,7 @@ export class TeamNote extends Command {
 
     private async addNote(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         const steamid = options.getString('steamid');
         const note = options.getString('notiz');
 
@@ -143,7 +143,7 @@ export class TeamNote extends Command {
 
     private async listNotes(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         const steamid = options.getString('steamid');
 
         if (!steamid) {
@@ -193,7 +193,7 @@ export class TeamNote extends Command {
 
     private async viewNote(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         const id = options.getInteger('id');
 
         if (!id) {

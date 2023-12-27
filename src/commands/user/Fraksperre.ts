@@ -70,7 +70,7 @@ export class Fraksperre extends Command {
 
     private async removeFraksperre(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         const steamid = options.getString('steamid');
         if (!steamid) {
             await interaction.reply({ content: 'Bitte gib eine SteamID an!', ephemeral: true });
@@ -147,7 +147,7 @@ export class Fraksperre extends Command {
             LogManager.error(error);
             await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true });
         }
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         embed.setTitle('Fraktionssperre gesetzt');
         embed.setDescription(
             `Die Fraktionssperre von ${vPlayer.playerdata.fullname} (${

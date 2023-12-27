@@ -1,6 +1,7 @@
 import LogManager from '@utils/Logger';
 import { createSocket, RemoteInfo, Socket } from 'dgram';
 
+// @TODO: Refactor this class
 export class RconClient {
     private static socket: Socket | null = null;
 

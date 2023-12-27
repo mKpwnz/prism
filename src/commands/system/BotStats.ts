@@ -33,7 +33,7 @@ export class BotStats extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         embed.setTitle('Bot Stats');
 
         const data = await BotDB.command_log.groupBy({

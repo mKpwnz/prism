@@ -2,7 +2,7 @@ import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { Player } from '@controller/Player.controller';
 import { EENV } from '@enums/EENV';
-import { EmbedColors } from '@enums/EmbedColors';
+import { EEmbedColors } from '@enums/EmbedColors';
 import Config from '@proot/Config';
 import { GameDB } from '@sql/Database';
 import LogManager from '@utils/Logger';
@@ -53,7 +53,7 @@ export class ChangeBirthday extends Command {
         const { options } = interaction;
         const birthday = options.getString('datum');
         const steamID = options.getString('steam');
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         if (!birthday) {
             await interaction.reply({
                 content: 'Es wurde kein Geburtstag angegeben!',
@@ -85,14 +85,14 @@ export class ChangeBirthday extends Command {
                 );
                 if (res.affectedRows > 0) {
                     embed.setTitle('Geburtstag geändert');
-                    embed.setColor(EmbedColors.SUCCESS);
+                    embed.setColor(EEmbedColors.SUCCESS);
                     embed.setDescription(
                         `Der Geburtstag des Spielers **${vPlayer.playerdata.fullname}** (${vPlayer.identifiers.steam}) wurde auf **${birthday}** geändert.`,
                     );
                     await interaction.reply({ embeds: [embed] });
                 } else {
                     embed.setTitle('Geburtstag nicht geändert');
-                    embed.setColor(EmbedColors.ALERT);
+                    embed.setColor(EEmbedColors.ALERT);
                     embed.setDescription(
                         `Der Geburtstag des Spielers **${vPlayer.playerdata.fullname}** (${vPlayer.identifiers.steam}) konnte nicht auf **${birthday}** geändert werden.`,
                     );

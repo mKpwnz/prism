@@ -204,7 +204,7 @@ export class Wahl extends Command {
 
     private async createElection(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         if (options.getString('name') === '') {
             await interaction.reply({ content: 'Bitte gib einen Namen an!', ephemeral: true });
             return;
@@ -237,7 +237,7 @@ export class Wahl extends Command {
 
     private async showStatus(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         const status = ['Erstellt', 'Gestartet', 'Beendet', 'Löschen'];
         try {
             if (options.getNumber('wahlid') === 0) {
@@ -286,7 +286,7 @@ export class Wahl extends Command {
 
     public async manageUser(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         if (
             options.getNumber('wahlid') === 0 ||
             options.getString('steamid') === '' ||
@@ -367,7 +367,7 @@ export class Wahl extends Command {
 
     public async showResult(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         try {
             const [query] = await GameDB.query<IElection[]>(
                 'SELECT * FROM immo_elections WHERE id = ?',
@@ -494,7 +494,7 @@ export class Wahl extends Command {
     }
 
     public async listElections(interaction: ChatInputCommandInteraction): Promise<void> {
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         const status = ['Erstellt', 'Gestartet', 'Beendet', 'Löschen'];
         try {
             const [elections] = await GameDB.query<IElection[]>(
@@ -525,7 +525,7 @@ export class Wahl extends Command {
 
     public async listCandidates(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         try {
             const [query] = await GameDB.query<IElection[]>(
                 'SELECT id, name FROM immo_elections WHERE id = ?',
@@ -559,7 +559,7 @@ export class Wahl extends Command {
 
     public async manipulateElection(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         try {
             if (
                 options.getNumber('wahlid') === 0 ||

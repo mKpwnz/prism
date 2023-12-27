@@ -157,7 +157,7 @@ export class Rechnung extends Command {
 
     private async searchInvoice(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         try {
             const steamid = options.getString('steamid');
             const status = options.getString('status');
@@ -246,7 +246,7 @@ export class Rechnung extends Command {
 
     private async showInvoice(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         try {
             const rechnungsnummer = options.getInteger('id');
             if (!rechnungsnummer) {
@@ -304,7 +304,7 @@ export class Rechnung extends Command {
 
     private async payInvoice(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         try {
             const rechnungsnummer = options.getInteger('id');
             if (!rechnungsnummer) {
@@ -353,7 +353,7 @@ export class Rechnung extends Command {
 
     private async deleteInvoice(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         try {
             const rechnungsnummer = options.getInteger('id');
             if (!rechnungsnummer) {
@@ -397,7 +397,7 @@ export class Rechnung extends Command {
 
     private async createInvoice(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         const steamid = options.getString('steamid');
         if (!steamid) {
             await interaction.reply({

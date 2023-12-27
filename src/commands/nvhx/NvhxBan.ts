@@ -32,7 +32,7 @@ export class NvhxBan extends Command {
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         try {
             const id = options.getInteger('id', true);
 

@@ -56,7 +56,7 @@ export class DeletePhone extends Command {
         const { options } = interaction;
         const vPlayer = await Player.validatePlayer(options.getString('steamid') ?? '');
         const reset = options.getBoolean('reset') ?? false;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         if (!vPlayer) {
             await interaction.reply('Es konnte kein Spieler mit dieser SteamID gefunden werden!');
             return;

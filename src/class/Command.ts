@@ -1,5 +1,5 @@
 import { EENV } from '@enums/EENV';
-import { EmbedColors } from '@enums/EmbedColors';
+import { EEmbedColors } from '@enums/EmbedColors';
 import Config from '@proot/Config';
 import { BotDB } from '@sql/Database';
 import { Helper } from '@utils/Helper';
@@ -209,10 +209,11 @@ export abstract class Command {
      * @param {ChatInputCommandInteraction} interaction
      * @returns {*}  {EmbedBuilder}
      * @memberof Command
+     * @deprecated
      */
-    getEmbedTemplate(interaction: ChatInputCommandInteraction): EmbedBuilder {
+    static getEmbedTemplate(interaction: ChatInputCommandInteraction): EmbedBuilder {
         return new EmbedBuilder()
-            .setColor(EmbedColors.DEFAULT)
+            .setColor(EEmbedColors.DEFAULT)
             .setTimestamp()
             .setAuthor({ name: Config.Discord.BOT_NAME, iconURL: Config.Pictures.Prism.LOGO_BLUE })
             .setFooter({
@@ -223,26 +224,40 @@ export abstract class Command {
             .setImage(Config.Pictures.WHITESPACE);
     }
 
-    async replyWithEmbed(
-        interaction: ChatInputCommandInteraction,
-        title: string,
-        description: string,
-    ): Promise<void> {
-        const embed = this.getEmbedTemplate(interaction)
-            .setTitle(title)
-            .setDescription(description);
-        await interaction.reply({
-            embeds: [embed],
-        });
-    }
-
-    addCommandBenchmark(embed: EmbedBuilder): void {
+    async replyWithEmbed(opt: {
+        interaction: ChatInputCommandInteraction;
+        title: string;
+        description: string;
+        fields?: {
+            name: string;
+            value: string;
+        }[];
+        customImage?: string;
+        color?: EEmbedColors | number;
+        ephemeral?: boolean;
+    }): Promise<void> {
         this.CmdPerformanceStop = new Date();
         const executionTime =
             this.CmdPerformanceStop.getTime() - this.CmdPerformanceStart!.getTime();
-        embed.setFooter({
-            text: `${embed.data.footer?.text} | Executiontime: ${executionTime}ms`,
-            iconURL: embed.data.footer?.icon_url,
+
+        const embed = new EmbedBuilder()
+            .setTitle(opt.title)
+            .setDescription(opt.description)
+            .setColor(opt.color ?? EEmbedColors.DEFAULT)
+            .setAuthor({ name: Config.Discord.BOT_NAME, iconURL: Config.Pictures.Prism.LOGO_BLUE })
+            .setFooter({
+                text: `${
+                    opt.interaction.user.displayName ?? ''
+                } | Executiontime: ${executionTime}ms`,
+                iconURL: opt.interaction.user.avatarURL() ?? '',
+            })
+            .setTimestamp(new Date())
+            .setFields(opt.fields ?? [])
+            .setImage(opt.customImage ?? Config.Pictures.WHITESPACE);
+
+        await opt.interaction.reply({
+            embeds: [embed],
+            ephemeral: opt.ephemeral,
         });
     }
 }

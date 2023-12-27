@@ -93,7 +93,7 @@ export class Setjob extends Command {
 
     private async setOnline(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         const job = options.getString('jobname');
         const grade = options.getInteger('grade') ?? 0;
         if (!job) {
@@ -133,7 +133,7 @@ export class Setjob extends Command {
 
     private async setOffline(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         const steamid = options.getString('steamid');
         const job = options.getString('jobname');
         const grade = options.getInteger('grade') ?? 0;

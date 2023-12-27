@@ -1,4 +1,4 @@
-import { EmbedColors } from '@enums/EmbedColors';
+import { EEmbedColors } from '@enums/EmbedColors';
 import Config from '@proot/Config';
 import { AlignmentEnum, AsciiTable3 } from 'ascii-table3';
 import { caching, MemoryCache, MemoryStore } from 'cache-manager';
@@ -118,7 +118,7 @@ export class Cache {
         cachingKey?: string,
     ): Promise<void> {
         const embed = new EmbedBuilder()
-            .setColor(EmbedColors.DEFAULT)
+            .setColor(EEmbedColors.DEFAULT)
             .setTimestamp()
             .setAuthor({ name: Config.Discord.BOT_NAME, iconURL: Config.Pictures.Prism.LOGO_BLUE })
             .setFooter({

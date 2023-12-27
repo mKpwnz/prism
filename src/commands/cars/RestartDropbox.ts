@@ -9,6 +9,15 @@ import { CommandHelper } from '@commands/CommandHelper';
 
 // @TODO add docs for this file
 // @TODO does this belong in the cars folder?
+
+/**
+ * @description
+ * @author mKpwnz
+ * @date 27.12.2023
+ * @export
+ * @class RestartDropbox
+ * @extends {Command}
+ */
 export class RestartDropbox extends Command {
     constructor() {
         super();
@@ -37,11 +46,11 @@ export class RestartDropbox extends Command {
             const response = await RconClient.sendCommand('ensure immo_store');
             LogManager.log(response);
 
-            await this.replyWithEmbed(
+            await this.replyWithEmbed({
                 interaction,
-                `Dropbox neugestartet`,
-                `Dropbox wurde neugestartet.`,
-            );
+                title: 'Dropbox neugestartet',
+                description: 'Dropbox wurde neugestartet.',
+            });
         } catch (error) {
             // @TODO Error Handling does not work like that
             // @TODO If you want to catch this specific error, you should do it in RconClient.ts

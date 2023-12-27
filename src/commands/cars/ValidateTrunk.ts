@@ -2,7 +2,7 @@ import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { Items } from '@controller/Item.controller';
 import { EENV } from '@enums/EENV';
-import { EmbedColors } from '@enums/EmbedColors';
+import { EEmbedColors } from '@enums/EmbedColors';
 import Config from '@proot/Config';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { CommandHelper } from '@commands/CommandHelper';
@@ -41,7 +41,7 @@ export class ValidateTrunk extends Command {
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction).setTitle('Validiere Kofferraum');
+        const embed = Command.getEmbedTemplate(interaction).setTitle('Validiere Kofferraum');
         try {
             const plate = options.getString('plate');
 
@@ -78,7 +78,7 @@ export class ValidateTrunk extends Command {
                 await ValidateTrunk.getScuffedItemsFromTrunk(vehicle.kofferraum);
 
             if (!scuffedItems.length) {
-                embed.setColor(EmbedColors.SUCCESS);
+                embed.setColor(EEmbedColors.SUCCESS);
                 embed.setDescription(
                     `Der Kofferraum des Fahrzeugs mit dem Kennzeichen \`${vehicle.plate}\` ist valid.`,
                 );
@@ -86,7 +86,7 @@ export class ValidateTrunk extends Command {
                     embeds: [embed],
                 });
             } else {
-                embed.setColor(EmbedColors.ALERT);
+                embed.setColor(EEmbedColors.ALERT);
                 embed.setDescription(
                     `Der Kofferraum des Fahrzeugs mit dem Kennzeichen \`${
                         vehicle.plate

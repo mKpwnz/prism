@@ -45,7 +45,7 @@ export class RequestToSupport extends Command {
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         embed.setTitle('Request to Support');
         try {
             const anzeigen = options.getBoolean('anzeigen');

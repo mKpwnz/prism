@@ -82,7 +82,7 @@ export class Give extends Command {
     // TODO: Item Liste als Autocomplete mit einbauen
     private async giveItem(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         const id = options.getInteger('id');
         const item = options.getString('item');
         const anzahl = options.getInteger('anzahl');
@@ -101,7 +101,7 @@ export class Give extends Command {
     // TODO: Waffenliste als Choose einbauen @Micha
     private async giveWeapon(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         try {
             const id = options.getInteger('id');
             const waffe = options.getString('waffe') ?? '';

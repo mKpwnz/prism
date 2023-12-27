@@ -100,7 +100,7 @@ export class Versicherung extends Command {
 
     private async checkInsurance(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         try {
             let kennzeichen = options.getString('kennzeichen');
             if (!kennzeichen) {
@@ -145,7 +145,7 @@ export class Versicherung extends Command {
 
     private async addInsurance(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         try {
             let kennzeichen = options.getString('kennzeichen');
             if (!kennzeichen) {
@@ -180,7 +180,7 @@ export class Versicherung extends Command {
 
     private async removeInsurance(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         try {
             const plate = options.getString('kennzeichen');
 

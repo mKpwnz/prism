@@ -2,6 +2,7 @@ import { ChatInputCommandInteraction } from 'discord.js';
 import LogManager from '@utils/Logger';
 
 export class CommandHelper {
+    // @TODO Is this method necessary? @see Comamnd.ts#L:196
     public static async handleInteractionError(
         error: any,
         interaction: ChatInputCommandInteraction,

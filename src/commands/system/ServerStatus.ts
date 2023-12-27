@@ -2,8 +2,7 @@ import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { DiscordResponse } from '@ctypes/DiscordResponse';
 import { DiscordResponseGroupe } from '@ctypes/DiscordResponseGroupe';
-import { HeartbeatResponse } from '@ctypes/HeartbeatResponse';
-import { PublicGroupListEntry } from '@ctypes/PublicGroupListEntry';
+import { HeartbeatResponse, PublicGroupListEntry } from '@ctypes/Monitoring';
 import { EENV } from '@enums/EENV';
 import { EServerStatus } from '@enums/EServerStatus';
 import Config from '@proot/Config';
@@ -101,7 +100,7 @@ export class ServerStatus extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const embed = this.getEmbedTemplate(interaction);
+        const embed = Command.getEmbedTemplate(interaction);
         const EmbedData = await this.getAgregatedData();
 
         embed.setTitle('Serverstatus');
@@ -126,7 +125,6 @@ export class ServerStatus extends Command {
             });
             embed.setImage(Config.Pictures.WHITESPACE);
         }
-        this.addCommandBenchmark(embed);
         interaction.reply({ content: ' ', embeds: [embed] });
     }
 }

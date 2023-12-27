@@ -17,6 +17,7 @@ export class VersicherungRepository {
         return versicherungen;
     }
 
+    // @TODO: Add return: Count of inserted rows
     public static async addVersicherung(kennzeichen: string, dauer: number, premium: boolean) {
         await GameDB.query<IVersicherung[]>(
             'INSERT INTO `versicherungen` (`plate`, `ts`, `premium`) VALUES (?, ADDDATE(NOW (), INTERVAL ? DAY), ?) ON DUPLICATE KEY UPDATE ts = ADDDATE(NOW (), INTERVAL ? DAY), premium = ? RETURNING * ',
