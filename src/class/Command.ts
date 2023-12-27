@@ -190,15 +190,23 @@ export abstract class Command {
                 },
             });
         }
-        // LogManager.debug(logEntry)
         try {
             this.CmdPerformanceStart = new Date();
             await this.execute(interaction);
         } catch (error) {
-            LogManager.error(error);
-            await interaction.reply({
-                content: `Es ist ein Fehler aufgetreten!\`\`\`json${JSON.stringify(error)}\`\`\``,
-                ephemeral: true,
+            const errobj: { [k: string]: any } = {};
+            if (error instanceof Error) {
+                errobj.name = error.name;
+                errobj.message = error.message;
+            } else {
+                errobj.e = error;
+            }
+            LogManager.error(errobj);
+            await this.replyWithEmbed({
+                interaction,
+                title: 'Es ist ein Fehler aufgetreten!',
+                description: `\`\`\`json\n${JSON.stringify(errobj, null, 2)}\n\`\`\``,
+                color: EEmbedColors.ALERT,
             });
         }
     }

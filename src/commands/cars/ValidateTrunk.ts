@@ -29,10 +29,7 @@ export class ValidateTrunk extends Command {
                 .setName('validatetrunk')
                 .setDescription('Validiere den Inhalt eines Kofferraums')
                 .addStringOption((option) =>
-                    option
-                        .setName('plate')
-                        .setDescription('Das Kennzeichen des Fahrzeugs')
-                        .setRequired(true),
+                    option.setName('plate').setDescription('Das Kennzeichen des Fahrzeugs'),
                 ),
             this,
         );
@@ -42,14 +39,7 @@ export class ValidateTrunk extends Command {
         const { options } = interaction;
         const embed = Command.getEmbedTemplate(interaction).setTitle('Validiere Kofferraum');
 
-        const plate = options.getString('plate');
-
-        // @TODO Do we really need this check? Can this happen? I think Discord will prevent empty strings.
-        if (!plate) {
-            embed.setDescription(`Bitte gebe ein Kennzeichen an.`);
-            await interaction.reply({ embeds: [embed], ephemeral: true });
-            return;
-        }
+        const plate = options.getString('plate', true);
 
         // @TODO Maybe we could move Input Validation & Retrieval to a separate class & Create custom return types?
         const formattedPlate: string = Helper.formatNumberplate(plate);
