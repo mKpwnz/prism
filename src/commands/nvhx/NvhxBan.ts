@@ -3,9 +3,8 @@ import { RconClient } from '@class/RconClient';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 
-import Config from '@proot/Config';
+import Config from '@Config';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { CommandHelper } from '@commands/CommandHelper';
 
 export class NvhxBan extends Command {
     constructor() {
@@ -31,24 +30,21 @@ export class NvhxBan extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction;
-        const embed = Command.getEmbedTemplate(interaction);
-        try {
-            const id = options.getInteger('id', true);
-
-            const response = await NvhxBan.banPlayerById(id);
-
-            if (response.includes('Banned: ')) {
-                embed.setTitle('Neverhax Ban');
-                embed.setDescription(
-                    `Bannt SpielerID ${id}\nAntwort vom Server:\n\`\`\`${response}\`\`\``,
-                );
-                await interaction.reply({ embeds: [embed] });
-            } else {
-                await interaction.reply({ content: 'Spieler nicht gefunden!', ephemeral: true });
-            }
-        } catch (error) {
-            await CommandHelper.handleInteractionError(error, interaction);
+        const id = interaction.options.getInteger('id', true);
+        const response = await NvhxBan.banPlayerById(id);
+        if (response.includes('Banned: ')) {
+            await this.replyWithEmbed({
+                interaction,
+                title: 'Neverhax Ban',
+                description: `Bannt SpielerID ${id}\nAntwort vom Server:\n\`\`\`${response}\`\`\``,
+            });
+        } else {
+            this.replyWithEmbed({
+                interaction,
+                title: 'Neverhax Ban',
+                description: `Spieler nicht gefunden!`,
+                ephemeral: true,
+            });
         }
     }
 

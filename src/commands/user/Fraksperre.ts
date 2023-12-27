@@ -1,11 +1,11 @@
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
-import Config from '@proot/Config';
+import Config from '@Config';
 import { GameDB } from '@sql/Database';
 import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { EENV } from '@enums/EENV';
-import { Player } from '@controller/Player.controller';
+import { PlayerService } from '@services/PlayerService';
 
 export class Fraksperre extends Command {
     constructor() {
@@ -76,7 +76,7 @@ export class Fraksperre extends Command {
             await interaction.reply({ content: 'Bitte gib eine SteamID an!', ephemeral: true });
             return;
         }
-        const vPlayer = await Player.validatePlayer(steamid);
+        const vPlayer = await PlayerService.validatePlayer(steamid);
         if (!vPlayer) {
             await interaction.reply({
                 content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
@@ -126,7 +126,7 @@ export class Fraksperre extends Command {
             await interaction.reply({ content: 'Bitte gib eine SteamID an!', ephemeral: true });
             return;
         }
-        const vPlayer = await Player.validatePlayer(steamid);
+        const vPlayer = await PlayerService.validatePlayer(steamid);
         if (!vPlayer) {
             await interaction.reply({
                 content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',

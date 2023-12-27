@@ -2,7 +2,7 @@ import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { PhonePhotosController } from '@controller/PhonePhotos.controller';
 import { EENV } from '@enums/EENV';
-import Config from '@proot/Config';
+import Config from '@Config';
 import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 
 // @TODO add typedoc for this command

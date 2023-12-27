@@ -1,7 +1,7 @@
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { IEmbedField } from '@interfaces/IEmbedField';
-import Config from '@proot/Config';
+import Config from '@Config';
 import { BotDB } from '@sql/Database';
 import { Helper } from '@utils/Helper';
 import LogManager from '@utils/Logger';

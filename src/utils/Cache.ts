@@ -1,5 +1,5 @@
 import { EEmbedColors } from '@enums/EmbedColors';
-import Config from '@proot/Config';
+import Config from '@Config';
 import { AlignmentEnum, AsciiTable3 } from 'ascii-table3';
 import { caching, MemoryCache, MemoryStore } from 'cache-manager';
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';

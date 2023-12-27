@@ -1,8 +1,8 @@
+import Config from '@Config';
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
-import { Player } from '@controller/Player.controller';
 import { EENV } from '@enums/EENV';
-import Config from '@proot/Config';
+import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
 import { IElection } from '@sql/schema/Election.schema';
 import { IElectionParticipant } from '@sql/schema/ElectionParticipant.schema';
@@ -310,7 +310,7 @@ export class Wahl extends Command {
             return;
         }
         const election = query[0];
-        const vPlayer = await Player.validatePlayer(options.getString('steamid') ?? '');
+        const vPlayer = await PlayerService.validatePlayer(options.getString('steamid') ?? '');
         if (!vPlayer) {
             await interaction.reply({
                 content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',

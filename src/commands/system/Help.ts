@@ -3,8 +3,8 @@ import { CommandHandler, RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { ICmdPrintInformation } from '@interfaces/ICmdPrintInformation';
 import { ICmdPrintInformationOption } from '@interfaces/ICmdPrintInformationOption';
-import { BotClient } from '@proot/Bot';
-import Config from '@proot/Config';
+import { BotClient } from '@Bot';
+import Config from '@Config';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class Help extends Command {

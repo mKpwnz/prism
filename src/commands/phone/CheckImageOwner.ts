@@ -1,10 +1,9 @@
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
-import Config from '@proot/Config';
+import Config from '@Config';
 import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { CommandHelper } from '@commands/CommandHelper';
 import { PhoneRepository } from '@sql/repositories/phone.repository';
 
 // TODO: REFACTOR
@@ -44,28 +43,24 @@ export class CheckImageOwner extends Command {
     }
 
     public async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        try {
-            // @TODO We should have a better solution for input validation
-            const nLink = this.normalizeLink(
-                interaction.options.get('imageurl')?.value?.toString() as string,
-            );
-            if (!nLink) {
-                await interaction.reply({
-                    content: `Der link konnte nicht validiert werden.`,
-                    ephemeral: true,
-                });
-                return;
-            }
-            // @TODO why log here?
-            LogManager.debug(nLink);
-
-            const phoneOwner = await PhoneRepository.getPhoneOwnerByImageLink(nLink);
-
+        // @TODO We should have a better solution for input validation
+        const nLink = this.normalizeLink(
+            interaction.options.get('imageurl')?.value?.toString() as string,
+        );
+        if (!nLink) {
             await interaction.reply({
-                content: `\`\`\`json\n${JSON.stringify(phoneOwner, null, 4)}\`\`\``,
+                content: `Der link konnte nicht validiert werden.`,
+                ephemeral: true,
             });
-        } catch (error) {
-            await CommandHelper.handleInteractionError(error, interaction);
+            return;
         }
+        // @TODO why log here?
+        LogManager.debug(nLink);
+
+        const phoneOwner = await PhoneRepository.getPhoneOwnerByImageLink(nLink);
+
+        await interaction.reply({
+            content: `\`\`\`json\n${JSON.stringify(phoneOwner, null, 4)}\`\`\``,
+        });
     }
 }

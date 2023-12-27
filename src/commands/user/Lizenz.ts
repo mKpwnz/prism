@@ -1,11 +1,11 @@
 import { Command } from '@class/Command';
 import { NonEmptyArray } from '@class/NonEmptyArray';
 import { RegisterCommand } from '@commands/CommandHandler';
-import { Player } from '@controller/Player.controller';
+import { PlayerService } from '@services/PlayerService';
 import { ValidatedPlayer } from '@ctypes/ValidatedPlayer';
 import { EENV } from '@enums/EENV';
 import { ELicenses } from '@enums/ELicenses';
-import Config from '@proot/Config';
+import Config from '@Config';
 import { GameDB } from '@sql/Database';
 import { IUserLicense } from '@sql/schema/UserLicense.schema';
 import { Helper } from '@utils/Helper';
@@ -130,7 +130,7 @@ export class Lizenz extends Command {
             await interaction.reply({ content: 'Bitte gib eine SteamID an!', ephemeral: true });
             return;
         }
-        const vPlayer = await Player.validatePlayer(steamid);
+        const vPlayer = await PlayerService.validatePlayer(steamid);
         if (!vPlayer) {
             await interaction.reply({
                 content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
@@ -169,7 +169,7 @@ export class Lizenz extends Command {
             await interaction.reply({ content: 'Bitte gib eine Lizenz an!', ephemeral: true });
             return;
         }
-        const vPlayer = await Player.validatePlayer(steamid);
+        const vPlayer = await PlayerService.validatePlayer(steamid);
         if (!vPlayer) {
             await interaction.reply({
                 content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',

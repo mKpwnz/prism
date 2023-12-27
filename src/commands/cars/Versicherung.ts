@@ -1,10 +1,9 @@
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
-import Config from '@proot/Config';
+import Config from '@Config';
 import { IVersicherung } from '@sql/schema/Versicherung.schema';
 import { Helper } from '@utils/Helper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { CommandHelper } from '@commands/CommandHelper';
 import { VersicherungRepository } from '@sql/repositories/versicherung.repository';
 
 // @TODO unused class Versicherung
@@ -101,122 +100,111 @@ export class Versicherung extends Command {
     private async checkInsurance(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
         const embed = Command.getEmbedTemplate(interaction);
-        try {
-            let kennzeichen = options.getString('kennzeichen');
-            if (!kennzeichen) {
-                await interaction.reply('Kein Kennzeichen angegeben!');
-                return;
-            }
 
-            kennzeichen = Helper.validateNumberplate(kennzeichen);
-            // @TODO
-            // What if kennzeichen is not valid?
-            // Currently we still check in sql
-            // but it think it would be better to let the user know that the plate is not valid
-
-            const versicherungen: IVersicherung[] =
-                await VersicherungRepository.getVersicherungenByNumberplate(kennzeichen);
-
-            if (versicherungen.length !== 1) {
-                let message;
-                if (versicherungen.length === 0)
-                    message = `Keine Versicherung für ${kennzeichen} gefunden!`;
-                // @TODO why don't we show all insurances in the embed?
-                else
-                    message = `Es wurden ${versicherungen.length} Versicherungen für ${kennzeichen} gefunden!`;
-                await interaction.reply({ content: message, ephemeral: true });
-                return;
-            }
-            const versicherung = versicherungen[0];
-            embed.setTitle('Versicherung Prüfen');
-            let status = '**Nicht Versichert**';
-            if (versicherung.ts > new Date()) status = '**Versichert**';
-            embed.addFields({
-                name: versicherung.plate,
-                value: `${status}\nVersichert bis: ${versicherung.ts.toLocaleDateString()} ${versicherung.ts.toLocaleTimeString()}\nPremium: ${
-                    versicherung.premium
-                }`,
-            });
-            await interaction.reply({ embeds: [embed] });
-        } catch (error) {
-            await CommandHelper.handleInteractionError(error, interaction);
+        let kennzeichen = options.getString('kennzeichen');
+        if (!kennzeichen) {
+            await interaction.reply('Kein Kennzeichen angegeben!');
+            return;
         }
+
+        kennzeichen = Helper.validateNumberplate(kennzeichen);
+        // @TODO
+        // What if kennzeichen is not valid?
+        // Currently we still check in sql
+        // but it think it would be better to let the user know that the plate is not valid
+
+        const versicherungen: IVersicherung[] =
+            await VersicherungRepository.getVersicherungenByNumberplate(kennzeichen);
+
+        if (versicherungen.length !== 1) {
+            let message;
+            if (versicherungen.length === 0)
+                message = `Keine Versicherung für ${kennzeichen} gefunden!`;
+            // @TODO why don't we show all insurances in the embed?
+            else
+                message = `Es wurden ${versicherungen.length} Versicherungen für ${kennzeichen} gefunden!`;
+            await interaction.reply({ content: message, ephemeral: true });
+            return;
+        }
+        const versicherung = versicherungen[0];
+        embed.setTitle('Versicherung Prüfen');
+        let status = '**Nicht Versichert**';
+        if (versicherung.ts > new Date()) status = '**Versichert**';
+        embed.addFields({
+            name: versicherung.plate,
+            value: `${status}\nVersichert bis: ${versicherung.ts.toLocaleDateString()} ${versicherung.ts.toLocaleTimeString()}\nPremium: ${
+                versicherung.premium
+            }`,
+        });
+        await interaction.reply({ embeds: [embed] });
     }
 
     private async addInsurance(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
         const embed = Command.getEmbedTemplate(interaction);
-        try {
-            let kennzeichen = options.getString('kennzeichen');
-            if (!kennzeichen) {
-                await interaction.reply('Kein Kennzeichen angegeben!');
-                return;
-            }
-            kennzeichen = Helper.validateNumberplate(kennzeichen);
-
-            const dauer = options.getNumber('dauer');
-            if (!dauer) {
-                await interaction.reply('Keine Dauer angegeben!');
-                return;
-            }
-            const premium = options.getBoolean('premium') ?? false;
-
-            await VersicherungRepository.addVersicherung(kennzeichen, dauer, premium);
-
-            const ts = new Date();
-            ts.setDate(ts.getDate() + dauer);
-            embed.setTitle('Versicherung Hinzufügen');
-            embed.addFields({
-                name: kennzeichen ?? 'Fehler',
-                value: `Versichert bis: ${ts.toLocaleDateString()} ${ts.toLocaleTimeString()}\nPremium: ${
-                    premium ? 'Ja' : 'Nein'
-                }`,
-            });
-            await interaction.reply({ embeds: [embed] });
-        } catch (error) {
-            await CommandHelper.handleInteractionError(error, interaction);
+        let kennzeichen = options.getString('kennzeichen');
+        if (!kennzeichen) {
+            await interaction.reply('Kein Kennzeichen angegeben!');
+            return;
         }
+        kennzeichen = Helper.validateNumberplate(kennzeichen);
+
+        const dauer = options.getNumber('dauer');
+        if (!dauer) {
+            await interaction.reply('Keine Dauer angegeben!');
+            return;
+        }
+        const premium = options.getBoolean('premium') ?? false;
+
+        await VersicherungRepository.addVersicherung(kennzeichen, dauer, premium);
+
+        const ts = new Date();
+        ts.setDate(ts.getDate() + dauer);
+        embed.setTitle('Versicherung Hinzufügen');
+        embed.addFields({
+            name: kennzeichen ?? 'Fehler',
+            value: `Versichert bis: ${ts.toLocaleDateString()} ${ts.toLocaleTimeString()}\nPremium: ${
+                premium ? 'Ja' : 'Nein'
+            }`,
+        });
+        await interaction.reply({ embeds: [embed] });
     }
 
     private async removeInsurance(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
         const embed = Command.getEmbedTemplate(interaction);
-        try {
-            const plate = options.getString('kennzeichen');
 
-            // @TODO Remove?
-            if (!plate) {
-                await interaction.reply('Kein Kennzeichen angegeben!');
-                return;
-            }
+        const plate = options.getString('kennzeichen');
 
-            const formattedPlate = Helper.validateNumberplate(plate);
-            const versicherungen: IVersicherung[] =
-                await VersicherungRepository.getVersicherungenByNumberplate(formattedPlate);
-
-            if (versicherungen.length !== 1) {
-                let message;
-                if (versicherungen.length === 0)
-                    message = `Keine Versicherung für ${plate} gefunden!`;
-                else
-                    message = `Es wurden ${versicherungen.length} Versicherungen für ${plate} gefunden!`;
-                await interaction.reply({ content: message, ephemeral: true });
-                return;
-            }
-            const versicherung = versicherungen[0];
-            // @TODO Are we sure we want to delete every insurance for the plate?
-            await VersicherungRepository.deleteVersicherungenByNumberplate(versicherung);
-
-            embed.setTitle('Versicherung Entfernen');
-            embed.addFields({
-                name: plate,
-                value: `Versicherung entfernt\nPremium: ${
-                    versicherung.premium ? 'Ja' : 'Nein'
-                }\nVersichert bis: ${versicherung.ts.toLocaleDateString()} ${versicherung.ts.toLocaleTimeString()}`,
-            });
-            await interaction.reply({ embeds: [embed] });
-        } catch (error) {
-            await CommandHelper.handleInteractionError(error, interaction);
+        // @TODO Remove?
+        if (!plate) {
+            await interaction.reply('Kein Kennzeichen angegeben!');
+            return;
         }
+
+        const formattedPlate = Helper.validateNumberplate(plate);
+        const versicherungen: IVersicherung[] =
+            await VersicherungRepository.getVersicherungenByNumberplate(formattedPlate);
+
+        if (versicherungen.length !== 1) {
+            let message;
+            if (versicherungen.length === 0) message = `Keine Versicherung für ${plate} gefunden!`;
+            else
+                message = `Es wurden ${versicherungen.length} Versicherungen für ${plate} gefunden!`;
+            await interaction.reply({ content: message, ephemeral: true });
+            return;
+        }
+        const versicherung = versicherungen[0];
+        // @TODO Are we sure we want to delete every insurance for the plate?
+        await VersicherungRepository.deleteVersicherungenByNumberplate(versicherung);
+
+        embed.setTitle('Versicherung Entfernen');
+        embed.addFields({
+            name: plate,
+            value: `Versicherung entfernt\nPremium: ${
+                versicherung.premium ? 'Ja' : 'Nein'
+            }\nVersichert bis: ${versicherung.ts.toLocaleDateString()} ${versicherung.ts.toLocaleTimeString()}`,
+        });
+        await interaction.reply({ embeds: [embed] });
     }
 }

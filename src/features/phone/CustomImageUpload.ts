@@ -1,7 +1,7 @@
-import { Player } from '@controller/Player.controller';
+import { PlayerService } from '@services/PlayerService';
 import { ValidatedPlayer } from '@ctypes/ValidatedPlayer';
 import { EUniqueIdentifier } from '@enums/ESearchType';
-import Config from '@proot/Config';
+import Config from '@Config';
 import { GameDB } from '@sql/Database';
 import { Helper } from '@utils/Helper';
 import LogManager from '@utils/Logger';
@@ -203,7 +203,7 @@ export class CustomImageUpload {
             );
             this.input_reason = interaction.fields.getTextInputValue('phone_ciu_in_reason');
 
-            this.vPlayer = await Player.validatePlayer(
+            this.vPlayer = await PlayerService.validatePlayer(
                 this.input_phoneNumber,
                 EUniqueIdentifier.PHONENUMBER,
             );

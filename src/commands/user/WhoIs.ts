@@ -3,7 +3,7 @@ import { RegisterCommand } from '@commands/CommandHandler';
 import { NvhxData } from '@controller/NvhxData.controller';
 import { EENV } from '@enums/EENV';
 import { ESearchType } from '@enums/ESearchType';
-import Config from '@proot/Config';
+import Config from '@Config';
 import { BotDB, GameDB } from '@sql/Database';
 import { IFindUser } from '@sql/schema/User.schema';
 import { Helper } from '@utils/Helper';

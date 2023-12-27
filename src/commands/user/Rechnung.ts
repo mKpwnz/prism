@@ -1,8 +1,8 @@
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
-import { Player } from '@controller/Player.controller';
+import { PlayerService } from '@services/PlayerService';
 import { EENV } from '@enums/EENV';
-import Config from '@proot/Config';
+import Config from '@Config';
 import { GameDB } from '@sql/Database';
 import { IBilling } from '@sql/schema/Billing.schema';
 import { IJob } from '@sql/schema/Job.schema';
@@ -169,7 +169,7 @@ export class Rechnung extends Command {
                 return;
             }
 
-            const vPlayer = await Player.validatePlayer(steamid);
+            const vPlayer = await PlayerService.validatePlayer(steamid);
             if (!vPlayer) {
                 await interaction.reply({
                     content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
@@ -406,7 +406,7 @@ export class Rechnung extends Command {
             });
             return;
         }
-        const vPlayer = await Player.validatePlayer(steamid);
+        const vPlayer = await PlayerService.validatePlayer(steamid);
         if (!vPlayer) {
             await interaction.reply({
                 content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',

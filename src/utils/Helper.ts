@@ -1,5 +1,5 @@
-import { BotClient } from '@proot/Bot';
-import Config from '@proot/Config';
+import { BotClient } from '@Bot';
+import Config from '@Config';
 import { CommandInteraction, GuildEmoji, TextChannel } from 'discord.js';
 import LogManager from './Logger';
 

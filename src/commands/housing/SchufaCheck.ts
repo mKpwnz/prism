@@ -1,10 +1,9 @@
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
-import Config from '@proot/Config';
+import Config from '@Config';
 import { ISchufaUser } from '@sql/schema/User.schema';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { CommandHelper } from '@commands/CommandHelper';
 import { UserRepository } from '@sql/repositories/user.repository';
 
 // @TODO should we reply with Embed?
@@ -33,24 +32,18 @@ export class SchufaCheck extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        try {
-            const schufaUsers: ISchufaUser[] = await UserRepository.getSchufaUsers();
-
-            for (const user of schufaUsers) {
-                schufaUsers[schufaUsers.indexOf(user)].accounts = JSON.parse(user.accounts);
-            }
-
-            await interaction.reply({
-                content: `**${
-                    schufaUsers.length
-                }** Hausbesitzer mit negativem Kontostand gefunden.\`\`\`json\n${JSON.stringify(
-                    schufaUsers,
-                    null,
-                    4,
-                )}\`\`\``,
-            });
-        } catch (error) {
-            await CommandHelper.handleInteractionError(error, interaction);
+        const schufaUsers: ISchufaUser[] = await UserRepository.getSchufaUsers();
+        for (const user of schufaUsers) {
+            schufaUsers[schufaUsers.indexOf(user)].accounts = JSON.parse(user.accounts);
         }
+        await interaction.reply({
+            content: `**${
+                schufaUsers.length
+            }** Hausbesitzer mit negativem Kontostand gefunden.\`\`\`json\n${JSON.stringify(
+                schufaUsers,
+                null,
+                4,
+            )}\`\`\``,
+        });
     }
 }

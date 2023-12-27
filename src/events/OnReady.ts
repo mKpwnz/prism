@@ -2,7 +2,7 @@ import { DCEvent } from '@class/DCEvent';
 import { RconClient } from '@class/RconClient';
 import { CommandHandler } from '@commands/CommandHandler';
 import { REST } from '@discordjs/rest';
-import Config from '@proot/Config';
+import Config from '@Config';
 import LogManager from '@utils/Logger';
 import { Client, Routes } from 'discord.js';
 

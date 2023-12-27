@@ -1,13 +1,13 @@
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
-import { Player } from '@controller/Player.controller';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
-import Config from '@proot/Config';
+import Config from '@Config';
 import { GameDB } from '@sql/Database';
 import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
+import { PlayerService } from '@services/PlayerService';
 
 export class ChangeBirthday extends Command {
     constructor() {
@@ -68,7 +68,7 @@ export class ChangeBirthday extends Command {
             });
             return;
         }
-        const vPlayer = await Player.validatePlayer(steamID);
+        const vPlayer = await PlayerService.validatePlayer(steamID);
         if (!vPlayer) {
             await interaction.reply({
                 content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',

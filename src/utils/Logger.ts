@@ -1,5 +1,5 @@
-import { BotClient } from '@proot/Bot';
-import Config from '@proot/Config';
+import { BotClient } from '@Bot';
+import Config from '@Config';
 import chalk from 'chalk';
 import colorize from 'json-colorizer';
 import winston, { createLogger, format, transports } from 'winston';

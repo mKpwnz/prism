@@ -1,8 +1,8 @@
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
-import { Player } from '@controller/Player.controller';
+import { PlayerService } from '@services/PlayerService';
 import { EENV } from '@enums/EENV';
-import Config from '@proot/Config';
+import Config from '@Config';
 import { BotDB } from '@sql/Database';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
@@ -88,7 +88,7 @@ export class TeamNote extends Command {
             await interaction.reply({ embeds: [embed] });
             return;
         }
-        const vPlayer = await Player.validatePlayer(steamid);
+        const vPlayer = await PlayerService.validatePlayer(steamid);
         if (!vPlayer) {
             embed.setTitle('Teamnote | Fehler');
             embed.setDescription('Die angegebene SteamID ist ungültig.');
@@ -152,7 +152,7 @@ export class TeamNote extends Command {
             await interaction.reply({ embeds: [embed] });
             return;
         }
-        const vPlayer = await Player.validatePlayer(steamid);
+        const vPlayer = await PlayerService.validatePlayer(steamid);
         if (!vPlayer) {
             embed.setTitle('Teamnote | Fehler');
             embed.setDescription('Die angegebene SteamID ist ungültig.');
@@ -213,7 +213,7 @@ export class TeamNote extends Command {
             await interaction.reply({ embeds: [embed] });
             return;
         }
-        const vPlayer = await Player.validatePlayer(data.user);
+        const vPlayer = await PlayerService.validatePlayer(data.user);
         if (vPlayer) {
             embed.setDescription(
                 `Notizen von **${vPlayer.playerdata.fullname}**  (${

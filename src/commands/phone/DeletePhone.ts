@@ -1,8 +1,8 @@
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
-import { Player } from '@controller/Player.controller';
 import { EENV } from '@enums/EENV';
-import Config from '@proot/Config';
+import Config from '@Config';
+import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
 import {
     IPhone,
@@ -54,7 +54,7 @@ export class DeletePhone extends Command {
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const vPlayer = await Player.validatePlayer(options.getString('steamid') ?? '');
+        const vPlayer = await PlayerService.validatePlayer(options.getString('steamid') ?? '');
         const reset = options.getBoolean('reset') ?? false;
         const embed = Command.getEmbedTemplate(interaction);
         if (!vPlayer) {

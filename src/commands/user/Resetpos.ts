@@ -1,8 +1,8 @@
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
-import { Player } from '@controller/Player.controller';
+import { PlayerService } from '@services/PlayerService';
 import { EENV } from '@enums/EENV';
-import Config from '@proot/Config';
+import Config from '@Config';
 import { GameDB } from '@sql/Database';
 import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
@@ -43,7 +43,7 @@ export class Resetpos extends Command {
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const steam = interaction.options.get('steam')?.value?.toString() ?? '';
-        const vPlayer = await Player.validatePlayer(steam);
+        const vPlayer = await PlayerService.validatePlayer(steam);
         const embed = Command.getEmbedTemplate(interaction);
         if (!vPlayer) {
             await interaction.reply('Es konnte kein Spieler mit dieser SteamID gefunden werden!');

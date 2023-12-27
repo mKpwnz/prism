@@ -1,7 +1,7 @@
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { Items } from '@controller/Item.controller';
-import Config from '@proot/Config';
+import Config from '@Config';
 import { Cache } from '@utils/Cache';
 import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';

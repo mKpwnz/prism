@@ -5,7 +5,7 @@ import { HeartbeatResponse, PublicGroupListEntry } from '@ctypes/Monitoring';
 import { EENV } from '@enums/EENV';
 import { EServerStatus } from '@enums/EServerStatus';
 import { IEmbedField } from '@interfaces/IEmbedField';
-import Config from '@proot/Config';
+import Config from '@Config';
 import LogManager from '@utils/Logger';
 import axios from 'axios';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';

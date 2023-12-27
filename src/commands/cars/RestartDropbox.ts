@@ -2,10 +2,9 @@ import { Command } from '@class/Command';
 import { RconClient } from '@class/RconClient';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
-import Config from '@proot/Config';
+import Config from '@Config';
 import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { CommandHelper } from '@commands/CommandHelper';
 
 // @TODO add docs for this file
 // @TODO does this belong in the cars folder?
@@ -42,20 +41,13 @@ export class RestartDropbox extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        try {
-            const response = await RconClient.sendCommand('ensure immo_store');
-            LogManager.log(response);
+        const response = await RconClient.sendCommand('ensure immo_store');
+        LogManager.log(response);
 
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Dropbox neugestartet',
-                description: 'Dropbox wurde neugestartet.',
-            });
-        } catch (error) {
-            // @TODO Error Handling does not work like that
-            // @TODO If you want to catch this specific error, you should do it in RconClient.ts
-            // @TODO A custom error type may be required
-            await CommandHelper.handleInteractionError(error, interaction);
-        }
+        await this.replyWithEmbed({
+            interaction,
+            title: 'Dropbox neugestartet',
+            description: 'Dropbox wurde neugestartet.',
+        });
     }
 }
