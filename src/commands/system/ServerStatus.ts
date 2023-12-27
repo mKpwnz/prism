@@ -1,10 +1,10 @@
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
-import { DiscordResponse } from '@ctypes/DiscordResponse';
-import { DiscordResponseGroupe } from '@ctypes/DiscordResponseGroupe';
+import { DiscordResponse, DiscordResponseGroupe } from '@ctypes/Discord';
 import { HeartbeatResponse, PublicGroupListEntry } from '@ctypes/Monitoring';
 import { EENV } from '@enums/EENV';
 import { EServerStatus } from '@enums/EServerStatus';
+import { IEmbedField } from '@interfaces/IEmbedField';
 import Config from '@proot/Config';
 import LogManager from '@utils/Logger';
 import axios from 'axios';
@@ -34,7 +34,7 @@ export class ServerStatus extends Command {
         );
     }
 
-    getEmoteForStatus(status: EServerStatus): string {
+    private static getEmoteForStatus(status: EServerStatus): string {
         let emote = '';
         switch (status) {
             case EServerStatus.DOWN:
@@ -56,6 +56,7 @@ export class ServerStatus extends Command {
         return emote;
     }
 
+    // TODO: Refactor this
     async getAgregatedData(): Promise<DiscordResponseGroupe[]> {
         const res: DiscordResponseGroupe[] = [];
         const pglRes: PublicGroupListEntry[] = await axios
@@ -90,7 +91,9 @@ export class ServerStatus extends Command {
                     uptime: Number((hbdRes.uptimeList[`${monitor.id}_24`] * 100).toFixed(2)),
                     print: '',
                 };
-                dr.print = `${this.getEmoteForStatus(dr.status)} ${dr.name} - ${dr.uptime}%\n`;
+                dr.print = `${ServerStatus.getEmoteForStatus(dr.status)} ${dr.name} - ${
+                    dr.uptime
+                }%\n`;
                 DiscordResponseList.push(dr);
             });
             res.push({ name: pglEntry.name, member: DiscordResponseList });
@@ -100,31 +103,38 @@ export class ServerStatus extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const embed = Command.getEmbedTemplate(interaction);
         const EmbedData = await this.getAgregatedData();
 
-        embed.setTitle('Serverstatus');
+        let description = '';
+        const embedFields: IEmbedField[] = [];
+
         if (EmbedData.length === 0) {
-            embed.setDescription('Es ist ein Fehler beim Abrufen der Daten aufgetreten!');
+            description = 'Es ist ein Fehler beim Abrufen der Daten aufgetreten!';
         } else {
-            embed.setDescription(
-                `${this.getEmoteForStatus(EServerStatus.UP)} = Online\n${this.getEmoteForStatus(
-                    EServerStatus.DOWN,
-                )} = Offline\n${this.getEmoteForStatus(
-                    EServerStatus.PENDING,
-                )} = Wird gestartet / Fehlerhaft\n${this.getEmoteForStatus(
-                    EServerStatus.MAINTENANCE,
-                )} = Im Wartungsmodus\n\n`,
-            );
+            description = `${ServerStatus.getEmoteForStatus(
+                EServerStatus.UP,
+            )} = Online\n${ServerStatus.getEmoteForStatus(
+                EServerStatus.DOWN,
+            )} = Offline\n${ServerStatus.getEmoteForStatus(
+                EServerStatus.PENDING,
+            )} = Wird gestartet / Fehlerhaft\n${ServerStatus.getEmoteForStatus(
+                EServerStatus.MAINTENANCE,
+            )} = Im Wartungsmodus\n\n`;
+
             EmbedData.forEach((group) => {
                 let print = '';
                 group.member.forEach((member) => {
                     print += member.print;
                 });
-                embed.addFields({ name: group.name, value: print });
+                embedFields.push({ name: group.name, value: print });
             });
-            embed.setImage(Config.Pictures.WHITESPACE);
         }
-        interaction.reply({ content: ' ', embeds: [embed] });
+
+        await this.replyWithEmbed({
+            interaction,
+            title: 'Serverstatus',
+            fields: embedFields,
+            description,
+        });
     }
 }

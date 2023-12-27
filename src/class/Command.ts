@@ -1,5 +1,6 @@
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
+import { IEmbedField } from '@interfaces/IEmbedField';
 import Config from '@proot/Config';
 import { BotDB } from '@sql/Database';
 import { Helper } from '@utils/Helper';
@@ -228,10 +229,8 @@ export abstract class Command {
         interaction: ChatInputCommandInteraction;
         title: string;
         description: string;
-        fields?: {
-            name: string;
-            value: string;
-        }[];
+        messageContent?: string;
+        fields?: IEmbedField[];
         customImage?: string;
         color?: EEmbedColors | number;
         ephemeral?: boolean;
@@ -246,9 +245,7 @@ export abstract class Command {
             .setColor(opt.color ?? EEmbedColors.DEFAULT)
             .setAuthor({ name: Config.Discord.BOT_NAME, iconURL: Config.Pictures.Prism.LOGO_BLUE })
             .setFooter({
-                text: `${
-                    opt.interaction.user.displayName ?? ''
-                } | Executiontime: ${executionTime}ms`,
+                text: `${opt.interaction.user.displayName ?? ''} • ET: ${executionTime}ms`,
                 iconURL: opt.interaction.user.avatarURL() ?? '',
             })
             .setTimestamp(new Date())
@@ -256,6 +253,7 @@ export abstract class Command {
             .setImage(opt.customImage ?? Config.Pictures.WHITESPACE);
 
         await opt.interaction.reply({
+            content: opt.messageContent ?? '',
             embeds: [embed],
             ephemeral: opt.ephemeral,
         });
