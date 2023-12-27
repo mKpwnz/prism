@@ -41,9 +41,7 @@ export class Revive extends Command {
         const id = interaction.options.getInteger('id');
         const incapacitated = interaction.options.getBoolean('kampfunfähig') ?? false;
 
-        let command = `revive ${id}`;
-        if (incapacitated) command = `revive ${id} 1`;
-        await RconClient.sendCommand(command);
+        await RconClient.sendCommand(`revive ${id}${incapacitated ? ' 1' : ''}`);
         this.replyWithEmbed({
             interaction,
             title: 'Revive',
