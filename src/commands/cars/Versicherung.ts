@@ -1,13 +1,13 @@
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import Config from '@Config';
-import { IVersicherung } from '@sql/schema/Versicherung.schema';
+import { IInsurance } from '@sql/schema/Versicherung.schema';
 import { Helper } from '@utils/Helper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { VersicherungRepository } from '@sql/repositories/versicherung.repository';
+import { InsuranceRepository } from '@sql/repositories/insurance.repository';
 
 // @TODO unused class Versicherung
-export class Versicherung extends Command {
+export class Insurance extends Command {
     constructor() {
         super();
         this.AllowedChannels = [
@@ -107,14 +107,14 @@ export class Versicherung extends Command {
             return;
         }
 
-        kennzeichen = Helper.validateNumberplate(kennzeichen);
+        kennzeichen = Helper.formatNumberplate(kennzeichen);
         // @TODO
         // What if kennzeichen is not valid?
         // Currently we still check in sql
         // but it think it would be better to let the user know that the plate is not valid
 
-        const versicherungen: IVersicherung[] =
-            await VersicherungRepository.getVersicherungenByNumberplate(kennzeichen);
+        const versicherungen: IInsurance[] =
+            await InsuranceRepository.getInsuranceByNumberplate(kennzeichen);
 
         if (versicherungen.length !== 1) {
             let message;
@@ -147,7 +147,7 @@ export class Versicherung extends Command {
             await interaction.reply('Kein Kennzeichen angegeben!');
             return;
         }
-        kennzeichen = Helper.validateNumberplate(kennzeichen);
+        kennzeichen = Helper.formatNumberplate(kennzeichen);
 
         const dauer = options.getNumber('dauer');
         if (!dauer) {
@@ -156,7 +156,7 @@ export class Versicherung extends Command {
         }
         const premium = options.getBoolean('premium') ?? false;
 
-        await VersicherungRepository.addVersicherung(kennzeichen, dauer, premium);
+        await InsuranceRepository.addInsurance(kennzeichen, dauer, premium);
 
         const ts = new Date();
         ts.setDate(ts.getDate() + dauer);
@@ -182,9 +182,9 @@ export class Versicherung extends Command {
             return;
         }
 
-        const formattedPlate = Helper.validateNumberplate(plate);
-        const versicherungen: IVersicherung[] =
-            await VersicherungRepository.getVersicherungenByNumberplate(formattedPlate);
+        const formattedPlate = Helper.formatNumberplate(plate);
+        const versicherungen: IInsurance[] =
+            await InsuranceRepository.getInsuranceByNumberplate(formattedPlate);
 
         if (versicherungen.length !== 1) {
             let message;
@@ -196,7 +196,7 @@ export class Versicherung extends Command {
         }
         const versicherung = versicherungen[0];
         // @TODO Are we sure we want to delete every insurance for the plate?
-        await VersicherungRepository.deleteVersicherungenByNumberplate(versicherung);
+        await InsuranceRepository.deleteVersicherungenByNumberplate(versicherung);
 
         embed.setTitle('Versicherung Entfernen');
         embed.addFields({

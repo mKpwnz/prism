@@ -142,7 +142,7 @@ export class Helper {
     }
 
     /**
-     * @description Validates a numberplate and returns a valid one with 8 characters (including spaces) or an empty string if the input is invalid
+     * @description Formatss a numberplate and returns a valid one with 8 characters (including spaces) or an empty string if the input is invalid
      * @author mKpwnz
      * @date 06.10.2023
      * @static
@@ -150,8 +150,7 @@ export class Helper {
      * @returns {*}  {string}
      * @memberof Helper
      */
-    // @TODO this is weird & it does 2 jobs in 1 - formatting & validating
-    static validateNumberplate(platetext: string): string {
+    static formatNumberplate(platetext: string): string {
         platetext = platetext.toUpperCase().replace(/[^A-Z0-9 ]*/g, '');
         if (platetext.length === 0) {
             return '        ';
