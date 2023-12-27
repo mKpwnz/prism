@@ -1,17 +1,10 @@
-import { GameDB } from '@sql/Database';
-import { ISchufaUser } from '@sql/schema/User.schema';
 import { IPhoneOwnerResponse } from '@sql/schema/Phone.schema';
+import { GameDB } from '@sql/Database';
 
-export class GameDbService {
-    public static async getSchufaUsers(): Promise<ISchufaUser[]> {
-        const [schufaUsers] = await GameDB.query<ISchufaUser[]>(
-            `SELECT firstname, lastname, steamId, accounts FROM users u JOIN player_houses ph ON u.identifier = ph.identifier WHERE JSON_EXTRACT(u.accounts, '$.bank') < 0;`,
-        );
-
-        return schufaUsers;
-    }
-
-    public static async getPhoneOwnerByImageLink(link: string): Promise<IPhoneOwnerResponse> {
+export class PhoneRepository {
+    public static async getPhoneOwnerByImageLink(
+        link: string,
+    ): Promise<IPhoneOwnerResponse | undefined> {
         const [response] = await GameDB.query<IPhoneOwnerResponse[]>(
             `
                 SELECT u.firstname,

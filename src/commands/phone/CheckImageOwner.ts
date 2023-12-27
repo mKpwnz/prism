@@ -5,7 +5,7 @@ import Config from '@proot/Config';
 import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { CommandHelper } from '@commands/CommandHelper';
-import { GameDbService } from '@proot/services/GameDb.service';
+import { PhoneRepository } from '@sql/repositories/phone.repository';
 
 // TODO: REFACTOR
 export class CheckImageOwner extends Command {
@@ -45,7 +45,7 @@ export class CheckImageOwner extends Command {
 
     public async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         try {
-            // We should have a better solution for input validation
+            // @TODO We should have a better solution for input validation
             const nLink = this.normalizeLink(
                 interaction.options.get('imageurl')?.value?.toString() as string,
             );
@@ -56,10 +56,10 @@ export class CheckImageOwner extends Command {
                 });
                 return;
             }
-            // @TODO why?
+            // @TODO why log here?
             LogManager.debug(nLink);
 
-            const phoneOwner = await GameDbService.getPhoneOwnerByImageLink(nLink);
+            const phoneOwner = await PhoneRepository.getPhoneOwnerByImageLink(nLink);
 
             await interaction.reply({
                 content: `\`\`\`json\n${JSON.stringify(phoneOwner, null, 4)}\`\`\``,

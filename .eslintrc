@@ -16,8 +16,7 @@
                 "no-underscore-dangle": "off",
                 "no-await-in-loop": "off",
                 "no-plusplus": "off",
-                "import/no-extraneous-dependencies": "off", // TODO: @Etox kannst du dir das einmal bitte anschauen, warum er in der ExpressApp.ts am meckern ist?
-                "no-param-reassign": "warn",
+                "no-param-reassign": "off", // no benefit
                 "class-methods-use-this": "warn"
             }
         }

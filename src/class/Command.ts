@@ -223,6 +223,19 @@ export abstract class Command {
             .setImage(Config.Pictures.WHITESPACE);
     }
 
+    async replyWithEmbed(
+        interaction: ChatInputCommandInteraction,
+        title: string,
+        description: string,
+    ): Promise<void> {
+        const embed = this.getEmbedTemplate(interaction)
+            .setTitle(title)
+            .setDescription(description);
+        await interaction.reply({
+            embeds: [embed],
+        });
+    }
+
     addCommandBenchmark(embed: EmbedBuilder): void {
         this.CmdPerformanceStop = new Date();
         const executionTime =

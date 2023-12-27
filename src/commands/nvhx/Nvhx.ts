@@ -142,15 +142,4 @@ export class Nvhx extends Command {
         }
         return desc;
     }
-
-    private async replyWithEmbed(
-        interaction: ChatInputCommandInteraction,
-        title: string,
-        description: string,
-    ): Promise<void> {
-        const embed = this.getEmbedTemplate(interaction);
-        embed.setTitle(title);
-        embed.setDescription(description);
-        await interaction.reply({ embeds: [embed] });
-    }
 }

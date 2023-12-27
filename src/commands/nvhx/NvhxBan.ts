@@ -35,7 +35,6 @@ export class NvhxBan extends Command {
         const embed = this.getEmbedTemplate(interaction);
         try {
             const id = options.getInteger('id', true);
-            // @TODO should we check if id was provided? Otherwise an error will be thrown.
 
             const response = await NvhxBan.banPlayerById(id);
 

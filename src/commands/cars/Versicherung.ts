@@ -1,11 +1,11 @@
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import Config from '@proot/Config';
-import { GameDB } from '@sql/Database';
 import { IVersicherung } from '@sql/schema/Versicherung.schema';
 import { Helper } from '@utils/Helper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { CommandHelper } from '@commands/CommandHelper';
+import { VersicherungRepository } from '@sql/repositories/versicherung.repository';
 
 // @TODO unused class Versicherung
 export class Versicherung extends Command {
@@ -114,11 +114,8 @@ export class Versicherung extends Command {
             // Currently we still check in sql
             // but it think it would be better to let the user know that the plate is not valid
 
-            // @TODO move to service
-            const [versicherungen] = await GameDB.query<IVersicherung[]>(
-                'SELECT * FROM `versicherungen` WHERE `plate` = ?',
-                [kennzeichen],
-            );
+            const versicherungen: IVersicherung[] =
+                await VersicherungRepository.getVersicherungenByNumberplate(kennzeichen);
 
             if (versicherungen.length !== 1) {
                 let message;
@@ -164,10 +161,8 @@ export class Versicherung extends Command {
             }
             const premium = options.getBoolean('premium') ?? false;
 
-            await GameDB.query<IVersicherung[]>(
-                'INSERT INTO `versicherungen` (`plate`, `ts`, `premium`) VALUES (?, ADDDATE(NOW (), INTERVAL ? DAY), ?) ON DUPLICATE KEY UPDATE ts = ADDDATE(NOW (), INTERVAL ? DAY), premium = ? RETURNING * ',
-                [kennzeichen, dauer, premium ? 1 : 0, dauer, premium ? 1 : 0],
-            );
+            await VersicherungRepository.addVersicherung(kennzeichen, dauer, premium);
+
             const ts = new Date();
             ts.setDate(ts.getDate() + dauer);
             embed.setTitle('Versicherung Hinzufügen');
@@ -187,33 +182,34 @@ export class Versicherung extends Command {
         const { options } = interaction;
         const embed = this.getEmbedTemplate(interaction);
         try {
-            let kennzeichen = options.getString('kennzeichen');
-            if (!kennzeichen) {
+            const plate = options.getString('kennzeichen');
+
+            // @TODO Remove?
+            if (!plate) {
                 await interaction.reply('Kein Kennzeichen angegeben!');
                 return;
             }
-            kennzeichen = Helper.validateNumberplate(kennzeichen);
 
-            const [versicherungen] = await GameDB.query<IVersicherung[]>(
-                'SELECT * FROM `versicherungen` WHERE `plate` = ?',
-                [kennzeichen],
-            );
+            const formattedPlate = Helper.validateNumberplate(plate);
+            const versicherungen: IVersicherung[] =
+                await VersicherungRepository.getVersicherungenByNumberplate(formattedPlate);
+
             if (versicherungen.length !== 1) {
                 let message;
                 if (versicherungen.length === 0)
-                    message = `Keine Versicherung für ${kennzeichen} gefunden!`;
+                    message = `Keine Versicherung für ${plate} gefunden!`;
                 else
-                    message = `Es wurden ${versicherungen.length} Versicherungen für ${kennzeichen} gefunden!`;
+                    message = `Es wurden ${versicherungen.length} Versicherungen für ${plate} gefunden!`;
                 await interaction.reply({ content: message, ephemeral: true });
                 return;
             }
             const versicherung = versicherungen[0];
-            await GameDB.query('DELETE FROM `versicherungen` WHERE `plate` = ?', [
-                versicherung.plate,
-            ]);
+            // @TODO Are we sure we want to delete every insurance for the plate?
+            await VersicherungRepository.deleteVersicherungenByNumberplate(versicherung);
+
             embed.setTitle('Versicherung Entfernen');
             embed.addFields({
-                name: kennzeichen,
+                name: plate,
                 value: `Versicherung entfernt\nPremium: ${
                     versicherung.premium ? 'Ja' : 'Nein'
                 }\nVersichert bis: ${versicherung.ts.toLocaleDateString()} ${versicherung.ts.toLocaleTimeString()}`,

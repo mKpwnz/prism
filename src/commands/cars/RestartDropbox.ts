@@ -33,19 +33,19 @@ export class RestartDropbox extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const embed = this.getEmbedTemplate(interaction);
         try {
             const response = await RconClient.sendCommand('ensure immo_store');
             LogManager.log(response);
-            embed.setTitle(`Dropbox neugestartet`);
-            embed.setDescription(`Dropbox wurde neugestartet.`);
-            await interaction.reply({
-                embeds: [embed],
-            });
+
+            await this.replyWithEmbed(
+                interaction,
+                `Dropbox neugestartet`,
+                `Dropbox wurde neugestartet.`,
+            );
         } catch (error) {
-            // Error Handling does not work like that
-            // If you want to catch this specific error, you should do it in RconClient.ts
-            // A custom error type may be required
+            // @TODO Error Handling does not work like that
+            // @TODO If you want to catch this specific error, you should do it in RconClient.ts
+            // @TODO A custom error type may be required
             await CommandHelper.handleInteractionError(error, interaction);
         }
     }

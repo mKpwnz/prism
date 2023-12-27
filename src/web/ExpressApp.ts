@@ -21,7 +21,7 @@ export class ExpressApp {
         this.app.use(
             rateLimit({
                 windowMs: 15 * 60 * 1000, // 15 minutes
-                max: 100, // limit each IP to 100 requests per windowMs
+                limit: 100, // limit each IP to 100 requests per windowMs
             }),
         );
         this.app.set('trust proxy', true);

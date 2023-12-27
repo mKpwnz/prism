@@ -35,6 +35,7 @@ export class BotStats extends Command {
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const embed = this.getEmbedTemplate(interaction);
         embed.setTitle('Bot Stats');
+
         const data = await BotDB.command_log.groupBy({
             by: ['command'],
             _count: {
@@ -46,6 +47,7 @@ export class BotStats extends Command {
                 },
             },
         });
+
         const table = new AsciiTable3('Command Stats')
             .setStyle('unicode-single')
             .setHeading('Command', 'Count')
