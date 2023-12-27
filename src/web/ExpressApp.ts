@@ -24,7 +24,6 @@ export class ExpressApp {
                 limit: 100, // limit each IP to 100 requests per windowMs
             }),
         );
-        this.app.set('trust proxy', true);
         this.app.get('/commandhelplist', async (req, res) => {
             res.redirect(301, '/api/v1/commandhelplist');
         });
