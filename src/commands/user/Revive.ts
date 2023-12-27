@@ -25,9 +25,7 @@ export class Revive extends Command {
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('revive')
-                .setDescription('Suche nach Spielern')
-                // add string option
-                .setDMPermission(true)
+                .setDescription('Revive einen Spieler')
                 .addIntegerOption((option) =>
                     option.setName('id').setDescription('ID des Spielers').setRequired(true),
                 )
