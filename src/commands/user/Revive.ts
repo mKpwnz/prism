@@ -42,7 +42,7 @@ export class Revive extends Command {
         const incapacitated = interaction.options.getBoolean('kampfunfähig') ?? false;
 
         await RconClient.sendCommand(`revive ${id}${incapacitated ? ' 1' : ''}`);
-        this.replyWithEmbed({
+        await this.replyWithEmbed({
             interaction,
             title: 'Revive',
             description: `Der Spieler mit der ID **${id}** wurde revived!`,

@@ -43,6 +43,7 @@ export class ValidateTrunk extends Command {
 
         // @TODO Maybe we could move Input Validation & Retrieval to a separate class & Create custom return types?
         const formattedPlate: string = Helper.formatNumberplate(plate);
+
         const vehicle = await VehicleRepository.getVehicleByNumberplate(formattedPlate);
 
         if (!vehicle) {
