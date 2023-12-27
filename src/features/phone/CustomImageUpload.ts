@@ -244,7 +244,7 @@ export class CustomImageUpload {
         if (this.image_attachment) {
             const { height, width, size } = this.image_attachment;
             const url = this.image_attachment.url.split('?')[0];
-            if (!/(.*?)\\.(jpg|jpeg|webp|png)/.test(url)) {
+            if (!/(.*?)\.(jpg|jpeg|webp|png)/.test(url)) {
                 response.messages.push(
                     'Das Bild muss eine .jpg, .jpeg, .webp oder .png Datei sein.',
                 );
