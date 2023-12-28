@@ -13,7 +13,7 @@ import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
 
-export class Lizenz extends Command {
+export class License extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
@@ -138,7 +138,7 @@ export class Lizenz extends Command {
             });
             return;
         }
-        const response = await Lizenz.deleteLicense(vPlayer, license);
+        const response = await License.deleteLicense(vPlayer, license);
         if (response instanceof Error) {
             LogManager.error(response);
             await interaction.reply({
@@ -223,7 +223,7 @@ export class Lizenz extends Command {
 
             if (Array.isArray(licenses)) {
                 for (const license of licenses) {
-                    if (await Lizenz.checkLicense(vPlayer, license)) {
+                    if (await License.checkLicense(vPlayer, license)) {
                         if (license === licenses[0]) {
                             query += '(';
                         } else {
@@ -238,7 +238,7 @@ export class Lizenz extends Command {
                 if (licenses === ELicenses.ALL) {
                     query = 'DELETE FROM user_licenses WHERE owner = ?';
                 } else {
-                    if (!(await Lizenz.checkLicense(vPlayer, licenses))) {
+                    if (!(await License.checkLicense(vPlayer, licenses))) {
                         return new Error('Der Spieler besitzt diese Lizenz nicht!');
                     }
                     query += `type = "${licenses}"`;

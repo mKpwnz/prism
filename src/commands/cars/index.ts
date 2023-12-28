@@ -1,3 +1,3 @@
-export * from './Versicherung';
+export * from './Insurance';
 export * from './ValidateTrunk';
 export * from './RestartDropbox';

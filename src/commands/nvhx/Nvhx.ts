@@ -1,7 +1,7 @@
 import { Command } from '@class/Command';
 import { RconClient } from '@class/RconClient';
 import { RegisterCommand } from '@commands/CommandHandler';
-import { NvhxData } from '@controller/NvhxData.controller';
+import { NvhxService } from '@services/NvhxService';
 import { EENV } from '@enums/EENV';
 import { ILivePlayer } from '@interfaces/ILivePlayer';
 import { Helper } from '@utils/Helper';
@@ -57,9 +57,7 @@ export class Nvhx extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const subcommand = interaction.options.getSubcommand();
-
-        switch (subcommand) {
+        switch (interaction.options.getSubcommand()) {
             case 'sc':
                 await this.captureScreenByPlayerId(interaction);
                 break;
@@ -119,10 +117,10 @@ export class Nvhx extends Command {
 
     private async fetchBannedLivePlayers(): Promise<ILivePlayer[]> {
         const livePlayers = await PlayerService.getAllLivePlayers();
-        const globalBans = await NvhxData.GetAllGlobalBans();
+        const globalBans = await NvhxService.GetAllGlobalBans();
 
         return livePlayers.filter((player) =>
-            NvhxData.CheckIfUserIsBanned(player.identifiers, globalBans),
+            NvhxService.CheckIfUserIsBanned(player.identifiers, globalBans),
         );
     }
 

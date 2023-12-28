@@ -1,11 +1,12 @@
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
-import { PhonePhotosController } from '@controller/PhonePhotos.controller';
+import { PhonePhotosService } from '@services/PhonePhotosService';
 import { EENV } from '@enums/EENV';
 import Config from '@Config';
 import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 
-// @TODO add typedoc for this command
+// TODO add typedoc for this command
+// TODO refactor
 export class CheckPhotos extends Command {
     constructor() {
         super();
@@ -59,7 +60,6 @@ export class CheckPhotos extends Command {
                 .addBooleanOption((option) =>
                     option.setName('selectall').setDescription('Alle auswählen?'),
                 ),
-
             this,
         );
     }
@@ -75,7 +75,7 @@ export class CheckPhotos extends Command {
 
         let user: string[] = [];
         if (!selectAll) {
-            user = await PhonePhotosController.checkAllPhotosWithProgress(
+            user = await PhonePhotosService.checkAllPhotosWithProgress(
                 new Date(`${year}-${month}-1`),
                 new Date(`${year}-${month}-31`),
                 interaction,
@@ -83,7 +83,7 @@ export class CheckPhotos extends Command {
             );
         } else {
             // @TODO Why only starting from 2023? And why hardcoded?
-            user = await PhonePhotosController.checkAllPhotosWithProgress(
+            user = await PhonePhotosService.checkAllPhotosWithProgress(
                 new Date('2023-1-1'),
                 new Date('2024-12-31'),
                 interaction,

@@ -315,4 +315,16 @@ export class Helper {
         if (!enumName) throw Error();
         return _enum[enumName];
     };
+
+    /**
+     * @description Validates a date string in the format dd.mm.yyyy and returns true if it is valid, false if not
+     * @author Etox
+     * @date 28.12.2023
+     * @param {string} date
+     * @returns {boolean}
+     * @memberof Helper
+     */
+    static validateDate(date: string): boolean {
+        return /^\d{1,2}\.\d{1,2}\.\d{4}$/.test(date);
+    }
 }

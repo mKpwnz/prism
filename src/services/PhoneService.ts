@@ -1,7 +1,8 @@
 import { IPhoneOwnerResponse } from '@sql/schema/Phone.schema';
 import { GameDB } from '@sql/Database';
+import { ResultSetHeader } from 'mysql2';
 
-export class PhoneRepository {
+export class PhoneService {
     public static async getPhoneOwnerByImageLink(
         link: string,
     ): Promise<IPhoneOwnerResponse | undefined> {
@@ -21,5 +22,20 @@ export class PhoneRepository {
             [`%${link}%`],
         );
         return response[0];
+    }
+
+    /**
+     * @description Deletes a phone from the database by the identifier.
+     * @static
+     * @param {string} identifier - The identifier of the phone to be deleted.
+     * @returns {Promise<boolean>} A Promise that resolves to true if the phone was successfully deleted, or false otherwise.
+     * @memberof PhoneService
+     */
+    public static async deletePhoneByIdentifier(identifier: string): Promise<boolean> {
+        const [result] = await GameDB.query<ResultSetHeader>(
+            'DELETE FROM phone_phones WHERE identifier = ?',
+            [identifier],
+        );
+        return result.affectedRows > 0;
     }
 }

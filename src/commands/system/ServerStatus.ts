@@ -35,7 +35,7 @@ export class ServerStatus extends Command {
     }
 
     private static getEmoteForStatus(status: EServerStatus): string {
-        let emote = '';
+        let emote;
         switch (status) {
             case EServerStatus.DOWN:
                 emote = ':red_circle:';
@@ -57,7 +57,7 @@ export class ServerStatus extends Command {
     }
 
     // TODO: Refactor this
-    async getAgregatedData(): Promise<DiscordResponseGroupe[]> {
+    async getAggregatedData(): Promise<DiscordResponseGroupe[]> {
         const res: DiscordResponseGroupe[] = [];
         const pglRes: PublicGroupListEntry[] = await axios
             .get('https://status.immortaldev.eu/api/status-page/9t7abvczql56qa629fkejnfg2dyl072r', {
@@ -68,6 +68,7 @@ export class ServerStatus extends Command {
                 LogManager.error(err);
                 return [];
             });
+
         const hbdRes: HeartbeatResponse = await axios
             .get(
                 'https://status.immortaldev.eu/api/status-page/heartbeat/9t7abvczql56qa629fkejnfg2dyl072r',
@@ -103,7 +104,7 @@ export class ServerStatus extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const EmbedData = await this.getAgregatedData();
+        const EmbedData = await this.getAggregatedData();
 
         let description = '';
         const embedFields: IEmbedField[] = [];

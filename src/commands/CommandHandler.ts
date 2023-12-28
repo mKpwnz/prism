@@ -12,7 +12,7 @@ import {
     Fraksperre,
     Give,
     Kick,
-    Lizenz,
+    License,
     Rechnung,
     Rename,
     RequestToSupport,
@@ -73,7 +73,7 @@ export class CommandHandler {
         new Revive(); // Funktionsfähig RCON
         new Resetpos(); // Funktionsfähig
         new Setjob(); // Funktionsfähig RCON
-        new Lizenz(); // Funktionsfähig
+        new License(); // Funktionsfähig
 
         new CheckImageOwner();
         new SchufaCheck();

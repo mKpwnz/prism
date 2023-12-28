@@ -2,13 +2,13 @@ import { ISocietyFinanceResponse } from '@interfaces/ISocietyFinanceResponse';
 import { BotDB, GameDB } from '@sql/Database';
 import LogManager from '@utils/Logger';
 
-export class CronJobs {
+export class CronJobService {
     /**
      * @description Logs the society finance to the database.
      * @author mKpwnz
      * @date 27.12.2023
      * @static
-     * @memberof CronJobs
+     * @memberof CronJobService
      */
     public static async logSocietyFinance() {
         const [data] = await GameDB.query<ISocietyFinanceResponse[]>(

@@ -6,7 +6,7 @@ import { ExpressApp } from '@web/ExpressApp';
 import { Client, Events, IntentsBitField } from 'discord.js';
 import { CronManager } from '@utils/CronManager';
 import { CronJob } from 'cron';
-import { CronJobs } from '@controller/CronJobs.controller';
+import { CronJobService } from '@services/CronJobService';
 
 LogManager.configure();
 
@@ -35,7 +35,9 @@ client.once(Events.ClientReady, async () => {
     new ExpressApp();
     if (process.env.NODE_ENV === 'production') {
         CronManager.initCronManager({
-            'fraktionen.finance': new CronJob('0 0 */8 * * *', () => CronJobs.logSocietyFinance()),
+            'fraktionen.finance': new CronJob('0 0 */8 * * *', () =>
+                CronJobService.logSocietyFinance(),
+            ),
         });
     } else {
         LogManager.debug('CronManager is disabled in DEV mode');

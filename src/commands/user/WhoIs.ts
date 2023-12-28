@@ -1,6 +1,6 @@
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
-import { NvhxData } from '@controller/NvhxData.controller';
+import { NvhxService } from '@services/NvhxService';
 import { EENV } from '@enums/EENV';
 import { ESearchType } from '@enums/ESearchType';
 import Config from '@Config';
@@ -102,7 +102,7 @@ export class WhoIs extends Command {
             return;
         }
 
-        const globalBans = await NvhxData.GetAllGlobalBans();
+        const globalBans = await NvhxService.GetAllGlobalBans();
 
         for (let i = pageSize * (page - 1); i < findUsers.length; i++) {
             // Pagination
@@ -120,7 +120,7 @@ export class WhoIs extends Command {
                 },
             });
 
-            const nvhxBanned = NvhxData.CheckIfUserIsBanned(
+            const nvhxBanned = NvhxService.CheckIfUserIsBanned(
                 [findUsers[i].identifier, findUsers[i].discord],
                 globalBans,
             );

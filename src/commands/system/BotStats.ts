@@ -33,9 +33,6 @@ export class BotStats extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const embed = Command.getEmbedTemplate(interaction);
-        embed.setTitle('Bot Stats');
-
         const data = await BotDB.command_log.groupBy({
             by: ['command'],
             _count: {
@@ -56,8 +53,13 @@ export class BotStats extends Command {
         data.forEach((d) => {
             table.addRow(d.command, d._count.command);
         });
-        embed.setDescription(`\`\`\`\n${table.toString()}\`\`\``);
+        // TODO why log here?
         LogManager.debug(data);
-        await interaction.reply({ content: '', embeds: [embed] });
+
+        await this.replyWithEmbed({
+            interaction,
+            title: 'Bot Stats',
+            description: `\`\`\`\n${table.toString()}\`\`\``,
+        });
     }
 }

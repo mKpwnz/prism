@@ -4,9 +4,8 @@ import { EENV } from '@enums/EENV';
 import Config from '@Config';
 import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { PhoneRepository } from '@sql/repositories/phone.repository';
+import { PhoneService } from '@services/PhoneService';
 
-// TODO: REFACTOR
 export class CheckImageOwner extends Command {
     constructor() {
         super();
@@ -34,7 +33,7 @@ export class CheckImageOwner extends Command {
         );
     }
 
-    normalizeLink(link: string): string | null {
+    private normalizeLink(link: string): string | null {
         const match = link.match(/\/(\d+\/\d+\/[^/?]+)(?:\?.*)?$/);
         if (match) {
             return match[1];
@@ -43,24 +42,37 @@ export class CheckImageOwner extends Command {
     }
 
     public async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        // @TODO We should have a better solution for input validation
-        const nLink = this.normalizeLink(
-            interaction.options.get('imageurl')?.value?.toString() as string,
-        );
-        if (!nLink) {
-            await interaction.reply({
-                content: `Der link konnte nicht validiert werden.`,
+        const imageUrl: string = interaction.options.getString('imageurl', true);
+        const normalizedLink = this.normalizeLink(imageUrl);
+
+        if (!normalizedLink) {
+            await this.replyWithEmbed({
+                interaction,
+                title: 'Image Owner',
+                description: `Der link konnte nicht validiert werden.`,
                 ephemeral: true,
             });
             return;
         }
         // @TODO why log here?
-        LogManager.debug(nLink);
+        LogManager.debug(normalizedLink);
 
-        const phoneOwner = await PhoneRepository.getPhoneOwnerByImageLink(nLink);
+        const phoneOwner = await PhoneService.getPhoneOwnerByImageLink(normalizedLink);
 
-        await interaction.reply({
-            content: `\`\`\`json\n${JSON.stringify(phoneOwner, null, 4)}\`\`\``,
+        if (!phoneOwner) {
+            await this.replyWithEmbed({
+                interaction,
+                title: 'Image Owner',
+                description: `Es konnte kein Spieler mit diesem Bild gefunden werden.`,
+                ephemeral: true,
+            });
+            return;
+        }
+
+        await this.replyWithEmbed({
+            interaction,
+            title: 'Image Owner',
+            description: `\`\`\`json\n${JSON.stringify(phoneOwner, null, 4)}\`\`\``,
         });
     }
 }

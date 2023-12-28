@@ -29,6 +29,7 @@ export class Help extends Command {
         );
     }
 
+    // TODO I think we should move all methods to HelpService.ts
     public static getCommands(): ICmdPrintInformation[] {
         const CmdPrintInformation: ICmdPrintInformation[] = [];
         CommandHandler.commands.forEach((cmd) => {
@@ -54,7 +55,6 @@ export class Help extends Command {
                 }
             });
 
-            // if (cmd.cmd.RunEnvironment === EENV.PRODUCTION)
             CmdPrintInformation.push({
                 commandName: cmd.scb.name,
                 description: cmd.scb.description,
@@ -72,7 +72,7 @@ export class Help extends Command {
     public static async getGroups(): Promise<Map<string, string>> {
         const res = new Map<string, string>();
 
-        const roles = await BotClient.guilds.cache.get(Config.Discord.ServerID)?.roles.cache;
+        const roles = BotClient.guilds.cache.get(Config.Discord.ServerID)?.roles.cache;
         if (!roles) return res;
         for (const [key, value] of roles.entries()) {
             res.set(key, value.name);
@@ -82,8 +82,8 @@ export class Help extends Command {
 
     public static async getChannel(): Promise<Map<string, string>> {
         const channel = new Map<string, string>();
-        const channelApiResponse = await BotClient.guilds.cache.get(Config.Discord.ServerID)
-            ?.channels.cache;
+        const channelApiResponse = BotClient.guilds.cache.get(Config.Discord.ServerID)?.channels
+            .cache;
         if (!channelApiResponse) return channel;
         for (const [key, value] of channelApiResponse.entries()) {
             channel.set(key, value.name);
@@ -92,8 +92,10 @@ export class Help extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        await interaction.reply({
-            content:
+        await this.replyWithEmbed({
+            interaction,
+            title: 'Bot Hilfe',
+            description:
                 'Die Hilfe findest du auf folgender Seite: [Bot Hilfe](https://brand.immortaldev.eu/discordbot)',
             ephemeral: true,
         });
