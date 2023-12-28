@@ -74,7 +74,6 @@ export class WhoIs extends Command {
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const { channel } = interaction;
-        const embed = Command.getEmbedTemplate(interaction);
 
         const identifierValue = interaction.options.getString('input');
 
@@ -169,14 +168,11 @@ export class WhoIs extends Command {
                 } weitere Ergebnisse sind ausgeblendet!`;
             }
 
-            embed.setTitle('Suchergebnisse');
-            embed.setDescription(
-                `Hier sind ${embedFields.length}/${findUsers.length} Suchergebnisse für "${identifierValue}":${additionalString}${pageString}`,
-            );
-            embed.setFields(embedFields);
-            await interaction.reply({
-                content: `${interaction.user.toString()}`,
-                embeds: [embed],
+            await this.replyWithEmbed({
+                interaction,
+                title: `Suchergebnisse`,
+                description: `Hier sind ${embedFields.length}/${findUsers.length} Suchergebnisse für "${identifierValue}":${additionalString}${pageString}`,
+                fields: embedFields,
             });
             // channel?.send({
             //     content: `${interaction.user.toString()}`,

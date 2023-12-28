@@ -106,11 +106,11 @@ export class CheckPhotos extends Command {
 
         // @TODO missing await?
         if (embeds.length === 0) {
-            interaction.editReply(
+            await interaction.editReply(
                 '▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰ 100% / 100% | Check completed, no illegal photos found!',
             );
         } else {
-            interaction.editReply({ embeds });
+            await interaction.editReply({ embeds });
         }
     }
 }

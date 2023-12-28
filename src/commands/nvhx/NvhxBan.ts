@@ -50,6 +50,7 @@ export class NvhxBan extends Command {
 
     // @TODO move to another place that makes sense
     // @TODO improve return value
+    // @TODO Move to NvhxService
     private static async banPlayerById(playerId: number): Promise<string> {
         let response = await RconClient.sendCommand(`nvhx ban ${playerId}`);
         response = response.replace('print ', '');

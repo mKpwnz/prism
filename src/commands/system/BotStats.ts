@@ -1,9 +1,8 @@
+import Config from '@Config';
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
-import Config from '@Config';
 import { BotDB } from '@sql/Database';
-import LogManager from '@utils/Logger';
 import { AlignmentEnum, AsciiTable3 } from 'ascii-table3';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
@@ -53,8 +52,6 @@ export class BotStats extends Command {
         data.forEach((d) => {
             table.addRow(d.command, d._count.command);
         });
-        // TODO why log here?
-        LogManager.debug(data);
 
         await this.replyWithEmbed({
             interaction,

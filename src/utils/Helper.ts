@@ -327,4 +327,19 @@ export class Helper {
     static validateDate(date: string): boolean {
         return /^\d{1,2}\.\d{1,2}\.\d{4}$/.test(date);
     }
+
+    /**
+     * @description
+     * @author mKpwnz
+     * @date 28.12.2023
+     * @static
+     * @param {number} ms
+     * @returns {*}  {Promise<void>}
+     * @memberof Helper
+     */
+    static promiseTimeout(ms: number): Promise<void> {
+        return new Promise((resolve) => {
+            setTimeout(resolve, ms);
+        });
+    }
 }

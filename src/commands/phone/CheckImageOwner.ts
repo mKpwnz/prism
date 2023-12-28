@@ -1,10 +1,9 @@
+import Config from '@Config';
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
-import Config from '@Config';
-import LogManager from '@utils/Logger';
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { PhoneService } from '@services/PhoneService';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class CheckImageOwner extends Command {
     constructor() {
@@ -54,8 +53,6 @@ export class CheckImageOwner extends Command {
             });
             return;
         }
-        // @TODO why log here?
-        LogManager.debug(normalizedLink);
 
         const phoneOwner = await PhoneService.getPhoneOwnerByImageLink(normalizedLink);
 
