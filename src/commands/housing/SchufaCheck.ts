@@ -4,9 +4,16 @@ import { EENV } from '@enums/EENV';
 import Config from '@Config';
 import { ISchufaUser } from '@sql/schema/User.schema';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { UserRepository } from '@sql/repositories/user.repository';
+import { UserService } from '@services/UserService';
 
-// @TODO should we reply with Embed?
+/**
+ * @description Klasse zum Überprüfen von Hausbesitzern mit negativem Kontostand.
+ * @author mKpwnz
+ * @date 28.12.2023
+ * @export
+ * @class SchufaCheck
+ * @extends {Command}
+ */
 export class SchufaCheck extends Command {
     constructor() {
         super();
@@ -32,12 +39,16 @@ export class SchufaCheck extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const schufaUsers: ISchufaUser[] = await UserRepository.getSchufaUsers();
+        const schufaUsers: ISchufaUser[] = await UserService.getSchufaUsers();
+
         for (const user of schufaUsers) {
             schufaUsers[schufaUsers.indexOf(user)].accounts = JSON.parse(user.accounts);
         }
-        await interaction.reply({
-            content: `**${
+
+        await this.replyWithEmbed({
+            interaction,
+            title: 'Schufa Check abgeschlossen',
+            description: `**${
                 schufaUsers.length
             }** Hausbesitzer mit negativem Kontostand gefunden.\`\`\`json\n${JSON.stringify(
                 schufaUsers,

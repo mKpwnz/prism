@@ -22,6 +22,7 @@ import LogManager from '@utils/Logger';
 import { AttachmentBuilder, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { readFileSync, writeFileSync } from 'fs';
 
+// TODO refactor
 export class DeletePhone extends Command {
     constructor() {
         super();

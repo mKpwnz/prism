@@ -9,9 +9,10 @@ import { GameDB } from '@sql/Database';
 import { IUser } from '@sql/schema/User.schema';
 import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { Lizenz } from './Lizenz';
+import { PhoneService } from '@services/PhoneService';
+import { License } from './License';
 
-export class Deletecharacter extends Command {
+export class DeleteCharacter extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.DEVELOPMENT;
@@ -37,65 +38,43 @@ export class Deletecharacter extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        await this.delete(interaction);
-    }
+        const steamId = interaction.options.getString('steamid', true);
 
-    public async delete(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction;
-        try {
-            const steamid = options.getString('steamid');
-            if (!steamid) {
-                await interaction.reply({ content: 'Bitte gib eine SteamID an!', ephemeral: true });
-                return;
-            }
-            const vPlayer = await PlayerService.validatePlayer(steamid);
-            if (!vPlayer) {
-                await interaction.reply({
-                    content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
-                    ephemeral: true,
-                });
-                return;
-            }
-            const phone = await this.deletePhone(vPlayer.identifiers.steam);
-            if (!phone) {
-                await interaction.reply({
-                    content: 'Es ist ein Fehler beim Löschen des Telefons aufgetreten!',
-                    ephemeral: true,
-                });
-                return;
-            }
-            const licenses = await Lizenz.deleteLicense(vPlayer, ELicenses.ALL);
-            if (licenses instanceof Error) {
-                LogManager.error(licenses);
-                await interaction.reply({
-                    content: `Es ist ein Fehler beim Löschen der Lizenzen aufgetreten!\`\`\`json${JSON.stringify(
-                        licenses,
-                    )}\`\`\``,
-                    ephemeral: true,
-                });
-                return;
-            }
-            const archive = await this.moveCharacterToArchive(vPlayer);
-            if (!archive) {
-                await interaction.reply({
-                    content: 'Es ist ein Fehler beim Archivieren des Charakters aufgetreten!',
-                    ephemeral: true,
-                });
-            }
-        } catch (error) {
-            LogManager.error(error);
-            await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true });
+        const vPlayer = await PlayerService.validatePlayer(steamId);
+        if (!vPlayer) {
+            await interaction.reply({
+                content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
+                ephemeral: true,
+            });
+            return;
         }
-    }
 
-    public async deletePhone(itendifier: string): Promise<boolean> {
-        try {
-            // TODO: ADD Return Handling
-            await GameDB.query('DELETE FROM phone_phones WHERE identifier = ?', [itendifier]);
-            return true;
-        } catch (error) {
-            LogManager.error(error);
-            return false;
+        const phone = await PhoneService.deletePhoneByIdentifier(vPlayer.identifiers.steam);
+        if (!phone) {
+            await interaction.reply({
+                content: 'Es ist ein Fehler beim Löschen des Telefons aufgetreten!',
+                ephemeral: true,
+            });
+            return;
+        }
+
+        const licenses = await License.deleteLicense(vPlayer, ELicenses.ALL);
+        if (licenses instanceof Error) {
+            LogManager.error(licenses);
+            await interaction.reply({
+                content: `Es ist ein Fehler beim Löschen der Lizenzen aufgetreten!\`\`\`json${JSON.stringify(
+                    licenses,
+                )}\`\`\``,
+                ephemeral: true,
+            });
+            return;
+        }
+        const archive = await this.moveCharacterToArchive(vPlayer);
+        if (!archive) {
+            await interaction.reply({
+                content: 'Es ist ein Fehler beim Archivieren des Charakters aufgetreten!',
+                ephemeral: true,
+            });
         }
     }
 
