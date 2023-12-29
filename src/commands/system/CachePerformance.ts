@@ -1,6 +1,6 @@
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
-import { Items } from '@controller/Item.controller';
+import { ItemService } from '@services/ItemService';
 import Config from '@Config';
 import { Cache } from '@utils/Cache';
 import LogManager from '@utils/Logger';
@@ -27,7 +27,7 @@ export class CachePerformance extends Command {
         await Cache.testPerformance(
             interaction,
             async () => {
-                const res = await Items.doesItemExists('fixkit');
+                const res = await ItemService.doesItemExists('fixkit');
                 LogManager.debug(res);
             },
             'items',

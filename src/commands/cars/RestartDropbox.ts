@@ -6,7 +6,7 @@ import { EENV } from '@enums/EENV';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 /**
- * @description Neustartet die Ingame Dropbox (Import Garage für neue Fahrzeuge aus dem Tebex Store)
+ * @description Klasse zum Neustarten der Ingame Dropbox (Import Garage für neue Fahrzeuge aus dem Tebex Store).
  * @author mKpwnz
  * @date 27.12.2023
  * @export

@@ -1,7 +1,7 @@
 import { Command } from '@class/Command';
 import { RconClient } from '@class/RconClient';
 import { RegisterCommand } from '@commands/CommandHandler';
-import { Items } from '@controller/Item.controller';
+import { ItemService } from '@services/ItemService';
 import { EENV } from '@enums/EENV';
 import Config from '@Config';
 import { Helper } from '@utils/Helper';
@@ -91,7 +91,7 @@ export class Give extends Command {
             await interaction.reply({ content: 'Item darf nicht leer sein!', ephemeral: true });
             return;
         }
-        const validateitem = await Items.validateItemName(item ?? '');
+        const validateitem = await ItemService.validateItemName(item ?? '');
         await RconClient.sendCommand(`giveitem ${id} ${validateitem} ${anzahl}`);
         embed.setTitle('Give Item');
         embed.setDescription(`Spieler ${id} sollte ${anzahl}x ${validateitem} erhalten haben!`);

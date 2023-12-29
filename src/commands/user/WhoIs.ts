@@ -1,6 +1,6 @@
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
-import { NvhxData } from '@controller/NvhxData.controller';
+import { NvhxService } from '@services/NvhxService';
 import { EENV } from '@enums/EENV';
 import { ESearchType } from '@enums/ESearchType';
 import Config from '@Config';
@@ -74,7 +74,6 @@ export class WhoIs extends Command {
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const { channel } = interaction;
-        const embed = Command.getEmbedTemplate(interaction);
 
         const identifierValue = interaction.options.getString('input');
 
@@ -102,7 +101,7 @@ export class WhoIs extends Command {
             return;
         }
 
-        const globalBans = await NvhxData.GetAllGlobalBans();
+        const globalBans = await NvhxService.GetAllGlobalBans();
 
         for (let i = pageSize * (page - 1); i < findUsers.length; i++) {
             // Pagination
@@ -120,7 +119,7 @@ export class WhoIs extends Command {
                 },
             });
 
-            const nvhxBanned = NvhxData.CheckIfUserIsBanned(
+            const nvhxBanned = NvhxService.CheckIfUserIsBanned(
                 [findUsers[i].identifier, findUsers[i].discord],
                 globalBans,
             );
@@ -169,14 +168,11 @@ export class WhoIs extends Command {
                 } weitere Ergebnisse sind ausgeblendet!`;
             }
 
-            embed.setTitle('Suchergebnisse');
-            embed.setDescription(
-                `Hier sind ${embedFields.length}/${findUsers.length} Suchergebnisse für "${identifierValue}":${additionalString}${pageString}`,
-            );
-            embed.setFields(embedFields);
-            await interaction.reply({
-                content: `${interaction.user.toString()}`,
-                embeds: [embed],
+            await this.replyWithEmbed({
+                interaction,
+                title: `Suchergebnisse`,
+                description: `Hier sind ${embedFields.length}/${findUsers.length} Suchergebnisse für "${identifierValue}":${additionalString}${pageString}`,
+                fields: embedFields,
             });
             // channel?.send({
             //     content: `${interaction.user.toString()}`,

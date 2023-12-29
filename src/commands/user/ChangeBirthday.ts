@@ -4,10 +4,10 @@ import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import Config from '@Config';
 import { GameDB } from '@sql/Database';
-import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
 import { PlayerService } from '@services/PlayerService';
+import { Helper } from '@utils/Helper';
 
 export class ChangeBirthday extends Command {
     constructor() {
@@ -31,7 +31,6 @@ export class ChangeBirthday extends Command {
             new SlashCommandBuilder()
                 .setName('changebirthday')
                 .setDescription('Ändert den Geburtstag eines Nutzers')
-                // add string option
                 .setDMPermission(true)
                 .addStringOption((option) =>
                     option
@@ -51,23 +50,9 @@ export class ChangeBirthday extends Command {
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const birthday = options.getString('datum');
-        const steamID = options.getString('steam');
-        const embed = Command.getEmbedTemplate(interaction);
-        if (!birthday) {
-            await interaction.reply({
-                content: 'Es wurde kein Geburtstag angegeben!',
-                ephemeral: true,
-            });
-            return;
-        }
-        if (!steamID) {
-            await interaction.reply({
-                content: 'Es wurde keine SteamID angegeben!',
-                ephemeral: true,
-            });
-            return;
-        }
+        const birthday = options.getString('datum', true);
+        const steamID = options.getString('steam', true);
+
         const vPlayer = await PlayerService.validatePlayer(steamID);
         if (!vPlayer) {
             await interaction.reply({
@@ -77,36 +62,33 @@ export class ChangeBirthday extends Command {
             return;
         }
 
-        try {
-            if (/^\d{1,2}\.\d{1,2}\.\d{4}$/.test(birthday)) {
-                const [res] = await GameDB.execute<ResultSetHeader>(
-                    `UPDATE users SET dateofbirth = ? WHERE identifier = ?`,
-                    [birthday, vPlayer.identifiers.steam],
-                );
-                if (res.affectedRows > 0) {
-                    embed.setTitle('Geburtstag geändert');
-                    embed.setColor(EEmbedColors.SUCCESS);
-                    embed.setDescription(
-                        `Der Geburtstag des Spielers **${vPlayer.playerdata.fullname}** (${vPlayer.identifiers.steam}) wurde auf **${birthday}** geändert.`,
-                    );
-                    await interaction.reply({ embeds: [embed] });
-                } else {
-                    embed.setTitle('Geburtstag nicht geändert');
-                    embed.setColor(EEmbedColors.ALERT);
-                    embed.setDescription(
-                        `Der Geburtstag des Spielers **${vPlayer.playerdata.fullname}** (${vPlayer.identifiers.steam}) konnte nicht auf **${birthday}** geändert werden.`,
-                    );
-                    await interaction.reply({ embeds: [embed] });
-                }
-            } else {
-                await interaction.reply({
-                    content: 'Das Format des Geburtstags ist nicht korrekt!',
-                    ephemeral: true,
-                });
-            }
-        } catch (error) {
-            LogManager.error(error);
-            await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true });
+        if (!Helper.validateDate(birthday)) {
+            await interaction.reply({
+                content: 'Das Format des Geburtstags ist nicht korrekt!',
+                ephemeral: true,
+            });
+            return;
+        }
+
+        const [res] = await GameDB.execute<ResultSetHeader>(
+            `UPDATE users SET dateofbirth = ? WHERE identifier = ?`,
+            [birthday, vPlayer.identifiers.steam],
+        );
+
+        if (res.affectedRows > 0) {
+            await this.replyWithEmbed({
+                interaction,
+                title: 'Geburtstag geändert',
+                description: `Der Geburtstag des Spielers **${vPlayer.playerdata.fullname}** (${vPlayer.identifiers.steam}) wurde auf **${birthday}** geändert.`,
+                color: EEmbedColors.SUCCESS,
+            });
+        } else {
+            await this.replyWithEmbed({
+                interaction,
+                title: 'Geburtstag nicht geändert',
+                description: `Der Geburtstag des Spielers **${vPlayer.playerdata.fullname}** (${vPlayer.identifiers.steam}) konnte nicht auf **${birthday}** geändert werden.`,
+                color: EEmbedColors.ALERT,
+            });
         }
     }
 }

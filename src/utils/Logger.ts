@@ -15,10 +15,6 @@ import LokiTransport from 'winston-loki';
 export default class LogManager {
     private static logger: winston.Logger;
 
-    private static clone<T>(obj: T): T {
-        return JSON.parse(JSON.stringify(obj));
-    }
-
     private static formatLoglevel(loglevel: string): string {
         const uLevel = loglevel.toUpperCase();
         switch (loglevel.toLowerCase()) {
@@ -111,9 +107,7 @@ export default class LogManager {
      * @memberof LogManager
      */
     public static log(...args: any[]) {
-        for (const arg of args) {
-            this.logger.log(arg);
-        }
+        args.forEach((arg) => this.logger.debug(arg));
     }
 
     /**
@@ -125,9 +119,7 @@ export default class LogManager {
      * @memberof LogManager
      */
     public static error(...args: any[]) {
-        for (const arg of args) {
-            this.logger.error(arg);
-        }
+        args.forEach((arg) => this.logger.error(arg));
     }
 
     /**
@@ -139,9 +131,7 @@ export default class LogManager {
      * @memberof LogManager
      */
     public static warn(...args: any[]) {
-        for (const arg of args) {
-            this.logger.warn(arg);
-        }
+        args.forEach((arg) => this.logger.warn(arg));
     }
 
     /**
@@ -153,9 +143,7 @@ export default class LogManager {
      * @memberof LogManager
      */
     public static info(...args: any[]) {
-        for (const arg of args) {
-            this.logger.info(arg);
-        }
+        args.forEach((arg) => this.logger.info(arg));
     }
 
     /**
@@ -167,9 +155,7 @@ export default class LogManager {
      * @memberof LogManager
      */
     public static debug(...args: any[]) {
-        for (const arg of args) {
-            this.logger.debug(arg);
-        }
+        args.forEach((arg) => this.logger.debug(arg));
     }
 
     /**

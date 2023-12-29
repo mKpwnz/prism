@@ -3,20 +3,20 @@ import { IItem } from '@sql/schema/Item.schema';
 import { Cache } from '@utils/Cache';
 
 /**
- * @description Controller für Items.
+ * @description Service für Items.
  * @author mKpwnz
  * @date 14.10.2023
  * @export
- * @class Items
+ * @class ItemService
  */
-export class Items {
+export class ItemService {
     /**
      * @description Gibt alle Items zurück.
      * @author mKpwnz
      * @date 14.10.2023
      * @static
      * @returns {*}  {Promise<IItem[]>}
-     * @memberof Items
+     * @memberof ItemService
      */
     public static async getAllItems(): Promise<IItem[]> {
         const cItems = await Cache.get<IItem[]>('items');
@@ -35,7 +35,7 @@ export class Items {
      * @static
      * @param {string} itemName
      * @returns {*}  {Promise<boolean>}
-     * @memberof Items
+     * @memberof ItemService
      */
     public static async doesItemExists(itemName: string): Promise<boolean> {
         const items = await this.getAllItems();
@@ -49,7 +49,7 @@ export class Items {
      * @static
      * @param {string} itemName
      * @returns {*}  {Promise<string>}
-     * @memberof Items
+     * @memberof ItemService
      */
     public static async validateItemName(itemName: string): Promise<string> {
         const items = await this.getAllItems();

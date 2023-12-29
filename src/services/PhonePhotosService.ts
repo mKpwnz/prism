@@ -14,7 +14,7 @@ import {
     IPhoneTinderMessages,
 } from '@sql/schema/Phone.schema';
 
-export class PhonePhotosController {
+export class PhonePhotosService {
     public static async checkPhotos(start: Date, end: Date): Promise<IPhonePhotos[]> {
         let query = 'SELECT * FROM phone_photos WHERE NOT ';
         for (let i = 0; i < Config.Pictures.AllowedChannels.length; i++) {

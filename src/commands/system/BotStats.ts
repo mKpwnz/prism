@@ -1,9 +1,8 @@
+import Config from '@Config';
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
-import Config from '@Config';
 import { BotDB } from '@sql/Database';
-import LogManager from '@utils/Logger';
 import { AlignmentEnum, AsciiTable3 } from 'ascii-table3';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
@@ -33,9 +32,6 @@ export class BotStats extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const embed = Command.getEmbedTemplate(interaction);
-        embed.setTitle('Bot Stats');
-
         const data = await BotDB.command_log.groupBy({
             by: ['command'],
             _count: {
@@ -56,8 +52,11 @@ export class BotStats extends Command {
         data.forEach((d) => {
             table.addRow(d.command, d._count.command);
         });
-        embed.setDescription(`\`\`\`\n${table.toString()}\`\`\``);
-        LogManager.debug(data);
-        await interaction.reply({ content: '', embeds: [embed] });
+
+        await this.replyWithEmbed({
+            interaction,
+            title: 'Bot Stats',
+            description: `\`\`\`\n${table.toString()}\`\`\``,
+        });
     }
 }
