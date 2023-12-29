@@ -5,7 +5,6 @@ import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
-import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
 
@@ -47,9 +46,10 @@ export class Rename extends Command {
         );
     }
 
-    // TODO: Refactor
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const steamId = interaction.options.getString('steam', true);
+        let firstname = interaction.options.getString('vorname');
+        let lastname = interaction.options.getString('nachname');
         const vPlayer = await PlayerService.validatePlayer(steamId);
 
         if (!vPlayer) {
@@ -61,39 +61,49 @@ export class Rename extends Command {
             });
             return;
         }
-        const firstname =
-            interaction.options.get('vorname')?.value?.toString() ?? vPlayer.playerdata.firstname;
-        const lastname =
-            interaction.options.get('nachname')?.value?.toString() ?? vPlayer.playerdata.lastname;
 
-        // if (!interaction.options.get('vorname') || !interaction.options.get('nachname')) {
-        //     await interaction.reply({
-        //         content: 'Es wurde kein Vor- oder Nachname angegeben!',
-        //         ephemeral: true,
-        //     });
-        //     return;
-        // }
-        let query = 'UPDATE users SET ';
-        LogManager.log(lastname);
-        // LogManager.log(vPlayer.playerdata.lastname);
-        if (firstname !== vPlayer.playerdata.firstname) {
-            query += `firstname = '${firstname}'`;
-            if (lastname !== vPlayer.playerdata.lastname) {
-                query += ', ';
-            }
+        if (!firstname && !lastname) {
+            await this.replyWithEmbed({
+                interaction,
+                title: 'Fehler',
+                description: 'Bitte mindestens einen Vornamen oder Nachnamen angeben!',
+                color: EEmbedColors.ALERT,
+            });
+            return;
         }
-        if (lastname !== vPlayer.playerdata.lastname) {
-            query += `lastname = '${lastname}' `;
+
+        if (!firstname) {
+            firstname = vPlayer.playerdata.firstname;
         }
-        const [res] = await GameDB.execute<ResultSetHeader>(`${query}WHERE identifier = ? `, [
-            vPlayer.identifiers.steam,
-        ]);
+
+        if (!lastname) {
+            lastname = vPlayer.playerdata.lastname;
+        }
+
+        const [res] = await GameDB.execute<ResultSetHeader>(
+            `UPDATE users SET firstname = ?, lastname = ? WHERE identifier = ?`,
+            [firstname, lastname, vPlayer.identifiers.steam],
+        );
 
         if (res.affectedRows !== 0) {
             await this.replyWithEmbed({
                 interaction,
                 title: 'Spieler umbenannt',
-                description: `Der Spieler mit dem Namen ${vPlayer.playerdata.fullname} (${vPlayer.identifiers.steam}) hat nun den Namen "${firstname} ${lastname}".`,
+                description: `Der Spieler wurde erfolgreich umbenannt.`,
+                fields: [
+                    {
+                        name: 'SteamID',
+                        value: vPlayer.identifiers.steam,
+                    },
+                    {
+                        name: 'Vorheriger Name',
+                        value: vPlayer.playerdata.fullname,
+                    },
+                    {
+                        name: 'Neuer Name',
+                        value: `${firstname} ${lastname}`,
+                    },
+                ],
                 color: EEmbedColors.SUCCESS,
             });
         } else {
