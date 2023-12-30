@@ -21,6 +21,7 @@ export class EmoteManager {
     }
 
     static async updateBotEmotes(client: Client): Promise<void> {
+        if (process.env.NODE_ENV !== 'production') return;
         LogManager.info('Cheking emotes...');
         const guild = client.guilds.cache.get(Config.Discord.ServerID);
         if (!guild) {

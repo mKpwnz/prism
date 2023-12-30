@@ -10,7 +10,7 @@ v1Router.get('/commandhelplist', async (req, res) => {
         HelpService.getChannel(),
     ]);
 
-    res.send({ commands: cmd, channel: chan, groups: grp });
+    res.send({ commands: cmd, channel: Object.fromEntries(chan), groups: Object.fromEntries(grp) });
 });
 
 export default v1Router;
