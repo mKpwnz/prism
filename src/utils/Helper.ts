@@ -40,10 +40,10 @@ export class Helper {
         if (blockedUsers.includes(user.id)) {
             userIsAllowed = false;
         }
-        if (Config.Discord.Users.GlobalBlocked.includes(user.id)) {
+        if (Config.Bot.GlobalBlockedUsers.includes(user.id)) {
             userIsAllowed = false;
         }
-        if (Config.Discord.Users.GlobalWhitelist.includes(user.id)) {
+        if (Config.Bot.GlobalWhitelistUsers.includes(user.id)) {
             userIsAllowed = true;
         }
 
@@ -295,7 +295,7 @@ export class Helper {
      * @memberof Helper
      */
     static async getEmote(emoteName: string): Promise<GuildEmoji | null> {
-        const guild = BotClient.guilds.cache.get(Config.Discord.ServerID);
+        const guild = BotClient.guilds.cache.get(Config.Bot.ServerID);
         if (!guild) return null;
         const emoteData = await guild.emojis.fetch();
         return emoteData.find((e) => e.name === emoteName) ?? null;

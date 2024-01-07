@@ -2,31 +2,30 @@ import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
-import Config from '@Config';
 import { GameDB } from '@sql/Database';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
 import { PlayerService } from '@services/PlayerService';
 import { Helper } from '@utils/Helper';
+import Config from '@Config';
 
 export class ChangeBirthday extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [
-            Config.Discord.Channel.WHOIS_TESTI,
-            Config.Discord.Channel.WHOIS_RENAME,
+            Config.Channels.PROD.WHOIS_RENAME,
+            Config.Channels.PROD.WHOIS_TESTI,
+
+            Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
-            Config.Discord.Groups.DEV_SERVERENGINEER,
-            Config.Discord.Groups.DEV_BOTTESTER,
-            Config.Discord.Groups.IC_SUPERADMIN,
+            Config.Groups.PROD.SERVERENGINEER,
+            Config.Groups.PROD.IC_SUPERADMIN,
+
+            Config.Groups.DEV.BOTTEST,
         ];
-        this.AllowedUsers = [
-            Config.Discord.Users.List.L33V33N,
-            Config.Discord.Users.List.ZMASTER,
-            Config.Discord.Users.List.MANU,
-        ];
+        this.AllowedUsers = [Config.Users.L33V33N, Config.Users.ZMASTER, Config.Users.MANU];
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('changebirthday')

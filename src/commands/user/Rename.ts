@@ -13,19 +13,18 @@ export class Rename extends Command {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [
-            Config.Discord.Channel.WHOIS_TESTI,
-            Config.Discord.Channel.WHOIS_RENAME,
+            Config.Channels.PROD.WHOIS_TESTI,
+            Config.Channels.PROD.WHOIS_RENAME,
+
+            Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
-            Config.Discord.Groups.DEV_SERVERENGINEER,
-            Config.Discord.Groups.DEV_BOTTESTER,
-            Config.Discord.Groups.IC_SUPERADMIN,
+            Config.Groups.PROD.SERVERENGINEER,
+            Config.Groups.PROD.IC_SUPERADMIN,
+
+            Config.Groups.DEV.BOTTEST,
         ];
-        this.AllowedUsers = [
-            Config.Discord.Users.List.L33V33N,
-            Config.Discord.Users.List.ZMASTER,
-            Config.Discord.Users.List.MANU,
-        ];
+        this.AllowedUsers = [Config.Users.L33V33N, Config.Users.ZMASTER, Config.Users.MANU];
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('rename')

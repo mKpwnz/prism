@@ -1,6 +1,7 @@
 import { ISocietyFinanceResponse } from '@interfaces/ISocietyFinanceResponse';
 import { BotDB, GameDB } from '@sql/Database';
 import LogManager from '@utils/Logger';
+import { PlayerService } from './PlayerService';
 
 export class CronJobService {
     /**
@@ -27,5 +28,16 @@ export class CronJobService {
             data: [...data],
         });
         LogManager.debug('CronJobs: logSocietyFinance() done.');
+    }
+
+    public static async logPlayerCount() {
+        const playerArray = await PlayerService.getAllLivePlayers();
+
+        await BotDB.player_count.create({
+            data: {
+                count: playerArray.length,
+            },
+        });
+        LogManager.debug('CronJobs: logPlayerCount() done.');
     }
 }

@@ -29,14 +29,17 @@ export class Wahl extends Command {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [
-            Config.Discord.Channel.WHOIS_TESTI,
-            Config.Discord.Channel.WHOIS_LIMITED,
+            Config.Channels.PROD.WHOIS_TESTI,
+            Config.Channels.PROD.WHOIS_LIMITED,
+
+            Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
-            Config.Discord.Groups.DEV_SERVERENGINEER,
-            Config.Discord.Groups.DEV_BOTTESTER,
-            Config.Discord.Groups.IC_SUPERADMIN,
-            Config.Discord.Groups.IC_HADMIN,
+            Config.Groups.PROD.SERVERENGINEER,
+            Config.Groups.PROD.IC_SUPERADMIN,
+            Config.Groups.PROD.IC_HADMIN,
+
+            Config.Groups.DEV.BOTTEST,
         ];
         RegisterCommand(
             new SlashCommandBuilder()
@@ -224,9 +227,7 @@ export class Wahl extends Command {
                     'job',
                 )}\nEnthaltung: ${options.getBoolean('enthaltung')}\nID: ${queryResult[0].id}`,
             );
-            const channel = await interaction.guild?.channels.fetch(
-                Config.Discord.LogChannel.S1_WAHLEN,
-            );
+            const channel = await interaction.guild?.channels.fetch(Config.Channels.PROD.S1_WAHLEN);
             if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] });
             await interaction.reply({ embeds: [embed] });
         } catch (error) {
@@ -273,9 +274,7 @@ export class Wahl extends Command {
                     status[options.getNumber('option_status') ?? 0]
                 } geändert!`,
             );
-            const channel = await interaction.guild?.channels.fetch(
-                Config.Discord.LogChannel.S1_WAHLEN,
-            );
+            const channel = await interaction.guild?.channels.fetch(Config.Channels.PROD.S1_WAHLEN);
             if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] });
             await interaction.reply({ embeds: [embed] });
         } catch (error) {
@@ -331,9 +330,7 @@ export class Wahl extends Command {
             embed.setDescription(
                 `Nutzer ${vPlayer.playerdata.fullname} zur Wahl ${election.name} (${election.id}) hinzugefügt!\nSteamID: \`${vPlayer.identifiers.steam}\`\nParticipantID: ${response[0].id}`,
             );
-            const channel = await interaction.guild?.channels.fetch(
-                Config.Discord.LogChannel.S1_WAHLEN,
-            );
+            const channel = await interaction.guild?.channels.fetch(Config.Channels.PROD.S1_WAHLEN);
             if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] });
             await interaction.reply({ embeds: [embed] });
         } else if (options.getString('operation') === 'remove') {
@@ -351,7 +348,7 @@ export class Wahl extends Command {
                     `Nutzer ${vPlayer.playerdata.fullname} von Wahl ${election.name} (${election.id}) entfernt!\nSteamID: \`${steamid}\``,
                 );
                 const channel = await interaction.guild?.channels.fetch(
-                    Config.Discord.LogChannel.S1_WAHLEN,
+                    Config.Channels.PROD.S1_WAHLEN,
                 );
                 if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] });
                 await interaction.reply({ embeds: [embed] });
@@ -612,7 +609,7 @@ export class Wahl extends Command {
                 embed.setDescription(
                     `${anzahl} Stimmen für ${participant[0].name} von Wahl ${name} (${id}) hinzugefügt!`,
                 );
-                // const channel = await interaction.guild?.channels.fetch(Config.Discord.LogChannel.S1_WAHLEN);
+                // const channel = await interaction.guild?.channels.fetch(Config.Channels.PROD.S1_WAHLEN);
                 // if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] })
                 await interaction.reply({ embeds: [embed] });
             } else if (options.getString('operation') === 'remove') {
@@ -633,7 +630,7 @@ export class Wahl extends Command {
                     } von Wahl ${name} (${id}) entfernt!`,
                 );
                 const channel = await interaction.guild?.channels.fetch(
-                    Config.Discord.LogChannel.S1_WAHLEN,
+                    Config.Channels.PROD.S1_WAHLEN,
                 );
                 if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] });
                 await interaction.reply({ embeds: [embed] });

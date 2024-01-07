@@ -11,15 +11,18 @@ export class NvhxBan extends Command {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [
-            Config.Discord.Channel.WHOIS_TESTI,
-            Config.Discord.Channel.WHOIS_LIMITED,
+            Config.Channels.PROD.WHOIS_TESTI,
+            Config.Channels.PROD.WHOIS_LIMITED,
+
+            Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
-            Config.Discord.Groups.DEV_SERVERENGINEER,
-            Config.Discord.Groups.DEV_BOTTESTER,
-            Config.Discord.Groups.IC_SUPERADMIN,
+            Config.Groups.PROD.SERVERENGINEER,
+            Config.Groups.PROD.IC_SUPERADMIN,
+
+            Config.Groups.DEV.BOTTEST,
         ];
-        this.AllowedUsers = [Config.Discord.Users.List.MIKA];
+        this.AllowedUsers = [Config.Users.MIKA];
         this.IsBetaCommand = true;
         RegisterCommand(
             new SlashCommandBuilder()

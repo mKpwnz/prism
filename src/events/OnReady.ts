@@ -1,4 +1,4 @@
-import Config from '@Config';
+import { Config } from '@Config';
 import { DCEvent } from '@class/DCEvent';
 import { RconClient } from '@class/RconClient';
 import { CommandHandler } from '@commands/CommandHandler';
@@ -19,10 +19,7 @@ export class OnReady extends DCEvent {
         new RconClient();
         const commandData = CommandHandler.commands.map((command) => command.scb.toJSON());
         await rest.put(
-            Routes.applicationGuildCommands(
-                client.user?.id ?? 'missing id',
-                Config.Discord.ServerID,
-            ),
+            Routes.applicationGuildCommands(client.user?.id ?? 'missing id', Config.Bot.ServerID),
             {
                 body: commandData,
             },

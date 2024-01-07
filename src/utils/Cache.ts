@@ -120,13 +120,16 @@ export class Cache {
         const embed = new EmbedBuilder()
             .setColor(EEmbedColors.DEFAULT)
             .setTimestamp()
-            .setAuthor({ name: Config.Discord.BOT_NAME, iconURL: Config.Pictures.Prism.LOGO_BLUE })
+            .setAuthor({
+                name: Config.Bot.BOT_NAME,
+                iconURL: Config.Bot.BOT_LOGO,
+            })
             .setFooter({
                 text: interaction.user.displayName ?? '',
                 iconURL: interaction.user.avatarURL() ?? '',
             })
             .setTimestamp(new Date())
-            .setImage(Config.Pictures.WHITESPACE);
+            .setImage(Config.Bot.WHITESPACE);
         embed.setTitle('Cache Performance Test');
 
         const cacheStore = await Cache.getStore();

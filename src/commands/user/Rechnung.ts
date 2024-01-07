@@ -14,16 +14,19 @@ export class Rechnung extends Command {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [
-            Config.Discord.Channel.WHOIS_TESTI,
-            Config.Discord.Channel.WHOIS_UNLIMITED,
+            Config.Channels.PROD.WHOIS_TESTI,
+            Config.Channels.PROD.WHOIS_UNLIMITED,
+
+            Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
-            Config.Discord.Groups.DEV_SERVERENGINEER,
-            Config.Discord.Groups.DEV_BOTTESTER,
-            Config.Discord.Groups.IC_SUPERADMIN,
-            Config.Discord.Groups.IC_HADMIN,
-            Config.Discord.Groups.IC_ADMIN,
-            Config.Discord.Groups.IC_MOD,
+            Config.Groups.PROD.SERVERENGINEER,
+            Config.Groups.PROD.IC_SUPERADMIN,
+            Config.Groups.PROD.IC_HADMIN,
+            Config.Groups.PROD.IC_ADMIN,
+            Config.Groups.PROD.IC_MOD,
+
+            Config.Groups.DEV.BOTTEST,
         ];
         RegisterCommand(
             new SlashCommandBuilder()
@@ -341,7 +344,7 @@ export class Rechnung extends Command {
             embed.setTitle('Rechnung bezahlen');
             embed.setDescription('Die Rechnung wurde erfolgreich bezahlt');
             const channel = await interaction.guild?.channels.fetch(
-                Config.Discord.LogChannel.S1_IMMO_BILLING,
+                Config.Channels.PROD.S1_IMMO_BILLING,
             );
             if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] });
             await interaction.reply({ embeds: [embed] });
@@ -385,7 +388,7 @@ export class Rechnung extends Command {
             embed.setTitle('Rechnung löschen');
             embed.setDescription('Die Rechnung wurde erfolgreich gelöscht');
             const channel = await interaction.guild?.channels.fetch(
-                Config.Discord.LogChannel.S1_IMMO_BILLING,
+                Config.Channels.PROD.S1_IMMO_BILLING,
             );
             if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] });
             await interaction.reply({ embeds: [embed] });
@@ -484,7 +487,7 @@ export class Rechnung extends Command {
         embed.setTitle('Rechnung erstellen');
         embed.setFields([field]);
         const channel = await interaction.guild?.channels.fetch(
-            Config.Discord.LogChannel.S1_IMMO_BILLING,
+            Config.Channels.PROD.S1_IMMO_BILLING,
         );
         if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] });
         await interaction.reply({ embeds: [embed] });

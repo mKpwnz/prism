@@ -13,17 +13,17 @@ import { Client, Guild } from 'discord.js';
 
 export class EmoteManager {
     static getAllBotEmotes() {
-        return Config.Discord.Emotes;
+        return Config.Bot.Emotes;
     }
 
     static getEmoteByName(name: string) {
-        return Config.Discord.Emotes.find((emote) => emote.name === name);
+        return Config.Bot.Emotes.find((emote) => emote.name === name);
     }
 
     static async updateBotEmotes(client: Client): Promise<void> {
-        if (process.env.NODE_ENV !== 'production') return;
+        // if (process.env.NODE_ENV !== 'production') return;
         LogManager.info('Cheking emotes...');
-        const guild = client.guilds.cache.get(Config.Discord.ServerID);
+        const guild = client.guilds.cache.get(Config.Bot.ServerID);
         if (!guild) {
             LogManager.error('Guild not found!');
             return;

@@ -17,9 +17,10 @@ import {
 export class PhonePhotosService {
     public static async checkPhotos(start: Date, end: Date): Promise<IPhonePhotos[]> {
         let query = 'SELECT * FROM phone_photos WHERE NOT ';
-        for (let i = 0; i < Config.Pictures.AllowedChannels.length; i++) {
-            query += `link LIKE '%${Config.Pictures.AllowedChannels[i]}%'`;
-            if (i < Config.Pictures.AllowedChannels.length - 1) query += ' AND NOT ';
+        for (let i = 0; i < Config.Commands.PhonePictures.AllowedDiscordChannels.length; i++) {
+            query += `link LIKE '%${Config.Commands.PhonePictures.AllowedDiscordChannels[i]}%'`;
+            if (i < Config.Commands.PhonePictures.AllowedDiscordChannels.length - 1)
+                query += ' AND NOT ';
         }
         query += ` AND timestamp BETWEEN '${start.toISOString()}' AND '${end.toISOString()}'`;
         // LogManager.debug(query)
@@ -41,9 +42,10 @@ export class PhonePhotosService {
 
     public static async checkDarkchat(start: Date, end: Date): Promise<IPhoneDarkchatMessages[]> {
         let query = 'SELECT * FROM phone_darkchat_messages WHERE NOT ';
-        for (let i = 0; i < Config.Pictures.AllowedChannels.length; i++) {
-            query += `content LIKE '%${Config.Pictures.AllowedChannels[i]}%'`;
-            if (i < Config.Pictures.AllowedChannels.length - 1) query += ' AND NOT ';
+        for (let i = 0; i < Config.Commands.PhonePictures.AllowedDiscordChannels.length; i++) {
+            query += `content LIKE '%${Config.Commands.PhonePictures.AllowedDiscordChannels[i]}%'`;
+            if (i < Config.Commands.PhonePictures.AllowedDiscordChannels.length - 1)
+                query += ' AND NOT ';
         }
         query += ` AND timestamp BETWEEN '${start.toISOString()}' AND '${end.toISOString()}' AND content LIKE '%discord%'`;
         // LogManager.debug(query)
@@ -67,9 +69,10 @@ export class PhonePhotosService {
 
     public static async checkInstagram(start: Date, end: Date): Promise<IPhoneInstagramPosts[]> {
         let query = 'SELECT * FROM phone_instagram_posts WHERE NOT ';
-        for (let i = 0; i < Config.Pictures.AllowedChannels.length; i++) {
-            query += `media LIKE '%${Config.Pictures.AllowedChannels[i]}%'`;
-            if (i < Config.Pictures.AllowedChannels.length - 1) query += ' AND NOT ';
+        for (let i = 0; i < Config.Commands.PhonePictures.AllowedDiscordChannels.length; i++) {
+            query += `media LIKE '%${Config.Commands.PhonePictures.AllowedDiscordChannels[i]}%'`;
+            if (i < Config.Commands.PhonePictures.AllowedDiscordChannels.length - 1)
+                query += ' AND NOT ';
         }
         query += ` AND timestamp BETWEEN '${start.toISOString()}' AND '${end.toISOString()}' AND media LIKE '%discord%'`;
         // LogManager.debug(query)
@@ -91,9 +94,10 @@ export class PhonePhotosService {
 
     public static async checkMail(start: Date, end: Date): Promise<IPhoneMailMessages[]> {
         let query = 'SELECT * FROM phone_mail_messages WHERE NOT ';
-        for (let i = 0; i < Config.Pictures.AllowedChannels.length; i++) {
-            query += `attachments LIKE '%${Config.Pictures.AllowedChannels[i]}%' AND NOT content LIKE '%${Config.Pictures.AllowedChannels[i]}%'`;
-            if (i < Config.Pictures.AllowedChannels.length - 1) query += ' AND NOT ';
+        for (let i = 0; i < Config.Commands.PhonePictures.AllowedDiscordChannels.length; i++) {
+            query += `attachments LIKE '%${Config.Commands.PhonePictures.AllowedDiscordChannels[i]}%' AND NOT content LIKE '%${Config.Commands.PhonePictures.AllowedDiscordChannels[i]}%'`;
+            if (i < Config.Commands.PhonePictures.AllowedDiscordChannels.length - 1)
+                query += ' AND NOT ';
         }
         query += ` AND timestamp BETWEEN '${start.toISOString()}' AND '${end.toISOString()}' AND (content LIKE '%discord%' OR attachments LIKE '%discord%')`;
         // LogManager.debug(query)
@@ -115,9 +119,10 @@ export class PhonePhotosService {
 
     public static async checkMessages(start: Date, end: Date): Promise<IPhoneMessages[]> {
         let query = 'SELECT * FROM phone_message_messages WHERE NOT ';
-        for (let i = 0; i < Config.Pictures.AllowedChannels.length; i++) {
-            query += `attachments LIKE '%${Config.Pictures.AllowedChannels[i]}%' AND NOT content LIKE '%${Config.Pictures.AllowedChannels[i]}%'`;
-            if (i < Config.Pictures.AllowedChannels.length - 1) query += ' AND NOT ';
+        for (let i = 0; i < Config.Commands.PhonePictures.AllowedDiscordChannels.length; i++) {
+            query += `attachments LIKE '%${Config.Commands.PhonePictures.AllowedDiscordChannels[i]}%' AND NOT content LIKE '%${Config.Commands.PhonePictures.AllowedDiscordChannels[i]}%'`;
+            if (i < Config.Commands.PhonePictures.AllowedDiscordChannels.length - 1)
+                query += ' AND NOT ';
         }
         query += ` AND timestamp BETWEEN '${start.toISOString()}' AND '${end.toISOString()}' AND (content LIKE '%discord%' OR attachments LIKE '%discord%')`;
         // LogManager.debug(query)
@@ -139,9 +144,10 @@ export class PhonePhotosService {
 
     public static async checkTiktok(start: Date, end: Date): Promise<IPhoneTiktokMessages[]> {
         let query = 'SELECT * FROM phone_tiktok_messages WHERE NOT ';
-        for (let i = 0; i < Config.Pictures.AllowedChannels.length; i++) {
-            query += `content LIKE '%${Config.Pictures.AllowedChannels[i]}%'`;
-            if (i < Config.Pictures.AllowedChannels.length - 1) query += ' AND NOT ';
+        for (let i = 0; i < Config.Commands.PhonePictures.AllowedDiscordChannels.length; i++) {
+            query += `content LIKE '%${Config.Commands.PhonePictures.AllowedDiscordChannels[i]}%'`;
+            if (i < Config.Commands.PhonePictures.AllowedDiscordChannels.length - 1)
+                query += ' AND NOT ';
         }
         query += ` AND timestamp BETWEEN '${start.toISOString()}' AND '${end.toISOString()}' AND content LIKE '%discord%'`;
         // LogManager.debug(query)
@@ -163,9 +169,10 @@ export class PhonePhotosService {
 
     public static async checkTinder(start: Date, end: Date): Promise<IPhoneTinderMessages[]> {
         let query = 'SELECT * FROM phone_tinder_messages WHERE NOT ';
-        for (let i = 0; i < Config.Pictures.AllowedChannels.length; i++) {
-            query += `content LIKE '%${Config.Pictures.AllowedChannels[i]}%'`;
-            if (i < Config.Pictures.AllowedChannels.length - 1) query += ' AND NOT ';
+        for (let i = 0; i < Config.Commands.PhonePictures.AllowedDiscordChannels.length; i++) {
+            query += `content LIKE '%${Config.Commands.PhonePictures.AllowedDiscordChannels[i]}%'`;
+            if (i < Config.Commands.PhonePictures.AllowedDiscordChannels.length - 1)
+                query += ' AND NOT ';
         }
         query += ` AND timestamp BETWEEN '${start.toISOString()}' AND '${end.toISOString()}' AND content LIKE '%discord%'`;
         // LogManager.debug(query)
