@@ -1,7 +1,7 @@
+import Config from '@Config';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { IEmbedField } from '@interfaces/IEmbedField';
-import Config from '@Config';
 import { BotDB } from '@sql/Database';
 import { Helper } from '@utils/Helper';
 import LogManager from '@utils/Logger';
@@ -126,11 +126,12 @@ export abstract class Command {
         // Override Channel in Devmode
         if (this.RunEnvironment !== EENV.PRODUCTION) {
             this.DoNotCountUse = true;
-            this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI];
-            this.AllowedGroups = [
-                Config.Discord.Groups.DEV_SERVERENGINEER,
-                Config.Discord.Groups.DEV_BOTTESTER,
+            this.AllowedChannels = [
+                Config.Channels.PROD.WHOIS_TESTI,
+
+                Config.Channels.DEV.PRISM_TESTING,
             ];
+            this.AllowedGroups = [Config.Groups.PROD.SERVERENGINEER, Config.Groups.DEV.BOTTEST];
         }
         if (process.env.NODE_ENV !== 'production') {
             this.DoNotCountUse = true;
@@ -225,13 +226,16 @@ export abstract class Command {
         return new EmbedBuilder()
             .setColor(EEmbedColors.DEFAULT)
             .setTimestamp()
-            .setAuthor({ name: Config.Discord.BOT_NAME, iconURL: Config.Pictures.Prism.LOGO_BLUE })
+            .setAuthor({
+                name: Config.Bot.BOT_NAME,
+                iconURL: Config.Bot.BOT_LOGO,
+            })
             .setFooter({
                 text: interaction.user.displayName ?? '',
                 iconURL: interaction.user.avatarURL() ?? '',
             })
             .setTimestamp(new Date())
-            .setImage(Config.Pictures.WHITESPACE);
+            .setImage(Config.Bot.WHITESPACE);
     }
 
     async replyWithEmbed(opt: {
@@ -252,14 +256,17 @@ export abstract class Command {
             .setTitle(opt.title)
             .setDescription(opt.description)
             .setColor(opt.color ?? EEmbedColors.DEFAULT)
-            .setAuthor({ name: Config.Discord.BOT_NAME, iconURL: Config.Pictures.Prism.LOGO_BLUE })
+            .setAuthor({
+                name: Config.Bot.BOT_NAME,
+                iconURL: Config.Bot.BOT_LOGO,
+            })
             .setFooter({
                 text: `${opt.interaction.user.displayName ?? ''} • ET: ${executionTime}ms`,
                 iconURL: opt.interaction.user.avatarURL() ?? '',
             })
             .setTimestamp(new Date())
             .setFields(opt.fields ?? [])
-            .setImage(opt.customImage ?? Config.Pictures.WHITESPACE);
+            .setImage(opt.customImage ?? Config.Bot.WHITESPACE);
 
         await opt.interaction.reply({
             content: opt.messageContent ?? '',

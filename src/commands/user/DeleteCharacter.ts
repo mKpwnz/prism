@@ -16,11 +16,16 @@ export class DeleteCharacter extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.DEVELOPMENT;
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI];
+        this.AllowedChannels = [
+            Config.Channels.PROD.WHOIS_TESTI,
+
+            Config.Channels.DEV.PRISM_TESTING,
+        ];
         this.AllowedGroups = [
-            Config.Discord.Groups.DEV_SERVERENGINEER,
-            Config.Discord.Groups.DEV_BOTTESTER,
-            Config.Discord.Groups.IC_SUPERADMIN,
+            Config.Groups.PROD.SERVERENGINEER,
+            Config.Groups.PROD.IC_SUPERADMIN,
+
+            Config.Groups.DEV.BOTTEST,
         ];
         this.IsBetaCommand = true;
         RegisterCommand(

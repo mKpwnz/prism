@@ -9,11 +9,12 @@ import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 export class CachePerformance extends Command {
     constructor() {
         super();
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI];
-        this.AllowedGroups = [
-            Config.Discord.Groups.DEV_SERVERENGINEER,
-            Config.Discord.Groups.DEV_BOTTESTER,
+        this.AllowedChannels = [
+            Config.Channels.PROD.WHOIS_TESTI,
+
+            Config.Channels.DEV.PRISM_TESTING,
         ];
+        this.AllowedGroups = [Config.Groups.PROD.SERVERENGINEER, Config.Groups.DEV.BOTTEST];
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('cacheperformance')

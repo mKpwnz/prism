@@ -18,15 +18,18 @@ export class RestartDropbox extends Command {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [
-            Config.Discord.Channel.WHOIS_TESTI,
-            Config.Discord.Channel.WHOIS_TEBEX,
+            Config.Channels.PROD.WHOIS_TEBEX,
+            Config.Channels.PROD.WHOIS_TESTI,
+
+            Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
-            Config.Discord.Groups.DEV_SERVERENGINEER,
-            Config.Discord.Groups.DEV_BOTTESTER,
-            Config.Discord.Groups.IC_SUPERADMIN,
+            Config.Groups.PROD.SERVERENGINEER,
+            Config.Groups.PROD.IC_SUPERADMIN,
+
+            Config.Groups.DEV.BOTTEST,
         ];
-        this.AllowedUsers = [Config.Discord.Users.List.SCHLAUCHI];
+        this.AllowedUsers = [Config.Users.SCHLAUCHI];
         this.IsBetaCommand = true;
         RegisterCommand(
             new SlashCommandBuilder()

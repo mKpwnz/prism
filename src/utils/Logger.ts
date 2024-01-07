@@ -167,7 +167,7 @@ export default class LogManager {
      * @memberof LogManager
      */
     public static discordActionLog(message: string) {
-        const channel = BotClient.channels.cache.get(Config.Discord.LogChannel.BOT_LOG);
+        const channel = BotClient.channels.cache.get(Config.Channels.PROD.BOT_LOG);
         if (channel && channel.isTextBased()) {
             channel.send(message);
         }

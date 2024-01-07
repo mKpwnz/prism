@@ -46,8 +46,8 @@ export class CustomImageUpload {
         this.client = client;
         const channel =
             process.env.NODE_ENV === 'production'
-                ? Config.Discord.Channel.WHOIS_IMAGEUPLOAD
-                : Config.Discord.Channel.WHOIS_TESTI;
+                ? Config.Channels.PROD.WHOIS_IMAGEUPLOAD
+                : Config.Channels.DEV.PRISM_TESTING;
         client.on('messageCreate', async (message: Message) => {
             if (message.channelId === channel) {
                 this.onMessage(message);
@@ -98,7 +98,7 @@ export class CustomImageUpload {
                     ],
                 });
             }
-        } else if (Config.Discord.Channel.WHOIS_IMAGEUPLOAD) message.delete();
+        } else if (Config.Channels.PROD.WHOIS_IMAGEUPLOAD) message.delete();
     }
 
     async onInteract(interaction: Interaction) {
@@ -159,8 +159,8 @@ export class CustomImageUpload {
                             .setColor(0x0792f1)
                             .setTitle('Custom Image Upload')
                             .setAuthor({
-                                name: Config.Discord.BOT_NAME,
-                                iconURL: Config.Pictures.Prism.LOGO_BLUE,
+                                name: Config.Bot.BOT_NAME,
+                                iconURL: Config.Bot.BOT_LOGO,
                             })
                             .addFields(
                                 {
@@ -295,7 +295,7 @@ export class CustomImageUpload {
             const newFilename = `${Helper.getUniqueId()}.${fileFormat}`;
 
             const customPicsChannel = this.client.channels.cache.get(
-                Config.Discord.Channel.WHOIS_CUSTOMPICS_DATASTORE,
+                Config.Channels.PROD.WHOIS_CUSTOMPICS_DATASTORE,
             ) as TextChannel;
 
             if (customPicsChannel) {

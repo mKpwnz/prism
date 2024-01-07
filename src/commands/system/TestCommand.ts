@@ -10,11 +10,8 @@ export class TestCommand extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
-        this.AllowedChannels = [Config.Discord.Channel.WHOIS_TESTI];
-        this.AllowedGroups = [
-            Config.Discord.Groups.DEV_SERVERENGINEER,
-            Config.Discord.Groups.DEV_BOTTESTER,
-        ];
+        this.AllowedChannels = [Config.Channels.DEV.PRISM_TESTING];
+        this.AllowedGroups = [Config.Groups.DEV.BOTTEST];
         RegisterCommand(
             new SlashCommandBuilder().setName('testcommand').setDescription('Test Command'),
             this,
