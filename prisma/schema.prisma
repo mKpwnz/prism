@@ -39,3 +39,10 @@ model society_finance {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 }
+
+model player_count {
+  id         Int      @id @default(autoincrement())
+  count      Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
