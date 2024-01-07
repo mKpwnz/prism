@@ -2,7 +2,7 @@ const BotConfig = {
     ServerID: (() => {
         switch (process.env.NODE_ENV) {
             case 'production':
-                return '1000335817853636646';
+                return '973238003092848711';
             default:
                 return '1192895296099844116';
         }
