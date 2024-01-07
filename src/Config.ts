@@ -1,5 +1,9 @@
 const Config = {
     Discord: {
+        // DEV ServerID: 1192895296099844116
+        // DEV Channel: 1193147826641842266
+        // DEV Gruppe: 1193511629426544742
+
         ServerID: '973238003092848711', // IMMO Logs
         Channel: {
             WHOIS_UNLIMITED: '1158520784059371590', // Zugriff für alle
