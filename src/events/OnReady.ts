@@ -18,6 +18,7 @@ export class OnReady extends DCEvent {
         CommandHandler.initAll();
         new RconClient();
         const commandData = CommandHandler.commands.map((command) => command.scb.toJSON());
+        LogManager.error(Config.Bot.ServerID);
         await rest.put(
             Routes.applicationGuildCommands(client.user?.id ?? 'missing id', Config.Bot.ServerID),
             {
