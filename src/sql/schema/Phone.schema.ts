@@ -46,6 +46,16 @@ export interface IPhoneDarkchatMembers extends RowDataPacket {
     username: string;
 }
 
+export interface IPhoneDarkchatSearch extends RowDataPacket {
+    msgID: number;
+    channel: string;
+    sender: string;
+    phone_number: number;
+    steamID: string;
+    content: string | null;
+    timestamp: Date;
+}
+
 /**
  * @description
  * @author mKpwnz
