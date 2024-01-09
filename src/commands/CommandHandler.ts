@@ -5,7 +5,7 @@ import { Interaction, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } 
 import { RestartDropbox, ValidateTrunk } from './cars';
 import { SchufaCheck } from './housing';
 import { Nvhx, NvhxBan } from './nvhx';
-import { CheckImageOwner, CheckPhotos, DeletePhone } from './phone';
+import { CheckImageOwner, CheckPhotos, Darkchat, DeletePhone } from './phone';
 import { BotStats, CachePerformance, Help, Ping, ServerStatus, TestCommand, Wahl } from './system';
 import {
     ChangeBirthday,
@@ -63,6 +63,7 @@ export class CommandHandler {
 
         new DeletePhone();
         new CheckPhotos();
+        new Darkchat();
 
         new ChangeBirthday(); // Funktionsfähig
         new Rename(); // Funktionsfähig
