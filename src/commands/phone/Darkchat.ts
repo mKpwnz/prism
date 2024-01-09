@@ -10,7 +10,7 @@ import { IPhoneDarkchatSearch } from '@sql/schema/Phone.schema';
 export class Darkchat extends Command {
     constructor() {
         super();
-        this.RunEnvironment = EENV.DEVELOPMENT;
+        this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [
             Config.Channels.PROD.WHOIS_TESTI,
             Config.Channels.PROD.WHOIS_UNLIMITED,
