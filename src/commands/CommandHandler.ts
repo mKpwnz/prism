@@ -22,6 +22,7 @@ import {
     TeamNote,
     WhoIs,
 } from './user';
+import { GiveCar } from '@commands/cars/GiveCar';
 
 export class CommandHandler {
     static commands: {
@@ -87,6 +88,7 @@ export class CommandHandler {
 
         new ValidateTrunk();
         // Car Commands
+        new GiveCar();
         // new Versicherung()
         new BotStats();
         new CachePerformance();

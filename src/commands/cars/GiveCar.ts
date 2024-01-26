@@ -8,7 +8,7 @@ import { RconClient } from '@class/RconClient';
 import { Helper } from '@utils/Helper';
 import { PlayerService } from '@services/PlayerService';
 
-export class ValidateTrunk extends Command {
+export class GiveCar extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
