@@ -6,6 +6,7 @@ import Config from '@Config';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { RconClient } from '@class/RconClient';
 import { Helper } from '@utils/Helper';
+import { PlayerService } from '@services/PlayerService';
 
 export class ValidateTrunk extends Command {
     constructor() {
@@ -32,8 +33,8 @@ export class ValidateTrunk extends Command {
                 .setDescription('Schenke einem Spieler ein Fahrzeug')
                 .addStringOption((option) =>
                     option
-                        .setName('player')
-                        .setDescription('Der Identifier des Spielers')
+                        .setName('steamId')
+                        .setDescription('SteamID des Spielers')
                         .setRequired(true),
                 )
                 .addStringOption((option) =>
@@ -55,11 +56,18 @@ export class ValidateTrunk extends Command {
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const embedTitle = 'Fahrzeug schenken';
 
-        const player = interaction.options.getString('player', true);
+        const steamId = interaction.options.getString('player', true);
         const vehicle = interaction.options.getString('vehicle', true);
         const plate = interaction.options.getString('plate', false);
 
-        // TODO check if vehicle exists or is allowed?
+        const vPlayer = await PlayerService.validatePlayer(steamId);
+        if (!vPlayer) {
+            await interaction.reply({
+                content: `Es konnte kein Spieler mit der SteamID \`${steamId}\` gefunden werden!`,
+                ephemeral: true,
+            });
+            return;
+        }
 
         if (plate) {
             const formattedPlate = Helper.formatNumberplate(plate);
@@ -74,8 +82,9 @@ export class ValidateTrunk extends Command {
                 return;
             }
 
-
-            await RconClient.sendCommand(`givecarplate ${player} ${vehicle} ${formattedPlate}`);
+            await RconClient.sendCommand(
+                `givecarplate ${vPlayer.identifiers.steam} ${vehicle} ${formattedPlate}`,
+            );
             await this.replyWithEmbed({
                 interaction,
                 title: embedTitle,
@@ -83,7 +92,7 @@ export class ValidateTrunk extends Command {
                 color: EEmbedColors.SUCCESS,
             });
         } else {
-            await RconClient.sendCommand(`givecar ${player} ${vehicle}`);
+            await RconClient.sendCommand(`givecar ${vPlayer.identifiers.steam} ${vehicle}`);
             await this.replyWithEmbed({
                 interaction,
                 title: embedTitle,
@@ -91,6 +100,5 @@ export class ValidateTrunk extends Command {
                 color: EEmbedColors.SUCCESS,
             });
         }
-
     }
 }
