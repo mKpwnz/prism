@@ -1,10 +1,11 @@
 services:
     bot:
-        image: prism
+        image: registry.immortaldev.eu/bots/prism:latest
         ports:
             - '51333:3000'
         env_file:
             - stack.env
+        restart: always
     log_db:
         image: postgres:latest
         env_file:
