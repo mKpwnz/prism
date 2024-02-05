@@ -33,7 +33,7 @@ export class GiveCar extends Command {
                 .setDescription('Schenke einem Spieler ein Fahrzeug')
                 .addStringOption((option) =>
                     option
-                        .setName('steamId')
+                        .setName('steamid')
                         .setDescription('SteamID des Spielers')
                         .setRequired(true),
                 )
@@ -56,7 +56,7 @@ export class GiveCar extends Command {
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const embedTitle = 'Fahrzeug schenken';
 
-        const steamId = interaction.options.getString('player', true);
+        const steamId = interaction.options.getString('steamid', true);
         const vehicle = interaction.options.getString('vehicle', true);
         const plate = interaction.options.getString('plate', false);
 
@@ -82,21 +82,21 @@ export class GiveCar extends Command {
                 return;
             }
 
-            await RconClient.sendCommand(
-                `givecarplate ${vPlayer.identifiers.steam} ${vehicle} ${formattedPlate}`,
+            const result = await RconClient.sendCommand(
+                `givecardiscord ${vPlayer.identifiers.steam} ${vehicle} ${formattedPlate}`,
             );
             await this.replyWithEmbed({
                 interaction,
                 title: embedTitle,
-                description: `Das Fahrzeug mit dem Namen \`${vehicle}\` und dem Kennzeichen \`${formattedPlate}\` wurde erfolgreich erstellt.`,
+                description: result,
                 color: EEmbedColors.SUCCESS,
             });
         } else {
-            await RconClient.sendCommand(`givecar ${vPlayer.identifiers.steam} ${vehicle}`);
+            const result = await RconClient.sendCommand(`givecardiscord ${vPlayer.identifiers.steam} ${vehicle} random`);
             await this.replyWithEmbed({
                 interaction,
                 title: embedTitle,
-                description: `Das Fahrzeug mit dem Namen \`${vehicle}\` wurde erfolgreich erstellt.`,
+                description: result,
                 color: EEmbedColors.SUCCESS,
             });
         }
