@@ -2,6 +2,7 @@ import { Command } from '@class/Command';
 import { EENV } from '@enums/EENV';
 import LogManager from '@utils/Logger';
 import { Interaction, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js';
+import { GiveCar } from '@commands/cars';
 import { RestartDropbox, ValidateTrunk } from './cars';
 import { SchufaCheck } from './housing';
 import { Nvhx, NvhxBan } from './nvhx';
@@ -22,7 +23,6 @@ import {
     TeamNote,
     WhoIs,
 } from './user';
-import { GiveCar } from '@commands/cars/GiveCar';
 
 export class CommandHandler {
     static commands: {
