@@ -19,14 +19,11 @@ export class GiveCar extends Command {
             Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
-            Config.Groups.PROD.SERVERENGINEER,
-            Config.Groups.PROD.IC_SUPERADMIN,
-            Config.Groups.PROD.IC_HADMIN,
-            Config.Groups.PROD.IC_ADMIN,
-            Config.Groups.PROD.IC_MOD,
-
             Config.Groups.DEV.BOTTEST,
         ];
+        this.AllowedUsers = [
+            Config.Users.SCHLAUCHI,
+        ]
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('givecar')
