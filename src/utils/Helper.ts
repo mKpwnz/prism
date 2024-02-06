@@ -142,7 +142,7 @@ export class Helper {
     }
 
     /**
-     * @description Formatss a numberplate and returns a valid one with 8 characters (including spaces) or an empty string if the input is invalid
+     * @description Formats a numberplate and returns a valid one with 8 characters (including spaces) or an empty string if the input is invalid
      * @author mKpwnz
      * @date 06.10.2023
      * @static

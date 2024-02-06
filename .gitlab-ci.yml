@@ -10,6 +10,8 @@ before_script:
 
 Build:
   stage: build
+  only:
+    - release
   script:
     # fetches the latest image (not failing if image is not found)
     - docker pull $CI_REGISTRY_IMAGE:latest || true
