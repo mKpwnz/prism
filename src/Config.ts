@@ -1,3 +1,19 @@
+const UserConfig = {
+    MIKA: '530485414453051402',
+    L33V33N: '312132715128553472',
+    MANU: '219123072295370754',
+    ZMASTER: '469606487312957452',
+    EFORCE: '418762151881211907',
+    JUSTIM: '487678405412782082',
+
+    SCHLAUCHI: '621081555804094484',
+    SPARTA: '388818838189375491',
+    RIGU: '548588225455849483',
+    DRGRUSELIG: '483002612417822721',
+    KRAUTERBART: '483002612417822721',
+    MKMICHA: '353246189367328769'
+};
+
 const BotConfig = {
     ServerID: (() => {
         switch (process.env.NODE_ENV) {
@@ -21,7 +37,7 @@ const BotConfig = {
     BOT_LOGO: 'https://i.imgur.com/NkZDE8l.png',
     WHITESPACE: 'https://i.imgur.com/pdkIDFc.png',
     GlobalBlockedUsers: [
-        '487678405412782082', // Justim
+        UserConfig.JUSTIM,
     ],
     GlobalWhitelistUsers: [
         UserConfig.SPARTA,
@@ -30,21 +46,6 @@ const BotConfig = {
         UserConfig.KRAUTERBART,
         UserConfig.MKMICHA
     ],
-};
-
-const UserConfig = {
-    MIKA: '530485414453051402',
-    L33V33N: '312132715128553472',
-    MANU: '219123072295370754',
-    ZMASTER: '469606487312957452',
-    EFORCE: '418762151881211907',
-
-    SCHLAUCHI: '621081555804094484',
-    SPARTA: '388818838189375491',
-    RIGU: '548588225455849483',
-    DRGRUSELIG: '483002612417822721',
-    KRAUTERBART: '483002612417822721',
-    MKMICHA: '353246189367328769'
 };
 
 const GroupConfig = {
