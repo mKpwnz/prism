@@ -19,6 +19,7 @@ export class GiveCar extends Command {
             Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
+            Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
         this.AllowedUsers = [
