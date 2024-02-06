@@ -24,9 +24,11 @@ const BotConfig = {
         '487678405412782082', // Justim
     ],
     GlobalWhitelistUsers: [
-        '388818838189375491', // Sparta
-        '548588225455849483', // Rigu
-        '483002612417822721', // DrGruselig
+        UserConfig.SPARTA,
+        UserConfig.RIGU,
+        UserConfig.DRGRUSELIG,
+        UserConfig.KRAUTERBART,
+        UserConfig.MKMICHA
     ],
 };
 
@@ -36,7 +38,13 @@ const UserConfig = {
     MANU: '219123072295370754',
     ZMASTER: '469606487312957452',
     EFORCE: '418762151881211907',
+
     SCHLAUCHI: '621081555804094484',
+    SPARTA: '388818838189375491',
+    RIGU: '548588225455849483',
+    DRGRUSELIG: '483002612417822721',
+    KRAUTERBART: '483002612417822721',
+    MKMICHA: '353246189367328769'
 };
 
 const GroupConfig = {
