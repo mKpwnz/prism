@@ -17,6 +17,7 @@ export type ValidatedPlayer = {
     metadata: {
         isPlayerOnline: boolean;
         lastLogin: Date;
+        currentID: number;
     };
     playerdata: {
         fullname: string;
