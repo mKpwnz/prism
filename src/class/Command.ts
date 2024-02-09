@@ -268,10 +268,17 @@ export abstract class Command {
             .setFields(opt.fields ?? [])
             .setImage(opt.customImage ?? Config.Bot.WHITESPACE);
 
-        await opt.interaction.reply({
-            content: opt.messageContent ?? '',
-            embeds: [embed],
-            ephemeral: opt.ephemeral,
-        });
+        if (opt.interaction.deferred) {
+            await opt.interaction.editReply({
+                content: opt.messageContent ?? '',
+                embeds: [embed],
+            });
+        } else {
+            await opt.interaction.reply({
+                content: opt.messageContent ?? '',
+                embeds: [embed],
+                ephemeral: opt.ephemeral,
+            });
+        }
     }
 }

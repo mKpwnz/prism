@@ -1,9 +1,10 @@
+import Config from '@Config';
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
-import { NvhxService } from '@services/NvhxService';
 import { EENV } from '@enums/EENV';
 import { ESearchType } from '@enums/ESearchType';
-import Config from '@Config';
+import { NvhxService } from '@services/NvhxService';
+import { PlayerService } from '@services/PlayerService';
 import { BotDB, GameDB } from '@sql/Database';
 import { IFindUser } from '@sql/schema/User.schema';
 import { Helper } from '@utils/Helper';
@@ -77,11 +78,13 @@ export class WhoIs extends Command {
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const { channel } = interaction;
-
         const identifierValue = interaction.options.getString('input');
 
         if (!identifierValue) {
-            await interaction.reply('Die Option "identifier" enthält keinen gültigen Wert.');
+            await interaction.reply({
+                content: 'Die Option "identifier" enthält keinen gültigen Wert.',
+                ephemeral: true,
+            });
             return;
         }
 
@@ -103,6 +106,8 @@ export class WhoIs extends Command {
             });
             return;
         }
+
+        await interaction.deferReply();
 
         const globalBans = await NvhxService.GetAllGlobalBans();
 
@@ -127,9 +132,12 @@ export class WhoIs extends Command {
                 globalBans,
             );
 
+            const onlineID = await PlayerService.getPlayerId(findUsers[i].identifier);
+
             embedFields.push(
                 this.EmbedFieldsBuilder(
                     findUsers[i],
+                    onlineID,
                     nvhxBanned,
                     bannedEmote,
                     steamId,
@@ -155,9 +163,8 @@ export class WhoIs extends Command {
                 content: `${interaction.user.toString()}`,
                 files: [attachment],
             });
-            await interaction.reply({
+            await interaction.editReply({
                 content: 'Daten gefunden und im Chat hinterlegt!',
-                ephemeral: true,
             });
         } else {
             let pageString = '';
@@ -177,15 +184,12 @@ export class WhoIs extends Command {
                 description: `Hier sind ${embedFields.length}/${findUsers.length} Suchergebnisse für "${identifierValue}":${additionalString}${pageString}`,
                 fields: embedFields,
             });
-            // channel?.send({
-            //     content: `${interaction.user.toString()}`,
-            //     embeds: [embed],
-            // });
         }
     }
 
     private EmbedFieldsBuilder(
         user: IFindUser,
+        id: number,
         nvhxBanned: boolean,
         bannedEmote: GuildEmoji | null,
         steamId: bigint,
@@ -196,7 +200,7 @@ export class WhoIs extends Command {
         embedFieldLength: number,
     ) {
         return {
-            name: `${user.playername} (${user.name})`,
+            name: `${user.playername} (${user.name}) ${id != -1 ? '[' + id + ']' : ''}`,
             value:
                 `${
                     nvhxBanned ? `${bannedEmote} **NVHX Global Ban Detected** ${bannedEmote}` : ''

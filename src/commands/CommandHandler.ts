@@ -12,6 +12,7 @@ import {
     ChangeBirthday,
     Fraksperre,
     Give,
+    IsOnline,
     Kick,
     License,
     Rechnung,
@@ -81,6 +82,7 @@ export class CommandHandler {
         new SchufaCheck();
         new ChangeHouseOwner();
         new GetHouse();
+        new IsOnline();
 
         new Rechnung();
 
