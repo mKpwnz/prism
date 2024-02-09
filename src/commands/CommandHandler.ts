@@ -1,10 +1,10 @@
 import { Command } from '@class/Command';
+import { GiveCar } from '@commands/cars';
 import { EENV } from '@enums/EENV';
 import LogManager from '@utils/Logger';
 import { Interaction, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js';
-import { GiveCar } from '@commands/cars';
 import { RestartDropbox, ValidateTrunk } from './cars';
-import { SchufaCheck } from './housing';
+import { ChangeHouseOwner, GetHouse, SchufaCheck } from './housing';
 import { Nvhx, NvhxBan } from './nvhx';
 import { CheckImageOwner, CheckPhotos, Darkchat, DeletePhone } from './phone';
 import { BotStats, CachePerformance, Help, Ping, ServerStatus, TestCommand, Wahl } from './system';
@@ -79,6 +79,8 @@ export class CommandHandler {
 
         new CheckImageOwner();
         new SchufaCheck();
+        new ChangeHouseOwner();
+        new GetHouse();
 
         new Rechnung();
 
