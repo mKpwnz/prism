@@ -51,6 +51,20 @@ export class PlayerService {
     }
 
     /**
+     * @description Check if a player is Online
+     * @author mKpwnz
+     * @date 20.10.2023
+     * @static
+     * @param {string} identifier
+     * @returns {*}  {Promise<boolean>}
+     * @memberof Player
+     */
+    public static async getPlayerId(identifier: string): Promise<number> {
+        const livePlayers = await PlayerService.getAllLivePlayers();
+        return livePlayers.find((p) => p.identifiers.indexOf(identifier) > -1)?.id ?? -1;
+    }
+
+    /**
      * @description Validate a player by a given search string and type. Returns null if no player was found. Returns a ValidatedPlayer object if a player was found.
      * @author mKpwnz
      * @date 19.10.2023
@@ -112,6 +126,7 @@ export class PlayerService {
 
         const usr = user[0];
         const iPO = await this.isPlayerOnline(usr.identifiers_steam);
+        const cID = await this.getPlayerId(usr.identifiers_steam);
 
         const accountData = JSON.parse(usr.playerdata_accounts_raw);
         const userObject: ValidatedPlayer = {
@@ -130,6 +145,7 @@ export class PlayerService {
             metadata: {
                 isPlayerOnline: iPO,
                 lastLogin: usr.metadata_lastLogin,
+                currentID: cID,
             },
             playerdata: {
                 fullname: usr.playerdata_fullname,

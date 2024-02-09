@@ -2,6 +2,7 @@ export * from './ChangeBirthday';
 export * from './DeleteCharacter';
 export * from './Fraksperre';
 export * from './Give';
+export * from './IsOnline';
 export * from './Kick';
 export * from './License';
 export * from './Rechnung';
