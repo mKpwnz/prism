@@ -22,16 +22,20 @@ export class GetHouse extends Command {
         this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [
             Config.Channels.PROD.WHOIS_UNLIMITED,
+            Config.Channels.PROD.WHOIS_LIMITED,
             Config.Channels.PROD.WHOIS_TESTI,
 
             Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
             Config.Groups.PROD.SERVERENGINEER,
+            Config.Groups.PROD.IC_SUPERADMIN,
+            Config.Groups.PROD.IC_HADMIN,
+            Config.Groups.PROD.IC_ADMIN,
+            Config.Groups.PROD.IC_MOD,
             Config.Groups.DEV.BOTTEST,
             Config.Groups.PROD.BOT_DEV,
         ];
-        this.AllowedUsers = [Config.Users.FABI, Config.Users.KREAAMZY];
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('gethouse')

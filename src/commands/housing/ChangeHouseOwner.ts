@@ -21,7 +21,7 @@ export class ChangeHouseOwner extends Command {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [
-            Config.Channels.PROD.WHOIS_UNLIMITED,
+            Config.Channels.PROD.WHOIS_LIMITED,
             Config.Channels.PROD.WHOIS_TESTI,
 
             Config.Channels.DEV.PRISM_TESTING,
