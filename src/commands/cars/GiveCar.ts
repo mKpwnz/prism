@@ -7,6 +7,7 @@ import { EEmbedColors } from '@enums/EmbedColors';
 import { PlayerService } from '@services/PlayerService';
 import { VehicleService } from '@services/VehicleService';
 import { Helper } from '@utils/Helper';
+import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class GiveCar extends Command {
@@ -85,9 +86,14 @@ export class GiveCar extends Command {
                 });
             }
 
-            const result = await RconClient.sendCommand(
+            let result = await RconClient.sendCommand(
                 `givecardiscord ${vPlayer.identifiers.steam} ${vehicle} ${formattedPlate}`,
             );
+
+            let car = await VehicleService.getNewestVehicleByOwner(vPlayer.identifiers.steam);
+            if (car != null) {
+                result = `\n\nDas Fahrzeug hat das Kennzeichen \`${car.plate}\``;
+            }
             await this.replyWithEmbed({
                 interaction,
                 title: embedTitle,
@@ -95,9 +101,35 @@ export class GiveCar extends Command {
                 color: EEmbedColors.SUCCESS,
             });
         } else {
-            const result = await RconClient.sendCommand(
+            await RconClient.sendCommand(
                 `givecardiscord ${vPlayer.identifiers.steam} ${vehicle} random`,
             );
+            let result: string;
+
+            let car = await VehicleService.getNewestVehicleByOwner(vPlayer.identifiers.steam);
+            if (car != null) {
+                let inserted = new Date(car.inserted);
+                if (inserted > new Date(Date.now() - 1000 * 60)) {
+                    result = `Das Fahrzeug wurde erstellt und hat das Kennzeichen \`${car.plate}\`.`;
+                } else {
+                    await this.replyWithEmbed({
+                        interaction,
+                        title: embedTitle,
+                        description: `Das Fahrzeug konnte nicht erstellt werden.`,
+                        color: EEmbedColors.ALERT,
+                    });
+                    return;
+                }
+            } else {
+                await this.replyWithEmbed({
+                    interaction,
+                    title: embedTitle,
+                    description: `Das Fahrzeug konnte nicht erstellt werden.`,
+                    color: EEmbedColors.ALERT,
+                });
+                return;
+            }
+
             await this.replyWithEmbed({
                 interaction,
                 title: embedTitle,
