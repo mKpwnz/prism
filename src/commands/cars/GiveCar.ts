@@ -1,12 +1,13 @@
+import Config from '@Config';
 import { Command } from '@class/Command';
+import { RconClient } from '@class/RconClient';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
-import Config from '@Config';
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { RconClient } from '@class/RconClient';
-import { Helper } from '@utils/Helper';
 import { PlayerService } from '@services/PlayerService';
+import { VehicleService } from '@services/VehicleService';
+import { Helper } from '@utils/Helper';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class GiveCar extends Command {
     constructor() {
@@ -18,13 +19,8 @@ export class GiveCar extends Command {
 
             Config.Channels.DEV.PRISM_TESTING,
         ];
-        this.AllowedGroups = [
-            Config.Groups.PROD.BOT_DEV,
-            Config.Groups.DEV.BOTTEST,
-        ];
-        this.AllowedUsers = [
-            Config.Users.SCHLAUCHI,
-        ]
+        this.AllowedGroups = [Config.Groups.PROD.BOT_DEV, Config.Groups.DEV.BOTTEST];
+        this.AllowedUsers = [Config.Users.SCHLAUCHI];
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('givecar')
@@ -80,6 +76,15 @@ export class GiveCar extends Command {
                 return;
             }
 
+            if (VehicleService.getVehicleByNumberplate(formattedPlate) == null) {
+                await this.replyWithEmbed({
+                    interaction,
+                    title: embedTitle,
+                    description: `Es gibt schon das Kennzeichen \`${formattedPlate}\`.`,
+                    color: EEmbedColors.ALERT,
+                });
+            }
+
             const result = await RconClient.sendCommand(
                 `givecardiscord ${vPlayer.identifiers.steam} ${vehicle} ${formattedPlate}`,
             );
@@ -90,7 +95,9 @@ export class GiveCar extends Command {
                 color: EEmbedColors.SUCCESS,
             });
         } else {
-            const result = await RconClient.sendCommand(`givecardiscord ${vPlayer.identifiers.steam} ${vehicle} random`);
+            const result = await RconClient.sendCommand(
+                `givecardiscord ${vPlayer.identifiers.steam} ${vehicle} random`,
+            );
             await this.replyWithEmbed({
                 interaction,
                 title: embedTitle,
