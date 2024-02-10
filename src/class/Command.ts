@@ -199,6 +199,7 @@ export abstract class Command {
             if (error instanceof Error) {
                 errobj.name = error.name;
                 errobj.message = error.message;
+                LogManager.debug(error.stack);
             } else {
                 errobj.e = error;
             }
@@ -249,8 +250,9 @@ export abstract class Command {
         ephemeral?: boolean;
     }): Promise<void> {
         this.CmdPerformanceStop = new Date();
-        const executionTime =
-            this.CmdPerformanceStop.getTime() - this.CmdPerformanceStart!.getTime();
+        const executionTime = this.CmdPerformanceStart
+            ? this.CmdPerformanceStop.getTime() - this.CmdPerformanceStart.getTime()
+            : 0;
 
         const embed = new EmbedBuilder()
             .setTitle(opt.title)
