@@ -209,7 +209,6 @@ export abstract class Command {
                 title: 'Es ist ein Fehler aufgetreten!',
                 description: `\`\`\`json\n${JSON.stringify(errobj, null, 2)}\n\`\`\``,
                 color: EEmbedColors.ALERT,
-                // TODO ephemeral: true?
             });
         }
     }
