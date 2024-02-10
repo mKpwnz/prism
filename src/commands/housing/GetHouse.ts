@@ -5,7 +5,6 @@ import { EENV } from '@enums/EENV';
 import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
 import { IHouseLocation, IHouseLocationCoords, IHousing } from '@sql/schema/Housing.schema';
-import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 /**
@@ -94,7 +93,6 @@ export class GetHouse extends Command {
                     name: `Haus \`${house.houseID}\``,
                     value: `**Besitzer:** ${house.identifier}\n**Haus:** Keine Location gefunden`,
                 });
-                continue;
             }
             const location = houseLocation[0];
             const coords: IHouseLocationCoords = JSON.parse(location.coords ?? '{}');
@@ -114,7 +112,7 @@ export class GetHouse extends Command {
             interaction,
             title: 'Hausdaten',
             description: `Alle Häuser von \`${vUser.identifiers.steam}\` (${vUser.playerdata.fullname})`,
-            fields: fields,
+            fields,
         });
     }
 }

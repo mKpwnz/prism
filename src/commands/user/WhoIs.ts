@@ -200,7 +200,7 @@ export class WhoIs extends Command {
         embedFieldLength: number,
     ) {
         return {
-            name: `${user.playername} (${user.name}) ${id != -1 ? '[' + id + ']' : ''}`,
+            name: `${user.playername} (${user.name}) ${id !== -1 ? `[${id}]` : ''}`,
             value:
                 `${
                     nvhxBanned ? `${bannedEmote} **NVHX Global Ban Detected** ${bannedEmote}` : ''
