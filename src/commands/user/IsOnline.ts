@@ -73,7 +73,7 @@ export class IsOnline extends Command {
             interaction,
             title: vUser.metadata.isPlayerOnline
                 ? `Spieler ist online ${
-                      vUser.metadata.currentID != -1 ? `| ID: ${vUser.metadata.currentID}` : ''
+                      vUser.metadata.currentID !== -1 ? `| ID: ${vUser.metadata.currentID}` : ''
                   }`
                 : 'Spieler ist offline',
             description: `Name: ${vUser.playerdata.fullname}\nTX-Admin: ${vUser.steamnames.current}`,
