@@ -4,7 +4,6 @@ import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { GameDB } from '@sql/Database';
 import { ITebexTransactions } from '@sql/schema/Tebex.schema';
-import LogManager from '@utils/Logger';
 import axios from 'axios';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
@@ -67,7 +66,7 @@ export class Tebex extends Command {
             return;
         }
 
-        if (/tbx-[0-9a-f]{13}-[0-9a-f]{6}/.test(tbxNummer)) {
+        if (!/tbx-[0-9a-f]{14}-[0-9a-f]{6}/.test(tbxNummer)) {
             await this.replyWithEmbed({
                 interaction,
                 title: 'Fehler',
@@ -92,7 +91,6 @@ export class Tebex extends Command {
                         : process.env.TEBEX_SECRET,
                 },
             });
-            console.log(response);
 
             if (response.status !== 200 || !response.data) throw new Error('Invalid response');
 
@@ -141,7 +139,6 @@ export class Tebex extends Command {
                         value: transactions[0].identifier,
                     });
                 }
-                LogManager.debug(transactions);
             }
             fields.push({
                 name: 'Tebex Username',
