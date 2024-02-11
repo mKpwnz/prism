@@ -12,4 +12,3 @@ export interface ITebexTransactions extends RowDataPacket {
     buytime: Date;
     taketime: Date;
 }
-
