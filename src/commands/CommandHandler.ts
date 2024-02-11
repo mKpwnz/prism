@@ -33,6 +33,7 @@ import {
     TeamNote,
     WhoIs,
 } from './user';
+import { Tebex } from './tebex';
 
 export class CommandHandler {
     static commands: {
@@ -102,6 +103,7 @@ export class CommandHandler {
         new ValidateTrunk();
         // Car Commands
         new GiveCar();
+        new Tebex();
         // new Versicherung()
         new SysInfo();
         new BotStats();
