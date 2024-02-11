@@ -22,7 +22,7 @@
                 "no-await-in-loop": "off",
                 "no-plusplus": "off",
                 "no-param-reassign": "off", // no benefit
-                "class-methods-use-this": "warn",
+                "class-methods-use-this": "off",
                 "deprecation/deprecation": "warn"
             }
         }

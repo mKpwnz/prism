@@ -7,7 +7,16 @@ import { RestartDropbox, ValidateTrunk } from './cars';
 import { ChangeHouseOwner, GetHouse, SchufaCheck } from './housing';
 import { Nvhx, NvhxBan } from './nvhx';
 import { CheckImageOwner, CheckPhotos, Darkchat, DeletePhone } from './phone';
-import { BotStats, CachePerformance, Help, Ping, ServerStatus, TestCommand, Wahl } from './system';
+import {
+    BotStats,
+    CachePerformance,
+    Help,
+    Ping,
+    ServerStatus,
+    SysInfo,
+    TestCommand,
+    Wahl,
+} from './system';
 import {
     ChangeBirthday,
     Fraksperre,
@@ -24,6 +33,7 @@ import {
     TeamNote,
     WhoIs,
 } from './user';
+import { Tebex } from './tebex';
 
 export class CommandHandler {
     static commands: {
@@ -93,7 +103,9 @@ export class CommandHandler {
         new ValidateTrunk();
         // Car Commands
         new GiveCar();
+        new Tebex();
         // new Versicherung()
+        new SysInfo();
         new BotStats();
         new CachePerformance();
         new TestCommand();
