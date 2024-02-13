@@ -11,7 +11,7 @@ import { Chart, ChartConfiguration } from 'chart.js';
 import { ChartJSNodeCanvas } from 'chartjs-node-canvas';
 import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { RowDataPacket } from 'mysql2';
+import { ResultSetHeader, RowDataPacket } from 'mysql2';
 
 declare module 'chartjs-plugin-datalabels' {
     interface Context {
@@ -256,12 +256,11 @@ export class Wahl extends Command {
                 });
                 return;
             }
-            // TODO: Umbauen von "as RowDataPacket[]" aut Database.query<T>
-            const response = (await GameDB.query(
+            const [response] = await GameDB.query<ResultSetHeader>(
                 'UPDATE immo_elections SET status = ?, updated = NOW() WHERE id = ?',
                 [options.getNumber('option_status'), options.getNumber('wahlid')],
-            )) as RowDataPacket[];
-            if (response[0].rowsChanged === 0) {
+            );
+            if (response.affectedRows === 0) {
                 await interaction.reply({
                     content: 'Die Wahl konnte nicht verändert werden!',
                     ephemeral: true,
@@ -337,12 +336,18 @@ export class Wahl extends Command {
             try {
                 let steamid = options.getString('steamid') ?? '';
                 if (!steamid.startsWith('steam:')) steamid = `steam:${steamid}`;
-                // TODO: Auswertung "affected rows" einfügen
-                const res = await GameDB.query<RowDataPacket[][]>(
+                const [res] = await GameDB.query<ResultSetHeader>(
                     'DELETE FROM immo_elections_participants WHERE electionid = ? AND identifier = ?',
                     [options.getNumber('wahlid'), steamid],
                 );
                 LogManager.debug(res);
+                if (res.affectedRows === 0) {
+                    await interaction.reply({
+                        content: 'Der Nutzer konnte nicht entfernt werden!',
+                        ephemeral: true,
+                    });
+                    return;
+                }
                 embed.setTitle('Nutzer hinzugefügt');
                 embed.setDescription(
                     `Nutzer ${vPlayer.playerdata.fullname} von Wahl ${election.name} (${election.id}) entfernt!\nSteamID: \`${steamid}\``,
@@ -594,7 +599,6 @@ export class Wahl extends Command {
                 return;
             }
             if (options.getString('operation') === 'add') {
-                // TODO: Umbau SQL mit RETURNING * und const [data] = await Databse.query<T> (Anmerkung: die Daten sind nicht interessant, lediglich wie viele Zeilen geändert wurden)
                 let querystring =
                     'INSERT INTO immo_elections_votes (electionid, identifier, participantid) VALUES ';
                 const anzahl = options.getNumber('stimmen') ?? 0;
@@ -603,18 +607,17 @@ export class Wahl extends Command {
                         'wahlid',
                     )}, "Manipulation", ${options.getString('kandidatennr')}),`;
                 }
-                const response = await GameDB.query<RowDataPacket[][]>(querystring.slice(0, -1));
+                const [response] = await GameDB.query<ResultSetHeader>(querystring.slice(0, -1));
                 LogManager.debug(response);
                 embed.setTitle('Wahl manipuliert!');
                 embed.setDescription(
-                    `${anzahl} Stimmen für ${participant[0].name} von Wahl ${name} (${id}) hinzugefügt!`,
+                    `${response.affectedRows} Stimmen für ${participant[0].name} von Wahl ${name} (${id}) hinzugefügt!`,
                 );
                 // const channel = await interaction.guild?.channels.fetch(Config.Channels.PROD.S1_WAHLEN);
                 // if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] })
                 await interaction.reply({ embeds: [embed] });
             } else if (options.getString('operation') === 'remove') {
-                // TODO: Umbau auf neue Query Struktur
-                const response = await GameDB.query<RowDataPacket[][]>(
+                const [response] = await GameDB.query<ResultSetHeader>(
                     'DELETE FROM immo_elections_votes WHERE electionid = ? AND participantid = ? LIMIT ?',
                     [
                         options.getNumber('wahlid'),
@@ -625,9 +628,7 @@ export class Wahl extends Command {
                 LogManager.debug(response);
                 embed.setTitle('Wahl manipuliert!');
                 embed.setDescription(
-                    `${options.getNumber('stimmen')} Stimmen für ${
-                        participant[0].name
-                    } von Wahl ${name} (${id}) entfernt!`,
+                    `${response.affectedRows} Stimmen für ${participant[0].name} von Wahl ${name} (${id}) entfernt!`,
                 );
                 const channel = await interaction.guild?.channels.fetch(
                     Config.Channels.PROD.S1_WAHLEN,

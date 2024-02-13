@@ -1,8 +1,8 @@
+import Config from '@Config';
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
-import { PhonePhotosService } from '@services/PhonePhotosService';
 import { EENV } from '@enums/EENV';
-import Config from '@Config';
+import { PhonePhotosService } from '@services/PhonePhotosService';
 import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 
 // TODO add typedoc for this command
@@ -85,10 +85,9 @@ export class CheckPhotos extends Command {
                 deleteOption,
             );
         } else {
-            // @TODO Why only starting from 2023? And why hardcoded?
             user = await PhonePhotosService.checkAllPhotosWithProgress(
                 new Date('2023-1-1'),
-                new Date('2024-12-31'),
+                new Date(),
                 interaction,
                 deleteOption,
             );
@@ -107,7 +106,6 @@ export class CheckPhotos extends Command {
             embeds.push(embed);
         }
 
-        // @TODO missing await?
         if (embeds.length === 0) {
             await interaction.editReply(
                 '▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰ 100% / 100% | Check completed, no illegal photos found!',

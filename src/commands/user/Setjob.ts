@@ -1,14 +1,14 @@
+import Config from '@Config';
 import { Command } from '@class/Command';
 import { RconClient } from '@class/RconClient';
 import { RegisterCommand } from '@commands/CommandHandler';
-import { PlayerService } from '@services/PlayerService';
 import { EENV } from '@enums/EENV';
-import Config from '@Config';
+import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
 import { IJob } from '@sql/schema/Job.schema';
 import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { RowDataPacket } from 'mysql2';
+import { ResultSetHeader } from 'mysql2';
 
 export class Setjob extends Command {
     constructor() {
@@ -96,7 +96,6 @@ export class Setjob extends Command {
 
     private async setOnline(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = Command.getEmbedTemplate(interaction);
         const job = options.getString('jobname');
         const grade = options.getInteger('grade') ?? 0;
         if (!job) {
@@ -117,13 +116,13 @@ export class Setjob extends Command {
             await RconClient.sendCommand(
                 `setjob ${options.getInteger('id')} ${job.toLowerCase()} ${grade}`,
             );
-            embed.setTitle('Job geändert (online)');
-            embed.setDescription(
-                `Der Job von ID ${options.getInteger(
+            this.replyWithEmbed({
+                interaction,
+                title: 'Job geändert (online)',
+                description: `Der Job von ID ${options.getInteger(
                     'id',
                 )} wurde auf ${job} Grade ${grade} gesetzt!`,
-            );
-            await interaction.reply({ embeds: [embed] });
+            });
         } catch (error) {
             await interaction.reply({
                 content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(
@@ -136,7 +135,6 @@ export class Setjob extends Command {
 
     private async setOffline(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-        const embed = Command.getEmbedTemplate(interaction);
         const steamid = options.getString('steamid');
         const job = options.getString('jobname');
         const grade = options.getInteger('grade') ?? 0;
@@ -171,25 +169,25 @@ export class Setjob extends Command {
                 });
                 return;
             }
-            // TODO: Update zu "affectedRows" mit Database.query<T>
-            const query = (await GameDB.query(
+
+            const [query] = await GameDB.query<ResultSetHeader>(
                 'UPDATE users SET job = ?, job_grade = ? WHERE identifier = ?',
                 [job.toLowerCase(), grade, vPlayer.identifiers.steam],
-            )) as RowDataPacket[];
+            );
 
-            if (query[0].affectedRows === 0) {
+            if (query.affectedRows === 0) {
                 await interaction.reply({
                     content: 'Der Job konnte nicht geändert werden!',
                     ephemeral: true,
                 });
                 return;
             }
-            embed.setTitle('Job geändert (offline)');
-            embed.setDescription(
-                `Der Job von ${vPlayer.playerdata.fullname} (${vPlayer.identifiers.steam}) wurde auf ${jobquery[0].label}\nGrade ${grade} gesetzt!`,
-            );
 
-            await interaction.reply({ embeds: [embed] });
+            this.replyWithEmbed({
+                interaction,
+                title: 'Job geändert (offline)',
+                description: `Der Job von ${vPlayer.playerdata.fullname} (${vPlayer.identifiers.steam}) wurde auf ${jobquery[0].label}\nGrade ${grade} gesetzt!`,
+            });
         } catch (error) {
             LogManager.error(error);
             await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true });
