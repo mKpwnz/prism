@@ -14,7 +14,11 @@ export class CachePerformance extends Command {
 
             Config.Channels.DEV.PRISM_TESTING,
         ];
-        this.AllowedGroups = [Config.Groups.PROD.SERVERENGINEER, Config.Groups.DEV.BOTTEST];
+        this.AllowedGroups = [
+            Config.Groups.PROD.SERVERENGINEER,
+            Config.Groups.PROD.BOT_DEV,
+            Config.Groups.DEV.BOTTEST,
+        ];
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('cacheperformance')

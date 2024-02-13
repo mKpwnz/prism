@@ -32,6 +32,7 @@ export class IsOnline extends Command {
             Config.Groups.PROD.IC_HADMIN,
             Config.Groups.PROD.IC_ADMIN,
             Config.Groups.PROD.IC_MOD,
+
             Config.Groups.DEV.BOTTEST,
             Config.Groups.PROD.BOT_DEV,
         ];
@@ -54,7 +55,7 @@ export class IsOnline extends Command {
 
         if (player === '') {
             await interaction.reply({
-                content: `Bitte gib eine HausID oder einen Spieler an!`,
+                content: `Bitte gib eine SteamID an!`,
                 ephemeral: true,
             });
             return;
@@ -63,7 +64,7 @@ export class IsOnline extends Command {
         const vUser = await PlayerService.validatePlayer(player);
         if (!vUser) {
             await interaction.reply({
-                content: `Es konnte kein User mit dem Namen \`${player}\` gefunden werden!`,
+                content: `Es konnte kein User mit der SteamID \`${player}\` gefunden werden!`,
                 ephemeral: true,
             });
             return;

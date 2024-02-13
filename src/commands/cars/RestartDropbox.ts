@@ -27,6 +27,7 @@ export class RestartDropbox extends Command {
             Config.Groups.PROD.SERVERENGINEER,
             Config.Groups.PROD.IC_SUPERADMIN,
 
+            Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
         this.AllowedUsers = [Config.Users.SCHLAUCHI];

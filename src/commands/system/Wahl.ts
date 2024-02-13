@@ -39,6 +39,7 @@ export class Wahl extends Command {
             Config.Groups.PROD.IC_SUPERADMIN,
             Config.Groups.PROD.IC_HADMIN,
 
+            Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
         RegisterCommand(

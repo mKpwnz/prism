@@ -32,6 +32,7 @@ export class GetHouse extends Command {
             Config.Groups.PROD.IC_HADMIN,
             Config.Groups.PROD.IC_ADMIN,
             Config.Groups.PROD.IC_MOD,
+
             Config.Groups.DEV.BOTTEST,
             Config.Groups.PROD.BOT_DEV,
         ];

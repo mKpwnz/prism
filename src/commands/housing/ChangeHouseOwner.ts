@@ -28,6 +28,7 @@ export class ChangeHouseOwner extends Command {
         ];
         this.AllowedGroups = [
             Config.Groups.PROD.SERVERENGINEER,
+
             Config.Groups.DEV.BOTTEST,
             Config.Groups.PROD.BOT_DEV,
         ];
