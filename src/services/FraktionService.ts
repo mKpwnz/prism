@@ -20,7 +20,7 @@ export class FraktionService {
 
         armory[item] += count;
 
-        let [result] = await GameDB.query<ResultSetHeader>(
+        const [result] = await GameDB.query<ResultSetHeader>(
             `UPDATE jobs SET armory = ? WHERE name = ?`,
             [JSON.stringify(armory), fraktion],
         );
@@ -47,13 +47,13 @@ export class FraktionService {
 
         if (!armory) armory = {};
 
-        if (!armory['weapon_weapons']) armory['weapon_weapons'] = {};
+        if (!armory.weapon_weapons) armory.weapon_weapons = {};
 
         for (let i = 0; i < count; i++) {
-            armory['weapon_weapons'].push({ w: weapon, c: 300 });
+            armory.weapon_weapons.push({ w: weapon, c: 300 });
         }
 
-        let [result] = await GameDB.query<ResultSetHeader>(
+        const [result] = await GameDB.query<ResultSetHeader>(
             `UPDATE jobs SET armory = ? WHERE name = ?`,
             [JSON.stringify(armory), fraktion],
         );
@@ -68,7 +68,7 @@ export class FraktionService {
     }
 
     public static async clearArmory(fraktion: string): Promise<boolean> {
-        let [result] = await GameDB.query<ResultSetHeader>(
+        const [result] = await GameDB.query<ResultSetHeader>(
             `UPDATE jobs SET armory = ? WHERE name = ?`,
             [JSON.stringify({}), fraktion],
         );
@@ -83,7 +83,7 @@ export class FraktionService {
     }
 
     public static async clearPlayerArmory(fraktion: string, identifier: string): Promise<boolean> {
-        let [result] = await GameDB.query<ResultSetHeader>(
+        const [result] = await GameDB.query<ResultSetHeader>(
             `UPDATE jobs_player_armory SET armory = ? WHERE identifier = ? AND job = ?`,
             [JSON.stringify({}), identifier, fraktion],
         );

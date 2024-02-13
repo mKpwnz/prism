@@ -22,7 +22,7 @@ export class InsuranceService {
         dauer: number,
         premium: boolean,
     ): Promise<boolean> {
-        let [result] = await GameDB.query<ResultSetHeader>(
+        const [result] = await GameDB.query<ResultSetHeader>(
             'INSERT INTO `versicherungen` (`plate`, `ts`, `premium`) VALUES (?, ADDDATE(NOW (), INTERVAL ? DAY), ?) ON DUPLICATE KEY UPDATE ts = ADDDATE(NOW (), INTERVAL ? DAY), premium = ? RETURNING * ',
             [Helper.formatNumberplate(plate), dauer, premium ? 1 : 0, dauer, premium ? 1 : 0],
         );

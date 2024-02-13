@@ -127,7 +127,7 @@ export class Insurance extends Command {
         const dauer: number = options.getNumber('dauer', true);
         const premium: boolean = options.getBoolean('premium') ?? false;
 
-        let result = await InsuranceService.addInsurance(plate, dauer, premium);
+        const result = await InsuranceService.addInsurance(plate, dauer, premium);
 
         if (!result) {
             await interaction.reply({

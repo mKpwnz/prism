@@ -87,7 +87,7 @@ export class DeleteCharacter extends Command {
     private async moveCharacterToArchive(vPlayer: ValidatedPlayer): Promise<boolean> {
         try {
             const newIdentifier = vPlayer.identifiers.steam.replace('steam', 'deleted');
-            let [updateResponse] = await GameDB.query<ResultSetHeader>(
+            const [updateResponse] = await GameDB.query<ResultSetHeader>(
                 'UPDATE users SET identifier = ? WHERE identifier = ?',
                 [newIdentifier, vPlayer.identifiers.steam],
             );
