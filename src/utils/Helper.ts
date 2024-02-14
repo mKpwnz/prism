@@ -342,4 +342,27 @@ export class Helper {
             setTimeout(resolve, ms);
         });
     }
+
+    /**
+     * @description Generates the hash of a string using the One-At-A-Time (OAAT) hash function
+     * @author mKpwnz
+     * @date 14.02.2024
+     * @static
+     * @param {string} inputText
+     * @returns {*}  {number}
+     * @memberof Helper
+     */
+    static generateOAAThash(inputText: string): number {
+        const input = inputText.toLowerCase();
+        let hash = 0;
+        for (let i = 0; i < input.length; ++i) {
+            hash += input.charCodeAt(i);
+            hash += hash << 10;
+            hash ^= hash >>> 6;
+        }
+        hash += hash << 3;
+        hash ^= hash >>> 11;
+        hash += hash << 15;
+        return (hash >>> 0) >> 0;
+    }
 }

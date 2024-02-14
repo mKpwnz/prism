@@ -7,6 +7,7 @@ import { ITebexTransactions } from '@sql/schema/Tebex.schema';
 import axios from 'axios';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
+// @TODO: Rewrite to Service structure
 export class Tebex extends Command {
     constructor() {
         super();

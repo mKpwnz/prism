@@ -5,7 +5,7 @@ import { IEmbedField } from '@interfaces/IEmbedField';
 import { BotDB } from '@sql/Database';
 import { Helper } from '@utils/Helper';
 import LogManager from '@utils/Logger';
-import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
+import { AttachmentBuilder, ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 
 /**
  * @author mKpwnz
@@ -247,6 +247,7 @@ export abstract class Command {
         customImage?: string;
         color?: EEmbedColors | number;
         ephemeral?: boolean;
+        files?: AttachmentBuilder[];
     }): Promise<void> {
         this.CmdPerformanceStop = new Date();
         const executionTime = this.CmdPerformanceStart
@@ -273,12 +274,14 @@ export abstract class Command {
             await opt.interaction.editReply({
                 content: opt.messageContent ?? '',
                 embeds: [embed],
+                files: opt.files ?? [],
             });
         } else {
             await opt.interaction.reply({
                 content: opt.messageContent ?? '',
                 embeds: [embed],
                 ephemeral: opt.ephemeral,
+                files: opt.files ?? [],
             });
         }
     }

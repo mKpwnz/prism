@@ -1,5 +1,5 @@
 import { Command } from '@class/Command';
-import { GiveCar } from '@commands/cars';
+import { GiveCar, VehiclePop } from '@commands/cars';
 import { EENV } from '@enums/EENV';
 import LogManager from '@utils/Logger';
 import { Interaction, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js';
@@ -103,6 +103,7 @@ export class CommandHandler {
         new ValidateTrunk();
         // Car Commands
         new GiveCar();
+        new VehiclePop();
         new Tebex();
         // new Versicherung()
         new SysInfo();
