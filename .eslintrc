@@ -4,7 +4,9 @@
     "parserOptions": {
         "project": "./tsconfig.json"
     },
-    "plugins": ["@typescript-eslint"],
+    "plugins": [
+        "@typescript-eslint"
+    ],
     "extends": [
         "airbnb-base",
         "airbnb-typescript/base",
@@ -13,7 +15,9 @@
     ],
     "overrides": [
         {
-            "files": ["*"],
+            "files": [
+                "*"
+            ],
             "rules": {
                 "import/prefer-default-export": "off",
                 "no-new": "off",
@@ -21,6 +25,7 @@
                 "no-underscore-dangle": "off",
                 "no-await-in-loop": "off",
                 "no-plusplus": "off",
+                "no-bitwise": "off",
                 "no-param-reassign": "off", // no benefit
                 "class-methods-use-this": "off",
                 "deprecation/deprecation": "warn"
