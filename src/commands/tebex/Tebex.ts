@@ -11,11 +11,11 @@ export class Tebex extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
-
         this.AllowedChannels = [
-            Config.Channels.PROD.WHOIS_TESTI,
-            Config.Channels.PROD.WHOIS_TEBEX,
+            Config.Channels.PROD.PRISM_TEBEX,
+            Config.Channels.PROD.PRISM_HIGHTEAM,
 
+            Config.Channels.PROD.PRISM_TESTING,
             Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [

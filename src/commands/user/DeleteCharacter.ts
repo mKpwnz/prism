@@ -17,8 +17,10 @@ export class DeleteCharacter extends Command {
         super();
         this.RunEnvironment = EENV.DEVELOPMENT;
         this.AllowedChannels = [
-            Config.Channels.PROD.WHOIS_TESTI,
+            Config.Channels.PROD.PRISM_BOT,
+            Config.Channels.PROD.PRISM_HIGHTEAM,
 
+            Config.Channels.PROD.PRISM_TESTING,
             Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [

@@ -127,7 +127,7 @@ export abstract class Command {
         if (this.RunEnvironment !== EENV.PRODUCTION) {
             this.DoNotCountUse = true;
             this.AllowedChannels = [
-                Config.Channels.PROD.WHOIS_TESTI,
+                Config.Channels.PROD.PRISM_TESTING,
 
                 Config.Channels.DEV.PRISM_TESTING,
             ];
