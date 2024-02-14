@@ -8,14 +8,8 @@
         "moduleResolution": "NodeNext",
         "allowJs": true,
         "paths": {
-            "@*": [
-                "./src/*"
-            ]
+            "@*": ["./src/*"]
         }
     },
-    "include": [
-        "./src",
-        "types",
-        "./src/types"
-    ]
+    "include": ["./src", "types", "./src/types"]
 }

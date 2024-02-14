@@ -41,7 +41,7 @@ export class VehiclePop extends Command {
                         .setRequired(true),
                 )
                 .addBooleanOption((option) =>
-                    option.setName('exportjson').setDescription('Exportiere die Daten'),
+                    option.setName('noexport').setDescription('Ohne Export, nur zählen'),
                 ),
 
             this,
@@ -51,7 +51,7 @@ export class VehiclePop extends Command {
     // @TODO: Rewrite to Service structure
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const spawnname = interaction.options.getString('spawnname');
-        const exportjson = interaction.options.getBoolean('exportjson');
+        const noexport = interaction.options.getBoolean('noexport');
 
         if (!spawnname) {
             throw new Error('Spawnname is required');
@@ -75,7 +75,7 @@ export class VehiclePop extends Command {
             return;
         }
         const attachments = [];
-        if (exportjson) {
+        if (!noexport) {
             const reponseList = [];
             for (const vehicle of vehicles) {
                 const vehData = JSON.parse(vehicle.vehicle);
