@@ -1,10 +1,9 @@
+import Config from '@Config';
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
-import { PlayerService } from '@services/PlayerService';
 import { EENV } from '@enums/EENV';
-import Config from '@Config';
+import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
-import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { RowDataPacket } from 'mysql2';
 
@@ -34,8 +33,6 @@ export class Resetpos extends Command {
             new SlashCommandBuilder()
                 .setName('resetpos')
                 .setDescription('Setze die Position eines Spielers zum Würfelpark zurück')
-                // add string option
-                .setDMPermission(true)
                 .addStringOption((option) =>
                     option
                         .setName('steam')
@@ -47,11 +44,11 @@ export class Resetpos extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const steam = interaction.options.get('steam')?.value?.toString() ?? '';
+        const steam = interaction.options.getString('steam', true);
         const vPlayer = await PlayerService.validatePlayer(steam);
-        const embed = Command.getEmbedTemplate(interaction);
+
         if (!vPlayer) {
-            await interaction.reply('Es konnte kein Spieler mit dieser SteamID gefunden werden!');
+            await this.replyError('Es konnte kein Spieler mit dieser SteamID gefunden werden!');
             return;
         }
         try {
@@ -62,20 +59,14 @@ export class Resetpos extends Command {
                 vPlayer.identifiers.steam,
             ])) as RowDataPacket[];
             if (result[0].rowsChanged !== 0) {
-                embed.setTitle('Position zurückgesetzt');
-                embed.setDescription(
-                    `Die Position von ${vPlayer.playerdata.fullname} (${vPlayer.identifiers.steam}) wurde zurückgesetzt.`,
-                );
-                await interaction.reply({ embeds: [embed] });
-            } else {
-                await interaction.reply({
-                    content: 'Der Versuch, die Position zu ändern, ist fehlgeschlagen!',
-                    ephemeral: true,
+                await this.replyWithEmbed({
+                    description: `Die Position von ${vPlayer.playerdata.fullname} (${vPlayer.identifiers.steam}) wurde zurückgesetzt.`,
                 });
+            } else {
+                await this.replyError('Der Versuch, die Position zu ändern, ist fehlgeschlagen!');
             }
         } catch (error) {
-            LogManager.error(error);
-            await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true });
+            await this.replyError('Es ist ein Fehler aufgetreten!');
         }
     }
 }

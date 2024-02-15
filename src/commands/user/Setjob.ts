@@ -1,14 +1,13 @@
+import Config from '@Config';
 import { Command } from '@class/Command';
 import { RconClient } from '@class/RconClient';
 import { RegisterCommand } from '@commands/CommandHandler';
-import { PlayerService } from '@services/PlayerService';
 import { EENV } from '@enums/EENV';
-import Config from '@Config';
+import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
 import { IJob } from '@sql/schema/Job.schema';
-import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { RowDataPacket } from 'mysql2';
+import { ResultSetHeader } from 'mysql2';
 
 export class Setjob extends Command {
     constructor() {
@@ -85,116 +84,70 @@ export class Setjob extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction;
-
-        if (options.getSubcommand() === 'online') {
-            await this.setOnline(interaction);
-        } else if (options.getSubcommand() === 'offline') {
-            await this.setOffline(interaction);
-        } else {
-            await interaction.reply({ content: 'Command nicht gefunden.', ephemeral: true });
+        switch (interaction.options.getSubcommand()) {
+            case 'online':
+                await this.setOnline(interaction);
+                break;
+            case 'offline':
+                await this.setOffline(interaction);
+                break;
+            default:
+                await this.replyError('Command nicht gefunden.');
+                break;
         }
     }
 
     private async setOnline(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction;
-        const embed = Command.getEmbedTemplate(interaction);
-        const job = options.getString('jobname');
-        const grade = options.getInteger('grade') ?? 0;
-        if (!job) {
-            await interaction.reply({ content: 'Es wurde kein Job angegeben!', ephemeral: true });
+        const id = interaction.options.getString('id', true);
+        const job = interaction.options.getString('jobname', true);
+        const grade = interaction.options.getInteger('grade') ?? 0;
+
+        const [jobquery] = await GameDB.query<IJob[]>('SELECT * FROM jobs WHERE name = ?', [
+            job.toLowerCase(),
+        ]);
+        if (jobquery.length === 0) {
+            await this.replyError('Es wurde kein Job mit diesem Namen gefunden!');
             return;
         }
-        try {
-            const [jobquery] = await GameDB.query<IJob[]>('SELECT * FROM jobs WHERE name = ?', [
-                job.toLowerCase(),
-            ]);
-            if (jobquery.length === 0) {
-                await interaction.reply({
-                    content: 'Es wurde kein Job mit diesem Namen gefunden!',
-                    ephemeral: true,
-                });
-                return;
-            }
-            await RconClient.sendCommand(
-                `setjob ${options.getInteger('id')} ${job.toLowerCase()} ${grade}`,
-            );
-            embed.setTitle('Job geändert (online)');
-            embed.setDescription(
-                `Der Job von ID ${options.getInteger(
-                    'id',
-                )} wurde auf ${job} Grade ${grade} gesetzt!`,
-            );
-            await interaction.reply({ embeds: [embed] });
-        } catch (error) {
-            await interaction.reply({
-                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(
-                    error,
-                )}\`\`\``,
-                ephemeral: true,
-            });
-        }
+        await RconClient.sendCommand(`setjob ${id} ${job.toLowerCase()} ${grade}`);
+        await this.replyWithEmbed({
+            title: 'Job geändert (online)',
+            description: `Der Job von ID ${id} wurde auf ${job} Grade ${grade} gesetzt!`,
+        });
     }
 
     private async setOffline(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction;
-        const embed = Command.getEmbedTemplate(interaction);
-        const steamid = options.getString('steamid');
-        const job = options.getString('jobname');
-        const grade = options.getInteger('grade') ?? 0;
-        if (!steamid) {
-            await interaction.reply({
-                content: 'Es wurde keine SteamID angegeben!',
-                ephemeral: true,
-            });
-            return;
-        }
-        if (!job) {
-            await interaction.reply({ content: 'Es wurde kein Job angegeben!', ephemeral: true });
-            return;
-        }
+        const steamid = interaction.options.getString('steamid', true);
+        const job = interaction.options.getString('jobname', true);
+        const grade = interaction.options.getInteger('grade') ?? 0;
+
         const vPlayer = await PlayerService.validatePlayer(steamid);
         if (!vPlayer) {
-            await interaction.reply({
-                content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
-                ephemeral: true,
-            });
+            await this.replyError('Es konnte kein Spieler mit dieser SteamID gefunden werden!');
             return;
         }
-        try {
-            const [jobquery] = await GameDB.query<IJob[]>('SELECT * FROM jobs WHERE name = ?', [
-                job.toLowerCase(),
-            ]);
-            LogManager.debug(jobquery);
-            if (jobquery.length === 0) {
-                await interaction.reply({
-                    content: 'Es wurde kein Job mit diesem Namen gefunden!',
-                    ephemeral: true,
-                });
-                return;
-            }
-            // TODO: Update zu "affectedRows" mit Database.query<T>
-            const query = (await GameDB.query(
-                'UPDATE users SET job = ?, job_grade = ? WHERE identifier = ?',
-                [job.toLowerCase(), grade, vPlayer.identifiers.steam],
-            )) as RowDataPacket[];
 
-            if (query[0].affectedRows === 0) {
-                await interaction.reply({
-                    content: 'Der Job konnte nicht geändert werden!',
-                    ephemeral: true,
-                });
-                return;
-            }
-            embed.setTitle('Job geändert (offline)');
-            embed.setDescription(
-                `Der Job von ${vPlayer.playerdata.fullname} (${vPlayer.identifiers.steam}) wurde auf ${jobquery[0].label}\nGrade ${grade} gesetzt!`,
-            );
-
-            await interaction.reply({ embeds: [embed] });
-        } catch (error) {
-            LogManager.error(error);
-            await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true });
+        const [jobquery] = await GameDB.query<IJob[]>('SELECT * FROM jobs WHERE name = ?', [
+            job.toLowerCase(),
+        ]);
+        if (jobquery.length === 0) {
+            await this.replyError('Es wurde kein Job mit diesem Namen gefunden!');
+            return;
         }
+
+        const [res] = await GameDB.execute<ResultSetHeader>(
+            'UPDATE users SET job = ?, job_grade = ? WHERE identifier = ?',
+            [job.toLowerCase(), grade, vPlayer.identifiers.steam],
+        );
+
+        if (res.affectedRows === 0) {
+            await this.replyError('Der Job konnte nicht geändert werden!');
+            return;
+        }
+
+        await this.replyWithEmbed({
+            title: 'Job geändert (offline)',
+            description: `Der Job von ${vPlayer.playerdata.fullname} (${vPlayer.identifiers.steam}) wurde auf ${jobquery[0].label}\nGrade ${grade} gesetzt!`,
+        });
     }
 }

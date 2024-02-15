@@ -4,7 +4,7 @@ import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { BotDB } from '@sql/Database';
 import { AlignmentEnum, AsciiTable3 } from 'ascii-table3';
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
 
 export class BotStats extends Command {
     constructor() {
@@ -36,7 +36,7 @@ export class BotStats extends Command {
         this.DoNotCountUse = true;
     }
 
-    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+    async execute(): Promise<void> {
         const data = await BotDB.command_log.groupBy({
             by: ['command'],
             _count: {
@@ -59,8 +59,6 @@ export class BotStats extends Command {
         });
 
         await this.replyWithEmbed({
-            interaction,
-            title: 'Bot Stats',
             description: `\`\`\`\n${table.toString()}\`\`\``,
         });
     }

@@ -6,7 +6,7 @@ import { EEmbedColors } from '@enums/EmbedColors';
 import { GameDB } from '@sql/Database';
 import { IVehicle } from '@sql/schema/Vehicle.schema';
 import { Helper } from '@utils/Helper';
-import { AttachmentBuilder, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class VehiclePop extends Command {
     constructor() {
@@ -50,14 +50,9 @@ export class VehiclePop extends Command {
 
     // @TODO: Rewrite to Service structure
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const spawnname = interaction.options.getString('spawnname');
-        const noexport = interaction.options.getBoolean('noexport');
-
-        if (!spawnname) {
-            throw new Error('Spawnname is required');
-        }
+        const spawnname = interaction.options.getString('spawnname', true);
+        const noexport = interaction.options.getBoolean('noexport') ?? false;
         const hash = Helper.generateOAAThash(spawnname);
-
         await interaction.deferReply();
 
         const [vehicles] = await GameDB.query<IVehicle[]>(
@@ -66,12 +61,9 @@ export class VehiclePop extends Command {
         );
 
         if (!vehicles.length) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'VehiclePop',
-                color: EEmbedColors.ALERT,
-                description: `Es konnten keine Fahrzeuge mit dem Spawnname **${spawnname}** gefunden werden.`,
-            });
+            await this.replyError(
+                `Es konnten keine Fahrzeuge mit dem Spawnname **${spawnname}** gefunden werden.`,
+            );
             return;
         }
         const attachments = [];
@@ -91,18 +83,10 @@ export class VehiclePop extends Command {
                     modSuspension: vehData.modSuspension,
                 });
             }
-            const jsonString = JSON.stringify(reponseList, null, 4);
-            const buffer = Buffer.from(jsonString, 'utf-8');
-            attachments.push(
-                new AttachmentBuilder(buffer, {
-                    name: `PRISM_VehiclePop_${new Date().toLocaleString('de-DE')}.json`,
-                }),
-            );
+            attachments.push(Helper.attachmentFromObject(reponseList, 'VehiclePopBackup'));
         }
 
         await this.replyWithEmbed({
-            interaction,
-            title: 'VehiclePop',
             description: `Es wurden **${vehicles.length} Fahrzeuge** mit dem Spawnnamen **${spawnname}** gefunden.`,
             color: EEmbedColors.SUCCESS,
             files: attachments,

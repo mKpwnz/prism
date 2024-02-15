@@ -3,7 +3,7 @@ import { Command } from '@class/Command';
 import { RconClient } from '@class/RconClient';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
 
 /**
  * @description Klasse zum Neustarten der Ingame Dropbox (Import Garage für neue Fahrzeuge aus dem Tebex Store).
@@ -41,10 +41,9 @@ export class RestartDropbox extends Command {
         );
     }
 
-    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+    async execute(): Promise<void> {
         await RconClient.sendCommand('ensure immo_store');
         await this.replyWithEmbed({
-            interaction,
             title: 'Dropbox neugestartet',
             description: 'Dropbox wurde neugestartet.',
         });

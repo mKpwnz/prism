@@ -116,7 +116,6 @@ export class Insurance extends Command {
         const insurance = insurances[0];
         const status = insurance.ts > new Date() ? '**Versichert**' : '**Nicht Versichert**';
         await this.replyWithEmbed({
-            interaction,
             title: 'Versicherung Prüfen',
             description: `${status}\nVersichert bis: ${insurance.ts.toLocaleDateString()} ${insurance.ts.toLocaleTimeString()}\nPremium: ${
                 insurance.premium
@@ -136,7 +135,6 @@ export class Insurance extends Command {
         const ts = new Date();
         ts.setDate(ts.getDate() + dauer);
         await this.replyWithEmbed({
-            interaction,
             title: 'Versicherung Hinzufügen',
             fields: [
                 {
@@ -169,7 +167,6 @@ export class Insurance extends Command {
         await InsuranceService.deleteVersicherungenByNumberplate(insurance);
 
         await this.replyWithEmbed({
-            interaction,
             title: 'Versicherung Entfernen',
             fields: [
                 {

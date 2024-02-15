@@ -2,7 +2,7 @@ import Config from '@Config';
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
 
 export class SysInfo extends Command {
     constructor() {
@@ -22,9 +22,8 @@ export class SysInfo extends Command {
         );
     }
 
-    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+    async execute(): Promise<void> {
         await this.replyWithEmbed({
-            interaction,
             fields: [
                 { name: 'NodeJS Version', value: process.version },
                 { name: 'Platform', value: process.platform },

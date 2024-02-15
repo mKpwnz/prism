@@ -6,7 +6,8 @@ import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { VehicleService } from '@services/VehicleService';
 import { GameDB } from '@sql/Database';
-import { AttachmentBuilder, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { Helper } from '@utils/Helper';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
 
 export class DeleteTrunk extends Command {
@@ -46,57 +47,38 @@ export class DeleteTrunk extends Command {
 
     // @TODO: Rewrite to Service structure
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const plate = interaction.options.getString('plate');
+        const plate = interaction.options.getString('plate', true);
 
-        if (!plate) {
-            throw new Error('Plate is required');
-        }
         if (plate.length > 8) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Delete Trunk',
-                description: `Das Kennzeichen **${plate}** ist zu lang. \nDas Kennzeichen darf maximal 8 Zeichen lang sein.`,
-                color: EEmbedColors.ALERT,
-            });
+            await this.replyError(
+                `Das Kennzeichen **${plate}** ist zu lang. \nDas Kennzeichen darf maximal 8 Zeichen lang sein.`,
+            );
+
             return;
         }
         await interaction.deferReply();
-
         const vehicle = await VehicleService.getVehicleByNumberplate(plate);
         if (!vehicle) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Delete Trunk',
-                description: `Es wurden keine Fahrzeuge mit dem Kennzeichen ${plate} gefunden.`,
-                color: EEmbedColors.ALERT,
-            });
+            await this.replyError(
+                `Es wurden keine Fahrzeuge mit dem Kennzeichen ${plate} gefunden.`,
+            );
             return;
         }
-        const jsonString = JSON.stringify(vehicle, null, 4);
-        const buffer = Buffer.from(jsonString, 'utf-8');
-        const attachment = new AttachmentBuilder(buffer, {
-            name: `PRISM_DeleteTrunkBackup_${plate}_${new Date().toLocaleString('de-DE')}.json`,
-        });
         const [res] = await GameDB.execute<ResultSetHeader>(
             `UPDATE owned_vehicles SET kofferraum = '{}' WHERE plate = ?`,
             [vehicle.plate],
         );
         if (res.affectedRows === 0) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Delete Trunk',
-                description: `Es ist ein Fehler aufgetreten. Der Kofferraum des Fahrzeugs mit dem Kennzeichen ${plate} konnte nicht gelöscht werden.`,
-                color: EEmbedColors.ALERT,
-            });
+            await this.replyError(
+                `Es ist ein Fehler aufgetreten. Der Kofferraum des Fahrzeugs mit dem Kennzeichen ${plate} konnte nicht gelöscht werden.`,
+            );
             return;
         }
         await RconClient.sendCommand(`debugtrunk ${plate}`);
         await this.replyWithEmbed({
-            interaction,
-            title: 'Delete Trunk',
             description: `Der Kofferraum des Fahrzeugs mit dem Kennzeichen **${plate}** wurde erfolgreich gelöscht.`,
             color: EEmbedColors.SUCCESS,
-            files: [attachment],
+            files: [Helper.attachmentFromObject(vehicle, 'DeleteTrunkBackup')],
         });
     }
 }

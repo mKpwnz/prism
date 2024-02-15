@@ -47,7 +47,6 @@ export class Revive extends Command {
 
         await RconClient.sendCommand(`revive ${id}${incapacitated ? ' 1' : ''}`);
         await this.replyWithEmbed({
-            interaction,
             title: 'Revive',
             description: `Der Spieler mit der ID **${id}** wurde revived!`,
         });

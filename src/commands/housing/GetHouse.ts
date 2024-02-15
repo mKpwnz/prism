@@ -43,7 +43,7 @@ export class GetHouse extends Command {
                 .addStringOption((option) =>
                     option
                         .setName('spieler')
-                        .setDescription('Alle Häuser zur SpielerID')
+                        .setDescription('SteamID des Spielers')
                         .setRequired(true),
                 ),
             this,
@@ -51,22 +51,12 @@ export class GetHouse extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const player = interaction.options.getString('spieler', true) ?? '';
-
-        if (player === '') {
-            await interaction.reply({
-                content: `Bitte gib eine HausID oder einen Spieler an!`,
-                ephemeral: true,
-            });
-            return;
-        }
-
+        const player = interaction.options.getString('spieler', true);
         const vUser = await PlayerService.validatePlayer(player);
         if (!vUser) {
-            await interaction.reply({
-                content: `Es konnte kein User mit dem Namen \`${player}\` gefunden werden!`,
-                ephemeral: true,
-            });
+            await this.replyError(
+                `Es konnte kein User mit der SteamID \`${player}\` gefunden werden!`,
+            );
             return;
         }
 
@@ -76,10 +66,9 @@ export class GetHouse extends Command {
         );
 
         if (houses.length === 0) {
-            await interaction.reply({
-                content: `Es konnte kein Haus mit der ID \`${player}\` gefunden werden!`,
-                ephemeral: true,
-            });
+            await this.replyError(
+                `Es konnte kein Haus für den Spieler mit der SteamID \`${player}\` gefunden werden!`,
+            );
             return;
         }
 
@@ -110,8 +99,6 @@ export class GetHouse extends Command {
         }
 
         await this.replyWithEmbed({
-            interaction,
-            title: 'Hausdaten',
             description: `Alle Häuser von \`${vUser.identifiers.steam}\` (${vUser.playerdata.fullname})`,
             fields,
         });

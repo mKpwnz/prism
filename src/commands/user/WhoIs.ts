@@ -181,7 +181,6 @@ export class WhoIs extends Command {
             }
 
             await this.replyWithEmbed({
-                interaction,
                 title: `Suchergebnisse`,
                 description: `Hier sind ${embedFields.length}/${findUsers.length} Suchergebnisse für "${identifierValue}":${additionalString}${pageString}`,
                 fields: embedFields,

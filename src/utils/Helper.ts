@@ -1,7 +1,6 @@
 import { BotClient } from '@Bot';
 import Config from '@Config';
-import { CommandInteraction, GuildEmoji, TextChannel } from 'discord.js';
-import LogManager from './Logger';
+import { AttachmentBuilder, CommandInteraction, GuildEmoji, TextChannel } from 'discord.js';
 
 export class Helper {
     /**
@@ -184,12 +183,10 @@ export class Helper {
      * @returns {*}  {string}
      * @memberof Helper
      */
-    static validateWeaponName(weaponName: string): string {
-        LogManager.log(weaponName);
+    static validateWeaponName(weaponName: string): string | null {
         if (!weaponName.startsWith('WEAPON_')) {
             weaponName = `WEAPON_${weaponName.toUpperCase()}`;
         }
-        LogManager.log(weaponName);
         const weaponList = [
             'WEAPON_DAGGER',
             'WEAPON_BAT',
@@ -276,12 +273,9 @@ export class Helper {
             'WEAPON_HARZARDCAN',
             'WEAPON_STUNSHOT',
         ];
-        LogManager.debug(weaponList.includes(weaponName));
         if (!weaponList.includes(weaponName)) {
-            LogManager.log('Weapon not found');
-            return '';
+            return null;
         }
-        LogManager.log('Weapon found');
         return weaponName;
     }
 
@@ -364,5 +358,35 @@ export class Helper {
         hash ^= hash >>> 11;
         hash += hash << 15;
         return (hash >>> 0) >> 0;
+    }
+
+    /**
+     * @description Creates a new AttachmentBuilder from a JSON string and a filename. The filename will be prefixed with "PRISM_" and the current date and time in the format "dd.mm.yyyy_hh:mm:ss".
+     * @author mKpwnz
+     * @date 15.02.2024
+     * @static
+     * @param {string} jsonInput
+     * @param {string} filename
+     * @returns {*}  {AttachmentBuilder}
+     * @memberof Helper
+     */
+    static attachmentFromJson(jsonInput: string, filename: string): AttachmentBuilder {
+        return new AttachmentBuilder(Buffer.from(jsonInput, 'utf-8'), {
+            name: `PRISM_${filename}_${new Date().toLocaleString('de-DE')}.json`,
+        });
+    }
+
+    /**
+     * @description Creates a new AttachmentBuilder from an object and a filename. The object will be stringified with 4 spaces indentation and the filename will be prefixed with "PRISM_" and the current date and time in the format "dd.mm.yyyy_hh:mm:ss".
+     * @author mKpwnz
+     * @date 15.02.2024
+     * @static
+     * @param {*} objInput
+     * @param {string} filename
+     * @returns {*}  {AttachmentBuilder}
+     * @memberof Helper
+     */
+    static attachmentFromObject(objInput: any, filename: string): AttachmentBuilder {
+        return Helper.attachmentFromJson(JSON.stringify(objInput, null, 4), filename);
     }
 }

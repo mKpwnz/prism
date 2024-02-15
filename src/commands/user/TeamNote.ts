@@ -70,40 +70,29 @@ export class TeamNote extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        if (interaction.options.getSubcommand() === 'hinzufügen') {
-            await this.addNote(interaction);
-        } else if (interaction.options.getSubcommand() === 'auflisten') {
-            await this.listNotes(interaction);
-        } else if (interaction.options.getSubcommand() === 'anzeigen') {
-            await this.viewNote(interaction);
-        } else {
-            await interaction.reply({ content: 'Command nicht gefunden.', ephemeral: true });
+        switch (interaction.options.getSubcommand()) {
+            case 'hinzufügen':
+                await this.addNote(interaction);
+                break;
+            case 'auflisten':
+                await this.listNotes(interaction);
+                break;
+            case 'anzeigen':
+                await this.viewNote(interaction);
+                break;
+            default:
+                await this.replyError('Command nicht gefunden.');
+                break;
         }
     }
 
     private async addNote(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction;
-        const embed = Command.getEmbedTemplate(interaction);
-        const steamid = options.getString('steamid');
-        const note = options.getString('notiz');
+        const steamid = interaction.options.getString('steamid', true);
+        const note = interaction.options.getString('notiz', true);
 
-        if (!steamid) {
-            embed.setTitle('Teamnote | Fehler');
-            embed.setDescription('Es wurde keine SteamID angegeben.');
-            await interaction.reply({ embeds: [embed] });
-            return;
-        }
         const vPlayer = await PlayerService.validatePlayer(steamid);
         if (!vPlayer) {
-            embed.setTitle('Teamnote | Fehler');
-            embed.setDescription('Die angegebene SteamID ist ungültig.');
-            await interaction.reply({ embeds: [embed] });
-            return;
-        }
-        if (!note) {
-            embed.setTitle('Teamnote | Fehler');
-            embed.setDescription('Es wurde keine Notiz angegeben.');
-            await interaction.reply({ embeds: [embed] });
+            await this.replyError('Die angegebene SteamID ist ungültig.');
             return;
         }
 
@@ -115,53 +104,46 @@ export class TeamNote extends Command {
                 note,
             },
         });
-        embed.setTitle(`Teamnote | Hinzugefügt (ID: ${data.id})`);
-        embed.setFields([
-            {
-                name: 'User (IC Name)',
-                value: vPlayer.playerdata.fullname,
-                inline: true,
-            },
-            {
-                name: 'User (SteamID)',
-                value: vPlayer.identifiers.steam,
-                inline: true,
-            },
-            { name: '\u200B', value: '\u200B', inline: true },
-            {
-                name: 'Hinzugefügt von',
-                value: `${data.noterName} (${data.noterId})`,
-                inline: true,
-            },
-            {
-                name: 'Hinzugefügt am',
-                value: data.created_at.toLocaleString('de-DE'),
-                inline: true,
-            },
-            {
-                name: 'Notiz',
-                value: data.note,
-            },
-        ]);
-        await interaction.reply({ embeds: [embed] });
+
+        await this.replyWithEmbed({
+            title: `Teamnote | Hinzugefügt (ID: ${data.id})`,
+            description: 'Die Notiz wurde erfolgreich hinzugefügt.',
+            fields: [
+                {
+                    name: 'User (IC Name)',
+                    value: vPlayer.playerdata.fullname,
+                    inline: true,
+                },
+                {
+                    name: 'User (SteamID)',
+                    value: vPlayer.identifiers.steam,
+                    inline: true,
+                },
+                { name: '\u200B', value: '\u200B', inline: true },
+                {
+                    name: 'Hinzugefügt von',
+                    value: `${data.noterName} (${data.noterId})`,
+                    inline: true,
+                },
+                {
+                    name: 'Hinzugefügt am',
+                    value: data.created_at.toLocaleString('de-DE'),
+                    inline: true,
+                },
+                {
+                    name: 'Notiz',
+                    value: data.note,
+                },
+            ],
+        });
     }
 
     private async listNotes(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction;
-        const embed = Command.getEmbedTemplate(interaction);
-        const steamid = options.getString('steamid');
+        const steamid = interaction.options.getString('steamid', true);
 
-        if (!steamid) {
-            embed.setTitle('Teamnote | Fehler');
-            embed.setDescription('Es wurde keine SteamID angegeben.');
-            await interaction.reply({ embeds: [embed] });
-            return;
-        }
         const vPlayer = await PlayerService.validatePlayer(steamid);
         if (!vPlayer) {
-            embed.setTitle('Teamnote | Fehler');
-            embed.setDescription('Die angegebene SteamID ist ungültig.');
-            await interaction.reply({ embeds: [embed] });
+            this.replyError('Die angegebene SteamID ist ungültig.');
             return;
         }
 
@@ -181,8 +163,9 @@ export class TeamNote extends Command {
                 note.note
             }\`\`\`\n`;
         });
-        embed.setDescription(
-            `Notizen (${data.length > 5 ? 5 : data.length}/${data.length}) von **${
+
+        await this.replyWithEmbed({
+            description: `Notizen (${data.length > 5 ? 5 : data.length}/${data.length}) von **${
                 vPlayer.playerdata.fullname
             }**  (${vPlayer.identifiers.steam})\n${
                 data.length > 5
@@ -192,54 +175,42 @@ export class TeamNote extends Command {
                           .join(', ')}**`
                     : ''
             }\n\n${notes}`,
-        );
-        await interaction.reply({ embeds: [embed] });
+        });
     }
 
     private async viewNote(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction;
-        const embed = Command.getEmbedTemplate(interaction);
-        const id = options.getInteger('id');
+        const id = interaction.options.getInteger('id', true);
 
-        if (!id) {
-            embed.setTitle('Teamnote | Fehler');
-            embed.setDescription('Es wurde keine ID angegeben.');
-            await interaction.reply({ embeds: [embed] });
-            return;
-        }
         const data = await BotDB.team_notes.findUnique({
             where: {
                 id,
             },
         });
         if (!data) {
-            embed.setTitle('Teamnote | Fehler');
-            embed.setDescription('Die angegebene ID ist ungültig.');
-            await interaction.reply({ embeds: [embed] });
+            await this.replyError('Die angegebene ID ist ungültig.');
             return;
         }
         const vPlayer = await PlayerService.validatePlayer(data.user);
         if (vPlayer) {
-            embed.setDescription(
-                `Notizen von **${vPlayer.playerdata.fullname}**  (${
+            await this.replyWithEmbed({
+                description: `Notizen von **${vPlayer.playerdata.fullname}**  (${
                     vPlayer.identifiers.steam
                 })\n\nID: **${data.id}** | Erstellt von: **${
                     data.noterName
                 }** | Erstellt am **${data.created_at.toLocaleString('de-DE')}**\n\`\`\`${
                     data.note
                 }\`\`\`\n`,
-            );
+            });
         } else {
-            embed.setDescription(
-                `*Die SteamID konnte keinem Nutzer zugewiesen werden!*\n\nNotizen von **${
+            await this.replyWithEmbed({
+                description: `*Die SteamID konnte keinem Nutzer zugewiesen werden!*\n\nNotizen von **${
                     data.user
                 }** \n\nID: **${data.id}** | Erstellt von: **${
                     data.noterName
                 }** | Erstellt am **${data.created_at.toLocaleString('de-DE')}**\n\`\`\`${
                     data.note
                 }\`\`\`\n`,
-            );
+            });
         }
-        await interaction.reply({ embeds: [embed] });
     }
 }

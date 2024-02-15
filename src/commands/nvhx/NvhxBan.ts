@@ -42,13 +42,11 @@ export class NvhxBan extends Command {
         const response = await NvhxBan.banPlayerById(id);
         if (response.includes('Banned: ')) {
             await this.replyWithEmbed({
-                interaction,
                 title: 'Neverhax Ban',
                 description: `Bannt SpielerID ${id}\nAntwort vom Server:\n\`\`\`${response}\`\`\``,
             });
         } else {
             await this.replyWithEmbed({
-                interaction,
                 title: 'Neverhax Ban',
                 description: `Spieler nicht gefunden!`,
                 ephemeral: true,
