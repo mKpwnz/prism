@@ -76,14 +76,14 @@ export abstract class Command {
      * @type {Date}
      * @memberof Command
      */
-    CmdPerformanceStart: Date | undefined = undefined;
+    private CmdPerformanceStart: Date | undefined = undefined;
 
     /**
      * @description Gibt an, wann der Command fertig ausgeführt wurde. (Timestamp)
      * @type {Date}
      * @memberof Command
      */
-    CmdPerformanceStop: Date | undefined = undefined;
+    private CmdPerformanceStop: Date | undefined = undefined;
 
     /**
      * @description Gibt an, welcher EmbedTitle für Fehlermeldungen benutzt werden soll.
