@@ -1,5 +1,12 @@
 import { Command } from '@class/Command';
-import { DeleteTrunk, DeleteVehicle, GiveCar, VehiclePop } from '@commands/cars';
+import {
+    ChangePlate,
+    DeleteTrunk,
+    DeleteVehicle,
+    GiveCar,
+    Vehicle,
+    VehiclePop,
+} from '@commands/cars';
 import { EENV } from '@enums/EENV';
 import LogManager from '@utils/Logger';
 import { Interaction, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js';
@@ -106,6 +113,8 @@ export class CommandHandler {
         new VehiclePop();
         new DeleteTrunk();
         new DeleteVehicle();
+        new ChangePlate();
+        new Vehicle();
         new Tebex();
         // new Versicherung()
         new SysInfo();
