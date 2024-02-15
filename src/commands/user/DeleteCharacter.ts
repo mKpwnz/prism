@@ -2,7 +2,7 @@ import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { PlayerService } from '@services/PlayerService';
-import { ValidatedPlayer } from '@ctypes/ValidatedPlayer';
+import { IValidatedPlayer } from '@interfaces/IValidatedPlayer';
 import { ELicenses } from '@enums/ELicenses';
 import Config from '@Config';
 import { GameDB } from '@sql/Database';
@@ -86,7 +86,7 @@ export class DeleteCharacter extends Command {
         }
     }
 
-    private async moveCharacterToArchive(vPlayer: ValidatedPlayer): Promise<boolean> {
+    private async moveCharacterToArchive(vPlayer: IValidatedPlayer): Promise<boolean> {
         try {
             const newIdentifier = vPlayer.identifiers.steam.replace('steam', 'deleted');
             // TODO: Add Return Handler

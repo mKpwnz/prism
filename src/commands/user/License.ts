@@ -2,7 +2,7 @@ import { Command } from '@class/Command';
 import { NonEmptyArray } from '@class/NonEmptyArray';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { PlayerService } from '@services/PlayerService';
-import { ValidatedPlayer } from '@ctypes/ValidatedPlayer';
+import { IValidatedPlayer } from '@interfaces/IValidatedPlayer';
 import { EENV } from '@enums/EENV';
 import { ELicenses } from '@enums/ELicenses';
 import Config from '@Config';
@@ -179,7 +179,7 @@ export class License extends Command {
     }
 
     public static async deleteLicense(
-        vPlayer: ValidatedPlayer,
+        vPlayer: IValidatedPlayer,
         licenses: ELicenses | NonEmptyArray<Exclude<ELicenses, ELicenses.ALL>>,
     ): Promise<ResultSetHeader | Error> {
         let query = 'DELETE FROM user_licenses WHERE owner = ? AND ';
@@ -212,7 +212,7 @@ export class License extends Command {
     }
 
     public static async checkLicense(
-        vPlayer: ValidatedPlayer,
+        vPlayer: IValidatedPlayer,
         license: Exclude<ELicenses, ELicenses.ALL>,
     ): Promise<boolean> {
         const [result] = await GameDB.query<IUserLicense[]>(

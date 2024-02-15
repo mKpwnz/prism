@@ -1,5 +1,5 @@
 import { PlayerService } from '@services/PlayerService';
-import { ValidatedPlayer } from '@ctypes/ValidatedPlayer';
+import { IValidatedPlayer } from '@interfaces/IValidatedPlayer';
 import { EUniqueIdentifier } from '@enums/ESearchType';
 import Config from '@Config';
 import { GameDB } from '@sql/Database';
@@ -40,7 +40,7 @@ export class CustomImageUpload {
         size: 1024 * 800,
     };
 
-    private vPlayer: ValidatedPlayer | null = null;
+    private vPlayer: IValidatedPlayer | null = null;
 
     constructor(client: Client) {
         this.client = client;

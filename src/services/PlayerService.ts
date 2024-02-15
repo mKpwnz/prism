@@ -1,4 +1,4 @@
-import { ValidatedPlayer } from '@ctypes/ValidatedPlayer';
+import { IValidatedPlayer } from '@interfaces/IValidatedPlayer';
 import { EUniqueIdentifier } from '@enums/ESearchType';
 import { ILivePlayer } from '@interfaces/ILivePlayer';
 import { GameDB } from '@sql/Database';
@@ -77,7 +77,7 @@ export class PlayerService {
     public static async validatePlayer(
         searchString: string,
         type: EUniqueIdentifier = EUniqueIdentifier.IDENTIFIER,
-    ): Promise<ValidatedPlayer | null> {
+    ): Promise<IValidatedPlayer | null> {
         const filterMap = new Map<string, string>([
             [EUniqueIdentifier.IDENTIFIER, `LOWER( users.identifier ) = '${searchString}'`],
             [EUniqueIdentifier.STEAMID, `LOWER( users.steamid ) = '${searchString}'`],
@@ -129,7 +129,7 @@ export class PlayerService {
         const cID = await this.getPlayerId(usr.identifiers_steam);
 
         const accountData = JSON.parse(usr.playerdata_accounts_raw);
-        const userObject: ValidatedPlayer = {
+        const userObject: IValidatedPlayer = {
             steamnames: {
                 current: usr.steamnames_current,
                 atFirstLogin: usr.steamnames_atFirstLogin,
