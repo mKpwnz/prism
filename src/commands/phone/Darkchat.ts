@@ -97,13 +97,7 @@ export class Darkchat extends Command {
             errorList.push('Das Format für das "bis" Datum muss YYYY-MM-DD sein.');
 
         if (errorList.length > 0) {
-            const content = errorList.join('\n');
-            await this.replyWithEmbed({
-                interaction,
-                description: content,
-                title: 'Fehler',
-                color: EEmbedColors.ALERT,
-            });
+            await this.replyError(errorList.join('\n'));
             return;
         }
 
@@ -117,17 +111,11 @@ export class Darkchat extends Command {
         const pages = this.splitApiResponse(messages, 2000);
 
         if (page > pages.length || page < 1) {
-            await this.replyWithEmbed({
-                interaction,
-                description: `Seite ${page} existiert nicht.`,
-                title: 'Fehler',
-                color: EEmbedColors.ALERT,
-            });
+            await this.replyError(`Seite ${page} existiert nicht.`);
             return;
         }
 
         await this.replyWithEmbed({
-            interaction,
             description: pages[page - 1],
             title: `Darkchat Suche Seite ${page} von ${pages.length}`,
             color: EEmbedColors.DEFAULT,

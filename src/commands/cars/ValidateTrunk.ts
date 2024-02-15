@@ -1,11 +1,11 @@
+import Config from '@Config';
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
-import { ItemService } from '@services/ItemService';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
-import Config from '@Config';
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { ItemService } from '@services/ItemService';
 import { VehicleService } from '@services/VehicleService';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class ValidateTrunk extends Command {
     constructor() {
@@ -43,24 +43,18 @@ export class ValidateTrunk extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const embedTitle = 'Validiere Kofferraum';
-
         const plate = interaction.options.getString('plate', true);
         const vehicle = await VehicleService.getVehicleByNumberplate(plate);
 
         if (!vehicle) {
-            await this.replyWithEmbed({
-                interaction,
-                title: embedTitle,
-                description: `Es konnte kein Fahrzeug mit dem Kennzeichen ${plate} gefunden werden.`,
-            });
+            await this.replyError(
+                `Es konnte kein Fahrzeug mit dem Kennzeichen ${plate} gefunden werden.`,
+            );
             return;
         }
 
         if (!vehicle.kofferraum) {
             await this.replyWithEmbed({
-                interaction,
-                title: embedTitle,
                 description: `Der Kofferraum des Fahrzeugs mit dem Kennzeichen \`${vehicle.plate}\` ist leer.`,
             });
             return;
@@ -71,15 +65,11 @@ export class ValidateTrunk extends Command {
 
         if (!scuffedItems.length) {
             await this.replyWithEmbed({
-                interaction,
-                title: embedTitle,
                 description: `Der Kofferraum des Fahrzeugs mit dem Kennzeichen \`${vehicle.plate}\` ist valid.`,
                 color: EEmbedColors.SUCCESS,
             });
         } else {
             await this.replyWithEmbed({
-                interaction,
-                title: embedTitle,
                 description: `Der Kofferraum des Fahrzeugs mit dem Kennzeichen \`${
                     vehicle.plate
                 }\` ist nicht valid.\nFolgende Items sind nicht mehr im Spiel:\n\`\`\`${scuffedItems

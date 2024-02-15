@@ -54,22 +54,12 @@ export class Rename extends Command {
         const vPlayer = await PlayerService.validatePlayer(steamId);
 
         if (!vPlayer) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Fehler',
-                description: 'Der Spieler konnte nicht gefunden werden!',
-                color: EEmbedColors.ALERT,
-            });
+            await this.replyError('Der Spieler konnte nicht gefunden werden!');
             return;
         }
 
         if (!firstname && !lastname) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Fehler',
-                description: 'Bitte mindestens einen Vornamen oder Nachnamen angeben!',
-                color: EEmbedColors.ALERT,
-            });
+            await this.replyError('Bitte mindestens einen Vornamen oder Nachnamen angeben!');
             return;
         }
 
@@ -88,7 +78,6 @@ export class Rename extends Command {
 
         if (res.affectedRows !== 0) {
             await this.replyWithEmbed({
-                interaction,
                 title: 'Spieler umbenannt',
                 description: `Der Spieler wurde erfolgreich umbenannt.`,
                 fields: [
@@ -108,12 +97,7 @@ export class Rename extends Command {
                 color: EEmbedColors.SUCCESS,
             });
         } else {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Fehler',
-                description: 'Der Spieler konnte nicht umbenannt werden!',
-                color: EEmbedColors.ALERT,
-            });
+            await this.replyError('Der Spieler konnte nicht umbenannt werden!');
         }
     }
 }

@@ -5,7 +5,8 @@ import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { PlayerService } from '@services/PlayerService';
 import { VehicleService } from '@services/VehicleService';
-import { AttachmentBuilder, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { Helper } from '@utils/Helper';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class Vehicle extends Command {
     constructor() {
@@ -28,6 +29,7 @@ export class Vehicle extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
+        this.EmbedTitle = 'Vehicle Info';
 
         RegisterCommand(
             new SlashCommandBuilder()
@@ -45,50 +47,29 @@ export class Vehicle extends Command {
 
     // @TODO: Rewrite to Service structure
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const plate = interaction.options.getString('plate');
+        const plate = interaction.options.getString('plate', true);
 
-        if (!plate) {
-            throw new Error('Plate is required');
-        }
         if (plate.length > 8) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Vehicle Info',
-                description: `Das Kennzeichen **${plate}** ist zu lang. \nDas Kennzeichen darf maximal 8 Zeichen lang sein.`,
-                color: EEmbedColors.ALERT,
-            });
+            await this.replyError(
+                'Das Kennzeichen ist zu lang. \nDas Kennzeichen darf maximal 8 Zeichen lang sein.',
+            );
             return;
         }
         await interaction.deferReply();
 
         const vehicle = await VehicleService.getVehicleByNumberplate(plate);
         if (!vehicle) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Vehicle Info',
-                description: `Es wurden keine Fahrzeuge mit dem Kennzeichen ${plate} gefunden.`,
-                color: EEmbedColors.ALERT,
-            });
+            await this.replyError(
+                `Es wurden keine Fahrzeuge mit dem Kennzeichen ${plate} gefunden.`,
+            );
             return;
         }
-        const jsonString = JSON.stringify(vehicle, null, 4);
-        const buffer = Buffer.from(jsonString, 'utf-8');
-        const attachment = new AttachmentBuilder(buffer, {
-            name: `PRISM_VehicleInfo_${plate}_${new Date().toLocaleString('de-DE')}.json`,
-        });
         const player = await PlayerService.validatePlayer(vehicle.owner);
         if (!player) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Vehicle Info',
-                description: `Der Besitzer des Fahrzeugs konnte nicht gefunden werden.`,
-                color: EEmbedColors.ALERT,
-            });
+            await this.replyError(`Der Besitzer des Fahrzeugs konnte nicht gefunden werden.`);
             return;
         }
         await this.replyWithEmbed({
-            interaction,
-            title: 'Vehicle Info',
             description: `Fahrzeug Informationen für das Kennzeichen **${plate}**`,
             fields: [
                 {
@@ -101,14 +82,14 @@ export class Vehicle extends Command {
                 },
                 {
                     name: 'Besitzer Job',
-                    value: `${player.playerdata.job.nameLabel} | ${player.playerdata.job.gradeLabel}`,
+                    value: `${player.playerdata.job.nameLabel} (${player.playerdata.job.name}) | ${player.playerdata.job.gradeLabel}`,
                 },
                 {
                     name: 'Fahrzeug Job',
                     value: `${vehicle.job}`,
                 },
             ],
-            files: [attachment],
+            files: [Helper.attachmentFromObject(vehicle, 'VehicleInfo')],
             color: EEmbedColors.SUCCESS,
         });
     }

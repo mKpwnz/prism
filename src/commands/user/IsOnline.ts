@@ -69,7 +69,6 @@ export class IsOnline extends Command {
         }
 
         await this.replyWithEmbed({
-            interaction,
             title: vUser.metadata.isPlayerOnline
                 ? `Spieler ist online ${
                       vUser.metadata.currentID !== -1 ? `| ID: ${vUser.metadata.currentID}` : ''

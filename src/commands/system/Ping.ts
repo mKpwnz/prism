@@ -2,7 +2,7 @@ import Config from '@Config';
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
 
 export class Ping extends Command {
     constructor() {
@@ -18,7 +18,7 @@ export class Ping extends Command {
         RegisterCommand(new SlashCommandBuilder().setName('ping').setDescription('Pong!'), this);
     }
 
-    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        await interaction.reply('Pong!');
+    async execute(): Promise<void> {
+        await this.replyWithEmbed({ description: 'Pong!' });
     }
 }

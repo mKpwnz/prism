@@ -2,7 +2,7 @@ import Config from '@Config';
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
 
 export class Help extends Command {
     constructor() {
@@ -31,9 +31,8 @@ export class Help extends Command {
         );
     }
 
-    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+    async execute(): Promise<void> {
         await this.replyWithEmbed({
-            interaction,
             title: 'Bot Hilfe',
             description:
                 'Die Hilfe findest du auf folgender Seite: [Bot Hilfe](https://brand.immortaldev.eu/discordbot)',

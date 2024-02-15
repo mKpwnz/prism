@@ -102,11 +102,12 @@ export class CheckPhotos extends Command {
         const embeds: EmbedBuilder[] = [];
         // Split userset into chunks of 25
         for (let i = 0; i < userset.length; i += 150) {
-            const current = userset.slice(i, i + 150);
-            const embed = Command.getEmbedTemplate(interaction)
-                .setTitle('Nutzer mit illegalen Fotos')
-                .setDescription(`${current.join('\n')}`);
-            embeds.push(embed);
+            embeds.push(
+                this.getEmbedTemplate({
+                    title: 'Nutzer mit illegalen Fotos',
+                    description: `${userset.slice(i, i + 150).join('\n')}`,
+                }),
+            );
         }
 
         // @TODO missing await?

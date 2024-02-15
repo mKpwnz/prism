@@ -50,12 +50,7 @@ export class CheckImageOwner extends Command {
         const normalizedLink = this.normalizeLink(imageUrl);
 
         if (!normalizedLink) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Image Owner',
-                description: `Der link konnte nicht validiert werden.`,
-                ephemeral: true,
-            });
+            await this.replyError(`Der link konnte nicht validiert werden.`);
             return;
         }
 
@@ -63,17 +58,12 @@ export class CheckImageOwner extends Command {
 
         if (!phoneOwner) {
             await this.replyWithEmbed({
-                interaction,
-                title: 'Image Owner',
                 description: `Es konnte kein Spieler mit diesem Bild gefunden werden.`,
-                ephemeral: true,
             });
             return;
         }
 
         await this.replyWithEmbed({
-            interaction,
-            title: 'Image Owner',
             description: `\`\`\`json\n${JSON.stringify(phoneOwner, null, 4)}\`\`\``,
         });
     }

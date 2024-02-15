@@ -78,14 +78,12 @@ export class ChangeBirthday extends Command {
 
         if (res.affectedRows > 0) {
             await this.replyWithEmbed({
-                interaction,
                 title: 'Geburtstag geändert',
                 description: `Der Geburtstag des Spielers **${vPlayer.playerdata.fullname}** (${vPlayer.identifiers.steam}) wurde auf **${birthday}** geändert.`,
                 color: EEmbedColors.SUCCESS,
             });
         } else {
             await this.replyWithEmbed({
-                interaction,
                 title: 'Geburtstag nicht geändert',
                 description: `Der Geburtstag des Spielers **${vPlayer.playerdata.fullname}** (${vPlayer.identifiers.steam}) konnte nicht auf **${birthday}** geändert werden.`,
                 color: EEmbedColors.ALERT,

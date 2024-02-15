@@ -24,10 +24,14 @@ export class ChangePlate extends Command {
         this.AllowedGroups = [
             Config.Groups.PROD.SERVERENGINEER,
             Config.Groups.PROD.IC_SUPERADMIN,
-            Config.Groups.PROD.IC_HADMIN,
 
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
+        ];
+        this.AllowedUsers = [
+            Config.Users.SCHLAUCHI,
+            Config.Users.LUCASJHW,
+            Config.Users.JUNGLEJANIS,
         ];
 
         RegisterCommand(
@@ -52,37 +56,26 @@ export class ChangePlate extends Command {
 
     // @TODO: Rewrite to Service structure
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const oldplate = interaction.options.getString('oldplate');
-        const newplate = interaction.options.getString('newplate');
+        const oldplate = interaction.options.getString('oldplate', true);
+        const newplate = interaction.options.getString('newplate', true);
 
-        if (!oldplate || !newplate) {
-            throw new Error('Old and New Plate is required');
-        }
         if (oldplate.length > 8) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Change Plate',
-                description: `Das Kennzeichen **${oldplate}** ist zu lang. \nDas Kennzeichen darf maximal 8 Zeichen lang sein.`,
-                color: EEmbedColors.ALERT,
-            });
+            await this.replyError(
+                `Das Kennzeichen **${oldplate}** ist zu lang. \nDas Kennzeichen darf maximal 8 Zeichen lang sein.`,
+            );
             return;
         }
         if (newplate.length > 8) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Change Plate',
-                description: `Das Kennzeichen **${newplate}** ist zu lang. \nDas Kennzeichen darf maximal 8 Zeichen lang sein.`,
-                color: EEmbedColors.ALERT,
-            });
+            await this.replyError(
+                `Das Kennzeichen **${newplate}** ist zu lang. \nDas Kennzeichen darf maximal 8 Zeichen lang sein.`,
+            );
             return;
         }
         if (!newplate.toUpperCase().match(/^[A-Z0-9 ]*$/g)) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Change Plate',
-                description: `Das Kennzeichen **${newplate}** enthält ungültige Zeichen. \nDas Kennzeichen darf nur aus Buchstaben und Zahlen bestehen.`,
-                color: EEmbedColors.ALERT,
-            });
+            await this.replyError(
+                `Das Kennzeichen **${newplate}** enthält ungültige Zeichen. \nDas Kennzeichen darf nur aus Buchstaben und Zahlen bestehen.`,
+            );
+
             return;
         }
         await interaction.deferReply();
@@ -90,31 +83,23 @@ export class ChangePlate extends Command {
         const newplatefmt = Helper.formatNumberplate(newplate);
         const vehicle = await VehicleService.getVehicleByNumberplate(oldplate);
         if (!vehicle) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Change Plate',
-                description: `Es wurden keine Fahrzeuge mit dem Kennzeichen ${oldplate} gefunden.`,
-                color: EEmbedColors.ALERT,
-            });
+            await this.replyError(
+                `Es wurden keine Fahrzeuge mit dem Kennzeichen ${oldplate} gefunden.`,
+            );
             return;
         }
         if (vehicle.garage < 0) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Change Plate',
-                description: `Das Fahrzeug mit dem Kennzeichen **${oldplate}** ist nicht in einer Garage geparkt und kann daher nicht bearbeitet werden.`,
-                color: EEmbedColors.ALERT,
-            });
+            await this.replyError(
+                `Das Fahrzeug mit dem Kennzeichen **${oldplate}** ist nicht in einer Garage geparkt und kann daher nicht bearbeitet werden.`,
+            );
             return;
         }
         const newplatevehicle = await VehicleService.getVehicleByNumberplate(newplate);
         if (newplatevehicle) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Change Plate',
-                description: `Es existiert bereits ein Fahrzeug mit dem Kennzeichen ${newplate}.`,
-                color: EEmbedColors.ALERT,
-            });
+            await this.replyError(
+                `Es existiert bereits ein Fahrzeug mit dem Kennzeichen ${newplate}.`,
+            );
+
             return;
         }
         const [res] = await GameDB.execute<ResultSetHeader>(
@@ -122,19 +107,14 @@ export class ChangePlate extends Command {
             [newplatefmt, newplatefmt, vehicle.plate],
         );
         if (res.affectedRows === 0) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Delete Vehicle',
-                description: `Es ist ein Fehler aufgetreten. Des Fahrzeug mit dem Kennzeichen ${oldplate} konnte nicht bearbeitet werden.`,
-                color: EEmbedColors.ALERT,
-            });
+            await this.replyError(
+                `Es ist ein Fehler aufgetreten. Des Fahrzeug mit dem Kennzeichen ${oldplate} konnte nicht bearbeitet werden.`,
+            );
             return;
         }
         await RconClient.sendCommand(`unloadtrunk ${oldplate}`);
         await RconClient.sendCommand(`debugtrunk ${oldplate}`);
         await this.replyWithEmbed({
-            interaction,
-            title: 'Change Plate',
             description: `Das Fahrzeugs mit dem Kennzeichen **${oldplate}** hat nun das Kennzeichen **${newplatefmt}**.`,
             color: EEmbedColors.SUCCESS,
         });

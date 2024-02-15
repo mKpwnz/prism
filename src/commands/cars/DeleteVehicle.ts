@@ -44,29 +44,20 @@ export class DeleteVehicle extends Command {
 
     // @TODO: Rewrite to Service structure
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const plate = interaction.options.getString('plate');
+        const plate = interaction.options.getString('plate', true);
 
-        if (!plate) {
-            throw new Error('Plate is required');
-        }
         if (plate.length > 8) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Delete Vehicle',
-                description: `Das Kennzeichen **${plate}** ist zu lang. \nDas Kennzeichen darf maximal 8 Zeichen lang sein.`,
-                color: EEmbedColors.ALERT,
-            });
+            await this.replyError(
+                `Das Kennzeichen **${plate}** ist zu lang. \nDas Kennzeichen darf maximal 8 Zeichen lang sein.`,
+            );
             return;
         }
         await interaction.deferReply();
         const vehicle = await VehicleService.getVehicleByNumberplate(plate);
         if (!vehicle) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Delete Vehicle',
-                description: `Es wurden keine Fahrzeuge mit dem Kennzeichen ${plate} gefunden.`,
-                color: EEmbedColors.ALERT,
-            });
+            await this.replyError(
+                `Es wurden keine Fahrzeuge mit dem Kennzeichen ${plate} gefunden.`,
+            );
             return;
         }
         const jsonString = JSON.stringify(vehicle, null, 4);
@@ -79,17 +70,12 @@ export class DeleteVehicle extends Command {
             [vehicle.plate],
         );
         if (res.affectedRows === 0) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Delete Vehicle',
-                description: `Es ist ein Fehler aufgetreten. Des Fahrzeug mit dem Kennzeichen ${plate} konnte nicht gelöscht werden.`,
-                color: EEmbedColors.ALERT,
-            });
+            await this.replyError(
+                `Es ist ein Fehler aufgetreten. Des Fahrzeug mit dem Kennzeichen ${plate} konnte nicht gelöscht werden.`,
+            );
             return;
         }
         await this.replyWithEmbed({
-            interaction,
-            title: 'Delete Vehicle',
             description: `Das Fahrzeugs mit dem Kennzeichen **${plate}** wurde erfolgreich gelöscht.`,
             color: EEmbedColors.SUCCESS,
             files: [attachment],

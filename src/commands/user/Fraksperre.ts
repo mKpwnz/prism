@@ -1,11 +1,11 @@
+import Config from '@Config';
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
-import Config from '@Config';
-import { GameDB } from '@sql/Database';
-import LogManager from '@utils/Logger';
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { EENV } from '@enums/EENV';
 import { PlayerService } from '@services/PlayerService';
+import { GameDB } from '@sql/Database';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { ResultSetHeader } from 'mysql2';
 
 export class Fraksperre extends Command {
     constructor() {
@@ -74,91 +74,61 @@ export class Fraksperre extends Command {
     }
 
     private async removeFraksperre(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction;
-        const embed = Command.getEmbedTemplate(interaction);
-        const steamid = options.getString('steamid');
-        if (!steamid) {
-            await interaction.reply({ content: 'Bitte gib eine SteamID an!', ephemeral: true });
-            return;
-        }
+        const steamid = interaction.options.getString('steamid', true);
         const vPlayer = await PlayerService.validatePlayer(steamid);
         if (!vPlayer) {
-            await interaction.reply({
-                content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
-                ephemeral: true,
-            });
+            await this.replyError('Es konnte kein Spieler mit dieser SteamID gefunden werden!');
             return;
         }
         const today = new Date();
         if (vPlayer.playerdata.job.fraksperre.getTime() < today.getTime()) {
-            await interaction.reply({
-                content: 'Der Spieler hat keine Fraktionssperre!',
-                ephemeral: true,
-            });
+            await this.replyError('Der Spieler hat keine Fraktionssperre!');
             return;
         }
-        try {
-            // TODO: Response verarbeiten und auswerten
-            const dbResponse = await GameDB.query(
-                'UPDATE users SET fraksperre = NOW() WHERE identifier = ?',
-                [vPlayer.identifiers.steam],
-            );
-            LogManager.debug(dbResponse);
-        } catch (error) {
-            LogManager.error(error);
-            await interaction.reply({
-                content: 'Es ist ein Fehler aufgetreten!',
-                ephemeral: true,
-            });
-        }
-        LogManager.log(vPlayer);
-        embed.setTitle('Fraktionssperre entfernt');
-        embed.setDescription(
-            `
-                Die Fraktionssperre von ${vPlayer.playerdata.fullname} (${
-                    vPlayer.identifiers.steam
-                }) wurde entfernt!\n
-                Altes Datum: ${vPlayer.playerdata.job.fraksperre.toLocaleDateString()}`,
+
+        const [res] = await GameDB.execute<ResultSetHeader>(
+            'UPDATE users SET fraksperre = NOW() WHERE identifier = ?',
+            [vPlayer.identifiers.steam],
         );
-        await interaction.reply({ embeds: [embed] });
+        if (res.affectedRows === 0) {
+            await this.replyError('Es ist ein Fehler aufgetreten!');
+            return;
+        }
+
+        await this.replyWithEmbed({
+            title: 'Fraktionssperre entfernt',
+            description: `Die Fraktionssperre von ${vPlayer.playerdata.fullname} (${
+                vPlayer.identifiers.steam
+            }) wurde entfernt!\nAltes Datum: ${vPlayer.playerdata.job.fraksperre.toLocaleDateString()}`,
+        });
     }
 
     private async setFraksperre(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction;
-        const days = options.getInteger('zeit') ?? 5;
-        const steamid = options.getString('steamid');
-        if (!steamid) {
-            await interaction.reply({ content: 'Bitte gib eine SteamID an!', ephemeral: true });
-            return;
-        }
+        const days = interaction.options.getInteger('zeit') ?? 5;
+        const steamid = interaction.options.getString('steamid', true);
+
         const vPlayer = await PlayerService.validatePlayer(steamid);
         if (!vPlayer) {
-            await interaction.reply({
-                content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
-                ephemeral: true,
-            });
+            await this.replyError('Es konnte kein Spieler mit dieser SteamID gefunden werden!');
             return;
         }
         const ts = new Date();
         ts.setDate(ts.getDate() + days);
-        try {
-            // TODO: Response verarbeiten und auswerten
-            const dbResponse = await GameDB.query(
-                'UPDATE users SET fraksperre = ADDDATE(NOW(), INTERVAL ? DAY) WHERE identifier = ?',
-                [days, vPlayer.identifiers.steam],
-            );
-            LogManager.debug(dbResponse);
-        } catch (error) {
-            LogManager.error(error);
-            await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true });
+
+        const [res] = await GameDB.execute<ResultSetHeader>(
+            'UPDATE users SET fraksperre = ADDDATE(NOW(), INTERVAL ? DAY) WHERE identifier = ?',
+            [days, vPlayer.identifiers.steam],
+        );
+        if (res.affectedRows === 0) {
+            await this.replyError('Es ist ein Fehler aufgetreten!');
+            return;
         }
-        const embed = Command.getEmbedTemplate(interaction);
-        embed.setTitle('Fraktionssperre gesetzt');
-        embed.setDescription(
-            `Die Fraktionssperre von ${vPlayer.playerdata.fullname} (${
+
+        await this.replyWithEmbed({
+            title: 'Fraktionssperre gesetzt',
+            description: `Die Fraktionssperre von ${vPlayer.playerdata.fullname} (${
                 vPlayer.identifiers.steam
             }) wurde gesetzt!\nDauer: ${days} Tage\nEndet am: ${ts.toLocaleDateString()}`,
-        );
-        await interaction.reply({ embeds: [embed] });
+        });
     }
 }

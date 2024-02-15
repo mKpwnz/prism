@@ -56,24 +56,11 @@ export class Tebex extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const tbxNummer = interaction.options.getString('tbx');
+        const tbxNummer = interaction.options.getString('tbx', true);
         const useOldApi = interaction.options.getSubcommand() === 'checkold';
 
-        if (!tbxNummer) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Fehler',
-                description: 'Bitte gebe eine Tebex Nummer an.',
-            });
-            return;
-        }
-
         if (!/tbx-[0-9a-f]{14}-[0-9a-f]{6}/.test(tbxNummer)) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Fehler',
-                description: 'Ungültige Tebex Nummer.',
-            });
+            await this.replyError('Ungültige Tebex Nummer.');
             return;
         }
 
@@ -152,17 +139,12 @@ export class Tebex extends Command {
             });
 
             await this.replyWithEmbed({
-                interaction,
                 title: 'Tebex Bestellung',
                 description: 'Bestellung gefunden',
                 fields,
             });
         } catch (error) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Fehler',
-                description: 'Fehler beim ausführen der Anfrage.',
-            });
+            await this.replyError('Fehler beim ausführen der Anfrage.');
         }
     }
 }

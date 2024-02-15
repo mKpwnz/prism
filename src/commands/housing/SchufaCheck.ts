@@ -1,10 +1,10 @@
+import Config from '@Config';
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
-import Config from '@Config';
-import { ISchufaUser } from '@sql/schema/User.schema';
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { UserService } from '@services/UserService';
+import { ISchufaUser } from '@sql/schema/User.schema';
+import { SlashCommandBuilder } from 'discord.js';
 
 /**
  * @description Klasse zum Überprüfen von Hausbesitzern mit negativem Kontostand.
@@ -43,7 +43,7 @@ export class SchufaCheck extends Command {
         );
     }
 
-    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+    async execute(): Promise<void> {
         const schufaUsers: ISchufaUser[] = await UserService.getSchufaUsers();
 
         for (const user of schufaUsers) {
@@ -51,7 +51,6 @@ export class SchufaCheck extends Command {
         }
 
         await this.replyWithEmbed({
-            interaction,
             title: 'Schufa Check abgeschlossen',
             description: `**${
                 schufaUsers.length

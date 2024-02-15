@@ -54,10 +54,9 @@ export class ChangeHouseOwner extends Command {
 
         const vUser = await PlayerService.validatePlayer(newOwner);
         if (!vUser) {
-            await interaction.reply({
-                content: `Es konnte kein User mit dem Namen \`${newOwner}\` gefunden werden!`,
-                ephemeral: true,
-            });
+            await this.replyError(
+                `Es konnte kein User mit der SteamID \`${newOwner}\` gefunden werden!`,
+            );
             return;
         }
 
@@ -67,10 +66,7 @@ export class ChangeHouseOwner extends Command {
         );
 
         if (house.length === 0) {
-            await interaction.reply({
-                content: `Es konnte kein Haus mit der ID \`${houseId}\` gefunden werden!`,
-                ephemeral: true,
-            });
+            await this.replyError(`Es konnte kein Haus mit der ID \`${houseId}\` gefunden werden!`);
             return;
         }
 
@@ -80,16 +76,13 @@ export class ChangeHouseOwner extends Command {
         );
 
         if (updateHouse.affectedRows === 0) {
-            await interaction.reply({
-                content: `Es konnte kein Haus mit der ID \`${houseId}\` gefunden werden!`,
-                ephemeral: true,
-            });
+            await this.replyError(
+                `Es ist ein Fehler aufgetreten. Das haus mit der ID \`${houseId}\` konnte nicht geändert werden.`,
+            );
             return;
         }
 
         await this.replyWithEmbed({
-            interaction,
-            title: 'Hausbesitzer geändert',
             description: `Der Besitzer des Hauses mit der ID **${houseId}** wurde zu \`${vUser.identifiers.steam}\` (${vUser.playerdata.fullname}) geändert!`,
         });
     }
