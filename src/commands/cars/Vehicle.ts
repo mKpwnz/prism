@@ -6,7 +6,6 @@ import { EEmbedColors } from '@enums/EmbedColors';
 import { PlayerService } from '@services/PlayerService';
 import { VehicleService } from '@services/VehicleService';
 import { AttachmentBuilder, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import * as prettier from 'prettier';
 
 export class Vehicle extends Command {
     constructor() {
@@ -107,18 +106,6 @@ export class Vehicle extends Command {
                 {
                     name: 'Fahrzeug Job',
                     value: `${vehicle.job}`,
-                },
-                {
-                    name: 'Handschhuhfach',
-                    value: `\`\`\`json\n${await prettier.format(vehicle.handschuhfach || '{}', {
-                        parser: 'json5',
-                    })}\`\`\``,
-                },
-                {
-                    name: 'Kofferraum',
-                    value: `\`\`\`json\n${await prettier.format(vehicle.kofferraum || '{}', {
-                        parser: 'json5',
-                    })}\`\`\``,
                 },
             ],
             files: [attachment],
