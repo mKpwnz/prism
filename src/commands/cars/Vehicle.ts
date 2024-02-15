@@ -3,12 +3,12 @@ import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
+import { PlayerService } from '@services/PlayerService';
 import { VehicleService } from '@services/VehicleService';
-import { GameDB } from '@sql/Database';
 import { AttachmentBuilder, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { ResultSetHeader } from 'mysql2';
+import * as prettier from 'prettier';
 
-export class DeleteVehicle extends Command {
+export class Vehicle extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
@@ -23,6 +23,8 @@ export class DeleteVehicle extends Command {
             Config.Groups.PROD.SERVERENGINEER,
             Config.Groups.PROD.IC_SUPERADMIN,
             Config.Groups.PROD.IC_HADMIN,
+            Config.Groups.PROD.IC_ADMIN,
+            Config.Groups.PROD.IC_MOD,
 
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
@@ -30,8 +32,8 @@ export class DeleteVehicle extends Command {
 
         RegisterCommand(
             new SlashCommandBuilder()
-                .setName('deletevehicle')
-                .setDescription('Löscht das Fahrzeug')
+                .setName('vehicle')
+                .setDescription('Gibt Informationen zu einem Fahrzeug')
                 .addStringOption((option) =>
                     option
                         .setName('plate')
@@ -52,18 +54,19 @@ export class DeleteVehicle extends Command {
         if (plate.length > 8) {
             await this.replyWithEmbed({
                 interaction,
-                title: 'Delete Vehicle',
+                title: 'Vehicle Info',
                 description: `Das Kennzeichen **${plate}** ist zu lang. \nDas Kennzeichen darf maximal 8 Zeichen lang sein.`,
                 color: EEmbedColors.ALERT,
             });
             return;
         }
         await interaction.deferReply();
+
         const vehicle = await VehicleService.getVehicleByNumberplate(plate);
         if (!vehicle) {
             await this.replyWithEmbed({
                 interaction,
-                title: 'Delete Vehicle',
+                title: 'Vehicle Info',
                 description: `Es wurden keine Fahrzeuge mit dem Kennzeichen ${plate} gefunden.`,
                 color: EEmbedColors.ALERT,
             });
@@ -72,27 +75,55 @@ export class DeleteVehicle extends Command {
         const jsonString = JSON.stringify(vehicle, null, 4);
         const buffer = Buffer.from(jsonString, 'utf-8');
         const attachment = new AttachmentBuilder(buffer, {
-            name: `PRISM_DeleteVehicleBackup_${plate}_${new Date().toLocaleString('de-DE')}.json`,
+            name: `PRISM_VehicleInfo_${plate}_${new Date().toLocaleString('de-DE')}.json`,
         });
-        const [res] = await GameDB.execute<ResultSetHeader>(
-            `DELETE FROM owned_vehicles WHERE plate = ?`,
-            [vehicle.plate],
-        );
-        if (res.affectedRows === 0) {
+        const player = await PlayerService.validatePlayer(vehicle.owner);
+        if (!player) {
             await this.replyWithEmbed({
                 interaction,
-                title: 'Delete Vehicle',
-                description: `Es ist ein Fehler aufgetreten. Des Fahrzeug mit dem Kennzeichen ${plate} konnte nicht gelöscht werden.`,
+                title: 'Vehicle Info',
+                description: `Der Besitzer des Fahrzeugs konnte nicht gefunden werden.`,
                 color: EEmbedColors.ALERT,
             });
             return;
         }
+        console.log(vehicle);
         await this.replyWithEmbed({
             interaction,
-            title: 'Delete Vehicle',
-            description: `Das Fahrzeugs mit dem Kennzeichen **${plate}** wurde erfolgreich gelöscht.`,
-            color: EEmbedColors.SUCCESS,
+            title: 'Vehicle Info',
+            description: `Fahrzeug Informationen für das Kennzeichen **${plate}**`,
+            fields: [
+                {
+                    name: 'IC Name Besitzer',
+                    value: `${player.playerdata.fullname}`,
+                },
+                {
+                    name: 'Steam Besitzer',
+                    value: `${player.steamnames.current} | ${player.identifiers.steam}`,
+                },
+                {
+                    name: 'Besitzer Job',
+                    value: `${player.playerdata.job.nameLabel} | ${player.playerdata.job.gradeLabel}`,
+                },
+                {
+                    name: 'Fahrzeug Job',
+                    value: `${vehicle.job}`,
+                },
+                {
+                    name: 'Handschhuhfach',
+                    value: `\`\`\`json\n${await prettier.format(vehicle.handschuhfach || '{}', {
+                        parser: 'json5',
+                    })}\`\`\``,
+                },
+                {
+                    name: 'Kofferraum',
+                    value: `\`\`\`json\n${await prettier.format(vehicle.kofferraum || '{}', {
+                        parser: 'json5',
+                    })}\`\`\``,
+                },
+            ],
             files: [attachment],
+            color: EEmbedColors.SUCCESS,
         });
     }
 }
