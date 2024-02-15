@@ -72,7 +72,7 @@ export class DeleteTrunk extends Command {
             });
             return;
         }
-        const jsonString = JSON.parse(JSON.stringify(vehicle.kofferraum, null, 4));
+        const jsonString = JSON.stringify(vehicle, null, 4);
         const buffer = Buffer.from(jsonString, 'utf-8');
         const attachment = new AttachmentBuilder(buffer, {
             name: `PRISM_DeleteTrunkBackup_${plate}_${new Date().toLocaleString('de-DE')}.json`,
