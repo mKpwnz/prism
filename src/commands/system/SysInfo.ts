@@ -23,7 +23,6 @@ export class SysInfo extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        console.log(process);
         await this.replyWithEmbed({
             interaction,
             fields: [

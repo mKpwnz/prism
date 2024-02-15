@@ -87,7 +87,6 @@ export class Vehicle extends Command {
             });
             return;
         }
-        console.log(vehicle);
         await this.replyWithEmbed({
             interaction,
             title: 'Vehicle Info',
