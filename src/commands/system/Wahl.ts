@@ -226,6 +226,47 @@ export class Wahl extends Command {
 
     private async updateStatus(interaction: ChatInputCommandInteraction): Promise<void> {
         const status = ['Erstellt', 'Gestartet', 'Beendet', 'Löschen'];
+<<<<<<< 313859ff3b295d6e567f8ec4713f8ef890ef3257
+        try {
+            if (options.getNumber('wahlid') === 0) {
+                await interaction.reply({ content: 'Bitte gib eine WahlID an!', ephemeral: true });
+                return;
+            }
+            const [query] = await GameDB.query<IElection[]>(
+                'SELECT * FROM immo_elections WHERE id = ?',
+                [options.getNumber('wahlid')],
+            );
+            if (!query[0]) {
+                await interaction.reply({
+                    content: 'Es konnte keine Wahl mit dieser ID gefunden werden!',
+                    ephemeral: true,
+                });
+                return;
+            }
+            const [response] = await GameDB.query<ResultSetHeader>(
+                'UPDATE immo_elections SET status = ?, updated = NOW() WHERE id = ?',
+                [options.getNumber('option_status'), options.getNumber('wahlid')],
+            );
+            if (response.affectedRows === 0) {
+                await interaction.reply({
+                    content: 'Die Wahl konnte nicht verändert werden!',
+                    ephemeral: true,
+                });
+                return;
+            }
+            embed.setTitle('Wahlstatus geändert');
+            embed.setDescription(
+                `Wahlstatus für ${query[0].name} (${query[0].id}) auf ${
+                    status[options.getNumber('option_status') ?? 0]
+                } geändert!`,
+            );
+            const channel = await interaction.guild?.channels.fetch(Config.Channels.PROD.S1_WAHLEN);
+            if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] });
+            await interaction.reply({ embeds: [embed] });
+        } catch (error) {
+            LogManager.error(error);
+            await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true });
+=======
         const wahlid = interaction.options.getNumber('wahlid', true);
         const optionStatus = interaction.options.getNumber('option_status', true);
 
@@ -236,6 +277,7 @@ export class Wahl extends Command {
         if (!query[0]) {
             await this.replyError('Es konnte keine Wahl mit dieser ID gefunden werden!');
             return;
+>>>>>>> 273ad9d5417780a926112df3d7418e57d8fdd6e7
         }
 
         const [res] = await GameDB.execute<ResultSetHeader>(
@@ -293,6 +335,39 @@ export class Wahl extends Command {
             const channel = await interaction.guild?.channels.fetch(Config.Channels.PROD.S1_WAHLEN);
             if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] });
             await interaction.reply({ embeds: [embed] });
+<<<<<<< 313859ff3b295d6e567f8ec4713f8ef890ef3257
+        } else if (options.getString('operation') === 'remove') {
+            try {
+                let steamid = options.getString('steamid') ?? '';
+                if (!steamid.startsWith('steam:')) steamid = `steam:${steamid}`;
+                const [res] = await GameDB.query<ResultSetHeader>(
+                    'DELETE FROM immo_elections_participants WHERE electionid = ? AND identifier = ?',
+                    [options.getNumber('wahlid'), steamid],
+                );
+                LogManager.debug(res);
+                if (res.affectedRows === 0) {
+                    await interaction.reply({
+                        content: 'Der Nutzer konnte nicht entfernt werden!',
+                        ephemeral: true,
+                    });
+                    return;
+                }
+                embed.setTitle('Nutzer hinzugefügt');
+                embed.setDescription(
+                    `Nutzer ${vPlayer.playerdata.fullname} von Wahl ${election.name} (${election.id}) entfernt!\nSteamID: \`${steamid}\``,
+                );
+                const channel = await interaction.guild?.channels.fetch(
+                    Config.Channels.PROD.S1_WAHLEN,
+                );
+                if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] });
+                await interaction.reply({ embeds: [embed] });
+            } catch (error) {
+                LogManager.error(error);
+                await interaction.reply({
+                    content: 'Es ist ein Fehler aufgetreten!',
+                    ephemeral: true,
+                });
+=======
         } else if (operation === 'remove') {
             const [res] = await GameDB.execute<ResultSetHeader>(
                 'DELETE FROM immo_elections_participants WHERE electionid = ? AND identifier = ?',
@@ -302,6 +377,7 @@ export class Wahl extends Command {
             if (res.affectedRows === 0) {
                 await this.replyError('Der Nutzer konnte nicht entfernt werden!');
                 return;
+>>>>>>> 273ad9d5417780a926112df3d7418e57d8fdd6e7
             }
             const embed = this.getEmbedTemplate({
                 title: 'Nutzer hinzugefügt',
@@ -546,6 +622,61 @@ export class Wahl extends Command {
                 await this.replyError('Es ist ein Fehler aufgetreten!');
                 return;
             }
+<<<<<<< 313859ff3b295d6e567f8ec4713f8ef890ef3257
+            const { id, name } = query[0];
+            const [participant] = await GameDB.query<IElectionParticipant[]>(
+                'SELECT id, name FROM immo_elections_participants WHERE id = ?',
+                [options.getString('kandidatennr')],
+            );
+            if (participant[0].length === 0) {
+                await interaction.reply({
+                    content: 'Es konnte kein Kandidat mit dieser ID gefunden werden!',
+                    ephemeral: true,
+                });
+                return;
+            }
+            if (options.getString('operation') === 'add') {
+                let querystring =
+                    'INSERT INTO immo_elections_votes (electionid, identifier, participantid) VALUES ';
+                const anzahl = options.getNumber('stimmen') ?? 0;
+                for (let i = 0; i < anzahl; i++) {
+                    querystring += `(${options.getNumber(
+                        'wahlid',
+                    )}, "Manipulation", ${options.getString('kandidatennr')}),`;
+                }
+                const [response] = await GameDB.query<ResultSetHeader>(querystring.slice(0, -1));
+                LogManager.debug(response);
+                embed.setTitle('Wahl manipuliert!');
+                embed.setDescription(
+                    `${response.affectedRows} Stimmen für ${participant[0].name} von Wahl ${name} (${id}) hinzugefügt!`,
+                );
+                // const channel = await interaction.guild?.channels.fetch(Config.Channels.PROD.S1_WAHLEN);
+                // if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] })
+                await interaction.reply({ embeds: [embed] });
+            } else if (options.getString('operation') === 'remove') {
+                const [response] = await GameDB.query<ResultSetHeader>(
+                    'DELETE FROM immo_elections_votes WHERE electionid = ? AND participantid = ? LIMIT ?',
+                    [
+                        options.getNumber('wahlid'),
+                        options.getString('kandidatennr'),
+                        options.getNumber('stimmen'),
+                    ],
+                );
+                LogManager.debug(response);
+                embed.setTitle('Wahl manipuliert!');
+                embed.setDescription(
+                    `${response.affectedRows} Stimmen für ${participant[0].name} von Wahl ${name} (${id}) entfernt!`,
+                );
+                const channel = await interaction.guild?.channels.fetch(
+                    Config.Channels.PROD.S1_WAHLEN,
+                );
+                if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] });
+                await interaction.reply({ embeds: [embed] });
+            }
+        } catch (error) {
+            LogManager.error(error);
+            await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true });
+=======
             const embed = this.getEmbedTemplate({
                 title: 'Wahl manipuliert!',
                 description: `${stimmen} Stimmen für ${participant[0].name} von Wahl ${name} (${id}) entfernt!`,
@@ -553,6 +684,7 @@ export class Wahl extends Command {
             const channel = await interaction.guild?.channels.fetch(Config.Channels.PROD.S1_WAHLEN);
             if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] });
             await interaction.reply({ embeds: [embed] });
+>>>>>>> 273ad9d5417780a926112df3d7418e57d8fdd6e7
         }
     }
 }

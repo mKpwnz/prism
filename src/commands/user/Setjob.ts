@@ -98,6 +98,62 @@ export class Setjob extends Command {
     }
 
     private async setOnline(interaction: ChatInputCommandInteraction): Promise<void> {
+<<<<<<< 313859ff3b295d6e567f8ec4713f8ef890ef3257
+        const { options } = interaction;
+        const job = options.getString('jobname');
+        const grade = options.getInteger('grade') ?? 0;
+        if (!job) {
+            await interaction.reply({ content: 'Es wurde kein Job angegeben!', ephemeral: true });
+            return;
+        }
+        try {
+            const [jobquery] = await GameDB.query<IJob[]>('SELECT * FROM jobs WHERE name = ?', [
+                job.toLowerCase(),
+            ]);
+            if (jobquery.length === 0) {
+                await interaction.reply({
+                    content: 'Es wurde kein Job mit diesem Namen gefunden!',
+                    ephemeral: true,
+                });
+                return;
+            }
+            await RconClient.sendCommand(
+                `setjob ${options.getInteger('id')} ${job.toLowerCase()} ${grade}`,
+            );
+            this.replyWithEmbed({
+                interaction,
+                title: 'Job geändert (online)',
+                description: `Der Job von ID ${options.getInteger(
+                    'id',
+                )} wurde auf ${job} Grade ${grade} gesetzt!`,
+            });
+        } catch (error) {
+            await interaction.reply({
+                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(
+                    error,
+                )}\`\`\``,
+                ephemeral: true,
+            });
+        }
+    }
+
+    private async setOffline(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { options } = interaction;
+        const steamid = options.getString('steamid');
+        const job = options.getString('jobname');
+        const grade = options.getInteger('grade') ?? 0;
+        if (!steamid) {
+            await interaction.reply({
+                content: 'Es wurde keine SteamID angegeben!',
+                ephemeral: true,
+            });
+            return;
+        }
+        if (!job) {
+            await interaction.reply({ content: 'Es wurde kein Job angegeben!', ephemeral: true });
+            return;
+        }
+=======
         const id = interaction.options.getString('id', true);
         const job = interaction.options.getString('jobname', true);
         const grade = interaction.options.getInteger('grade') ?? 0;
@@ -121,11 +177,48 @@ export class Setjob extends Command {
         const job = interaction.options.getString('jobname', true);
         const grade = interaction.options.getInteger('grade') ?? 0;
 
+>>>>>>> 273ad9d5417780a926112df3d7418e57d8fdd6e7
         const vPlayer = await PlayerService.validatePlayer(steamid);
         if (!vPlayer) {
             await this.replyError('Es konnte kein Spieler mit dieser SteamID gefunden werden!');
             return;
         }
+<<<<<<< 313859ff3b295d6e567f8ec4713f8ef890ef3257
+        try {
+            const [jobquery] = await GameDB.query<IJob[]>('SELECT * FROM jobs WHERE name = ?', [
+                job.toLowerCase(),
+            ]);
+            LogManager.debug(jobquery);
+            if (jobquery.length === 0) {
+                await interaction.reply({
+                    content: 'Es wurde kein Job mit diesem Namen gefunden!',
+                    ephemeral: true,
+                });
+                return;
+            }
+
+            const [query] = await GameDB.query<ResultSetHeader>(
+                'UPDATE users SET job = ?, job_grade = ? WHERE identifier = ?',
+                [job.toLowerCase(), grade, vPlayer.identifiers.steam],
+            );
+
+            if (query.affectedRows === 0) {
+                await interaction.reply({
+                    content: 'Der Job konnte nicht geändert werden!',
+                    ephemeral: true,
+                });
+                return;
+            }
+
+            this.replyWithEmbed({
+                interaction,
+                title: 'Job geändert (offline)',
+                description: `Der Job von ${vPlayer.playerdata.fullname} (${vPlayer.identifiers.steam}) wurde auf ${jobquery[0].label}\nGrade ${grade} gesetzt!`,
+            });
+        } catch (error) {
+            LogManager.error(error);
+            await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true });
+=======
 
         const [jobquery] = await GameDB.query<IJob[]>('SELECT * FROM jobs WHERE name = ?', [
             job.toLowerCase(),
@@ -133,6 +226,7 @@ export class Setjob extends Command {
         if (jobquery.length === 0) {
             await this.replyError('Es wurde kein Job mit diesem Namen gefunden!');
             return;
+>>>>>>> 273ad9d5417780a926112df3d7418e57d8fdd6e7
         }
 
         const [res] = await GameDB.execute<ResultSetHeader>(
