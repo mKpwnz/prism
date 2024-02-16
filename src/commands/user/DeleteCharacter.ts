@@ -1,15 +1,9 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
-<<<<<<< 313859ff3b295d6e567f8ec4713f8ef890ef3257
-import { ValidatedPlayer } from '@ctypes/ValidatedPlayer';
 import { EENV } from '@enums/EENV';
-=======
-import { EENV } from '@enums/EENV';
-import { PlayerService } from '@services/PlayerService';
-import { IValidatedPlayer } from '@interfaces/IValidatedPlayer';
->>>>>>> 273ad9d5417780a926112df3d7418e57d8fdd6e7
 import { ELicenses } from '@enums/ELicenses';
+import { IValidatedPlayer } from '@interfaces/IValidatedPlayer';
 import { PhoneService } from '@services/PhoneService';
 import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
