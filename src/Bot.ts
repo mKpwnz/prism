@@ -7,6 +7,7 @@ import { Client, Events, IntentsBitField } from 'discord.js';
 import { CronManager } from '@utils/CronManager';
 import { CronJob } from 'cron';
 import { CronJobService } from '@services/CronJobService';
+import { EENV } from '@enums/EENV';
 
 LogManager.configure();
 
@@ -48,3 +49,4 @@ client.once(Events.ClientReady, async () => {
 });
 
 export const BotClient = client;
+export const BotENV = process.env.NODE_ENV === 'production' ? EENV.PRODUCTION : EENV.DEVELOPMENT;
