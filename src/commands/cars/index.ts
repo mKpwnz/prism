@@ -2,3 +2,8 @@ export * from './Insurance';
 export * from './ValidateTrunk';
 export * from './RestartDropbox';
 export * from './GiveCar';
+export * from './VehiclePop';
+export * from './DeleteTrunk';
+export * from './DeleteVehicle';
+export * from './ChangePlate';
+export * from './Vehicle';

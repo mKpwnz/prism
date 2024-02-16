@@ -1,7 +1,7 @@
+import Config from '@Config';
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
-import Config from '@Config';
 import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
 import {
@@ -28,15 +28,17 @@ export class DeletePhone extends Command {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [
-            Config.Channels.PROD.WHOIS_TESTI,
-            Config.Channels.PROD.WHOIS_LIMITED,
+            Config.Channels.PROD.PRISM_BOT,
+            Config.Channels.PROD.PRISM_HIGHTEAM,
 
+            Config.Channels.PROD.PRISM_TESTING,
             Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
             Config.Groups.PROD.SERVERENGINEER,
             Config.Groups.PROD.IC_SUPERADMIN,
 
+            Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
         this.IsBetaCommand = true;
@@ -57,12 +59,11 @@ export class DeletePhone extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction;
-        const vPlayer = await PlayerService.validatePlayer(options.getString('steamid') ?? '');
-        const reset = options.getBoolean('reset') ?? false;
-        const embed = Command.getEmbedTemplate(interaction);
+        const steamid = interaction.options.getString('steamid', true);
+        const reset = interaction.options.getBoolean('reset') ?? false;
+        const vPlayer = await PlayerService.validatePlayer(steamid);
         if (!vPlayer) {
-            await interaction.reply('Es konnte kein Spieler mit dieser SteamID gefunden werden!');
+            await this.replyError('Es konnte kein Spieler mit dieser SteamID gefunden werden!');
             return;
         }
         let phone;
@@ -80,14 +81,11 @@ export class DeletePhone extends Command {
                     name: `${vPlayer.identifiers.steam}.sql`,
                 },
             );
-            embed.setTitle('Handy gelöscht');
-            if (reset) {
-                embed.setTitle('Handy zurückgesetzt');
-            }
-            embed.setDescription(
-                `Owner: ${vPlayer.steamnames.current}\nIdentifier: ${vPlayer.identifiers.steam}`,
-            );
-            await interaction.reply({ embeds: [embed], files: [attachment] });
+            await this.replyWithEmbed({
+                title: reset ? 'Handy zurückgesetzt' : 'Handy gelöscht',
+                description: `Owner: ${vPlayer.steamnames.current}\nIdentifier: ${vPlayer.identifiers.steam}`,
+                files: [attachment],
+            });
         }
     }
 

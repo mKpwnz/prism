@@ -11,15 +11,17 @@ export class NvhxBan extends Command {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [
-            Config.Channels.PROD.WHOIS_TESTI,
-            Config.Channels.PROD.WHOIS_LIMITED,
+            Config.Channels.PROD.PRISM_BOT,
+            Config.Channels.PROD.PRISM_HIGHTEAM,
 
+            Config.Channels.PROD.PRISM_TESTING,
             Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
             Config.Groups.PROD.SERVERENGINEER,
             Config.Groups.PROD.IC_SUPERADMIN,
 
+            Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
         this.AllowedUsers = [Config.Users.MIKA];
@@ -40,13 +42,11 @@ export class NvhxBan extends Command {
         const response = await NvhxBan.banPlayerById(id);
         if (response.includes('Banned: ')) {
             await this.replyWithEmbed({
-                interaction,
                 title: 'Neverhax Ban',
                 description: `Bannt SpielerID ${id}\nAntwort vom Server:\n\`\`\`${response}\`\`\``,
             });
         } else {
             await this.replyWithEmbed({
-                interaction,
                 title: 'Neverhax Ban',
                 description: `Spieler nicht gefunden!`,
                 ephemeral: true,

@@ -10,9 +10,10 @@ export class CheckImageOwner extends Command {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [
-            Config.Channels.PROD.WHOIS_TESTI,
-            Config.Channels.PROD.WHOIS_UNLIMITED,
+            Config.Channels.PROD.PRISM_BOT,
+            Config.Channels.PROD.PRISM_HIGHTEAM,
 
+            Config.Channels.PROD.PRISM_TESTING,
             Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
@@ -22,6 +23,7 @@ export class CheckImageOwner extends Command {
             Config.Groups.PROD.IC_ADMIN,
             Config.Groups.PROD.IC_MOD,
 
+            Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
         RegisterCommand(
@@ -48,12 +50,7 @@ export class CheckImageOwner extends Command {
         const normalizedLink = this.normalizeLink(imageUrl);
 
         if (!normalizedLink) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Image Owner',
-                description: `Der link konnte nicht validiert werden.`,
-                ephemeral: true,
-            });
+            await this.replyError(`Der link konnte nicht validiert werden.`);
             return;
         }
 
@@ -61,17 +58,12 @@ export class CheckImageOwner extends Command {
 
         if (!phoneOwner) {
             await this.replyWithEmbed({
-                interaction,
-                title: 'Image Owner',
                 description: `Es konnte kein Spieler mit diesem Bild gefunden werden.`,
-                ephemeral: true,
             });
             return;
         }
 
         await this.replyWithEmbed({
-            interaction,
-            title: 'Image Owner',
             description: `\`\`\`json\n${JSON.stringify(phoneOwner, null, 4)}\`\`\``,
         });
     }

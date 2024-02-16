@@ -13,15 +13,17 @@ export class Rename extends Command {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [
-            Config.Channels.PROD.WHOIS_TESTI,
-            Config.Channels.PROD.WHOIS_RENAME,
+            Config.Channels.PROD.PRISM_BOT,
+            Config.Channels.PROD.PRISM_HIGHTEAM,
 
+            Config.Channels.PROD.PRISM_TESTING,
             Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
             Config.Groups.PROD.SERVERENGINEER,
             Config.Groups.PROD.IC_SUPERADMIN,
 
+            Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
         this.AllowedUsers = [Config.Users.L33V33N, Config.Users.ZMASTER, Config.Users.MANU];
@@ -52,22 +54,12 @@ export class Rename extends Command {
         const vPlayer = await PlayerService.validatePlayer(steamId);
 
         if (!vPlayer) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Fehler',
-                description: 'Der Spieler konnte nicht gefunden werden!',
-                color: EEmbedColors.ALERT,
-            });
+            await this.replyError('Der Spieler konnte nicht gefunden werden!');
             return;
         }
 
         if (!firstname && !lastname) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Fehler',
-                description: 'Bitte mindestens einen Vornamen oder Nachnamen angeben!',
-                color: EEmbedColors.ALERT,
-            });
+            await this.replyError('Bitte mindestens einen Vornamen oder Nachnamen angeben!');
             return;
         }
 
@@ -86,7 +78,6 @@ export class Rename extends Command {
 
         if (res.affectedRows !== 0) {
             await this.replyWithEmbed({
-                interaction,
                 title: 'Spieler umbenannt',
                 description: `Der Spieler wurde erfolgreich umbenannt.`,
                 fields: [
@@ -106,12 +97,7 @@ export class Rename extends Command {
                 color: EEmbedColors.SUCCESS,
             });
         } else {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Fehler',
-                description: 'Der Spieler konnte nicht umbenannt werden!',
-                color: EEmbedColors.ALERT,
-            });
+            await this.replyError('Der Spieler konnte nicht umbenannt werden!');
         }
     }
 }

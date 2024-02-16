@@ -7,15 +7,16 @@ import { ITebexTransactions } from '@sql/schema/Tebex.schema';
 import axios from 'axios';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
+// @TODO: Rewrite to Service structure
 export class Tebex extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
-
         this.AllowedChannels = [
-            Config.Channels.PROD.WHOIS_TESTI,
-            Config.Channels.PROD.WHOIS_TEBEX,
+            Config.Channels.PROD.PRISM_TEBEX,
+            Config.Channels.PROD.PRISM_HIGHTEAM,
 
+            Config.Channels.PROD.PRISM_TESTING,
             Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
@@ -25,6 +26,7 @@ export class Tebex extends Command {
             Config.Groups.PROD.IC_ADMIN,
             Config.Groups.PROD.IC_MOD,
 
+            Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
 
@@ -54,24 +56,11 @@ export class Tebex extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const tbxNummer = interaction.options.getString('tbx');
+        const tbxNummer = interaction.options.getString('tbx', true);
         const useOldApi = interaction.options.getSubcommand() === 'checkold';
 
-        if (!tbxNummer) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Fehler',
-                description: 'Bitte gebe eine Tebex Nummer an.',
-            });
-            return;
-        }
-
         if (!/tbx-[0-9a-f]{14}-[0-9a-f]{6}/.test(tbxNummer)) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Fehler',
-                description: 'Ungültige Tebex Nummer.',
-            });
+            await this.replyError('Ungültige Tebex Nummer.');
             return;
         }
 
@@ -150,17 +139,12 @@ export class Tebex extends Command {
             });
 
             await this.replyWithEmbed({
-                interaction,
                 title: 'Tebex Bestellung',
                 description: 'Bestellung gefunden',
                 fields,
             });
         } catch (error) {
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Fehler',
-                description: 'Fehler beim ausführen der Anfrage.',
-            });
+            await this.replyError('Fehler beim ausführen der Anfrage.');
         }
     }
 }

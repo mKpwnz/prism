@@ -1,5 +1,5 @@
 import { PlayerService } from '@services/PlayerService';
-import { ValidatedPlayer } from '@ctypes/ValidatedPlayer';
+import { IValidatedPlayer } from '@interfaces/IValidatedPlayer';
 import { EUniqueIdentifier } from '@enums/ESearchType';
 import Config from '@Config';
 import { GameDB } from '@sql/Database';
@@ -40,13 +40,13 @@ export class CustomImageUpload {
         size: 1024 * 800,
     };
 
-    private vPlayer: ValidatedPlayer | null = null;
+    private vPlayer: IValidatedPlayer | null = null;
 
     constructor(client: Client) {
         this.client = client;
         const channel =
             process.env.NODE_ENV === 'production'
-                ? Config.Channels.PROD.WHOIS_IMAGEUPLOAD
+                ? Config.Channels.PROD.PRISM_IMAGE_UPLOAD
                 : Config.Channels.DEV.PRISM_TESTING;
         client.on('messageCreate', async (message: Message) => {
             if (message.channelId === channel) {
@@ -98,7 +98,7 @@ export class CustomImageUpload {
                     ],
                 });
             }
-        } else if (Config.Channels.PROD.WHOIS_IMAGEUPLOAD) message.delete();
+        } else if (Config.Channels.PROD.PRISM_IMAGE_UPLOAD) message.delete();
     }
 
     async onInteract(interaction: Interaction) {
@@ -219,7 +219,7 @@ export class CustomImageUpload {
             }
 
             await interaction.reply({
-                content: `Möchte du das Bild wirklich an ${this.vPlayer.playerdata.fullname} (${this.input_phoneNumber}) zuweisen?`,
+                content: `Möchte du das Bild wirklich an ${this.vPlayer.playerdata.fullname} (${this.vPlayer.playerdata.phonenumber}) zuweisen?`,
                 components: [
                     new ActionRowBuilder<ButtonBuilder>().addComponents(
                         new ButtonBuilder()
@@ -295,7 +295,7 @@ export class CustomImageUpload {
             const newFilename = `${Helper.getUniqueId()}.${fileFormat}`;
 
             const customPicsChannel = this.client.channels.cache.get(
-                Config.Channels.PROD.WHOIS_CUSTOMPICS_DATASTORE,
+                Config.Channels.PROD.PRISM_CUSTOMPICS_DATASTORE,
             ) as TextChannel;
 
             if (customPicsChannel) {

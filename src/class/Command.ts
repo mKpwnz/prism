@@ -1,7 +1,7 @@
 import Config from '@Config';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
-import { IEmbedField } from '@interfaces/IEmbedField';
+import { IEmbedOptions } from '@interfaces/IEmbed';
 import { BotDB } from '@sql/Database';
 import { Helper } from '@utils/Helper';
 import LogManager from '@utils/Logger';
@@ -17,8 +17,6 @@ import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 export abstract class Command {
     /**
      * @description Gibt an, in welchen Kanälen der Command ausgeführt werden darf (Discord) (ID)
-     * @author mKpwnz
-     * @date 14.10.2023
      * @type {string[]}
      * @memberof Command
      */
@@ -26,8 +24,6 @@ export abstract class Command {
 
     /**
      * @description Gibt an, welche Gruppen den Command ausgeführt dürfen (Discord) (ID)
-     * @author mKpwnz
-     * @date 14.10.2023
      * @type {string[]}
      * @memberof Command
      */
@@ -35,8 +31,6 @@ export abstract class Command {
 
     /**
      * @description Gibt an, welche User den Command ausführen dürfen (Unabhängig von Gruppenrechten) (Discord) (ID)
-     * @author mKpwnz
-     * @date 14.10.2023
      * @type {string[]}
      * @memberof Command
      */
@@ -44,8 +38,6 @@ export abstract class Command {
 
     /**
      * @description Gibt an, welche User den Command nicht ausführen dürfen (Unabhängig von Gruppenrechten) (Discord) (ID)
-     * @author mKpwnz
-     * @date 14.10.2023
      * @type {string[]}
      * @memberof Command
      */
@@ -53,8 +45,6 @@ export abstract class Command {
 
     /**
      * @description Gibt an, ob die Permissions geprüft werden sollen oder nicht.
-     * @author mKpwnz
-     * @date 14.10.2023
      * @type {Boolean} [CheckPermissions=true]
      * @memberof Command
      */
@@ -62,8 +52,6 @@ export abstract class Command {
 
     /**
      * @description Gibt an, in welcher Umgebung der Command ausgeführt werden darf.
-     * @author mKpwnz
-     * @date 14.10.2023
      * @type {EENV} [RunEnvironment=EENV.DEVELOPMENT]
      * @memberof Command
      */
@@ -71,8 +59,6 @@ export abstract class Command {
 
     /**
      * @description Gibt an, ob der Command ein Beta Command ist oder nicht.
-     * @author mKpwnz
-     * @date 14.10.2023
      * @type {boolean} [IsBetaCommand=false]
      * @memberof Command
      */
@@ -80,8 +66,6 @@ export abstract class Command {
 
     /**
      * @description Gibt an, ob der Command nicht gezählt werden soll (Statistik)
-     * @author mKpwnz
-     * @date 14.10.2023
      * @type {boolean} [DoNotCountUse=false]
      * @memberof Command
      */
@@ -92,19 +76,32 @@ export abstract class Command {
      * @type {Date}
      * @memberof Command
      */
-    CmdPerformanceStart: Date | undefined = undefined;
+    private CmdPerformanceStart: Date | undefined = undefined;
 
     /**
      * @description Gibt an, wann der Command fertig ausgeführt wurde. (Timestamp)
      * @type {Date}
      * @memberof Command
      */
-    CmdPerformanceStop: Date | undefined = undefined;
+    private CmdPerformanceStop: Date | undefined = undefined;
+
+    /**
+     * @description Gibt an, welcher EmbedTitle für Fehlermeldungen benutzt werden soll.
+     * @type {string}
+     * @memberof Command
+     */
+    EmbedTitle: string = this.constructor.name;
+
+    /**
+     * @description
+     * @private
+     * @type {(ChatInputCommandInteraction | undefined)}
+     * @memberof Command
+     */
+    private currentInteraction: ChatInputCommandInteraction | undefined;
 
     /**
      * @description Führt den Command aus. Muss in der Klasse, die von Command erbt, implementiert werden. (execute() { ... })
-     * @author mKpwnz
-     * @date 14.10.2023
      * @abstract
      * @param {ChatInputCommandInteraction} interaction
      * @returns {*}  {Promise<void>}
@@ -114,27 +111,19 @@ export abstract class Command {
 
     /**
      * @description Wird vom CommandHandler ausgeführt
-     * @author mKpwnz
-     * @date 14.10.2023
      * @param {ChatInputCommandInteraction} interaction
      * @returns {*}  {Promise<void>}
      * @memberof Command
      */
     async run(interaction: ChatInputCommandInteraction): Promise<void> {
+        this.currentInteraction = interaction;
         const { options, user } = interaction;
 
         // Override Channel in Devmode
-        if (this.RunEnvironment !== EENV.PRODUCTION) {
-            this.DoNotCountUse = true;
-            this.AllowedChannels = [
-                Config.Channels.PROD.WHOIS_TESTI,
-
-                Config.Channels.DEV.PRISM_TESTING,
-            ];
-            this.AllowedGroups = [Config.Groups.PROD.SERVERENGINEER, Config.Groups.DEV.BOTTEST];
-        }
         if (process.env.NODE_ENV !== 'production') {
             this.DoNotCountUse = true;
+            this.AllowedChannels = [Config.Channels.DEV.PRISM_TESTING];
+            this.AllowedGroups = [Config.Groups.DEV.BOTTEST];
         }
         if (this.CheckPermissions) {
             // Check Permissions
@@ -194,6 +183,7 @@ export abstract class Command {
         try {
             this.CmdPerformanceStart = new Date();
             await this.execute(interaction);
+            this.currentInteraction = undefined;
         } catch (error) {
             const errobj: { [k: string]: any } = {};
             if (error instanceof Error) {
@@ -204,12 +194,10 @@ export abstract class Command {
                 errobj.e = error;
             }
             LogManager.error(errobj);
-            await this.replyWithEmbed({
-                interaction,
-                title: 'Es ist ein Fehler aufgetreten!',
-                description: `\`\`\`json\n${JSON.stringify(errobj, null, 2)}\n\`\`\``,
-                color: EEmbedColors.ALERT,
-            });
+            await this.replyError(
+                `\`\`\`json\n${JSON.stringify(errobj, null, 2)}\n\`\`\``,
+                'Es ist ein Fehler aufgetreten!',
+            );
         }
     }
 
@@ -222,7 +210,7 @@ export abstract class Command {
      * @memberof Command
      * @deprecated
      */
-    static getEmbedTemplate(interaction: ChatInputCommandInteraction): EmbedBuilder {
+    static getEmbedTemplateOld(interaction: ChatInputCommandInteraction): EmbedBuilder {
         return new EmbedBuilder()
             .setColor(EEmbedColors.DEFAULT)
             .setTimestamp()
@@ -238,23 +226,15 @@ export abstract class Command {
             .setImage(Config.Bot.WHITESPACE);
     }
 
-    async replyWithEmbed(opt: {
-        interaction: ChatInputCommandInteraction;
-        title: string;
-        description: string;
-        messageContent?: string;
-        fields?: IEmbedField[];
-        customImage?: string;
-        color?: EEmbedColors | number;
-        ephemeral?: boolean;
-    }): Promise<void> {
+    getEmbedTemplate(opt: IEmbedOptions): EmbedBuilder {
+        if (!this.currentInteraction) throw new Error('Unknown Interaction in Command Class');
         this.CmdPerformanceStop = new Date();
         const executionTime = this.CmdPerformanceStart
             ? this.CmdPerformanceStop.getTime() - this.CmdPerformanceStart.getTime()
             : 0;
 
-        const embed = new EmbedBuilder()
-            .setTitle(opt.title)
+        return new EmbedBuilder()
+            .setTitle(opt.title || this.EmbedTitle)
             .setDescription(opt.description)
             .setColor(opt.color ?? EEmbedColors.DEFAULT)
             .setAuthor({
@@ -262,24 +242,41 @@ export abstract class Command {
                 iconURL: Config.Bot.BOT_LOGO,
             })
             .setFooter({
-                text: `${opt.interaction.user.displayName ?? ''} • ET: ${executionTime}ms`,
-                iconURL: opt.interaction.user.avatarURL() ?? '',
+                text: `${this.currentInteraction.user.displayName ?? ''} • ET: ${executionTime}ms`,
+                iconURL: this.currentInteraction.user.avatarURL() ?? '',
             })
             .setTimestamp(new Date())
             .setFields(opt.fields ?? [])
             .setImage(opt.customImage ?? Config.Bot.WHITESPACE);
+    }
 
-        if (opt.interaction.deferred) {
-            await opt.interaction.editReply({
+    async replyWithEmbed(opt: IEmbedOptions): Promise<void> {
+        if (!this.currentInteraction) throw new Error('Unknown Interaction in Command Class');
+
+        const embed = this.getEmbedTemplate(opt);
+
+        if (this.currentInteraction.deferred) {
+            await this.currentInteraction.editReply({
                 content: opt.messageContent ?? '',
                 embeds: [embed],
+                files: opt.files ?? [],
             });
         } else {
-            await opt.interaction.reply({
+            await this.currentInteraction.reply({
                 content: opt.messageContent ?? '',
                 embeds: [embed],
                 ephemeral: opt.ephemeral,
+                files: opt.files ?? [],
             });
         }
+    }
+
+    async replyError(msg: string, title: string = this.EmbedTitle): Promise<void> {
+        if (!this.currentInteraction) throw new Error('Unknown Interaction in Command Class');
+        await this.replyWithEmbed({
+            title,
+            description: msg,
+            color: EEmbedColors.ALERT,
+        });
     }
 }

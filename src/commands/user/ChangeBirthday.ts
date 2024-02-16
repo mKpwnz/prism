@@ -14,15 +14,17 @@ export class ChangeBirthday extends Command {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [
-            Config.Channels.PROD.WHOIS_RENAME,
-            Config.Channels.PROD.WHOIS_TESTI,
+            Config.Channels.PROD.PRISM_BOT,
+            Config.Channels.PROD.PRISM_HIGHTEAM,
 
+            Config.Channels.PROD.PRISM_TESTING,
             Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
             Config.Groups.PROD.SERVERENGINEER,
             Config.Groups.PROD.IC_SUPERADMIN,
 
+            Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
         this.AllowedUsers = [Config.Users.L33V33N, Config.Users.ZMASTER, Config.Users.MANU];
@@ -76,14 +78,12 @@ export class ChangeBirthday extends Command {
 
         if (res.affectedRows > 0) {
             await this.replyWithEmbed({
-                interaction,
                 title: 'Geburtstag geändert',
                 description: `Der Geburtstag des Spielers **${vPlayer.playerdata.fullname}** (${vPlayer.identifiers.steam}) wurde auf **${birthday}** geändert.`,
                 color: EEmbedColors.SUCCESS,
             });
         } else {
             await this.replyWithEmbed({
-                interaction,
                 title: 'Geburtstag nicht geändert',
                 description: `Der Geburtstag des Spielers **${vPlayer.playerdata.fullname}** (${vPlayer.identifiers.steam}) konnte nicht auf **${birthday}** geändert werden.`,
                 color: EEmbedColors.ALERT,

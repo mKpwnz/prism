@@ -21,9 +21,10 @@ export class WhoIs extends Command {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [
-            Config.Channels.PROD.WHOIS_TESTI,
-            Config.Channels.PROD.WHOIS_UNLIMITED,
+            Config.Channels.PROD.PRISM_BOT,
+            Config.Channels.PROD.PRISM_HIGHTEAM,
 
+            Config.Channels.PROD.PRISM_TESTING,
             Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
@@ -33,6 +34,7 @@ export class WhoIs extends Command {
             Config.Groups.PROD.IC_ADMIN,
             Config.Groups.PROD.IC_MOD,
 
+            Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
         RegisterCommand(
@@ -179,7 +181,6 @@ export class WhoIs extends Command {
             }
 
             await this.replyWithEmbed({
-                interaction,
                 title: `Suchergebnisse`,
                 description: `Hier sind ${embedFields.length}/${findUsers.length} Suchergebnisse für "${identifierValue}":${additionalString}${pageString}`,
                 fields: embedFields,

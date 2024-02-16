@@ -14,9 +14,10 @@ export class GiveCar extends Command {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [
-            Config.Channels.PROD.WHOIS_TESTI,
-            Config.Channels.PROD.WHOIS_UNLIMITED,
+            Config.Channels.PROD.PRISM_BOT,
+            Config.Channels.PROD.PRISM_HIGHTEAM,
 
+            Config.Channels.PROD.PRISM_TESTING,
             Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [Config.Groups.PROD.BOT_DEV, Config.Groups.DEV.BOTTEST];
@@ -48,10 +49,8 @@ export class GiveCar extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const embedTitle = 'Fahrzeug schenken';
-
         const steamId = interaction.options.getString('steamid', true);
-        const vehicle = interaction.options.getString('vehicle', true);
+        const vehicleName = interaction.options.getString('vehicle', true);
         const plate = interaction.options.getString('plate', false);
 
         const vPlayer = await PlayerService.validatePlayer(steamId);
@@ -67,26 +66,17 @@ export class GiveCar extends Command {
             const formattedPlate = Helper.formatNumberplate(plate);
 
             if (!formattedPlate) {
-                await this.replyWithEmbed({
-                    interaction,
-                    title: embedTitle,
-                    description: `Das Kennzeichen \`${plate}\` ist ungültig.`,
-                    color: EEmbedColors.ALERT,
-                });
+                await this.replyError(`Das Kennzeichen \`${plate}\` ist ungültig.`);
+                return;
+            }
+            const vehicle = await VehicleService.getVehicleByNumberplate(formattedPlate);
+            if (vehicle) {
+                await this.replyError(`Es gibt das Kennzeichen \`${formattedPlate}\` schon.`);
                 return;
             }
 
-            if (VehicleService.getVehicleByNumberplate(formattedPlate) == null) {
-                await this.replyWithEmbed({
-                    interaction,
-                    title: embedTitle,
-                    description: `Es gibt schon das Kennzeichen \`${formattedPlate}\`.`,
-                    color: EEmbedColors.ALERT,
-                });
-            }
-
             let result = await RconClient.sendCommand(
-                `givecardiscord ${vPlayer.identifiers.steam} ${vehicle} ${formattedPlate}`,
+                `givecardiscord ${vPlayer.identifiers.steam} ${vehicleName} ${formattedPlate}`,
             );
 
             const car = await VehicleService.getNewestVehicleByOwner(vPlayer.identifiers.steam);
@@ -94,14 +84,12 @@ export class GiveCar extends Command {
                 result = `\n\nDas Fahrzeug hat das Kennzeichen \`${car.plate}\``;
             }
             await this.replyWithEmbed({
-                interaction,
-                title: embedTitle,
                 description: result,
                 color: EEmbedColors.SUCCESS,
             });
         } else {
             await RconClient.sendCommand(
-                `givecardiscord ${vPlayer.identifiers.steam} ${vehicle} random`,
+                `givecardiscord ${vPlayer.identifiers.steam} ${vehicleName} random`,
             );
             let result: string;
 
@@ -111,27 +99,15 @@ export class GiveCar extends Command {
                 if (inserted > new Date(Date.now() - 1000 * 60)) {
                     result = `Das Fahrzeug wurde erstellt und hat das Kennzeichen \`${car.plate}\`.`;
                 } else {
-                    await this.replyWithEmbed({
-                        interaction,
-                        title: embedTitle,
-                        description: `Das Fahrzeug konnte nicht erstellt werden.`,
-                        color: EEmbedColors.ALERT,
-                    });
+                    await this.replyError(`Das Fahrzeug konnte nicht erstellt werden.`);
                     return;
                 }
             } else {
-                await this.replyWithEmbed({
-                    interaction,
-                    title: embedTitle,
-                    description: `Das Fahrzeug konnte nicht erstellt werden.`,
-                    color: EEmbedColors.ALERT,
-                });
+                await this.replyError(`Das Fahrzeug konnte nicht erstellt werden.`);
                 return;
             }
 
             await this.replyWithEmbed({
-                interaction,
-                title: embedTitle,
                 description: result,
                 color: EEmbedColors.SUCCESS,
             });

@@ -6,7 +6,6 @@ import { EENV } from '@enums/EENV';
 import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
 import { IJob } from '@sql/schema/Job.schema';
-import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
 
@@ -15,9 +14,10 @@ export class Setjob extends Command {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [
-            Config.Channels.PROD.WHOIS_TESTI,
-            Config.Channels.PROD.WHOIS_UNLIMITED,
+            Config.Channels.PROD.PRISM_BOT,
+            Config.Channels.PROD.PRISM_HIGHTEAM,
 
+            Config.Channels.PROD.PRISM_TESTING,
             Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
@@ -27,6 +27,7 @@ export class Setjob extends Command {
             Config.Groups.PROD.IC_ADMIN,
             Config.Groups.PROD.IC_MOD,
 
+            Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
         this.IsBetaCommand = true;
@@ -83,18 +84,21 @@ export class Setjob extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction;
-
-        if (options.getSubcommand() === 'online') {
-            await this.setOnline(interaction);
-        } else if (options.getSubcommand() === 'offline') {
-            await this.setOffline(interaction);
-        } else {
-            await interaction.reply({ content: 'Command nicht gefunden.', ephemeral: true });
+        switch (interaction.options.getSubcommand()) {
+            case 'online':
+                await this.setOnline(interaction);
+                break;
+            case 'offline':
+                await this.setOffline(interaction);
+                break;
+            default:
+                await this.replyError('Command nicht gefunden.');
+                break;
         }
     }
 
     private async setOnline(interaction: ChatInputCommandInteraction): Promise<void> {
+<<<<<<< 313859ff3b295d6e567f8ec4713f8ef890ef3257
         const { options } = interaction;
         const job = options.getString('jobname');
         const grade = options.getInteger('grade') ?? 0;
@@ -149,14 +153,37 @@ export class Setjob extends Command {
             await interaction.reply({ content: 'Es wurde kein Job angegeben!', ephemeral: true });
             return;
         }
-        const vPlayer = await PlayerService.validatePlayer(steamid);
-        if (!vPlayer) {
-            await interaction.reply({
-                content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
-                ephemeral: true,
-            });
+=======
+        const id = interaction.options.getString('id', true);
+        const job = interaction.options.getString('jobname', true);
+        const grade = interaction.options.getInteger('grade') ?? 0;
+
+        const [jobquery] = await GameDB.query<IJob[]>('SELECT * FROM jobs WHERE name = ?', [
+            job.toLowerCase(),
+        ]);
+        if (jobquery.length === 0) {
+            await this.replyError('Es wurde kein Job mit diesem Namen gefunden!');
             return;
         }
+        await RconClient.sendCommand(`setjob ${id} ${job.toLowerCase()} ${grade}`);
+        await this.replyWithEmbed({
+            title: 'Job geändert (online)',
+            description: `Der Job von ID ${id} wurde auf ${job} Grade ${grade} gesetzt!`,
+        });
+    }
+
+    private async setOffline(interaction: ChatInputCommandInteraction): Promise<void> {
+        const steamid = interaction.options.getString('steamid', true);
+        const job = interaction.options.getString('jobname', true);
+        const grade = interaction.options.getInteger('grade') ?? 0;
+
+>>>>>>> 273ad9d5417780a926112df3d7418e57d8fdd6e7
+        const vPlayer = await PlayerService.validatePlayer(steamid);
+        if (!vPlayer) {
+            await this.replyError('Es konnte kein Spieler mit dieser SteamID gefunden werden!');
+            return;
+        }
+<<<<<<< 313859ff3b295d6e567f8ec4713f8ef890ef3257
         try {
             const [jobquery] = await GameDB.query<IJob[]>('SELECT * FROM jobs WHERE name = ?', [
                 job.toLowerCase(),
@@ -191,6 +218,30 @@ export class Setjob extends Command {
         } catch (error) {
             LogManager.error(error);
             await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true });
+=======
+
+        const [jobquery] = await GameDB.query<IJob[]>('SELECT * FROM jobs WHERE name = ?', [
+            job.toLowerCase(),
+        ]);
+        if (jobquery.length === 0) {
+            await this.replyError('Es wurde kein Job mit diesem Namen gefunden!');
+            return;
+>>>>>>> 273ad9d5417780a926112df3d7418e57d8fdd6e7
         }
+
+        const [res] = await GameDB.execute<ResultSetHeader>(
+            'UPDATE users SET job = ?, job_grade = ? WHERE identifier = ?',
+            [job.toLowerCase(), grade, vPlayer.identifiers.steam],
+        );
+
+        if (res.affectedRows === 0) {
+            await this.replyError('Der Job konnte nicht geändert werden!');
+            return;
+        }
+
+        await this.replyWithEmbed({
+            title: 'Job geändert (offline)',
+            description: `Der Job von ${vPlayer.playerdata.fullname} (${vPlayer.identifiers.steam}) wurde auf ${jobquery[0].label}\nGrade ${grade} gesetzt!`,
+        });
     }
 }

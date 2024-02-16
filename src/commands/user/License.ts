@@ -2,7 +2,7 @@ import { Command } from '@class/Command';
 import { NonEmptyArray } from '@class/NonEmptyArray';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { PlayerService } from '@services/PlayerService';
-import { ValidatedPlayer } from '@ctypes/ValidatedPlayer';
+import { IValidatedPlayer } from '@interfaces/IValidatedPlayer';
 import { EENV } from '@enums/EENV';
 import { ELicenses } from '@enums/ELicenses';
 import Config from '@Config';
@@ -18,9 +18,10 @@ export class License extends Command {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [
-            Config.Channels.PROD.WHOIS_TESTI,
-            Config.Channels.PROD.WHOIS_UNLIMITED,
+            Config.Channels.PROD.PRISM_BOT,
+            Config.Channels.PROD.PRISM_HIGHTEAM,
 
+            Config.Channels.PROD.PRISM_TESTING,
             Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
@@ -29,6 +30,7 @@ export class License extends Command {
             Config.Groups.PROD.IC_HADMIN,
             Config.Groups.PROD.IC_ADMIN,
 
+            Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
         this.IsBetaCommand = true;
@@ -110,167 +112,116 @@ export class License extends Command {
     }
 
     private async removeLicense(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction;
-        const embed = Command.getEmbedTemplate(interaction);
-        const lizenzStr = options.getString('lizenz');
-        if (!lizenzStr) {
-            await interaction.reply({ content: 'Bitte gib eine Lizenz an!', ephemeral: true });
-            return;
-        }
+        const lizenzStr = interaction.options.getString('lizenz', true);
+        const steamid = interaction.options.getString('steamid', true);
+
         let license: ELicenses;
         try {
             license = Helper.enumFromValue(lizenzStr, ELicenses);
         } catch (error) {
-            await interaction.reply({
-                content: 'Bitte gib eine gültige Lizenz an!',
-                ephemeral: true,
-            });
+            await this.replyError('Bitte gib eine gültige Lizenz an!');
             return;
         }
-        LogManager.debug(license);
-        const steamid = options.getString('steamid');
-        if (!steamid) {
-            await interaction.reply({ content: 'Bitte gib eine SteamID an!', ephemeral: true });
-            return;
-        }
+
         const vPlayer = await PlayerService.validatePlayer(steamid);
         if (!vPlayer) {
-            await interaction.reply({
-                content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
-                ephemeral: true,
-            });
+            await this.replyError('Es konnte kein Spieler mit dieser SteamID gefunden werden!');
             return;
         }
+
         const response = await License.deleteLicense(vPlayer, license);
         if (response instanceof Error) {
             LogManager.error(response);
-            await interaction.reply({
-                content: `Es ist ein Fehler beim Löschen der Lizenzen aufgetreten!\`\`\`json${JSON.stringify(
+            await this.replyError(
+                `Es ist ein Fehler beim Löschen der Lizenzen aufgetreten!\`\`\`json${JSON.stringify(
                     response,
                 )}\`\`\``,
-                ephemeral: true,
-            });
+            );
             return;
         }
-        embed.setTitle('Lizenz entfernt');
-        embed.setDescription(
-            `Es wurde/n ${response.affectedRows} Lizenz/en von ${vPlayer.playerdata.fullname} (\`${vPlayer.identifiers.steam}\`) entfernt!`,
-        );
-        await interaction.reply({ embeds: [embed] });
+        await this.replyWithEmbed({
+            title: 'Lizenz entfernt',
+            description: `Es wurde/n ${response.affectedRows} Lizenz/en von ${vPlayer.playerdata.fullname} (\`${vPlayer.identifiers.steam}\`) entfernt!`,
+        });
     }
 
     private async addLicense(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction;
-        const embed = Command.getEmbedTemplate(interaction);
-        const license = options.getString('lizenz');
-        const steamid = options.getString('steamid');
-        if (!steamid) {
-            await interaction.reply({ content: 'Bitte gib eine SteamID an!', ephemeral: true });
-            return;
-        }
-        if (!license) {
-            await interaction.reply({ content: 'Bitte gib eine Lizenz an!', ephemeral: true });
-            return;
-        }
+        const license = interaction.options.getString('lizenz', true);
+        const steamid = interaction.options.getString('steamid', true);
+
         const vPlayer = await PlayerService.validatePlayer(steamid);
         if (!vPlayer) {
-            await interaction.reply({
-                content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
-                ephemeral: true,
-            });
+            await this.replyError('Es konnte kein Spieler mit dieser SteamID gefunden werden!');
             return;
         }
-        try {
-            let query = 'SELECT * FROM user_licenses WHERE owner = ?';
-            if (license !== 'all') {
-                query += ` AND type = "${license}"`;
-            }
-            const [lizenzen] = await GameDB.query<IUserLicense[]>(query, [
-                vPlayer.identifiers.steam,
-            ]);
-            if (lizenzen.length !== 0) {
-                await interaction.reply({
-                    content: 'Der Spieler hat diese Lizenz bereits!',
-                    ephemeral: true,
-                });
-                return;
-            }
-            const [lizenz] = await GameDB.query<IUserLicense[]>(
-                'INSERT INTO user_licenses(type, owner) VALUES (?, ?)',
-                [license, vPlayer.identifiers.steam],
-            );
-            if (lizenz.length === 0) {
-                await interaction.reply({
-                    content: 'Es ist ein Fehler beim Hinzufügen der Lizenz aufgetreten!',
-                    ephemeral: true,
-                });
-                return;
-            }
-            embed.setTitle('Lizenz hinzugefügt');
-            embed.setDescription(
-                `Die Lizenz ${license} wurde ${vPlayer.playerdata.fullname} (${vPlayer.identifiers.steam}) hinzugefügt!`,
-            );
-            await interaction.reply({ embeds: [embed] });
-        } catch (error) {
-            LogManager.error(error);
-            await interaction.reply({ content: 'Es ist ein Fehler aufgetreten!', ephemeral: true });
+
+        let query = 'SELECT * FROM user_licenses WHERE owner = ?';
+        if (license !== 'all') {
+            query += ` AND type = "${license}"`;
         }
+        const [lizenzen] = await GameDB.query<IUserLicense[]>(query, [vPlayer.identifiers.steam]);
+        if (lizenzen.length !== 0) {
+            await this.replyError('Der Spieler besitzt diese Lizenz bereits!');
+            return;
+        }
+        const [lizenz] = await GameDB.query<IUserLicense[]>(
+            'INSERT INTO user_licenses(type, owner) VALUES (?, ?)',
+            [license, vPlayer.identifiers.steam],
+        );
+        if (lizenz.length === 0) {
+            await this.replyError('Es ist ein Fehler beim Hinzufügen der Lizenz aufgetreten!');
+            return;
+        }
+        await this.replyWithEmbed({
+            title: 'Lizenz hinzugefügt',
+            description: `Die Lizenz ${license} wurde ${vPlayer.playerdata.fullname} (${vPlayer.identifiers.steam}) hinzugefügt!`,
+        });
     }
 
     public static async deleteLicense(
-        vPlayer: ValidatedPlayer,
+        vPlayer: IValidatedPlayer,
         licenses: ELicenses | NonEmptyArray<Exclude<ELicenses, ELicenses.ALL>>,
     ): Promise<ResultSetHeader | Error> {
-        try {
-            let query = 'DELETE FROM user_licenses WHERE owner = ? AND ';
+        let query = 'DELETE FROM user_licenses WHERE owner = ? AND ';
 
-            if (Array.isArray(licenses)) {
-                for (const license of licenses) {
-                    if (await License.checkLicense(vPlayer, license)) {
-                        if (license === licenses[0]) {
-                            query += '(';
-                        } else {
-                            query += ' OR ';
-                        }
-                        query += `type = "${license}"`;
+        if (Array.isArray(licenses)) {
+            for (const license of licenses) {
+                if (await License.checkLicense(vPlayer, license)) {
+                    if (license === licenses[0]) {
+                        query += '(';
+                    } else {
+                        query += ' OR ';
                     }
-                }
-                query += ')';
-            } else {
-                LogManager.debug(licenses);
-                if (licenses === ELicenses.ALL) {
-                    query = 'DELETE FROM user_licenses WHERE owner = ?';
-                } else {
-                    if (!(await License.checkLicense(vPlayer, licenses))) {
-                        return new Error('Der Spieler besitzt diese Lizenz nicht!');
-                    }
-                    query += `type = "${licenses}"`;
+                    query += `type = "${license}"`;
                 }
             }
-            const result = await GameDB.query<ResultSetHeader>(query, [vPlayer.identifiers.steam]);
-            return result[0];
-        } catch (error) {
-            LogManager.error(error);
-            return new Error(JSON.stringify(error));
+            query += ')';
+        } else {
+            LogManager.debug(licenses);
+            if (licenses === ELicenses.ALL) {
+                query = 'DELETE FROM user_licenses WHERE owner = ?';
+            } else {
+                if (!(await License.checkLicense(vPlayer, licenses))) {
+                    return new Error('Der Spieler besitzt diese Lizenz nicht!');
+                }
+                query += `type = "${licenses}"`;
+            }
         }
+        const result = await GameDB.query<ResultSetHeader>(query, [vPlayer.identifiers.steam]);
+        return result[0];
     }
 
     public static async checkLicense(
-        vPlayer: ValidatedPlayer,
+        vPlayer: IValidatedPlayer,
         license: Exclude<ELicenses, ELicenses.ALL>,
     ): Promise<boolean> {
-        try {
-            const [result] = await GameDB.query<IUserLicense[]>(
-                'SELECT * FROM user_licenses WHERE owner = ? AND type = ?',
-                [vPlayer.identifiers.steam, license],
-            );
-            if (result.length === 0) {
-                return false;
-            }
-            return true;
-        } catch (error) {
-            LogManager.error(error);
+        const [result] = await GameDB.query<IUserLicense[]>(
+            'SELECT * FROM user_licenses WHERE owner = ? AND type = ?',
+            [vPlayer.identifiers.steam, license],
+        );
+        if (result.length === 0) {
             return false;
         }
+        return true;
     }
 }

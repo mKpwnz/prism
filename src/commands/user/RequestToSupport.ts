@@ -1,9 +1,8 @@
+import Config from '@Config';
 import { Command } from '@class/Command';
 import { RconClient } from '@class/RconClient';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
-import Config from '@Config';
-import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class RequestToSupport extends Command {
@@ -11,9 +10,10 @@ export class RequestToSupport extends Command {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [
-            Config.Channels.PROD.WHOIS_TESTI,
-            Config.Channels.PROD.WHOIS_UNLIMITED,
+            Config.Channels.PROD.PRISM_BOT,
+            Config.Channels.PROD.PRISM_HIGHTEAM,
 
+            Config.Channels.PROD.PRISM_TESTING,
             Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
@@ -23,6 +23,7 @@ export class RequestToSupport extends Command {
             Config.Groups.PROD.IC_ADMIN,
             Config.Groups.PROD.IC_MOD,
 
+            Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
         RegisterCommand(
@@ -47,45 +48,25 @@ export class RequestToSupport extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction;
-        const embed = Command.getEmbedTemplate(interaction);
-        embed.setTitle('Request to Support');
-        try {
-            const anzeigen = options.getBoolean('anzeigen');
-            const spielerid = options.getInteger('spielerid');
-            if (!spielerid) {
-                embed.setDescription('Bitte gib eine SpielerID an!');
-                await interaction.reply({
-                    embeds: [embed],
-                    ephemeral: true,
-                });
-                return;
-            }
-            const nachricht = options.getString('nachricht');
-            const anzeigenInt = anzeigen ? 1 : 0;
-
-            let des = `Bei dem Spieler mit der ID **${spielerid}** wird die "Request To Support" Meldung **${
-                anzeigen ? 'Angezeigt' : 'Ausgeblendet'
-            }**!`;
-
-            if (nachricht) {
-                des += `\n\nNachricht an den Spieler:\n\`\`\`${nachricht}\`\`\``;
-            }
-            embed.setDescription(des);
-
-            const command = `rts ${spielerid} ${anzeigenInt} ${nachricht ? `"${nachricht}"` : ''}`;
-            await RconClient.sendCommand(command);
-            await interaction.reply({
-                embeds: [embed],
-            });
-        } catch (error) {
-            LogManager.error(error);
-            await interaction.reply({
-                content: `Probleme mit der Serverkommunikation:\`\`\`json${JSON.stringify(
-                    error,
-                )}\`\`\``,
-                ephemeral: true,
-            });
+        const anzeigen = interaction.options.getBoolean('anzeigen', true);
+        const spielerid = interaction.options.getInteger('spielerid', true);
+        const nachricht = interaction.options.getString('nachricht');
+        if (!spielerid) {
+            this.replyError('Bitte gib eine SpielerID an!');
+            return;
         }
+        const anzeigenInt = anzeigen ? 1 : 0;
+
+        let des = `Bei dem Spieler mit der ID **${spielerid}** wird die "Request To Support" Meldung **${
+            anzeigen ? 'Angezeigt' : 'Ausgeblendet'
+        }**!`;
+
+        if (nachricht) {
+            des += `\n\nNachricht an den Spieler:\n\`\`\`${nachricht}\`\`\``;
+        }
+        await RconClient.sendCommand(
+            `rts ${spielerid} ${anzeigenInt} ${nachricht ? `"${nachricht}"` : ''}`,
+        );
+        await this.replyWithEmbed({ description: des });
     }
 }

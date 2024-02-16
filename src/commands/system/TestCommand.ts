@@ -11,7 +11,7 @@ export class TestCommand extends Command {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [Config.Channels.DEV.PRISM_TESTING];
-        this.AllowedGroups = [Config.Groups.DEV.BOTTEST];
+        this.AllowedGroups = [Config.Groups.PROD.BOT_DEV, Config.Groups.DEV.BOTTEST];
         RegisterCommand(
             new SlashCommandBuilder().setName('testcommand').setDescription('Test Command'),
             this,

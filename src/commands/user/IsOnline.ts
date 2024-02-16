@@ -18,12 +18,10 @@ export class IsOnline extends Command {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [
-            Config.Channels.PROD.WHOIS_UNLIMITED,
-            Config.Channels.PROD.WHOIS_LIMITED,
-            Config.Channels.PROD.WHOIS_ADMIN,
-            Config.Channels.PROD.WHOIS_RENAME,
-            Config.Channels.PROD.WHOIS_TESTI,
+            Config.Channels.PROD.PRISM_BOT,
+            Config.Channels.PROD.PRISM_HIGHTEAM,
 
+            Config.Channels.PROD.PRISM_TESTING,
             Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
@@ -32,6 +30,7 @@ export class IsOnline extends Command {
             Config.Groups.PROD.IC_HADMIN,
             Config.Groups.PROD.IC_ADMIN,
             Config.Groups.PROD.IC_MOD,
+
             Config.Groups.DEV.BOTTEST,
             Config.Groups.PROD.BOT_DEV,
         ];
@@ -54,7 +53,7 @@ export class IsOnline extends Command {
 
         if (player === '') {
             await interaction.reply({
-                content: `Bitte gib eine HausID oder einen Spieler an!`,
+                content: `Bitte gib eine SteamID an!`,
                 ephemeral: true,
             });
             return;
@@ -63,14 +62,13 @@ export class IsOnline extends Command {
         const vUser = await PlayerService.validatePlayer(player);
         if (!vUser) {
             await interaction.reply({
-                content: `Es konnte kein User mit dem Namen \`${player}\` gefunden werden!`,
+                content: `Es konnte kein User mit der SteamID \`${player}\` gefunden werden!`,
                 ephemeral: true,
             });
             return;
         }
 
         await this.replyWithEmbed({
-            interaction,
             title: vUser.metadata.isPlayerOnline
                 ? `Spieler ist online ${
                       vUser.metadata.currentID !== -1 ? `| ID: ${vUser.metadata.currentID}` : ''

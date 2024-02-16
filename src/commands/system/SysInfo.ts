@@ -1,12 +1,20 @@
+import Config from '@Config';
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
 
 export class SysInfo extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
+        this.AllowedChannels = [
+            Config.Channels.PROD.PRISM_BOT,
+            Config.Channels.PROD.PRISM_HIGHTEAM,
+
+            Config.Channels.PROD.PRISM_TESTING,
+            Config.Channels.DEV.PRISM_TESTING,
+        ];
 
         RegisterCommand(
             new SlashCommandBuilder().setName('sysinfo').setDescription('Get system information'),
@@ -14,10 +22,8 @@ export class SysInfo extends Command {
         );
     }
 
-    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        console.log(process);
+    async execute(): Promise<void> {
         await this.replyWithEmbed({
-            interaction,
             fields: [
                 { name: 'NodeJS Version', value: process.version },
                 { name: 'Platform', value: process.platform },

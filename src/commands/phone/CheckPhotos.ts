@@ -12,9 +12,10 @@ export class CheckPhotos extends Command {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [
-            Config.Channels.PROD.WHOIS_TESTI,
-            Config.Channels.PROD.WHOIS_LIMITED,
+            Config.Channels.PROD.PRISM_BOT,
+            Config.Channels.PROD.PRISM_HIGHTEAM,
 
+            Config.Channels.PROD.PRISM_TESTING,
             Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
@@ -22,6 +23,7 @@ export class CheckPhotos extends Command {
             Config.Groups.PROD.IC_SUPERADMIN,
             Config.Groups.PROD.IC_HADMIN,
 
+            Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
         this.IsBetaCommand = true;
@@ -99,11 +101,12 @@ export class CheckPhotos extends Command {
         const embeds: EmbedBuilder[] = [];
         // Split userset into chunks of 25
         for (let i = 0; i < userset.length; i += 150) {
-            const current = userset.slice(i, i + 150);
-            const embed = Command.getEmbedTemplate(interaction)
-                .setTitle('Nutzer mit illegalen Fotos')
-                .setDescription(`${current.join('\n')}`);
-            embeds.push(embed);
+            embeds.push(
+                this.getEmbedTemplate({
+                    title: 'Nutzer mit illegalen Fotos',
+                    description: `${userset.slice(i, i + 150).join('\n')}`,
+                }),
+            );
         }
 
         if (embeds.length === 0) {

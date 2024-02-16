@@ -4,7 +4,10 @@ import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
+<<<<<<< 313859ff3b295d6e567f8ec4713f8ef890ef3257
 import LogManager from '@utils/Logger';
+=======
+>>>>>>> 273ad9d5417780a926112df3d7418e57d8fdd6e7
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
 
@@ -13,9 +16,10 @@ export class Fraksperre extends Command {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [
-            Config.Channels.PROD.WHOIS_TESTI,
-            Config.Channels.PROD.WHOIS_UNLIMITED,
+            Config.Channels.PROD.PRISM_BOT,
+            Config.Channels.PROD.PRISM_HIGHTEAM,
 
+            Config.Channels.PROD.PRISM_TESTING,
             Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
@@ -25,6 +29,7 @@ export class Fraksperre extends Command {
             Config.Groups.PROD.IC_ADMIN,
             Config.Groups.PROD.IC_MOD,
 
+            Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
         RegisterCommand(
@@ -73,28 +78,27 @@ export class Fraksperre extends Command {
     }
 
     private async removeFraksperre(interaction: ChatInputCommandInteraction): Promise<void> {
+<<<<<<< 313859ff3b295d6e567f8ec4713f8ef890ef3257
         const { options } = interaction;
         const steamid = options.getString('steamid');
         if (!steamid) {
             await interaction.reply({ content: 'Bitte gib eine SteamID an!', ephemeral: true });
             return;
         }
+=======
+        const steamid = interaction.options.getString('steamid', true);
+>>>>>>> 273ad9d5417780a926112df3d7418e57d8fdd6e7
         const vPlayer = await PlayerService.validatePlayer(steamid);
         if (!vPlayer) {
-            await interaction.reply({
-                content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
-                ephemeral: true,
-            });
+            await this.replyError('Es konnte kein Spieler mit dieser SteamID gefunden werden!');
             return;
         }
         const today = new Date();
         if (vPlayer.playerdata.job.fraksperre.getTime() < today.getTime()) {
-            await interaction.reply({
-                content: 'Der Spieler hat keine Fraktionssperre!',
-                ephemeral: true,
-            });
+            await this.replyError('Der Spieler hat keine Fraktionssperre!');
             return;
         }
+<<<<<<< 313859ff3b295d6e567f8ec4713f8ef890ef3257
         try {
             const [dbResponse] = await GameDB.query<ResultSetHeader>(
                 'UPDATE users SET fraksperre = NOW() WHERE identifier = ?',
@@ -119,6 +123,19 @@ export class Fraksperre extends Command {
 
         this.replyWithEmbed({
             interaction,
+=======
+
+        const [res] = await GameDB.execute<ResultSetHeader>(
+            'UPDATE users SET fraksperre = NOW() WHERE identifier = ?',
+            [vPlayer.identifiers.steam],
+        );
+        if (res.affectedRows === 0) {
+            await this.replyError('Es ist ein Fehler aufgetreten!');
+            return;
+        }
+
+        await this.replyWithEmbed({
+>>>>>>> 273ad9d5417780a926112df3d7418e57d8fdd6e7
             title: 'Fraktionssperre entfernt',
             description: `Die Fraktionssperre von ${vPlayer.playerdata.fullname} (${
                 vPlayer.identifiers.steam
@@ -127,23 +144,17 @@ export class Fraksperre extends Command {
     }
 
     private async setFraksperre(interaction: ChatInputCommandInteraction): Promise<void> {
-        const { options } = interaction;
-        const days = options.getInteger('zeit') ?? 5;
-        const steamid = options.getString('steamid');
-        if (!steamid) {
-            await interaction.reply({ content: 'Bitte gib eine SteamID an!', ephemeral: true });
-            return;
-        }
+        const days = interaction.options.getInteger('zeit') ?? 5;
+        const steamid = interaction.options.getString('steamid', true);
+
         const vPlayer = await PlayerService.validatePlayer(steamid);
         if (!vPlayer) {
-            await interaction.reply({
-                content: 'Es konnte kein Spieler mit dieser SteamID gefunden werden!',
-                ephemeral: true,
-            });
+            await this.replyError('Es konnte kein Spieler mit dieser SteamID gefunden werden!');
             return;
         }
         const ts = new Date();
         ts.setDate(ts.getDate() + days);
+<<<<<<< 313859ff3b295d6e567f8ec4713f8ef890ef3257
         try {
             const [dbResponse] = await GameDB.query<ResultSetHeader>(
                 'UPDATE users SET fraksperre = ADDDATE(NOW(), INTERVAL ? DAY) WHERE identifier = ?',
@@ -164,6 +175,19 @@ export class Fraksperre extends Command {
 
         this.replyWithEmbed({
             interaction,
+=======
+
+        const [res] = await GameDB.execute<ResultSetHeader>(
+            'UPDATE users SET fraksperre = ADDDATE(NOW(), INTERVAL ? DAY) WHERE identifier = ?',
+            [days, vPlayer.identifiers.steam],
+        );
+        if (res.affectedRows === 0) {
+            await this.replyError('Es ist ein Fehler aufgetreten!');
+            return;
+        }
+
+        await this.replyWithEmbed({
+>>>>>>> 273ad9d5417780a926112df3d7418e57d8fdd6e7
             title: 'Fraktionssperre gesetzt',
             description: `Die Fraktionssperre von ${vPlayer.playerdata.fullname} (${
                 vPlayer.identifiers.steam

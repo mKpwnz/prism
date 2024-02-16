@@ -10,9 +10,10 @@ export class Revive extends Command {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [
-            Config.Channels.PROD.WHOIS_TESTI,
-            Config.Channels.PROD.WHOIS_UNLIMITED,
+            Config.Channels.PROD.PRISM_BOT,
+            Config.Channels.PROD.PRISM_HIGHTEAM,
 
+            Config.Channels.PROD.PRISM_TESTING,
             Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
@@ -22,6 +23,7 @@ export class Revive extends Command {
             Config.Groups.PROD.IC_ADMIN,
             Config.Groups.PROD.IC_MOD,
 
+            Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
         RegisterCommand(
@@ -45,7 +47,6 @@ export class Revive extends Command {
 
         await RconClient.sendCommand(`revive ${id}${incapacitated ? ' 1' : ''}`);
         await this.replyWithEmbed({
-            interaction,
             title: 'Revive',
             description: `Der Spieler mit der ID **${id}** wurde revived!`,
         });

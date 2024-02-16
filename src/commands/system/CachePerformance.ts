@@ -10,11 +10,15 @@ export class CachePerformance extends Command {
     constructor() {
         super();
         this.AllowedChannels = [
-            Config.Channels.PROD.WHOIS_TESTI,
+            Config.Channels.PROD.PRISM_TESTING,
 
             Config.Channels.DEV.PRISM_TESTING,
         ];
-        this.AllowedGroups = [Config.Groups.PROD.SERVERENGINEER, Config.Groups.DEV.BOTTEST];
+        this.AllowedGroups = [
+            Config.Groups.PROD.SERVERENGINEER,
+            Config.Groups.PROD.BOT_DEV,
+            Config.Groups.DEV.BOTTEST,
+        ];
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('cacheperformance')

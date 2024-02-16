@@ -1,5 +1,12 @@
 import { Command } from '@class/Command';
-import { GiveCar } from '@commands/cars';
+import {
+    ChangePlate,
+    DeleteTrunk,
+    DeleteVehicle,
+    GiveCar,
+    Vehicle,
+    VehiclePop,
+} from '@commands/cars';
 import { EENV } from '@enums/EENV';
 import LogManager from '@utils/Logger';
 import { Interaction, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js';
@@ -7,16 +14,7 @@ import { RestartDropbox, ValidateTrunk } from './cars';
 import { ChangeHouseOwner, GetHouse, SchufaCheck } from './housing';
 import { Nvhx, NvhxBan } from './nvhx';
 import { CheckImageOwner, CheckPhotos, Darkchat, DeletePhone } from './phone';
-import {
-    BotStats,
-    CachePerformance,
-    Help,
-    Ping,
-    ServerStatus,
-    SysInfo,
-    TestCommand,
-    Wahl,
-} from './system';
+import { BotStats, CachePerformance, Help, Ping, SysInfo, TestCommand, Wahl } from './system';
 import {
     ChangeBirthday,
     Fraksperre,
@@ -62,7 +60,6 @@ export class CommandHandler {
         // System Commands
         new Ping();
         new Help();
-        new ServerStatus();
 
         new RestartDropbox();
 
@@ -103,6 +100,11 @@ export class CommandHandler {
         new ValidateTrunk();
         // Car Commands
         new GiveCar();
+        new VehiclePop();
+        new DeleteTrunk();
+        new DeleteVehicle();
+        new ChangePlate();
+        new Vehicle();
         new Tebex();
         // new Versicherung()
         new SysInfo();

@@ -1,8 +1,14 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
+<<<<<<< 313859ff3b295d6e567f8ec4713f8ef890ef3257
 import { ValidatedPlayer } from '@ctypes/ValidatedPlayer';
 import { EENV } from '@enums/EENV';
+=======
+import { EENV } from '@enums/EENV';
+import { PlayerService } from '@services/PlayerService';
+import { IValidatedPlayer } from '@interfaces/IValidatedPlayer';
+>>>>>>> 273ad9d5417780a926112df3d7418e57d8fdd6e7
 import { ELicenses } from '@enums/ELicenses';
 import { PhoneService } from '@services/PhoneService';
 import { PlayerService } from '@services/PlayerService';
@@ -18,14 +24,17 @@ export class DeleteCharacter extends Command {
         super();
         this.RunEnvironment = EENV.DEVELOPMENT;
         this.AllowedChannels = [
-            Config.Channels.PROD.WHOIS_TESTI,
+            Config.Channels.PROD.PRISM_BOT,
+            Config.Channels.PROD.PRISM_HIGHTEAM,
 
+            Config.Channels.PROD.PRISM_TESTING,
             Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
             Config.Groups.PROD.SERVERENGINEER,
             Config.Groups.PROD.IC_SUPERADMIN,
 
+            Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
         this.IsBetaCommand = true;
@@ -84,7 +93,7 @@ export class DeleteCharacter extends Command {
         }
     }
 
-    private async moveCharacterToArchive(vPlayer: ValidatedPlayer): Promise<boolean> {
+    private async moveCharacterToArchive(vPlayer: IValidatedPlayer): Promise<boolean> {
         try {
             const newIdentifier = vPlayer.identifiers.steam.replace('steam', 'deleted');
             const [updateResponse] = await GameDB.query<ResultSetHeader>(

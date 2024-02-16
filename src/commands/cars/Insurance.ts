@@ -9,9 +9,10 @@ export class Insurance extends Command {
     constructor() {
         super();
         this.AllowedChannels = [
-            Config.Channels.PROD.WHOIS_UNLIMITED,
-            Config.Channels.PROD.WHOIS_TESTI,
+            Config.Channels.PROD.PRISM_BOT,
+            Config.Channels.PROD.PRISM_HIGHTEAM,
 
+            Config.Channels.PROD.PRISM_TESTING,
             Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
@@ -21,6 +22,7 @@ export class Insurance extends Command {
             Config.Groups.PROD.IC_ADMIN,
             Config.Groups.PROD.IC_MOD,
 
+            Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
         RegisterCommand(
@@ -112,7 +114,6 @@ export class Insurance extends Command {
         const insurance = insurances[0];
         const status = insurance.ts > new Date() ? '**Versichert**' : '**Nicht Versichert**';
         await this.replyWithEmbed({
-            interaction,
             title: 'Versicherung Prüfen',
             description: `${status}\nVersichert bis: ${insurance.ts.toLocaleDateString()} ${insurance.ts.toLocaleTimeString()}\nPremium: ${
                 insurance.premium
@@ -140,7 +141,6 @@ export class Insurance extends Command {
         const ts = new Date();
         ts.setDate(ts.getDate() + dauer);
         await this.replyWithEmbed({
-            interaction,
             title: 'Versicherung Hinzufügen',
             fields: [
                 {
@@ -172,7 +172,6 @@ export class Insurance extends Command {
         await InsuranceService.deleteVersicherungenByNumberplate(insurance);
 
         await this.replyWithEmbed({
-            interaction,
             title: 'Versicherung Entfernen',
             fields: [
                 {
