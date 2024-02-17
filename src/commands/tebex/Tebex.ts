@@ -55,6 +55,7 @@ export class Tebex extends Command {
         );
     }
 
+    // TODO: Change to Service Structure
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const tbxNummer = interaction.options.getString('tbx', true);
         const useOldApi = interaction.options.getSubcommand() === 'checkold';
