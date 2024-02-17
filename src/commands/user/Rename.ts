@@ -96,7 +96,11 @@ export class Rename extends Command {
                 ],
                 color: EEmbedColors.SUCCESS,
             });
-            const channel = await interaction.guild?.channels.fetch(process.env.NODE_ENV === 'production' ? Config.Channels.PROD.S1_NAMECHANGE : Config.Channels.DEV.PRISM_TEST_LOG);
+            const channel = await interaction.guild?.channels.fetch(
+                process.env.NODE_ENV === 'production'
+                    ? Config.Channels.PROD.S1_NAMECHANGE
+                    : Config.Channels.DEV.PRISM_TEST_LOG,
+            );
             if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] });
             await interaction.reply({ embeds: [embed] });
         } else {
