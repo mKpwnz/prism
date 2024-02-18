@@ -9,4 +9,5 @@ export enum EEmbedColors {
     SUCCESS = 0x17bf6b,
     WARNING = 0xffc632,
     ALERT = 0xe91916,
+    DEBUG = 0xda5dfa,
 }

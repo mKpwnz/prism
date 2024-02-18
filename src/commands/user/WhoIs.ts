@@ -1,5 +1,6 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
+import { PerformanceProfiler } from '@class/PerformanceProfiler';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { ESearchType } from '@enums/ESearchType';
@@ -79,6 +80,8 @@ export class WhoIs extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+        const profiler = new PerformanceProfiler('WhoIs Command');
+
         const { channel } = interaction;
         const identifierValue = interaction.options.getString('input');
 
@@ -89,7 +92,7 @@ export class WhoIs extends Command {
             });
             return;
         }
-
+        profiler.addStep('Validate Input');
         const pageSize = 18;
 
         const page = interaction.options.getNumber('seite') ?? 1;
@@ -97,10 +100,10 @@ export class WhoIs extends Command {
         const filter = spalte ? `\nFilter: ${spalte}` : '';
 
         const findUsers: IFindUser[] = await WhoIs.searchUsers(identifierValue, spalte);
-
+        profiler.addStep('Search Users');
         const embedFields = [];
         const bannedEmote = await Helper.getEmote('pbot_banned');
-
+        profiler.addStep('Get Banned Emote');
         if (findUsers.length === 0) {
             await interaction.reply({
                 content: `Keine Daten für "${identifierValue}" gefunden!${filter}`,
@@ -112,7 +115,7 @@ export class WhoIs extends Command {
         await interaction.deferReply();
 
         const globalBans = await NvhxService.GetAllGlobalBans();
-
+        profiler.addStep('Get Global Bans');
         for (let i = pageSize * (page - 1); i < findUsers.length; i++) {
             // Pagination
             if (embedFields.length >= pageSize) {
@@ -133,6 +136,7 @@ export class WhoIs extends Command {
                 [findUsers[i].identifier, findUsers[i].discord],
                 globalBans,
             );
+            profiler.addStep(`Check Bann ${i}`);
 
             const onlineID = await PlayerService.getPlayerId(findUsers[i].identifier);
 
@@ -186,6 +190,7 @@ export class WhoIs extends Command {
                 fields: embedFields,
             });
         }
+        await profiler.sendEmbed(interaction);
     }
 
     private EmbedFieldsBuilder(

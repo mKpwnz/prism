@@ -201,29 +201,18 @@ export abstract class Command {
         }
     }
 
-    /**
-     * @description Gibt ein Embed Template zurück, welches für die meisten Commands verwendet werden kann. (Footer, Author, Timestamp, Color, Image, etc.)
-     * @author mKpwnz
-     * @date 14.10.2023
-     * @param {ChatInputCommandInteraction} interaction
-     * @returns {*}  {EmbedBuilder}
-     * @memberof Command
-     * @deprecated
-     */
-    static getEmbedTemplateOld(interaction: ChatInputCommandInteraction): EmbedBuilder {
+    static getEmbedBase(opt: IEmbedOptions): EmbedBuilder {
         return new EmbedBuilder()
-            .setColor(EEmbedColors.DEFAULT)
-            .setTimestamp()
+            .setTitle(opt.title || ' ')
+            .setDescription(opt.description)
+            .setColor(opt.color ?? EEmbedColors.DEFAULT)
             .setAuthor({
                 name: Config.Bot.BOT_NAME,
                 iconURL: Config.Bot.BOT_LOGO,
             })
-            .setFooter({
-                text: interaction.user.displayName ?? '',
-                iconURL: interaction.user.avatarURL() ?? '',
-            })
             .setTimestamp(new Date())
-            .setImage(Config.Bot.WHITESPACE);
+            .setFields(opt.fields ?? [])
+            .setImage(opt.customImage ?? Config.Bot.WHITESPACE);
     }
 
     getEmbedTemplate(opt: IEmbedOptions): EmbedBuilder {
@@ -233,21 +222,10 @@ export abstract class Command {
             ? this.CmdPerformanceStop.getTime() - this.CmdPerformanceStart.getTime()
             : 0;
 
-        return new EmbedBuilder()
-            .setTitle(opt.title || this.EmbedTitle)
-            .setDescription(opt.description)
-            .setColor(opt.color ?? EEmbedColors.DEFAULT)
-            .setAuthor({
-                name: Config.Bot.BOT_NAME,
-                iconURL: Config.Bot.BOT_LOGO,
-            })
-            .setFooter({
-                text: `${this.currentInteraction.user.displayName ?? ''} • ET: ${executionTime}ms`,
-                iconURL: this.currentInteraction.user.avatarURL() ?? '',
-            })
-            .setTimestamp(new Date())
-            .setFields(opt.fields ?? [])
-            .setImage(opt.customImage ?? Config.Bot.WHITESPACE);
+        return Command.getEmbedBase(opt).setFooter({
+            text: `${this.currentInteraction.user.displayName ?? ''} • ET: ${executionTime}ms`,
+            iconURL: this.currentInteraction.user.avatarURL() ?? '',
+        });
     }
 
     async replyWithEmbed(opt: IEmbedOptions): Promise<void> {

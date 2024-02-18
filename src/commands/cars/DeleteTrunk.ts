@@ -53,10 +53,10 @@ export class DeleteTrunk extends Command {
             await this.replyError(
                 `Das Kennzeichen **${plate}** ist zu lang. \nDas Kennzeichen darf maximal 8 Zeichen lang sein.`,
             );
-
             return;
         }
         await interaction.deferReply();
+
         const vehicle = await VehicleService.getVehicleByNumberplate(plate);
         if (!vehicle) {
             await this.replyError(
@@ -68,6 +68,7 @@ export class DeleteTrunk extends Command {
             `UPDATE owned_vehicles SET kofferraum = '{}' WHERE plate = ?`,
             [vehicle.plate],
         );
+
         if (res.affectedRows === 0) {
             await this.replyError(
                 `Es ist ein Fehler aufgetreten. Der Kofferraum des Fahrzeugs mit dem Kennzeichen ${plate} konnte nicht gelöscht werden.`,

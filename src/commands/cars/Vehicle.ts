@@ -48,7 +48,6 @@ export class Vehicle extends Command {
     // @TODO: Rewrite to Service structure
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const plate = interaction.options.getString('plate', true);
-
         if (plate.length > 8) {
             await this.replyError(
                 'Das Kennzeichen ist zu lang. \nDas Kennzeichen darf maximal 8 Zeichen lang sein.',
@@ -69,6 +68,9 @@ export class Vehicle extends Command {
             await this.replyError(`Der Besitzer des Fahrzeugs konnte nicht gefunden werden.`);
             return;
         }
+
+        const file = Helper.attachmentFromObject(vehicle, 'VehicleInfo');
+
         await this.replyWithEmbed({
             description: `Fahrzeug Informationen für das Kennzeichen **${plate}**`,
             fields: [
@@ -89,7 +91,7 @@ export class Vehicle extends Command {
                     value: `${vehicle.job}`,
                 },
             ],
-            files: [Helper.attachmentFromObject(vehicle, 'VehicleInfo')],
+            files: [file],
             color: EEmbedColors.SUCCESS,
         });
     }
