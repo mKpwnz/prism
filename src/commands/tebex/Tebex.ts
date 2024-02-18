@@ -55,23 +55,20 @@ export class Tebex extends Command {
         );
     }
 
+    // TODO: Change to Service Structure
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const tbxNummer = interaction.options.getString('tbx', true);
         const useOldApi = interaction.options.getSubcommand() === 'checkold';
 
-        if (!/tbx-[0-9a-f]{14}-[0-9a-f]{6}/.test(tbxNummer)) {
+        if (!/tbx-[0-9a-f]{13,14}-[0-9a-f]{6}/.test(tbxNummer)) {
             await this.replyError('Ungültige Tebex Nummer.');
             return;
         }
 
-        await this.checkTebexOrder(interaction, tbxNummer, useOldApi);
+        await this.checkTebexOrder(tbxNummer, useOldApi);
     }
 
-    private async checkTebexOrder(
-        interaction: ChatInputCommandInteraction,
-        tbx: string,
-        useOldApi: boolean = false,
-    ): Promise<void> {
+    private async checkTebexOrder(tbx: string, useOldApi: boolean = false): Promise<void> {
         try {
             const response = await axios.get(`${process.env.TEBEX_ENDPOINT}${tbx}`, {
                 headers: {

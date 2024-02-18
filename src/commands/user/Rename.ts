@@ -77,7 +77,7 @@ export class Rename extends Command {
         );
 
         if (res.affectedRows !== 0) {
-            await this.replyWithEmbed({
+            const embed = this.getEmbedTemplate({
                 title: 'Spieler umbenannt',
                 description: `Der Spieler wurde erfolgreich umbenannt.`,
                 fields: [
@@ -96,6 +96,13 @@ export class Rename extends Command {
                 ],
                 color: EEmbedColors.SUCCESS,
             });
+            const channel = await interaction.guild?.channels.fetch(
+                process.env.NODE_ENV === 'production'
+                    ? Config.Channels.PROD.S1_NAMECHANGE
+                    : Config.Channels.DEV.PRISM_TEST_LOG,
+            );
+            if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] });
+            await interaction.reply({ embeds: [embed] });
         } else {
             await this.replyError('Der Spieler konnte nicht umbenannt werden!');
         }

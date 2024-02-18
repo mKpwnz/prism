@@ -1,11 +1,10 @@
+import Config from '@Config';
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
-import Config from '@Config';
+import { InsuranceService } from '@services/InsuranceService';
 import { IInsurance } from '@sql/schema/Versicherung.schema';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { InsuranceService } from '@services/InsuranceService';
 
-// @TODO unused class Versicherung
 export class Insurance extends Command {
     constructor() {
         super();
@@ -108,7 +107,6 @@ export class Insurance extends Command {
         if (insurances.length !== 1) {
             let message;
             if (insurances.length === 0) message = `Keine Versicherung für ${plate} gefunden!`;
-            // @TODO why don't we show all insurances in the embed?
             else message = `Es wurden ${insurances.length} Versicherungen für ${plate} gefunden!`;
             await interaction.reply({ content: message, ephemeral: true });
             return;
@@ -130,7 +128,15 @@ export class Insurance extends Command {
         const dauer: number = options.getNumber('dauer', true);
         const premium: boolean = options.getBoolean('premium') ?? false;
 
-        await InsuranceService.addInsurance(plate, dauer, premium);
+        const result = await InsuranceService.addInsurance(plate, dauer, premium);
+
+        if (!result) {
+            await interaction.reply({
+                content: 'Fehler beim Hinzufügen der Versicherung',
+                ephemeral: true,
+            });
+            return;
+        }
 
         const ts = new Date();
         ts.setDate(ts.getDate() + dauer);
@@ -144,7 +150,7 @@ export class Insurance extends Command {
                     }`,
                 },
             ],
-            description: '', // TODO ??
+            description: '',
         });
     }
 
@@ -163,7 +169,6 @@ export class Insurance extends Command {
             return;
         }
         const insurance = insurances[0];
-        // @TODO Are we sure we want to delete every insurance for the plate?
         await InsuranceService.deleteVersicherungenByNumberplate(insurance);
 
         await this.replyWithEmbed({
@@ -176,7 +181,7 @@ export class Insurance extends Command {
                     }\nVersichert bis: ${insurance.ts.toLocaleDateString()} ${insurance.ts.toLocaleTimeString()}`,
                 },
             ],
-            description: '', // TODO ??
+            description: '',
         });
     }
 }

@@ -1,15 +1,16 @@
+import Config from '@Config';
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
-import { PlayerService } from '@services/PlayerService';
-import { IValidatedPlayer } from '@interfaces/IValidatedPlayer';
 import { ELicenses } from '@enums/ELicenses';
-import Config from '@Config';
+import { IValidatedPlayer } from '@interfaces/IValidatedPlayer';
+import { PhoneService } from '@services/PhoneService';
+import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
 import { IUser } from '@sql/schema/User.schema';
 import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { PhoneService } from '@services/PhoneService';
+import { ResultSetHeader } from 'mysql2';
 import { License } from './License';
 
 export class DeleteCharacter extends Command {
@@ -89,11 +90,13 @@ export class DeleteCharacter extends Command {
     private async moveCharacterToArchive(vPlayer: IValidatedPlayer): Promise<boolean> {
         try {
             const newIdentifier = vPlayer.identifiers.steam.replace('steam', 'deleted');
-            // TODO: Add Return Handler
-            await GameDB.query('UPDATE users SET identifier = ? WHERE identifier = ?', [
-                newIdentifier,
-                vPlayer.identifiers.steam,
-            ]);
+            const [updateResponse] = await GameDB.query<ResultSetHeader>(
+                'UPDATE users SET identifier = ? WHERE identifier = ?',
+                [newIdentifier, vPlayer.identifiers.steam],
+            );
+            if (updateResponse.affectedRows === 0) {
+                return false;
+            }
             // Move to Archive
             const [response] = await GameDB.query<IUser[]>(
                 'INSERT INTO users_deleted SELECT * FROM users WHERE identifier = ? RETURNING *',
