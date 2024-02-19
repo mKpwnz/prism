@@ -141,7 +141,7 @@ export class WhoIs extends Command {
             const onlineID = await PlayerService.getPlayerId(findUsers[i].identifier);
 
             embedFields.push(
-                this.EmbedFieldsBuilder(
+                await this.EmbedFieldsBuilder(
                     findUsers[i],
                     onlineID,
                     nvhxBanned,
@@ -193,7 +193,7 @@ export class WhoIs extends Command {
         await profiler.sendEmbed(interaction);
     }
 
-    private EmbedFieldsBuilder(
+    private async EmbedFieldsBuilder(
         user: IFindUser,
         id: number,
         nvhxBanned: boolean,
@@ -206,12 +206,13 @@ export class WhoIs extends Command {
         embedFieldLength: number,
     ) {
         return {
-            name: `${user.playername} (${user.name}) ${id !== -1 ? `[${id}]` : ''}`,
+            name: `${user.playername} (${user.name})`,
             value:
                 `${
-                    nvhxBanned ? `${bannedEmote} **NVHX Global Ban Detected** ${bannedEmote}` : ''
+                    nvhxBanned ? `${bannedEmote} **NVHX Global Ban Detected** ${bannedEmote}\n` : ''
                 }` +
-                `\nSteamID: [${
+                `${id > -1 ? `:green_circle: **Online mit ID: ${id} **` : ''}\n` +
+                `SteamID: [${
                     user.identifier
                 }](https://steamid.pro/de/lookup/${steamId})\nDiscord: ${
                     user.discord ? `<@${user.discord?.replace('discord:', '')}>` : 'Nicht Vorhanden'
