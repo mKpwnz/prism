@@ -44,11 +44,7 @@ export class SchufaCheck extends Command {
     }
 
     async execute(): Promise<void> {
-        const schufaUsers: ISchufaUser[] = await UserService.getSchufaUsers();
-
-        for (const user of schufaUsers) {
-            schufaUsers[schufaUsers.indexOf(user)].accounts = JSON.parse(user.accounts);
-        }
+        const schufaUsers: ISchufaUser[] = await UserService.getSchufaHouseOwners();
 
         await this.replyWithEmbed({
             title: 'Schufa Check abgeschlossen',
