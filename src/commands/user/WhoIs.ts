@@ -114,7 +114,6 @@ export class WhoIs extends Command {
 
         await interaction.deferReply();
 
-        const globalBans = await NvhxService.GetAllGlobalBans();
         profiler.addStep('Get Global Bans');
         for (let i = pageSize * (page - 1); i < findUsers.length; i++) {
             // Pagination
@@ -132,10 +131,10 @@ export class WhoIs extends Command {
                 },
             });
 
-            const nvhxBanned = NvhxService.CheckIfUserIsBanned(
-                [findUsers[i].identifier, findUsers[i].discord],
-                globalBans,
-            );
+            const nvhxBanned = await NvhxService.CheckIfUserIsBanned([
+                findUsers[i].identifier,
+                findUsers[i].discord,
+            ]);
             profiler.addStep(`Check Bann ${i}`);
 
             const onlineID = await PlayerService.getPlayerId(findUsers[i].identifier);

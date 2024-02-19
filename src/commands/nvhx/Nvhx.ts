@@ -118,11 +118,8 @@ export class Nvhx extends Command {
 
     private async fetchBannedLivePlayers(): Promise<ILivePlayer[]> {
         const livePlayers = await PlayerService.getAllLivePlayers();
-        const globalBans = await NvhxService.GetAllGlobalBans();
 
-        return livePlayers.filter((player) =>
-            NvhxService.CheckIfUserIsBanned(player.identifiers, globalBans),
-        );
+        return livePlayers.filter((player) => NvhxService.CheckIfUserIsBanned(player.identifiers));
     }
 
     private async formatBannedPlayersDescription(bannedPlayers: ILivePlayer[]): Promise<string> {

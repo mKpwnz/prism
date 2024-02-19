@@ -3,7 +3,7 @@ import { Command } from '@class/Command';
 import { PerformanceProfiler } from '@class/PerformanceProfiler';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
-import { UserService } from '@services/UserService';
+import { PlayerService } from '@services/PlayerService';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class TestCommand extends Command {
@@ -21,8 +21,8 @@ export class TestCommand extends Command {
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const profiler = new PerformanceProfiler('TestCommand');
-        const schufaUsers = await UserService.getSchufaUsers();
-        console.log(schufaUsers);
+        const livePlayer = await PlayerService.getPlayerById(1);
+        console.log(livePlayer);
         await interaction.reply({ content: `Test` });
         await profiler.sendEmbed(interaction);
     }

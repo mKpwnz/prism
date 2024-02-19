@@ -171,4 +171,21 @@ export class PlayerService {
 
         return userObject;
     }
+
+    /**
+     * @description Get a Validated Player by the current Online ID
+     * @static
+     * @param {number} id
+     * @returns {*}  {(Promise<IValidatedPlayer | null>)}
+     * @memberof PlayerService
+     */
+    public static async getPlayerById(id: number): Promise<IValidatedPlayer | null> {
+        const livePlayers = await PlayerService.getAllLivePlayers();
+        const livePlayerSteamID = livePlayers
+            .find((p) => p.id === id)
+            ?.identifiers.find((i) => i.startsWith('steam:'));
+        if (!livePlayerSteamID) return null;
+        const livePlayer = await this.validatePlayer(livePlayerSteamID, EUniqueIdentifier.STEAMID);
+        return livePlayer;
+    }
 }

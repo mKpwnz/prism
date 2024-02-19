@@ -48,7 +48,8 @@ export class NvhxService {
      * @returns {*}  {Promise<boolean>}
      * @memberof NvhxService
      */
-    public static CheckIfUserIsBanned(userIds: string[], globalBans: Set<string>): boolean {
+    public static async CheckIfUserIsBanned(userIds: string[]): Promise<boolean> {
+        const globalBans = await this.GetAllGlobalBans();
         return userIds.some((id) => globalBans.has(id));
     }
 }
