@@ -27,6 +27,7 @@ import {
     RequestToSupport,
     Resetpos,
     Revive,
+    SchufaAuskunft,
     Setjob,
     TeamNote,
     WhoIs,
@@ -98,6 +99,7 @@ export class CommandHandler {
         new TeamNote();
 
         new ValidateTrunk();
+        new SchufaAuskunft();
         // Car Commands
         new GiveCar();
         new VehiclePop();

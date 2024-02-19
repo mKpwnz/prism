@@ -13,3 +13,4 @@ export * from './Revive';
 export * from './Setjob';
 export * from './TeamNote';
 export * from './WhoIs';
+export * from './SchufaAuskunft';

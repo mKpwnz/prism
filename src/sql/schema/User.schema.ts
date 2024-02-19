@@ -83,9 +83,21 @@ export interface IFindUser extends RowDataPacket {
  * @interface ISchufaUser
  * @extends {RowDataPacket}
  */
-export interface ISchufaUser extends RowDataPacket {
+export interface ISchufaUserRaw extends RowDataPacket {
     firstname: string;
     lastname: string;
     steamId: string;
-    accounts: any;
+    accountsRaw: string;
+}
+
+export interface ISchufaUser {
+    firstname: string;
+    lastname: string;
+    steamId: string;
+    accounts: {
+        bank: number;
+        money: number;
+        black_money: number;
+        negativesum: number;
+    };
 }
