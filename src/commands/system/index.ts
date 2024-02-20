@@ -5,3 +5,4 @@ export * from './Wahl';
 export * from './CachePerformance';
 export * from './TestCommand';
 export * from './SysInfo';
+export * from './Issue';

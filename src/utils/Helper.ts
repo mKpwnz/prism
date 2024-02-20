@@ -286,6 +286,7 @@ export class Helper {
      * @static
      * @param {string} emoteName
      * @returns {*}  {(string | null)}
+     * @deprecated Use getEmote in EmoteManager instead
      * @memberof Helper
      */
     static async getEmote(emoteName: string): Promise<GuildEmoji | null> {

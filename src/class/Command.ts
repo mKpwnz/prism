@@ -122,7 +122,10 @@ export abstract class Command {
         // Override Channel in Devmode
         if (process.env.NODE_ENV !== 'production') {
             this.DoNotCountUse = true;
-            this.AllowedChannels = [Config.Channels.DEV.PRISM_TESTING];
+            this.AllowedChannels = [
+                Config.Channels.DEV.PRISM_TESTING,
+                Config.Channels.DEV.PRISM_TESTING_2,
+            ];
             this.AllowedGroups = [Config.Groups.DEV.BOTTEST];
         }
         if (this.CheckPermissions) {

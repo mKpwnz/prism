@@ -3,7 +3,7 @@ import { EventHandler } from '@events/EventHandler';
 import { Cache } from '@utils/Cache';
 import LogManager from '@utils/Logger';
 import { ExpressApp } from '@web/ExpressApp';
-import { Client, Events, IntentsBitField } from 'discord.js';
+import { Client, Events, IntentsBitField, Partials } from 'discord.js';
 import { CronManager } from '@utils/CronManager';
 import { CronJob } from 'cron';
 import { CronJobService } from '@services/CronJobService';
@@ -24,9 +24,11 @@ const client = new Client({
         IntentsBitField.Flags.Guilds,
         IntentsBitField.Flags.GuildMessages,
         IntentsBitField.Flags.GuildIntegrations,
+        IntentsBitField.Flags.GuildMessageReactions,
         IntentsBitField.Flags.MessageContent,
         IntentsBitField.Flags.DirectMessages,
     ],
+    partials: [Partials.Message, Partials.Channel, Partials.Reaction, Partials.User],
 });
 
 Cache.init();
