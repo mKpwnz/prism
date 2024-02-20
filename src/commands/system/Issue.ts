@@ -229,6 +229,7 @@ export class Issue extends Command {
         const priorityIndex = embed.fields.findIndex((field) => field.name === 'Priorität');
         const oldPriority = embed.fields[priorityIndex].value;
         embed.fields[priorityIndex].value = priority;
+        if (oldPriority === priority) return;
         await message.thread?.send({
             content: `Priorität wurde durch **<@${user.id}>** von **${oldPriority}** auf **${priority}** geändert.`,
         });
