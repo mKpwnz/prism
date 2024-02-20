@@ -197,22 +197,22 @@ export class Issue extends Command {
                     await this.acceptIssue(message, user, false);
                     break;
                 case 'pbot_prio_sehr_niedrig':
-                    await this.updateIssuePriority(message, 'Sehr Niedrig');
+                    await this.updateIssuePriority(message, user, 'Sehr Niedrig');
                     break;
                 case 'pbot_prio_niedrig':
-                    await this.updateIssuePriority(message, 'Niedrig');
+                    await this.updateIssuePriority(message, user, 'Niedrig');
                     break;
                 case 'pbot_prio_normal':
-                    await this.updateIssuePriority(message, 'Normal');
+                    await this.updateIssuePriority(message, user, 'Normal');
                     break;
                 case 'pbot_prio_hoch':
-                    await this.updateIssuePriority(message, 'Hoch');
+                    await this.updateIssuePriority(message, user, 'Hoch');
                     break;
                 case 'pbot_prio_sehr_hoch':
-                    await this.updateIssuePriority(message, 'Sehr Hoch');
+                    await this.updateIssuePriority(message, user, 'Sehr Hoch');
                     break;
                 case 'pbot_prio_kritisch':
-                    await this.updateIssuePriority(message, 'Kritisch');
+                    await this.updateIssuePriority(message, user, 'Kritisch');
                     break;
                 default:
             }
@@ -221,12 +221,17 @@ export class Issue extends Command {
 
     async updateIssuePriority(
         message: Message<boolean> | PartialMessage,
+        user: User | PartialUser,
         priority: string,
     ): Promise<void> {
         const embed = message.embeds[0];
         if (!embed) return;
         const priorityIndex = embed.fields.findIndex((field) => field.name === 'Priorität');
+        const oldPriority = embed.fields[priorityIndex].value;
         embed.fields[priorityIndex].value = priority;
+        await message.thread?.send({
+            content: `Priorität wurde durch **<@${user.id}>** von **${oldPriority}** auf **${priority}** geändert.`,
+        });
         await message.edit({ embeds: [embed] });
     }
 
