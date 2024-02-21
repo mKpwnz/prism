@@ -63,13 +63,19 @@ const UserConfig = {
     SEBASTIAN: '613447760628285670',
 };
 
+const ServerConfig = {
+    IMMO_LOGS: '973238003092848711',
+    IMMO_TEAM: '1014139131670036531',
+    IMMO_DEVS: '1192895296099844116',
+};
+
 const BotConfig = {
     ServerID: (() => {
         switch (process.env.NODE_ENV) {
             case 'production':
-                return '973238003092848711';
+                return [ServerConfig.IMMO_LOGS, ServerConfig.IMMO_TEAM];
             default:
-                return '1192895296099844116';
+                return [ServerConfig.IMMO_DEVS];
         }
     })(),
     Emotes: [
@@ -181,12 +187,6 @@ const ChannelConfig = {
         PRISM_TESTING_2: '1209556376859189269',
         PRISM_TEST_LOG: '1204133095586926622',
     },
-};
-
-const ServerConfig = {
-    IMMO_LOGS: '973238003092848711',
-    IMMO_TEAM: '1014139131670036531',
-    IMMO_DEVS: '1192895296099844116',
 };
 
 const CommandConfig = {

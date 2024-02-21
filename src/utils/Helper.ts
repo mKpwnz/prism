@@ -1,5 +1,5 @@
-import { BotClient } from '@Bot';
 import Config from '@Config';
+import { EmoteManager } from '@manager/EmoteManager';
 import { AttachmentBuilder, CommandInteraction, GuildEmoji, TextChannel } from 'discord.js';
 
 export class Helper {
@@ -290,10 +290,7 @@ export class Helper {
      * @memberof Helper
      */
     static async getEmote(emoteName: string): Promise<GuildEmoji | null> {
-        const guild = BotClient.guilds.cache.get(Config.Bot.ServerID);
-        if (!guild) return null;
-        const emoteData = await guild.emojis.fetch();
-        return emoteData.find((e) => e.name === emoteName) ?? null;
+        return EmoteManager.getEmote(emoteName);
     }
 
     /**

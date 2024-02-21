@@ -48,7 +48,7 @@ export class HelpService {
     public static async getGroups(): Promise<Map<string, string>> {
         const res = new Map<string, string>();
 
-        const roles = await BotClient.guilds.cache.get(Config.Bot.ServerID)?.roles.cache;
+        const roles = await BotClient.guilds.cache.get(Config.Servers.IMMO_LOGS)?.roles.cache;
         if (!roles) return res;
         for (const [key, value] of roles.entries()) {
             res.set(key, value.name);
@@ -58,8 +58,8 @@ export class HelpService {
 
     public static async getChannel(): Promise<Map<string, string>> {
         const channel = new Map<string, string>();
-        const channelApiResponse = await BotClient.guilds.cache.get(Config.Bot.ServerID)?.channels
-            .cache;
+        const channelApiResponse = await BotClient.guilds.cache.get(Config.Servers.IMMO_LOGS)
+            ?.channels.cache;
         if (!channelApiResponse) return channel;
         for (const [key, value] of channelApiResponse.entries()) {
             channel.set(key, value.name);

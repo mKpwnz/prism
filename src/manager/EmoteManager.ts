@@ -27,21 +27,24 @@ export class EmoteManager {
         return Config.Bot.Emotes.find((emote) => emote.name === name);
     }
 
-    static async fetchEmoteFromAPI(emoteName: string): Promise<GuildEmoji | null> {
-        const guild = BotClient.guilds.cache.get(Config.Bot.ServerID);
+    static async fetchEmoteFromAPI(
+        emoteName: string,
+        serverid: string,
+    ): Promise<GuildEmoji | null> {
+        const guild = BotClient.guilds.cache.get(serverid);
         if (!guild) return null;
         const emoteData = await guild.emojis.fetch();
         return emoteData.find((e) => e.name === emoteName) ?? null;
     }
 
-    static async updateBotEmotes(client: Client): Promise<void> {
+    static async updateBotEmotes(client: Client, serverid: string): Promise<void> {
         LogManager.info('Cheking emotes...');
         if (process.env.NODE_ENV !== 'production') {
             await this.initEmotes();
             LogManager.info('Emotes Initialised!');
             return;
         }
-        const guild = client.guilds.cache.get(Config.Bot.ServerID);
+        const guild = client.guilds.cache.get(serverid);
         if (!guild) {
             LogManager.error('Guild not found!');
             return;
@@ -59,10 +62,12 @@ export class EmoteManager {
     }
 
     static async initEmotes(): Promise<void> {
-        for (const emote of EmoteManager.getAllBotEmotes()) {
-            const e = await EmoteManager.fetchEmoteFromAPI(emote.name);
-            if (e && e.name) EmoteManager.Emotes.set(e.name, e);
-        }
+        Config.Bot.ServerID.forEach(async (serverid) => {
+            for (const emote of EmoteManager.getAllBotEmotes()) {
+                const e = await EmoteManager.fetchEmoteFromAPI(emote.name, serverid);
+                if (e && e.name) EmoteManager.Emotes.set(e.name, e);
+            }
+        });
     }
 
     private static async deleteOldBotEmotes(guild: Guild, timeout: number = 5000): Promise<void> {
