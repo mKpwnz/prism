@@ -18,13 +18,14 @@ export class OnReady extends DCEvent {
         CommandHandler.initAll(client);
         new RconClient();
         const commandData = CommandHandler.commands.map((command) => command.scb.toJSON());
-        await rest.put(
-            Routes.applicationGuildCommands(client.user?.id ?? 'missing id', Config.Bot.ServerID),
-            {
+        Config.Bot.ServerID.forEach(async (id) => {
+            await rest.put(Routes.applicationGuildCommands(client.user?.id ?? 'missing id', id), {
                 body: commandData,
-            },
-        );
-        await EmoteManager.updateBotEmotes(client);
+            });
+        });
+        Config.Bot.ServerID.forEach(async (id) => {
+            await EmoteManager.updateBotEmotes(client, id);
+        });
 
         LogManager.info('Discord ready!');
     }
