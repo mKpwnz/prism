@@ -4,6 +4,7 @@ import { PerformanceProfiler } from '@class/PerformanceProfiler';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { ESearchType } from '@enums/ESearchType';
+import { EmoteManager } from '@manager/EmoteManager';
 import { NvhxService } from '@services/NvhxService';
 import { PlayerService } from '@services/PlayerService';
 import { BotDB, GameDB } from '@sql/Database';
@@ -80,6 +81,7 @@ export class WhoIs extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+        if (!interaction.guildId) return;
         const profiler = new PerformanceProfiler('WhoIs Command');
 
         const { channel } = interaction;
@@ -102,7 +104,7 @@ export class WhoIs extends Command {
         const findUsers: IFindUser[] = await WhoIs.searchUsers(identifierValue, spalte);
         profiler.addStep('Search Users');
         const embedFields = [];
-        const bannedEmote = await Helper.getEmote('pbot_banned');
+        const bannedEmote = await EmoteManager.getEmote('pbot_banned', interaction.guildId);
         profiler.addStep('Get Banned Emote');
         if (findUsers.length === 0) {
             await interaction.reply({

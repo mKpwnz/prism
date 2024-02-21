@@ -1,13 +1,13 @@
+import Config from '@Config';
 import { Command } from '@class/Command';
 import { RconClient } from '@class/RconClient';
 import { RegisterCommand } from '@commands/CommandHandler';
-import { NvhxService } from '@services/NvhxService';
 import { EENV } from '@enums/EENV';
 import { ILivePlayer } from '@interfaces/ILivePlayer';
-import { Helper } from '@utils/Helper';
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { EmoteManager } from '@manager/EmoteManager';
+import { NvhxService } from '@services/NvhxService';
 import { PlayerService } from '@services/PlayerService';
-import Config from '@Config';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class Nvhx extends Command {
     constructor() {
@@ -62,6 +62,7 @@ export class Nvhx extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+        if (!interaction.guildId) return;
         switch (interaction.options.getSubcommand()) {
             case 'sc':
                 await this.captureScreenByPlayerId(interaction);
@@ -70,7 +71,7 @@ export class Nvhx extends Command {
                 await this.unbanPlayerById(interaction);
                 break;
             case 'checkplayerbans':
-                await this.getBannedLivePlayers();
+                await this.getBannedLivePlayers(interaction);
                 break;
             default:
                 await interaction.reply({
@@ -107,9 +108,9 @@ export class Nvhx extends Command {
         }
     }
 
-    private async getBannedLivePlayers(): Promise<void> {
+    private async getBannedLivePlayers(interaction: ChatInputCommandInteraction): Promise<void> {
         const bannedPlayers = await this.fetchBannedLivePlayers();
-        const description = await this.formatBannedPlayersDescription(bannedPlayers);
+        const description = await this.formatBannedPlayersDescription(bannedPlayers, interaction);
         await this.replyWithEmbed({
             title: 'Neverhax Info',
             description,
@@ -122,11 +123,15 @@ export class Nvhx extends Command {
         return livePlayers.filter((player) => NvhxService.CheckIfUserIsBanned(player.identifiers));
     }
 
-    private async formatBannedPlayersDescription(bannedPlayers: ILivePlayer[]): Promise<string> {
+    private async formatBannedPlayersDescription(
+        bannedPlayers: ILivePlayer[],
+        interaction: ChatInputCommandInteraction,
+    ): Promise<string> {
+        if (!interaction.guildId) return '';
         let desc = `Es sind aktuell **${bannedPlayers.length}** von NVHX Global gebannte Spieler auf dem Server.\n`;
         if (bannedPlayers.length > 0) {
             desc += '\nAktuell gebannte Spieler:\n';
-            const bannedEmote = await Helper.getEmote('pbot_banned');
+            const bannedEmote = EmoteManager.getEmote('pbot_banned', interaction.guildId);
             bannedPlayers.forEach((player) => {
                 desc += `\n${bannedEmote} **${player.name} | ServerID: ${
                     player.id

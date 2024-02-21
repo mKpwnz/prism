@@ -92,6 +92,7 @@ export class Issue extends Command {
 
     async onInteract(interaction: Interaction) {
         if (interaction.isModalSubmit() && interaction.customId === 'issue') {
+            if (!interaction.guildId) return;
             const title = interaction.fields.getTextInputValue('issueTitle');
             const description = interaction.fields.getTextInputValue('issueDescription');
             const attachments = interaction.fields.getTextInputValue('issueAttachments') ?? 'Keine';
@@ -136,15 +137,30 @@ export class Issue extends Command {
 
                 await interaction.reply({ content: 'Dein Issue wurde erstellt.', ephemeral: true });
 
-                const emoteAccept = EmoteManager.getEmote('pbot_accept');
-                const emoteDeny = EmoteManager.getEmote('pbot_deny');
-                const emoteDivide = EmoteManager.getEmote('pbot_divide');
-                const emotePrioSehrNiedrig = EmoteManager.getEmote('pbot_prio_sehr_niedrig');
-                const emotePrioNiedrig = EmoteManager.getEmote('pbot_prio_niedrig');
-                const emotePrioNormal = EmoteManager.getEmote('pbot_prio_normal');
-                const emotePrioHoch = EmoteManager.getEmote('pbot_prio_hoch');
-                const emotePrioSehrHoch = EmoteManager.getEmote('pbot_prio_sehr_hoch');
-                const emotePrioKritisch = EmoteManager.getEmote('pbot_prio_kritisch');
+                const emoteAccept = EmoteManager.getEmote('pbot_accept', interaction.guildId);
+                const emoteDeny = EmoteManager.getEmote('pbot_deny', interaction.guildId);
+                const emoteDivide = EmoteManager.getEmote('pbot_divide', interaction.guildId);
+                const emotePrioSehrNiedrig = EmoteManager.getEmote(
+                    'pbot_prio_sehr_niedrig',
+                    interaction.guildId,
+                );
+                const emotePrioNiedrig = EmoteManager.getEmote(
+                    'pbot_prio_niedrig',
+                    interaction.guildId,
+                );
+                const emotePrioNormal = EmoteManager.getEmote(
+                    'pbot_prio_normal',
+                    interaction.guildId,
+                );
+                const emotePrioHoch = EmoteManager.getEmote('pbot_prio_hoch', interaction.guildId);
+                const emotePrioSehrHoch = EmoteManager.getEmote(
+                    'pbot_prio_sehr_hoch',
+                    interaction.guildId,
+                );
+                const emotePrioKritisch = EmoteManager.getEmote(
+                    'pbot_prio_kritisch',
+                    interaction.guildId,
+                );
 
                 if (emoteAccept) await embedMessage.react(emoteAccept);
                 if (emoteDeny) await embedMessage.react(emoteDeny);

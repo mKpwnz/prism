@@ -13,10 +13,10 @@ import { Client, Guild, GuildEmoji } from 'discord.js';
  */
 
 export class EmoteManager {
-    private static Emotes: Map<string, GuildEmoji> = new Map();
+    private static Emotes: Map<string, Map<string, GuildEmoji>> = new Map();
 
-    public static getEmote(name: string): GuildEmoji | null {
-        return this.Emotes.get(name) ?? null;
+    public static getEmote(name: string, serverid: string): GuildEmoji | null {
+        return this.Emotes.get(serverid)?.get(name) ?? null;
     }
 
     static getAllBotEmotes() {
@@ -65,7 +65,12 @@ export class EmoteManager {
         Config.Bot.ServerID.forEach(async (serverid) => {
             for (const emote of EmoteManager.getAllBotEmotes()) {
                 const e = await EmoteManager.fetchEmoteFromAPI(emote.name, serverid);
-                if (e && e.name) EmoteManager.Emotes.set(e.name, e);
+                if (e && e.name) {
+                    if (!this.Emotes.has(serverid)) {
+                        this.Emotes.set(serverid, new Map());
+                    }
+                    this.Emotes.get(serverid)?.set(e.name, e);
+                }
             }
         });
     }

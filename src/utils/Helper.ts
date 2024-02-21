@@ -289,8 +289,8 @@ export class Helper {
      * @deprecated Use getEmote in EmoteManager instead
      * @memberof Helper
      */
-    static async getEmote(emoteName: string): Promise<GuildEmoji | null> {
-        return EmoteManager.getEmote(emoteName);
+    static async getEmote(emoteName: string, serverid: string): Promise<GuildEmoji | null> {
+        return EmoteManager.getEmote(emoteName, serverid);
     }
 
     /**
