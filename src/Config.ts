@@ -81,7 +81,10 @@ const BotConfig = {
             name: 'pbot_banned',
             link: 'https://i.imgur.com/ZvpqMBv.png',
         },
-
+        {
+            name: 'pbot_edit',
+            link: 'https://i.imgur.com/1CCqHNJ.png',
+        },
         {
             name: 'pbot_accept',
             link: 'https://i.imgur.com/AHoFANt.png',
@@ -180,6 +183,12 @@ const ChannelConfig = {
     },
 };
 
+const ServerConfig = {
+    IMMO_LOGS: '973238003092848711',
+    IMMO_TEAM: '1014139131670036531',
+    IMMO_DEVS: '1192895296099844116',
+};
+
 const CommandConfig = {
     Resetpos: {
         DefaultPosition: { x: 229.28, heading: 0.0, z: 30.5, y: -886.76 },
@@ -198,6 +207,7 @@ export const Config = {
     Bot: BotConfig,
     Users: UserConfig,
     Groups: GroupConfig,
+    Servers: ServerConfig,
     Channels: ChannelConfig,
     Commands: CommandConfig,
 };

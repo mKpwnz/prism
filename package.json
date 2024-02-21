@@ -17,6 +17,7 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "@gitbeaker/rest": "^39.34.3",
         "@prisma/client": "^5.4.2",
         "@types/cors": "^2.8.15",
         "@types/errorhandler": "^1.5.2",

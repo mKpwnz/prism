@@ -1,13 +1,13 @@
-import 'dotenv/config'; // THIS NEED TO BE AT THE TOP !!!IMPORTANT
+import { EENV } from '@enums/EENV';
 import { EventHandler } from '@events/EventHandler';
+import { CronJobService } from '@services/CronJobService';
 import { Cache } from '@utils/Cache';
+import { CronManager } from '@utils/CronManager';
 import LogManager from '@utils/Logger';
 import { ExpressApp } from '@web/ExpressApp';
-import { Client, Events, IntentsBitField, Partials } from 'discord.js';
-import { CronManager } from '@utils/CronManager';
 import { CronJob } from 'cron';
-import { CronJobService } from '@services/CronJobService';
-import { EENV } from '@enums/EENV';
+import { Client, Events, IntentsBitField, Partials } from 'discord.js';
+import 'dotenv/config'; // THIS NEED TO BE AT THE TOP !!!IMPORTANT
 
 LogManager.configure();
 

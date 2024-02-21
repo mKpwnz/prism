@@ -1,11 +1,11 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
+import { GitlabClient } from '@clients/GitlabClient';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { EmoteManager } from '@manager/EmoteManager';
 import LogManager from '@utils/Logger';
-import axios from 'axios';
 import {
     ActionRowBuilder,
     ChatInputCommandInteraction,
@@ -227,9 +227,14 @@ export class Issue extends Command {
         const embed = message.embeds[0];
         if (!embed) return;
         const priorityIndex = embed.fields.findIndex((field) => field.name === 'Priorität');
+        const statusIndex = embed.fields.findIndex((field) => field.name === 'Status');
         const oldPriority = embed.fields[priorityIndex].value;
         embed.fields[priorityIndex].value = priority;
         if (oldPriority === priority) return;
+        if (embed.fields[statusIndex].value !== 'Nicht Bearbeitet') {
+            await message.reactions.removeAll();
+            return;
+        }
         await message.thread?.send({
             content: `Priorität wurde durch **<@${user.id}>** von **${oldPriority}** auf **${priority}** geändert.`,
         });
@@ -255,35 +260,35 @@ export class Issue extends Command {
         const fields = [...oldEmbed.fields];
 
         if (status) {
-            await axios
-                .post(
-                    `${process.env.GITLAB_ENDPOINT}projects/7/issues`,
-                    {
-                        title: `[API-TEST] ${
-                            oldEmbed.fields[titleIndex].value ?? '[API ERROR WHILE CREATING ISSUE]'
-                        }`,
-                        description: `### Eintragung für:\n${
-                            fields[teamlerIndex].value ?? '[API ERROR WHILE CREATING ISSUE]'
-                        }\n\n### Beschreibung:\n${
-                            fields[descIndex].value ?? '[API ERROR WHILE CREATING ISSUE]'
-                        }\n\n### Anhänge:\n${
-                            fields[attachmentsIndex].value ?? '[API ERROR WHILE CREATING ISSUE]'
-                        }`,
-                        labels: `prio::${fields[priorityIndex].value}`,
-                    },
-                    {
-                        headers: {
-                            'PRIVATE-TOKEN': process.env.GITLAB_TOKEN,
-                        },
-                    },
-                )
-                .then(async (res) => {
-                    if (fields[priorityIndex].value === 'Nicht vergeben')
-                        fields[priorityIndex].value = 'Niedrig';
-                    if (res.data) {
+            if (fields[priorityIndex].value === 'Nicht vergeben')
+                fields[priorityIndex].value = 'Niedrig';
+            const description = [];
+            description.push(`### Eintragung für:`);
+            description.push(`${fields[teamlerIndex].value ?? '[API ERROR WHILE CREATING ISSUE]'}`);
+            description.push(`### Beschreibung:`);
+            description.push(
+                `\`\`\` \n${
+                    fields[descIndex].value ?? '[API ERROR WHILE CREATING ISSUE]'
+                }\n \`\`\``,
+            );
+            description.push(`### Anhänge:`);
+            description.push(`${fields[attachmentsIndex].value ?? 'Keine'}`);
+            description.push(`### Thread Link:`);
+            description.push(`${message.thread?.url ?? '[API ERROR WHILE CREATING ISSUE]'}`);
+
+            GitlabClient.API.Issues.create(
+                7,
+                `${oldEmbed.fields[titleIndex].value ?? '[API ERROR WHILE CREATING ISSUE]'}`,
+                {
+                    description: `${description.join('\n')}`,
+                    labels: `prio::${fields[priorityIndex].value}`,
+                },
+            )
+                .then(async (response) => {
+                    if (response.web_url && response.iid) {
                         fields.push({
                             name: 'GitLab Issue',
-                            value: `[Issue #${res.data.iid}](${res.data.web_url})`,
+                            value: `[Issue #${response.iid}](${response.web_url})`,
                         });
                     }
                     const embed = Command.getEmbedBase({
@@ -294,6 +299,9 @@ export class Issue extends Command {
                     });
                     await message.reactions.removeAll();
                     await message.edit({ embeds: [embed] });
+                    await message.thread?.send({
+                        content: `Der TODO Eintrag wurde von <@${user.id}> Freigegeben.`,
+                    });
                 })
                 .catch(async (error) => {
                     LogManager.error(error);
@@ -308,6 +316,9 @@ export class Issue extends Command {
             });
             await message.reactions.removeAll();
             await message.edit({ embeds: [embed] });
+            await message.thread?.send({
+                content: `Der TODO Eintrag wurde von <@${user.id}> Abgelehnt.`,
+            });
         }
     }
 }
