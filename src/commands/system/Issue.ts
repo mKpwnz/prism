@@ -28,8 +28,24 @@ export class Issue extends Command {
     constructor(client: Client) {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
-        this.AllowedChannels = [Config.Channels.DEV.PRISM_TESTING_2];
-        this.AllowedGroups = [Config.Groups.DEV.BOTTEST];
+        this.AllowedChannels = [
+            Config.Channels.PROD.TEAM_DEV_TODO,
+
+            Config.Channels.DEV.PRISM_TESTING_2,
+        ];
+        this.AllowedGroups = [
+            Config.Groups.PROD.TEAM_INHABER,
+            Config.Groups.PROD.TEAM_PROJEKTLEITUNG,
+            Config.Groups.PROD.TEAM_STLV_PROJEKTLEITUNG,
+            Config.Groups.PROD.TEAM_SERVERLEITUNG,
+            Config.Groups.PROD.TEAM_HEAD_DEVELOPER,
+            Config.Groups.PROD.TEAM_SERVER_ENGINEER,
+
+            Config.Groups.PROD.TEAM_SUPPORT_STAFF,
+            Config.Groups.PROD.TEAM_DEVELOPER_STAFF,
+
+            Config.Groups.DEV.BOTTEST,
+        ];
         RegisterCommand(
             new SlashCommandBuilder()
                 .setName('issue')
