@@ -1,7 +1,8 @@
+import { BotClient } from '@Bot';
 import Config from '@Config';
 import { Helper } from '@utils/Helper';
 import LogManager from '@utils/Logger';
-import { Client, Guild } from 'discord.js';
+import { Client, Guild, GuildEmoji } from 'discord.js';
 
 /**
  * TODO: We need to create a possibility to define a timeout for the promise
@@ -12,6 +13,12 @@ import { Client, Guild } from 'discord.js';
  */
 
 export class EmoteManager {
+    private static Emotes: Map<string, GuildEmoji> = new Map();
+
+    public static getEmote(name: string): GuildEmoji | null {
+        return this.Emotes.get(name) ?? null;
+    }
+
     static getAllBotEmotes() {
         return Config.Bot.Emotes;
     }
@@ -20,9 +27,20 @@ export class EmoteManager {
         return Config.Bot.Emotes.find((emote) => emote.name === name);
     }
 
+    static async fetchEmoteFromAPI(emoteName: string): Promise<GuildEmoji | null> {
+        const guild = BotClient.guilds.cache.get(Config.Bot.ServerID);
+        if (!guild) return null;
+        const emoteData = await guild.emojis.fetch();
+        return emoteData.find((e) => e.name === emoteName) ?? null;
+    }
+
     static async updateBotEmotes(client: Client): Promise<void> {
-        if (process.env.NODE_ENV !== 'production') return;
         LogManager.info('Cheking emotes...');
+        if (process.env.NODE_ENV !== 'production') {
+            await this.initEmotes();
+            LogManager.info('Emotes Initialised!');
+            return;
+        }
         const guild = client.guilds.cache.get(Config.Bot.ServerID);
         if (!guild) {
             LogManager.error('Guild not found!');
@@ -32,9 +50,18 @@ export class EmoteManager {
             await this.deleteOldBotEmotes(guild);
             await this.createNewBotEmotes(guild);
             LogManager.info('Emotes checked!');
+            await this.initEmotes();
+            LogManager.info('Emotes Initialised!');
         } catch (error) {
             LogManager.error('Error while updating emotes!');
             LogManager.error(error);
+        }
+    }
+
+    static async initEmotes(): Promise<void> {
+        for (const emote of EmoteManager.getAllBotEmotes()) {
+            const e = await EmoteManager.fetchEmoteFromAPI(emote.name);
+            if (e && e.name) EmoteManager.Emotes.set(e.name, e);
         }
     }
 

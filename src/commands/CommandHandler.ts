@@ -9,12 +9,26 @@ import {
 } from '@commands/cars';
 import { EENV } from '@enums/EENV';
 import LogManager from '@utils/Logger';
-import { Interaction, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js';
+import {
+    Client,
+    Interaction,
+    SlashCommandBuilder,
+    SlashCommandSubcommandsOnlyBuilder,
+} from 'discord.js';
 import { RestartDropbox, ValidateTrunk } from './cars';
 import { ChangeHouseOwner, GetHouse, SchufaCheck } from './housing';
 import { Nvhx, NvhxBan } from './nvhx';
 import { CheckImageOwner, CheckPhotos, Darkchat, DeletePhone } from './phone';
-import { BotStats, CachePerformance, Help, Ping, SysInfo, TestCommand, Wahl } from './system';
+import {
+    BotStats,
+    CachePerformance,
+    Help,
+    Issue,
+    Ping,
+    SysInfo,
+    TestCommand,
+    Wahl,
+} from './system';
 import {
     ChangeBirthday,
     Fraksperre,
@@ -56,7 +70,7 @@ export class CommandHandler {
         }
     }
 
-    static initAll() {
+    static initAll(client: Client) {
         LogManager.info('CommandManager: Initializing all commands...');
         // System Commands
         new Ping();
@@ -112,6 +126,9 @@ export class CommandHandler {
         new SysInfo();
         new BotStats();
         new CachePerformance();
+
+        new Issue(client);
+
         new TestCommand();
         LogManager.info('CommandManager: All commands initialized!');
         LogManager.info('Commands [PROD]:', CommandHandler.prodCommands);

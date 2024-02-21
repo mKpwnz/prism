@@ -1,6 +1,6 @@
 import { CommandHandler } from '@commands/CommandHandler';
 import { CustomImageUpload } from '@features/phone/CustomImageUpload';
-import { Client, Interaction, Message } from 'discord.js';
+import { Client, Events, Interaction, Message } from 'discord.js';
 import { OnReady } from './OnReady';
 import { OnMessageCreate } from './OnMessageCreate';
 
@@ -13,9 +13,9 @@ import { OnMessageCreate } from './OnMessageCreate';
  */
 export class EventHandler {
     static init(client: Client) {
-        client.on('ready', async () => this.onReady(client));
-        client.on('messageCreate', async (message) => this.onMessageCreate(message));
-        client.on('interactionCreate', async (interaction) =>
+        client.on(Events.ClientReady, async () => this.onReady(client));
+        client.on(Events.MessageCreate, async (message) => this.onMessageCreate(message));
+        client.on(Events.InteractionCreate, async (interaction) =>
             this.onInteractionCreate(interaction),
         );
 

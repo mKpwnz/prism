@@ -15,7 +15,7 @@ export class OnReady extends DCEvent {
                 : process.env.DISCORD_TOKEN_DEV;
 
         const rest = new REST({ version: '9' }).setToken(token as string);
-        CommandHandler.initAll();
+        CommandHandler.initAll(client);
         new RconClient();
         const commandData = CommandHandler.commands.map((command) => command.scb.toJSON());
         await rest.put(

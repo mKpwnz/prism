@@ -81,6 +81,47 @@ const BotConfig = {
             name: 'pbot_banned',
             link: 'https://i.imgur.com/ZvpqMBv.png',
         },
+        {
+            name: 'pbot_edit',
+            link: 'https://i.imgur.com/1CCqHNJ.png',
+        },
+        {
+            name: 'pbot_accept',
+            link: 'https://i.imgur.com/AHoFANt.png',
+        },
+        {
+            name: 'pbot_deny',
+            link: 'https://i.imgur.com/RHA77k6.png',
+        },
+        {
+            name: 'pbot_divide',
+            link: 'https://i.imgur.com/ghB60AL.png',
+        },
+
+        {
+            name: 'pbot_prio_sehr_niedrig',
+            link: 'https://i.imgur.com/TZ43hVu.png',
+        },
+        {
+            name: 'pbot_prio_niedrig',
+            link: 'https://i.imgur.com/Aj9y2uJ.png',
+        },
+        {
+            name: 'pbot_prio_normal',
+            link: 'https://i.imgur.com/qImPuSy.png',
+        },
+        {
+            name: 'pbot_prio_hoch',
+            link: 'https://i.imgur.com/w87cK2o.png',
+        },
+        {
+            name: 'pbot_prio_sehr_hoch',
+            link: 'https://i.imgur.com/oRDnLEV.png',
+        },
+        {
+            name: 'pbot_prio_kritisch',
+            link: 'https://i.imgur.com/dEgahWk.png',
+        },
     ],
     BOT_NAME: 'PRISM | Immortal V',
     BOT_LOGO: 'https://i.imgur.com/NkZDE8l.png',
@@ -106,6 +147,13 @@ const GroupConfig = {
         IC_HADMIN: '1118186337573556254',
         IC_ADMIN: '1118186443504898068',
         IC_MOD: '1118186467395653682',
+
+        TEAM_INHABER: '1014139131728756811',
+        TEAM_PROJEKTLEITUNG: '1014139131728756810',
+        TEAM_STLV_PROJEKTLEITUNG: '1014139131728756809',
+        TEAM_SERVERLEITUNG: '1014139131728756807',
+        TEAM_HEAD_DEVELOPER: '1180945875841855558',
+        TEAM_SERVER_ENGINEER: '1180946503339102339',
     },
     DEV: {
         BOTTEST: '1193511629426544742',
@@ -121,6 +169,8 @@ const ChannelConfig = {
         PRISM_IMAGE_UPLOAD: '1158521623448666112',
         PRISM_CUSTOMPICS_DATASTORE: '1140733564963528704',
 
+        TEAM_DEV_TODO: '1138406113692356678',
+
         BOT_LOG: '1158521924108955699',
         S1_WAHLEN: '1135909041806258187',
         S1_IMMO_BILLING: '1009567127663034389',
@@ -128,8 +178,15 @@ const ChannelConfig = {
     },
     DEV: {
         PRISM_TESTING: '1193147826641842266',
+        PRISM_TESTING_2: '1209556376859189269',
         PRISM_TEST_LOG: '1204133095586926622',
     },
+};
+
+const ServerConfig = {
+    IMMO_LOGS: '973238003092848711',
+    IMMO_TEAM: '1014139131670036531',
+    IMMO_DEVS: '1192895296099844116',
 };
 
 const CommandConfig = {
@@ -150,6 +207,7 @@ export const Config = {
     Bot: BotConfig,
     Users: UserConfig,
     Groups: GroupConfig,
+    Servers: ServerConfig,
     Channels: ChannelConfig,
     Commands: CommandConfig,
 };
