@@ -4,27 +4,35 @@ import { GitlabClient } from '@clients/GitlabClient';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
-import { EmoteManager } from '@manager/EmoteManager';
 import LogManager from '@utils/Logger';
 import {
     ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
     ChatInputCommandInteraction,
     Client,
     Events,
     Interaction,
-    Message,
-    MessageReaction,
     ModalBuilder,
-    PartialMessage,
-    PartialMessageReaction,
-    PartialUser,
     SlashCommandBuilder,
+    StringSelectMenuBuilder,
+    StringSelectMenuOptionBuilder,
     TextInputBuilder,
     TextInputStyle,
-    User,
 } from 'discord.js';
 
 export class Issue extends Command {
+    private allowedManagementGroups = [
+        Config.Groups.PROD.TEAM_INHABER,
+        Config.Groups.PROD.TEAM_PROJEKTLEITUNG,
+        Config.Groups.PROD.TEAM_STLV_PROJEKTLEITUNG,
+        Config.Groups.PROD.TEAM_SERVERLEITUNG,
+        Config.Groups.PROD.TEAM_HEAD_DEVELOPER,
+        Config.Groups.PROD.TEAM_SERVER_ENGINEER,
+
+        Config.Groups.DEV.BOTTEST,
+    ];
+
     constructor(client: Client) {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
@@ -53,14 +61,11 @@ export class Issue extends Command {
             this,
         );
         client.on(Events.InteractionCreate, async (interaction) => this.onInteract(interaction));
-        client.on(Events.MessageReactionAdd, async (reaction, user) =>
-            this.onReact(reaction, user),
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const modal = new ModalBuilder()
-            .setCustomId('issue')
+            .setCustomId('issue_submit')
             .setTitle('TODO Eintag erstellen')
             .addComponents(
                 new ActionRowBuilder<TextInputBuilder>().addComponents(
@@ -91,8 +96,10 @@ export class Issue extends Command {
     }
 
     async onInteract(interaction: Interaction) {
-        if (interaction.isModalSubmit() && interaction.customId === 'issue') {
+        if (interaction.isModalSubmit() && interaction.customId === 'issue_submit') {
             if (!interaction.guildId) return;
+            if (!interaction.channel || !interaction.channel.isTextBased()) return;
+
             const title = interaction.fields.getTextInputValue('issueTitle');
             const description = interaction.fields.getTextInputValue('issueDescription');
             const attachments = interaction.fields.getTextInputValue('issueAttachments') ?? 'Keine';
@@ -119,8 +126,96 @@ export class Issue extends Command {
                         inline: true,
                     },
                     {
-                        name: 'Teamler',
-                        value: `${interaction.user.displayName}`,
+                        name: 'Status',
+                        value: `Nicht Bearbeitet`,
+                        inline: true,
+                    },
+                ],
+            }).setAuthor({
+                name: `${interaction.user.displayName} | ${interaction.user.id}`,
+                iconURL: interaction.user.avatarURL() ?? '',
+            });
+            const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
+                new ButtonBuilder()
+                    .setCustomId('issue_accept')
+                    .setLabel('Freigeben')
+                    .setStyle(ButtonStyle.Success),
+                new ButtonBuilder()
+                    .setCustomId('issue_deny')
+                    .setLabel('Ablehnen')
+                    .setStyle(ButtonStyle.Danger),
+                new ButtonBuilder()
+                    .setCustomId('issue_edit')
+                    .setLabel('Bearbeiten')
+                    .setStyle(ButtonStyle.Primary),
+            );
+            const prioSelect = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+                new StringSelectMenuBuilder()
+                    .setCustomId('issue_priority')
+                    .setPlaceholder('Priorität ändern')
+                    .addOptions(
+                        new StringSelectMenuOptionBuilder()
+                            .setLabel('Sehr Niedrig')
+                            .setValue('Sehr Niedrig'),
+                        new StringSelectMenuOptionBuilder().setLabel('Niedrig').setValue('Niedrig'),
+                        new StringSelectMenuOptionBuilder().setLabel('Normal').setValue('Normal'),
+                        new StringSelectMenuOptionBuilder().setLabel('Hoch').setValue('Hoch'),
+                        new StringSelectMenuOptionBuilder()
+                            .setLabel('Sehr Hoch')
+                            .setValue('Sehr Hoch'),
+                        new StringSelectMenuOptionBuilder()
+                            .setLabel('Kritisch')
+                            .setValue('Kritisch'),
+                    ),
+            );
+
+            const embedMessage = await interaction.channel.send({
+                embeds: [embed],
+                components: [buttons, prioSelect],
+            });
+            await embedMessage.startThread({ name: `Issue: ${title}` });
+            await interaction.reply({ content: 'Dein Issue wurde erstellt.', ephemeral: true });
+        } else if (interaction.isButton() && interaction.customId === 'issue_accept') {
+            await this.acceptIssue(interaction, true);
+            await interaction.message.edit({ components: [] });
+            await interaction.reply({ content: 'Das Issue wurde freigegeben.', ephemeral: true });
+        } else if (interaction.isButton() && interaction.customId === 'issue_deny') {
+            await this.acceptIssue(interaction, false);
+            await interaction.message.edit({ components: [] });
+            await interaction.reply({ content: 'Das Issue wurde abgelehnt.', ephemeral: true });
+        } else if (interaction.isButton() && interaction.customId === 'issue_edit') {
+            await this.editIssue(interaction);
+        } else if (interaction.isModalSubmit() && interaction.customId === 'issue_edit_submit') {
+            if (!interaction.message || !interaction.message.embeds[0]) {
+                await interaction.reply({
+                    content: 'Es ist ein Fehler aufgetreten.',
+                    ephemeral: true,
+                });
+                return;
+            }
+            const title = interaction.fields.getTextInputValue('issueTitle');
+            const description = interaction.fields.getTextInputValue('issueDescription');
+            const attachments = interaction.fields.getTextInputValue('issueAttachments') ?? 'Keine';
+            const oldEmbed = interaction.message.embeds[0];
+            const embed = Command.getEmbedBase({
+                title: 'TODO Eintrag (warte auf Freigabe)',
+                description: ` `,
+                fields: [
+                    {
+                        name: 'Titel',
+                        value: `${title}`,
+                    },
+                    {
+                        name: 'Beschreibung',
+                        value: `${description}`,
+                    },
+                    {
+                        name: 'Anhänge',
+                        value: `${attachments || 'Keine'}`,
+                    },
+                    {
+                        name: 'Priorität',
+                        value: `Nicht vergeben`,
                         inline: true,
                     },
                     {
@@ -129,133 +224,94 @@ export class Issue extends Command {
                         inline: true,
                     },
                 ],
+            }).setAuthor({
+                name: `${interaction.user.displayName} | ${interaction.user.id}`,
+                iconURL: interaction.user.avatarURL() ?? '',
             });
-
-            if (interaction.channel && interaction.channel.isTextBased()) {
-                const embedMessage = await interaction.channel.send({ embeds: [embed] });
-                await embedMessage.startThread({ name: `Issue: ${title}` });
-
-                await interaction.reply({ content: 'Dein Issue wurde erstellt.', ephemeral: true });
-
-                const emoteAccept = EmoteManager.getEmote('pbot_accept', interaction.guildId);
-                const emoteDeny = EmoteManager.getEmote('pbot_deny', interaction.guildId);
-                const emoteDivide = EmoteManager.getEmote('pbot_divide', interaction.guildId);
-                const emotePrioSehrNiedrig = EmoteManager.getEmote(
-                    'pbot_prio_sehr_niedrig',
-                    interaction.guildId,
-                );
-                const emotePrioNiedrig = EmoteManager.getEmote(
-                    'pbot_prio_niedrig',
-                    interaction.guildId,
-                );
-                const emotePrioNormal = EmoteManager.getEmote(
-                    'pbot_prio_normal',
-                    interaction.guildId,
-                );
-                const emotePrioHoch = EmoteManager.getEmote('pbot_prio_hoch', interaction.guildId);
-                const emotePrioSehrHoch = EmoteManager.getEmote(
-                    'pbot_prio_sehr_hoch',
-                    interaction.guildId,
-                );
-                const emotePrioKritisch = EmoteManager.getEmote(
-                    'pbot_prio_kritisch',
-                    interaction.guildId,
-                );
-
-                if (emoteAccept) await embedMessage.react(emoteAccept);
-                if (emoteDeny) await embedMessage.react(emoteDeny);
-                if (emoteDivide) await embedMessage.react(emoteDivide);
-                if (emotePrioSehrNiedrig) await embedMessage.react(emotePrioSehrNiedrig);
-                if (emotePrioNiedrig) await embedMessage.react(emotePrioNiedrig);
-                if (emotePrioNormal) await embedMessage.react(emotePrioNormal);
-                if (emotePrioHoch) await embedMessage.react(emotePrioHoch);
-                if (emotePrioSehrHoch) await embedMessage.react(emotePrioSehrHoch);
-                if (emotePrioKritisch) await embedMessage.react(emotePrioKritisch);
-            } else {
-                await this.replyError('Es ist ein Fehler aufgetreten.');
-            }
+            await interaction.message.edit({ embeds: [embed] });
+            await interaction.message.thread?.send({
+                content: `Der TODO Eintrag wurde von <@${interaction.user.id}> bearbeitet.\nAlter eintrag:`,
+                embeds: [oldEmbed],
+            });
+            await interaction.reply({ content: 'Dein Issue wurde bearbeitet.', ephemeral: true });
+        } else if (interaction.isStringSelectMenu() && interaction.customId === 'issue_priority') {
+            await this.updateIssuePriority(interaction, interaction.values[0]);
+            await interaction.reply({ content: 'Die Priorität wurde geändert.', ephemeral: true });
         }
     }
 
-    async onReact(
-        reaction: MessageReaction | PartialMessageReaction,
-        user: User | PartialUser,
-    ): Promise<void> {
-        const allowedManagementGroups = [
-            Config.Groups.PROD.TEAM_INHABER,
-            Config.Groups.PROD.TEAM_PROJEKTLEITUNG,
-            Config.Groups.PROD.TEAM_STLV_PROJEKTLEITUNG,
-            Config.Groups.PROD.TEAM_SERVERLEITUNG,
-            Config.Groups.PROD.TEAM_HEAD_DEVELOPER,
-            Config.Groups.PROD.TEAM_SERVER_ENGINEER,
-
-            Config.Groups.DEV.BOTTEST,
-        ];
-
-        if (user.bot) return;
-        const message = !reaction.message.author
-            ? await reaction.message.fetch()
-            : reaction.message;
-
-        if (!message.author?.bot) return;
-        if (!message.guild) return;
-        if (reaction.partial) {
-            try {
-                await reaction.fetch();
-            } catch (error) {
-                LogManager.error('Something went wrong when fetching the message:', error);
-                return;
-            }
-        }
-        if (!message.channel.isTextBased()) return;
+    async editIssue(interaction: Interaction) {
+        if (!interaction.isButton()) return;
+        const { message, user } = interaction;
         if (!message.embeds[0]) return;
-        if (
-            message.channelId !== Config.Channels.DEV.PRISM_TESTING_2 &&
-            message.channelId !== Config.Channels.PROD.TEAM_DEV_TODO
-        )
-            return;
-        const userRoleCache = message.guild.members.cache.get(user.id);
-        await message.reactions.resolve(reaction as MessageReaction).users.remove(user.id);
 
-        if (!allowedManagementGroups.some((roleID) => userRoleCache?.roles.cache.has(roleID)))
+        const embed = message.embeds[0];
+        const userRoleCache = message.guild?.members.cache.get(user.id);
+        const userHasManagementRole = this.allowedManagementGroups.some(
+            (roleID) => userRoleCache?.roles.cache.has(roleID),
+        );
+        const authorID = embed.author?.name.split(' ')[-1];
+        if (!userHasManagementRole && authorID !== user.id) {
+            await interaction.reply({
+                content: 'Du hast keine Berechtigung um diese Aktion auszuführen.',
+                ephemeral: true,
+            });
             return;
-
-        if (reaction.emoji.name) {
-            switch (reaction.emoji.name) {
-                case 'pbot_accept':
-                    await this.acceptIssue(message, user, true);
-                    break;
-                case 'pbot_deny':
-                    await this.acceptIssue(message, user, false);
-                    break;
-                case 'pbot_prio_sehr_niedrig':
-                    await this.updateIssuePriority(message, user, 'Sehr Niedrig');
-                    break;
-                case 'pbot_prio_niedrig':
-                    await this.updateIssuePriority(message, user, 'Niedrig');
-                    break;
-                case 'pbot_prio_normal':
-                    await this.updateIssuePriority(message, user, 'Normal');
-                    break;
-                case 'pbot_prio_hoch':
-                    await this.updateIssuePriority(message, user, 'Hoch');
-                    break;
-                case 'pbot_prio_sehr_hoch':
-                    await this.updateIssuePriority(message, user, 'Sehr Hoch');
-                    break;
-                case 'pbot_prio_kritisch':
-                    await this.updateIssuePriority(message, user, 'Kritisch');
-                    break;
-                default:
-            }
         }
+
+        const modal = new ModalBuilder()
+            .setCustomId('issue_edit_submit')
+            .setTitle('TODO Eintag bearbeiten')
+            .addComponents(
+                new ActionRowBuilder<TextInputBuilder>().addComponents(
+                    new TextInputBuilder()
+                        .setCustomId('issueTitle')
+                        .setLabel('Titel')
+                        .setValue(embed.fields.find((field) => field.name === 'Titel')?.value ?? '')
+                        .setStyle(TextInputStyle.Short)
+                        .setRequired(true),
+                ),
+                new ActionRowBuilder<TextInputBuilder>().addComponents(
+                    new TextInputBuilder()
+                        .setCustomId('issueDescription')
+                        .setLabel('Beschreibung')
+                        .setValue(
+                            embed.fields.find((field) => field.name === 'Beschreibung')?.value ??
+                                '',
+                        )
+                        .setMaxLength(1000)
+                        .setStyle(TextInputStyle.Paragraph)
+                        .setRequired(true),
+                ),
+                new ActionRowBuilder<TextInputBuilder>().addComponents(
+                    new TextInputBuilder()
+                        .setCustomId('issueAttachments')
+                        .setValue(
+                            embed.fields.find((field) => field.name === 'Anhänge')?.value ?? '',
+                        )
+                        .setLabel('Anhänge (Links)')
+                        .setMaxLength(1000)
+                        .setStyle(TextInputStyle.Paragraph)
+                        .setRequired(false),
+                ),
+            );
+
+        await interaction.showModal(modal);
     }
 
-    async updateIssuePriority(
-        message: Message<boolean> | PartialMessage,
-        user: User | PartialUser,
-        priority: string,
-    ): Promise<void> {
+    async updateIssuePriority(interaction: Interaction, priority: string): Promise<void> {
+        if (!interaction.isStringSelectMenu()) return;
+        const { message, user } = interaction;
+        const userRoleCache = message.guild?.members.cache.get(user.id);
+        if (
+            !this.allowedManagementGroups.some((roleID) => userRoleCache?.roles.cache.has(roleID))
+        ) {
+            await interaction.reply({
+                content: 'Du hast keine Berechtigung um diese Aktion auszuführen.',
+                ephemeral: true,
+            });
+            return;
+        }
         const embed = message.embeds[0];
         if (!embed) return;
         const priorityIndex = embed.fields.findIndex((field) => field.name === 'Priorität');
@@ -273,30 +329,37 @@ export class Issue extends Command {
         await message.edit({ embeds: [embed] });
     }
 
-    async acceptIssue(
-        message: Message<boolean> | PartialMessage,
-        user: User | PartialUser,
-        status: boolean,
-    ): Promise<void> {
-        const oldEmbed = message.embeds[0];
-        if (!oldEmbed || !oldEmbed.title) return;
-        const titleIndex = oldEmbed.fields.findIndex((field) => field.name === 'Titel');
-        const descIndex = oldEmbed.fields.findIndex((field) => field.name === 'Beschreibung');
-        const attachmentsIndex = oldEmbed.fields.findIndex((field) => field.name === 'Anhänge');
-        const priorityIndex = oldEmbed.fields.findIndex((field) => field.name === 'Priorität');
-        const statusIndex = oldEmbed.fields.findIndex((field) => field.name === 'Status');
-        const teamlerIndex = oldEmbed.fields.findIndex((field) => field.name === 'Teamler');
-        oldEmbed.fields[statusIndex].value = `${status ? 'Freigegeben' : 'Abgelehnt'} von <@${
+    async acceptIssue(interaction: Interaction, status: boolean): Promise<void> {
+        if (!interaction.isButton()) return;
+        const { message, user } = interaction;
+        const userRoleCache = message.guild?.members.cache.get(user.id);
+        if (
+            !this.allowedManagementGroups.some((roleID) => userRoleCache?.roles.cache.has(roleID))
+        ) {
+            await interaction.reply({
+                content: 'Du hast keine Berechtigung um diese Aktion auszuführen.',
+                ephemeral: true,
+            });
+            return;
+        }
+        const Embed = message.embeds[0];
+        if (!Embed || !Embed.title) return;
+        const titleIndex = Embed.fields.findIndex((field) => field.name === 'Titel');
+        const descIndex = Embed.fields.findIndex((field) => field.name === 'Beschreibung');
+        const attachmentsIndex = Embed.fields.findIndex((field) => field.name === 'Anhänge');
+        const priorityIndex = Embed.fields.findIndex((field) => field.name === 'Priorität');
+        const statusIndex = Embed.fields.findIndex((field) => field.name === 'Status');
+        Embed.fields[statusIndex].value = `${status ? 'Freigegeben' : 'Abgelehnt'} von <@${
             user.id
         }>`;
-        const fields = [...oldEmbed.fields];
+        const fields = [...Embed.fields];
 
         if (status) {
             if (fields[priorityIndex].value === 'Nicht vergeben')
                 fields[priorityIndex].value = 'Niedrig';
             const description = [];
             description.push(`### Eintragung für:`);
-            description.push(`${fields[teamlerIndex].value ?? '[API ERROR WHILE CREATING ISSUE]'}`);
+            description.push(`${Embed.author?.name ?? '[API ERROR WHILE CREATING ISSUE]'}`);
             description.push(`### Beschreibung:`);
             description.push(
                 `\`\`\` \n${
@@ -310,7 +373,7 @@ export class Issue extends Command {
 
             GitlabClient.API.Issues.create(
                 7,
-                `${oldEmbed.fields[titleIndex].value ?? '[API ERROR WHILE CREATING ISSUE]'}`,
+                `${Embed.fields[titleIndex].value ?? '[API ERROR WHILE CREATING ISSUE]'}`,
                 {
                     description: `${description.join('\n')}`,
                     labels: `prio::${fields[priorityIndex].value}`,

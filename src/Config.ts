@@ -87,47 +87,6 @@ const BotConfig = {
             name: 'pbot_banned',
             link: 'https://i.imgur.com/ZvpqMBv.png',
         },
-        {
-            name: 'pbot_edit',
-            link: 'https://i.imgur.com/1CCqHNJ.png',
-        },
-        {
-            name: 'pbot_accept',
-            link: 'https://i.imgur.com/AHoFANt.png',
-        },
-        {
-            name: 'pbot_deny',
-            link: 'https://i.imgur.com/RHA77k6.png',
-        },
-        {
-            name: 'pbot_divide',
-            link: 'https://i.imgur.com/ghB60AL.png',
-        },
-
-        {
-            name: 'pbot_prio_sehr_niedrig',
-            link: 'https://i.imgur.com/TZ43hVu.png',
-        },
-        {
-            name: 'pbot_prio_niedrig',
-            link: 'https://i.imgur.com/Aj9y2uJ.png',
-        },
-        {
-            name: 'pbot_prio_normal',
-            link: 'https://i.imgur.com/qImPuSy.png',
-        },
-        {
-            name: 'pbot_prio_hoch',
-            link: 'https://i.imgur.com/w87cK2o.png',
-        },
-        {
-            name: 'pbot_prio_sehr_hoch',
-            link: 'https://i.imgur.com/oRDnLEV.png',
-        },
-        {
-            name: 'pbot_prio_kritisch',
-            link: 'https://i.imgur.com/dEgahWk.png',
-        },
     ],
     BOT_NAME: 'PRISM | Immortal V',
     BOT_LOGO: 'https://i.imgur.com/NkZDE8l.png',
