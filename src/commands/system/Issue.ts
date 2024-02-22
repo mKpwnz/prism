@@ -224,10 +224,7 @@ export class Issue extends Command {
                         inline: true,
                     },
                 ],
-            }).setAuthor({
-                name: `${interaction.user.displayName} | ${interaction.user.id}`,
-                iconURL: interaction.user.avatarURL() ?? '',
-            });
+            }).setAuthor(oldEmbed.author);
             await interaction.message.edit({ embeds: [embed] });
             await interaction.message.thread?.send({
                 content: `Der TODO Eintrag wurde von <@${interaction.user.id}> bearbeitet.\nAlter eintrag:`,
