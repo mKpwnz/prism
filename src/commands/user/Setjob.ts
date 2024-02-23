@@ -98,7 +98,7 @@ export class Setjob extends Command {
     }
 
     private async setOnline(interaction: ChatInputCommandInteraction): Promise<void> {
-        const id = interaction.options.getString('id', true);
+        const id = interaction.options.getInteger('id', true);
         const job = interaction.options.getString('jobname', true);
         const grade = interaction.options.getInteger('grade') ?? 0;
 
