@@ -13,6 +13,7 @@ type TxAdminResponse = {
     data: object | null;
 };
 
+// TODO whitelist got the following methods: add, remove, approve, deny, deny_all
 /**
  * @description TxAdminClient is a class to interact with the TxAdmin Backend.
  */
@@ -34,6 +35,16 @@ class TxAdminClient {
                 'X-TXADMIN-CSRFTOKEN': this.CsrfToken,
             },
         };
+    }
+
+    private getTxAdminResponse(response: any, message: string): TxAdminResponse {
+        const { data } = response;
+
+        if (data.success) {
+            return { success: true, data };
+        }
+        LogManager.error(`[TxAdminClient] ${message}: ${util.inspect(data)}`);
+        return { success: false, data: null };
     }
 
     public static async getInstance(): Promise<TxAdminClient> {
@@ -86,13 +97,83 @@ class TxAdminClient {
             this.getTxAdminConfig(),
         );
 
-        const { data } = response;
+        return this.getTxAdminResponse(response, 'Error while banning by ids');
+    }
 
-        if (data.success) {
-            return { success: true, data };
-        }
-        LogManager.error(`[TxAdminClient] Error while banning: ${util.inspect(data)}`);
-        return { success: false, data: null };
+    public async whitelistRequestSet(requestId: string, status: boolean): Promise<TxAdminResponse> {
+        const action = status ? 'approve' : 'deny';
+
+        const response = await axios.post(
+            `${process.env.TX_ADMIN_ENDPOINT}whitelist/requests/${action}`,
+            { reqId: requestId },
+            this.getTxAdminConfig(),
+        );
+
+        return this.getTxAdminResponse(response, 'Error while setting whitelist request status');
+    }
+
+    public async playerSetWhitelist(license: string, status: boolean): Promise<TxAdminResponse> {
+        const response = await axios.post(
+            `${process.env.TX_ADMIN_ENDPOINT}player/whitelist?license=${license}`,
+            { status },
+            this.getTxAdminConfig(),
+        );
+
+        return this.getTxAdminResponse(response, 'Error while setting player whitelist status');
+    }
+
+    public async playerWarn(license: string, reason: string): Promise<TxAdminResponse> {
+        const response = await axios.post(
+            `${process.env.TX_ADMIN_ENDPOINT}player/warn?license=${license}`,
+            { reason },
+            this.getTxAdminConfig(),
+        );
+
+        return this.getTxAdminResponse(response, 'Error while warning player');
+    }
+
+    public async playerKick(license: string, reason: string): Promise<TxAdminResponse> {
+        const response = await axios.post(
+            `${process.env.TX_ADMIN_ENDPOINT}player/warn?license=${license}`,
+            { reason },
+            this.getTxAdminConfig(),
+        );
+
+        return this.getTxAdminResponse(response, 'Error while warning player');
+    }
+
+    public async playerMessage(license: string, message: string): Promise<TxAdminResponse> {
+        const response = await axios.post(
+            `${process.env.TX_ADMIN_ENDPOINT}player/message?license=${license}`,
+            { message },
+            this.getTxAdminConfig(),
+        );
+
+        return this.getTxAdminResponse(response, 'Error while messaging player');
+    }
+
+    public async playerSaveNote(license: string, note: string): Promise<TxAdminResponse> {
+        const response = await axios.post(
+            `${process.env.TX_ADMIN_ENDPOINT}player/save_note?license=${license}`,
+            { note },
+            this.getTxAdminConfig(),
+        );
+
+        return this.getTxAdminResponse(response, 'Error while saving note for player');
+    }
+
+    public async playerBan(
+        license: string,
+        reason: string,
+        duration: string,
+    ): Promise<TxAdminResponse> {
+        const response = await axios.post(
+            `${process.env.TX_ADMIN_ENDPOINT}player/warn?license=${license}`,
+            { reason, duration },
+            this.getTxAdminConfig(),
+        );
+
+        return this.getTxAdminResponse(response, 'Error while banning player');
     }
 }
 

@@ -48,6 +48,7 @@ import {
 } from './user';
 import { Tebex } from './tebex';
 import { TxAdminBan } from './txadmin/TxAdminBan';
+import { TxAdminWhitelist } from './txadmin/TxAdminWhitelist';
 
 export class CommandHandler {
     static commands: {
@@ -132,6 +133,7 @@ export class CommandHandler {
 
         new TestCommand();
         new TxAdminBan();
+        new TxAdminWhitelist();
         LogManager.info('CommandManager: All commands initialized!');
         // LogManager.info('Commands [PROD]:', CommandHandler.prodCommands);
         // LogManager.info('Commands [DEV]:', CommandHandler.devCommands);
