@@ -39,6 +39,12 @@ client.once(Events.ClientReady, async () => {
             'server.playercount': new CronJob('0 */10 * * * *', () => {
                 CronJobService.logPlayerCount();
             }),
+            'txadmin.authenticate': new CronJob('0 0 */23 * * *', () => {
+                CronJobService.txAdminAuthenticate();
+            }),
+            'txadmin.banpillegalphoto': new CronJob('0 */30 * * * *', () => {
+                CronJobService.banPlayersWithIllegalPhoto();
+            }),
         });
     } else {
         LogManager.debug('CronManager is disabled in DEV mode');

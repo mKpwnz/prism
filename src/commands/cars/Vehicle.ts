@@ -96,4 +96,3 @@ export class Vehicle extends Command {
         });
     }
 }
-
