@@ -302,7 +302,7 @@ export class CustomImageUpload {
                 const newMessage = await customPicsChannel.send({
                     files: [{ attachment: response.data, name: newFilename }],
                 });
-                return newMessage.attachments.first()?.url.split('?')[0] ?? '';
+                return newMessage.attachments.first()?.url || '';
             }
             LogManager.log('no channel found');
             return '';
