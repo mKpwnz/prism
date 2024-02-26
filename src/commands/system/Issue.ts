@@ -247,7 +247,7 @@ export class Issue extends Command {
         const userHasManagementRole = this.allowedManagementGroups.some(
             (roleID) => userRoleCache?.roles.cache.has(roleID),
         );
-        const authorID = embed.author?.name.split(' ')[-1];
+        const authorID = embed.author?.name.split(' ').at(-1);
         if (!userHasManagementRole && authorID !== user.id) {
             await interaction.reply({
                 content: 'Du hast keine Berechtigung um diese Aktion auszuführen.',
