@@ -82,7 +82,7 @@ export class TxAdminBan extends Command {
         const unit = interaction.options.getString('unit', true);
         const duration = interaction.options.getNumber('duration', false);
         const reason =
-            interaction.options.getString('reason', false) || 'Prism: Kein Grund angegeben';
+            interaction.options.getString('reason', false) ?? 'Prism: Kein Grund angegeben';
 
         const txAdminDuration = this.mapDurationToTxAdminFormat(duration, unit);
 
