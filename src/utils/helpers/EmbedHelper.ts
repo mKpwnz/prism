@@ -19,7 +19,7 @@ export function getEmbedBase(opt: IEmbedOptions): EmbedBuilder {
         .setImage(opt.customImage ?? Config.Bot.WHITESPACE);
 }
 
-export async function logToChannel(embed: EmbedBuilder, logChannel: string) {
+export async function sendToChannel(embed: EmbedBuilder, logChannel: string) {
     const channel = await BotClient.channels.fetch(
         process.env.NODE_ENV === 'production' ? logChannel : Config.Channels.DEV.PRISM_TEST_LOG,
     );

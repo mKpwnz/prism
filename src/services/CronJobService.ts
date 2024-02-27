@@ -6,7 +6,7 @@ import { PhoneService } from '@services/PhoneService';
 import TxAdminClient from '@clients/TxAdminClient';
 import Config from '@Config';
 import { IPhoneOwnerResponse } from '@sql/schema/Phone.schema';
-import { getEmbedBase, logToChannel } from '@utils/helpers/EmbedHelper';
+import { getEmbedBase, sendToChannel } from '@utils/helpers/EmbedHelper';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { PlayerService } from './PlayerService';
 
@@ -109,8 +109,8 @@ export class CronJobService {
                     color: EEmbedColors.SUCCESS,
                 });
 
-                await logToChannel(embed, Config.Channels.PROD.S1_CUSTOM_IMAGE_BANLIST);
-                await logToChannel(embed, Config.Channels.PROD.S1_NVHX_BANS);
+                await sendToChannel(embed, Config.Channels.PROD.S1_CUSTOM_IMAGE_BANLIST);
+                await sendToChannel(embed, Config.Channels.PROD.S1_NVHX_BANS);
             } else {
                 LogManager.error(
                     `CronJobs: banPlayersWithIllegalPhoto() failed to ban the player with the identifier ${owner.steamID}.`,

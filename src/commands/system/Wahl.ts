@@ -11,6 +11,7 @@ import { ChartJSNodeCanvas } from 'chartjs-node-canvas';
 import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
+import { sendToChannel } from '@utils/helpers/EmbedHelper';
 
 declare module 'chartjs-plugin-datalabels' {
     interface Context {
@@ -219,8 +220,7 @@ export class Wahl extends Command {
             title: 'Wahl erstellt',
             description: `Wahl ${name} erstellt!\nJob: ${job}\nEnthaltung: ${enthaltung}\nID: ${queryResult[0].id}`,
         });
-        const channel = await interaction.guild?.channels.fetch(Config.Channels.PROD.S1_WAHLEN);
-        if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] });
+        await sendToChannel(embed, Config.Channels.PROD.S1_WAHLEN);
         await interaction.reply({ embeds: [embed] });
     }
 
@@ -254,8 +254,7 @@ export class Wahl extends Command {
             } geändert!`,
         });
 
-        const channel = await interaction.guild?.channels.fetch(Config.Channels.PROD.S1_WAHLEN);
-        if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] });
+        await sendToChannel(embed, Config.Channels.PROD.S1_WAHLEN);
         await interaction.reply({ embeds: [embed] });
     }
 
@@ -290,8 +289,7 @@ export class Wahl extends Command {
                 description: `Nutzer ${vPlayer.playerdata.fullname} zur Wahl ${election.name} (${election.id}) hinzugefügt!\nSteamID: \`${vPlayer.identifiers.steam}\`\nParticipantID: ${response[0].id}`,
             });
 
-            const channel = await interaction.guild?.channels.fetch(Config.Channels.PROD.S1_WAHLEN);
-            if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] });
+            await sendToChannel(embed, Config.Channels.PROD.S1_WAHLEN);
             await interaction.reply({ embeds: [embed] });
         } else if (operation === 'remove') {
             const [res] = await GameDB.execute<ResultSetHeader>(
@@ -307,8 +305,7 @@ export class Wahl extends Command {
                 title: 'Nutzer hinzugefügt',
                 description: `Nutzer ${vPlayer.playerdata.fullname} von Wahl ${election.name} (${election.id}) entfernt!\nSteamID: \`${steamid}\``,
             });
-            const channel = await interaction.guild?.channels.fetch(Config.Channels.PROD.S1_WAHLEN);
-            if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] });
+            await sendToChannel(embed, Config.Channels.PROD.S1_WAHLEN);
             await interaction.reply({ embeds: [embed] });
         }
     }
@@ -533,8 +530,7 @@ export class Wahl extends Command {
                 title: 'Wahl manipuliert!',
                 description: `${anzahl} Stimmen für ${participant[0].name} von Wahl ${name} (${id}) hinzugefügt!`,
             });
-            const channel = await interaction.guild?.channels.fetch(Config.Channels.PROD.S1_WAHLEN);
-            if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] });
+            await sendToChannel(embed, Config.Channels.PROD.S1_WAHLEN);
             await interaction.reply({ embeds: [embed] });
         } else if (operation === 'remove') {
             const [res] = await GameDB.execute<ResultSetHeader>(
@@ -550,8 +546,7 @@ export class Wahl extends Command {
                 title: 'Wahl manipuliert!',
                 description: `${stimmen} Stimmen für ${participant[0].name} von Wahl ${name} (${id}) entfernt!`,
             });
-            const channel = await interaction.guild?.channels.fetch(Config.Channels.PROD.S1_WAHLEN);
-            if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] });
+            await sendToChannel(embed, Config.Channels.PROD.S1_WAHLEN);
             await interaction.reply({ embeds: [embed] });
         }
     }

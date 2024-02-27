@@ -7,7 +7,7 @@ import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
-import { logToChannel } from '@utils/helpers/EmbedHelper';
+import { sendToChannel } from '@utils/helpers/EmbedHelper';
 
 export class Rename extends Command {
     constructor() {
@@ -98,7 +98,7 @@ export class Rename extends Command {
                 color: EEmbedColors.SUCCESS,
             });
 
-            await logToChannel(embed, Config.Channels.PROD.S1_NAMECHANGE);
+            await sendToChannel(embed, Config.Channels.PROD.S1_NAMECHANGE);
             await interaction.reply({ embeds: [embed] });
         } else {
             await this.replyError('Der Spieler konnte nicht umbenannt werden!');
