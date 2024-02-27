@@ -1,8 +1,9 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
-import { TxAdminBanRequest, TxAdminClient } from '@clients/TxAdminClient';
+import TxAdminClient from '@clients/TxAdminClient';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
+import { PlayerService } from '@services/PlayerService';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class TxAdminBan extends Command {
@@ -31,13 +32,29 @@ export class TxAdminBan extends Command {
                 .setName('txadminban')
                 .setDescription('Banne einen Spieler über TxAdmin')
                 .addStringOption((option) =>
-                    option.setName('duration').setDescription('Dauer des Bans').setRequired(true),
-                )
-                .addStringOption((option) =>
                     option
                         .setName('identifier')
                         .setDescription('Identifier des Spielers')
                         .setRequired(true),
+                )
+                .addStringOption((option) =>
+                    option
+                        .setName('unit')
+                        .setDescription('Einheit der Bandauer')
+                        .setRequired(true)
+                        .addChoices(
+                            { name: 'Permanent', value: 'permanent' },
+                            { name: 'Stunden', value: 'hours' },
+                            { name: 'Tage', value: 'days' },
+                            { name: 'Wochen', value: 'weeks' },
+                            { name: 'Monate', value: 'months' },
+                        ),
+                )
+                .addNumberOption((option) =>
+                    option
+                        .setName('duration')
+                        .setDescription('Dauer des Bans (optional bei Permanent)')
+                        .setRequired(false),
                 )
                 .addStringOption((option) =>
                     option.setName('reason').setDescription('Grund des Bans').setRequired(false),
@@ -46,24 +63,52 @@ export class TxAdminBan extends Command {
         );
     }
 
+    /**
+     * @description Maps the duration and unit to the TxAdmin format
+     * @returns The duration in the TxAdmin format or null if it is invalid
+     */
+    private mapDurationToTxAdminFormat(duration: number | null, unit: string): string | null {
+        if (unit === 'permanent') {
+            return unit;
+        } if (unit !== 'permanent' && !duration) {
+            return null;
+        } 
+            return `${duration} ${unit}`;
+        
+    }
+
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const identifier = interaction.options.getString('identifier', true);
-        const duration = interaction.options.getString('duration', true);
+        const unit = interaction.options.getString('unit', true);
+        const duration = interaction.options.getNumber('duration', false);
         const reason =
             interaction.options.getString('reason', false) || 'Prism: Kein Grund angegeben';
 
-        // duration needs to be properly mapped to what txadmin expects
-        // possible values are: 'permanent', 'x hour(s)', 'x day(s)', 'x week(s)', 'x week(s)'
+        const txAdminDuration = this.mapDurationToTxAdminFormat(duration, unit);
+
+        if (!txAdminDuration) {
+            await this.replyWithEmbed({
+                title: 'TxAdmin Ban',
+                description: `Bitte gib eine Dauer für den Ban an, oder banne den Spieler Permanent!`,
+                ephemeral: true,
+            });
+            return;
+        }
 
         const txAdminClient = await TxAdminClient.getInstance();
 
-        const request: TxAdminBanRequest = {
-            reason,
-            duration,
-            identifiers: [identifier],
-        };
+        const player = await PlayerService.validatePlayer(identifier);
 
-        const banResponse = await txAdminClient.banIds(request);
+        if (!player) {
+            await this.replyWithEmbed({
+                title: 'TxAdmin Ban',
+                description: `Spieler nicht gefunden! Prüfe deine Eingabe und versuche es erneut.`,
+                ephemeral: true,
+            });
+            return;
+        }
+
+        const banResponse = await txAdminClient.playerBan(player, reason, txAdminDuration);
 
         if (banResponse.success) {
             await this.replyWithEmbed({

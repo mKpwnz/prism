@@ -3,13 +3,6 @@ import axios, { AxiosResponse } from 'axios';
 import util from 'util';
 import { IValidatedPlayer } from '@interfaces/IValidatedPlayer';
 
-
-type TxAdminBanRequest = {
-    reason: string;
-    duration: string;
-    identifiers: string[];
-};
-
 type TxAdminResponse = {
     success: boolean;
     data: object | null;
@@ -158,4 +151,4 @@ class TxAdminClient {
     }
 }
 
-export { TxAdminBanRequest, TxAdminClient };
+export default TxAdminClient;

@@ -3,9 +3,10 @@ import { BotDB, GameDB } from '@sql/Database';
 import LogManager from '@utils/Logger';
 import { PhonePhotosService } from '@services/PhonePhotosService';
 import { PhoneService } from '@services/PhoneService';
-import { TxAdminClient, TxAdminBanRequest } from '@clients/TxAdminClient';
+import TxAdminClient from '@clients/TxAdminClient';
 import { BotClient } from '@Bot';
 import Config from '@Config';
+import { IPhoneOwnerResponse } from '@sql/schema/Phone.schema';
 import { PlayerService } from './PlayerService';
 
 export class CronJobService {
@@ -58,7 +59,6 @@ export class CronJobService {
 
         const illegalPhotos = await PhonePhotosService.checkPhotos(startDate, endDate);
 
-        // Get Owners of the illegal photo
         const phoneOwners = (
             await Promise.all(
                 illegalPhotos.map(async (photo) => {
@@ -72,7 +72,7 @@ export class CronJobService {
                     return phoneOwner;
                 }),
             )
-        ).filter((owner) => owner !== null);
+        ).filter((owner) => owner !== null) as IPhoneOwnerResponse[];
 
         if (phoneOwners.length === 0) {
             LogManager.debug(
@@ -83,30 +83,41 @@ export class CronJobService {
 
         const txAdminClient = await TxAdminClient.getInstance();
 
-        const request: TxAdminBanRequest = {
-            reason: 'Bug Abuse (Custom Image Upload)',
-            duration: 'permanent',
-            identifiers: phoneOwners.map((owner) => owner!.steamID),
-        };
+        phoneOwners.forEach(async (owner) => {
+            const player = await PlayerService.validatePlayer(owner.steamID);
 
-        const banResponse = await txAdminClient.banIds(request);
+            if (!player) {
+                LogManager.error(
+                    `CronJobs: banPlayersWithIllegalPhoto() failed to find the player with the identifier ${owner.steamID}.`,
+                );
+                return;
+            }
 
-        if (banResponse.success) {
-            // Testi bans will also get logged in the prod channel, should be changed
-            const cibChannel = BotClient.channels.cache.get(
-                Config.Channels.PROD.S1_CUSTOM_IMAGE_BANLIST,
+            const banResponse = await txAdminClient.playerBan(
+                player,
+                'Bug Abuse (Custom Image Upload)',
+                'permanent',
             );
-            if (cibChannel && cibChannel.isTextBased()) {
-                // Log the ban
-            }
 
-            // Still required?
-            const nvhxChannel = BotClient.channels.cache.get(Config.Channels.PROD.S1_NVHX_BANS);
-            if (nvhxChannel && nvhxChannel.isTextBased()) {
-                // Log the ban
+            if (banResponse.success) {
+                // Testi bans will also get logged in the prod channel, should be changed
+                const cibChannel = BotClient.channels.cache.get(
+                    Config.Channels.PROD.S1_CUSTOM_IMAGE_BANLIST,
+                );
+                if (cibChannel && cibChannel.isTextBased()) {
+                    // Log the ban
+                }
+
+                // Still required?
+                const nvhxChannel = BotClient.channels.cache.get(Config.Channels.PROD.S1_NVHX_BANS);
+                if (nvhxChannel && nvhxChannel.isTextBased()) {
+                    // Log the ban
+                }
+            } else {
+                LogManager.error(
+                    'CronJobs: banPlayersWithIllegalPhoto() failed to ban the players.',
+                );
             }
-        } else {
-            LogManager.error('CronJobs: banPlayersWithIllegalPhoto() failed to ban the players.');
-        }
+        });
     }
 }
