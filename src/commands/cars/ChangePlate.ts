@@ -4,7 +4,7 @@ import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { VehicleService } from '@services/VehicleService';
-import { Helper } from '@utils/Helper';
+import { Helper } from '@utils/helpers/Helper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class ChangePlate extends Command {

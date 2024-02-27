@@ -4,7 +4,7 @@ import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { UserService } from '@services/UserService';
 import { ISchufaUser } from '@sql/schema/User.schema';
-import { Helper } from '@utils/Helper';
+import { Helper } from '@utils/helpers/Helper';
 import { AttachmentBuilder, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class SchufaAuskunft extends Command {

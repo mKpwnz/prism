@@ -1,6 +1,6 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
-import TxAdminClient  from '@clients/TxAdminClient';
+import TxAdminClient from '@clients/TxAdminClient';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';

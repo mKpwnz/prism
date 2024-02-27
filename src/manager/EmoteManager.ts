@@ -1,7 +1,7 @@
 import { BotClient } from '@Bot';
 import Config from '@Config';
 import { EENV } from '@enums/EENV';
-import { Helper } from '@utils/Helper';
+import { Helper } from '@utils/helpers/Helper';
 import LogManager from '@utils/Logger';
 import { Client, Guild, GuildEmoji } from 'discord.js';
 

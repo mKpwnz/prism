@@ -5,7 +5,7 @@ import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { GameDB } from '@sql/Database';
 import { IVehicle } from '@sql/schema/Vehicle.schema';
-import { Helper } from '@utils/Helper';
+import { Helper } from '@utils/helpers/Helper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class VehiclePop extends Command {

@@ -4,7 +4,7 @@ import { RegisterCommand } from '@commands/CommandHandler';
 import { ItemService } from '@services/ItemService';
 import { EENV } from '@enums/EENV';
 import Config from '@Config';
-import { Helper } from '@utils/Helper';
+import { Helper } from '@utils/helpers/Helper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class Give extends Command {

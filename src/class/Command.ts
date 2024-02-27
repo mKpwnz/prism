@@ -3,9 +3,10 @@ import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { IEmbedOptions } from '@interfaces/IEmbed';
 import { BotDB } from '@sql/Database';
-import { Helper } from '@utils/Helper';
+import { Helper } from '@utils/helpers/Helper';
 import LogManager from '@utils/Logger';
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
+import { getEmbedBase } from '@utils/helpers/EmbedHelper';
 
 /**
  * @author mKpwnz
@@ -204,20 +205,6 @@ export abstract class Command {
         }
     }
 
-    static getEmbedBase(opt: IEmbedOptions): EmbedBuilder {
-        return new EmbedBuilder()
-            .setTitle(opt.title || ' ')
-            .setDescription(opt.description)
-            .setColor(opt.color ?? EEmbedColors.DEFAULT)
-            .setAuthor({
-                name: Config.Bot.BOT_NAME,
-                iconURL: Config.Bot.BOT_LOGO,
-            })
-            .setTimestamp(new Date())
-            .setFields(opt.fields ?? [])
-            .setImage(opt.customImage ?? Config.Bot.WHITESPACE);
-    }
-
     getEmbedTemplate(opt: IEmbedOptions): EmbedBuilder {
         if (!this.currentInteraction) throw new Error('Unknown Interaction in Command Class');
         this.CmdPerformanceStop = new Date();
@@ -225,7 +212,7 @@ export abstract class Command {
             ? this.CmdPerformanceStop.getTime() - this.CmdPerformanceStart.getTime()
             : 0;
 
-        return Command.getEmbedBase(opt).setFooter({
+        return getEmbedBase(opt).setFooter({
             text: `${this.currentInteraction.user.displayName ?? ''} • ET: ${executionTime}ms`,
             iconURL: this.currentInteraction.user.avatarURL() ?? '',
         });

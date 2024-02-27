@@ -6,7 +6,7 @@ import { GameDB } from '@sql/Database';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
 import { PlayerService } from '@services/PlayerService';
-import { Helper } from '@utils/Helper';
+import { Helper } from '@utils/helpers/Helper';
 import Config from '@Config';
 
 export class ChangeBirthday extends Command {

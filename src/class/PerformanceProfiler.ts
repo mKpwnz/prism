@@ -2,7 +2,7 @@ import Config from '@Config';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { AlignmentEnum, AsciiTable3 } from 'ascii-table3';
 import { ChatInputCommandInteraction } from 'discord.js';
-import { Command } from './Command';
+import { getEmbedBase } from '@utils/helpers/EmbedHelper';
 
 export class PerformanceProfiler {
     private profilerName: string;
@@ -38,7 +38,7 @@ export class PerformanceProfiler {
             );
         });
 
-        const embed = Command.getEmbedBase({
+        const embed = getEmbedBase({
             title: `Performance Profiler: ${this.profilerName}`,
             description: `\`\`\`\n${table.toString()}\`\`\``,
             color: EEmbedColors.DEBUG,

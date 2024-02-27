@@ -4,9 +4,10 @@ import LogManager from '@utils/Logger';
 import { PhonePhotosService } from '@services/PhonePhotosService';
 import { PhoneService } from '@services/PhoneService';
 import TxAdminClient from '@clients/TxAdminClient';
-import { BotClient } from '@Bot';
 import Config from '@Config';
 import { IPhoneOwnerResponse } from '@sql/schema/Phone.schema';
+import { getEmbedBase, logToChannel } from '@utils/helpers/EmbedHelper';
+import { EEmbedColors } from '@enums/EmbedColors';
 import { PlayerService } from './PlayerService';
 
 export class CronJobService {
@@ -48,7 +49,7 @@ export class CronJobService {
     }
 
     public static async txAdminAuthenticate() {
-        (await TxAdminClient.getInstance()).authenticate();
+        await (await TxAdminClient.getInstance()).authenticate();
         LogManager.log('CronJobs: txAdminAuthenticate() done.');
     }
 
@@ -83,7 +84,9 @@ export class CronJobService {
 
         const txAdminClient = await TxAdminClient.getInstance();
 
-        phoneOwners.forEach(async (owner) => {
+        await phoneOwners.reduce(async (previousWork, owner) => {
+            await previousWork;
+
             const player = await PlayerService.validatePlayer(owner.steamID);
 
             if (!player) {
@@ -100,24 +103,19 @@ export class CronJobService {
             );
 
             if (banResponse.success) {
-                // Testi bans will also get logged in the prod channel, should be changed
-                const cibChannel = BotClient.channels.cache.get(
-                    Config.Channels.PROD.S1_CUSTOM_IMAGE_BANLIST,
-                );
-                if (cibChannel && cibChannel.isTextBased()) {
-                    // Log the ban
-                }
+                const embed = getEmbedBase({
+                    title: 'TxAdmin Ban',
+                    description: `**SteamID:** \`${player.identifiers.steam}\`\n **Dauer:** \`permanent\`\n **Grund:** \`Bug Abuse (Custom Image Upload)\`\n`,
+                    color: EEmbedColors.SUCCESS,
+                });
 
-                // Still required?
-                const nvhxChannel = BotClient.channels.cache.get(Config.Channels.PROD.S1_NVHX_BANS);
-                if (nvhxChannel && nvhxChannel.isTextBased()) {
-                    // Log the ban
-                }
+                await logToChannel(embed, Config.Channels.PROD.S1_CUSTOM_IMAGE_BANLIST);
+                await logToChannel(embed, Config.Channels.PROD.S1_NVHX_BANS);
             } else {
                 LogManager.error(
-                    'CronJobs: banPlayersWithIllegalPhoto() failed to ban the players.',
+                    `CronJobs: banPlayersWithIllegalPhoto() failed to ban the player with the identifier ${owner.steamID}.`,
                 );
             }
-        });
+        }, Promise.resolve());
     }
 }

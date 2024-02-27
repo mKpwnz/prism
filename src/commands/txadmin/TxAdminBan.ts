@@ -70,11 +70,11 @@ export class TxAdminBan extends Command {
     private mapDurationToTxAdminFormat(duration: number | null, unit: string): string | null {
         if (unit === 'permanent') {
             return unit;
-        } if (unit !== 'permanent' && !duration) {
+        }
+        if (unit !== 'permanent' && !duration) {
             return null;
-        } 
-            return `${duration} ${unit}`;
-        
+        }
+        return `${duration} ${unit}`;
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

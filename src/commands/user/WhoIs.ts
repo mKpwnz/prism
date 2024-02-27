@@ -9,7 +9,7 @@ import { NvhxService } from '@services/NvhxService';
 import { PlayerService } from '@services/PlayerService';
 import { BotDB, GameDB } from '@sql/Database';
 import { IFindUser } from '@sql/schema/User.schema';
-import { Helper } from '@utils/Helper';
+import { Helper } from '@utils/helpers/Helper';
 import LogManager from '@utils/Logger';
 import {
     AttachmentBuilder,

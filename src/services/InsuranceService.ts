@@ -1,6 +1,6 @@
 import { GameDB } from '@sql/Database';
 import { IInsurance } from '@sql/schema/Versicherung.schema';
-import { Helper } from '@utils/Helper';
+import { Helper } from '@utils/helpers/Helper';
 import { ResultSetHeader } from 'mysql2';
 
 export class InsuranceService {
