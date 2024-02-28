@@ -169,6 +169,7 @@ const CommandConfig = {
     },
 };
 
+// envalid Documentation für Types: https://www.npmjs.com/package/envalid
 const envConfig = cleanEnv(process.env, {
     DISCORD_APPID: str(),
     DISCORD_PUBLICKEY: str(),
