@@ -29,6 +29,7 @@ const envConfig = cleanEnv(process.env, {
     TX_ADMIN_ENDPOINT: url(),
     TX_ADMIN_USER: str(),
     TX_ADMIN_PASS: str(),
+    TX_ADMIN_VERSION: str(),
     LOGDB_URL: str(),
 });
 

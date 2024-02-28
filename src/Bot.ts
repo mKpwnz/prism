@@ -1,6 +1,5 @@
 import 'dotenv/config'; // THIS NEED TO BE AT THE TOP !!!IMPORTANT
 import Config from '@Config';
-import { EENV } from '@enums/EENV';
 import { EventHandler } from '@events/EventHandler';
 import { CronJobService } from '@services/CronJobService';
 import { Cache } from '@utils/Cache';

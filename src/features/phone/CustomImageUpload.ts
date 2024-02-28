@@ -20,7 +20,6 @@ import {
     TextInputBuilder,
     TextInputStyle,
 } from 'discord.js';
-import { EENV } from '@enums/EENV';
 
 export class CustomImageUpload {
     private client: Client | null;

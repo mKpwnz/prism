@@ -1,6 +1,5 @@
 import { BotClient } from '@Bot';
 import Config from '@Config';
-import { EENV } from '@enums/EENV';
 import chalk from 'chalk';
 import colorize from 'json-colorizer';
 import winston, { createLogger, format, transports } from 'winston';

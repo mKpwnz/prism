@@ -21,7 +21,7 @@ export function getEmbedBase(opt: IEmbedOptions): EmbedBuilder {
 
 export async function sendToChannel(embed: EmbedBuilder, logChannel: string) {
     const channel = await BotClient.channels.fetch(
-        process.env.NODE_ENV === 'production' ? logChannel : Config.Channels.DEV.PRISM_TEST_LOG,
+        Config.ENV.NODE_ENV === 'production' ? logChannel : Config.Channels.DEV.PRISM_TEST_LOG,
     );
     if (channel?.isTextBased()) {
         await channel.send({ embeds: [embed] });

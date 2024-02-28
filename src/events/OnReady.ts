@@ -14,7 +14,7 @@ export class OnReady extends DCEvent {
         const commandData = CommandHandler.commands.map((command) => command.scb.toJSON());
         Config.Bot.ServerID.forEach(async (id) => {
             try {
-                LogManager.info('Registering commands on Server ' + id);
+                LogManager.info(`Registering commands on Server ${id}`);
                 await rest.put(
                     Routes.applicationGuildCommands(client.user?.id ?? 'missing id', id),
                     {

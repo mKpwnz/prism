@@ -3,6 +3,7 @@ import util from 'util';
 import { IValidatedPlayer } from '@interfaces/IValidatedPlayer';
 import { TxAdminPlayerResponse } from '@interfaces/txadmin.interface';
 import { isTxAdminPlayerResponse } from '@utils/helpers/TxAdminHelper';
+import Config from '@Config';
 
 /**
  * @description TxAdminClient is a class to interact with the TxAdmin Backend.
@@ -36,10 +37,10 @@ class TxAdminClient {
      */
     public async authenticate() {
         const response = await axios.post(
-            `${process.env.TX_ADMIN_ENDPOINT}auth/password?uiVersion=${process.env.TX_ADMIN_VERSION}`,
+            `${Config.ENV.TX_ADMIN_ENDPOINT}auth/password?uiVersion=${Config.ENV.TX_ADMIN_VERSION}`,
             {
-                username: process.env.TX_ADMIN_USER,
-                password: process.env.TX_ADMIN_PASS,
+                username: Config.ENV.TX_ADMIN_USER,
+                password: Config.ENV.TX_ADMIN_PASS,
             },
         );
         const { data } = response;
@@ -62,7 +63,7 @@ class TxAdminClient {
 
     public async getPlayerInfo(player: IValidatedPlayer): Promise<TxAdminPlayerResponse> {
         const response = await axios.get(
-            `${process.env.TX_ADMIN_ENDPOINT}player?license=${player.identifiers.license.split(':')[1]}`,
+            `${Config.ENV.TX_ADMIN_ENDPOINT}player?license=${player.identifiers.license.split(':')[1]}`,
             this.getTxAdminRequestConfig(),
         );
 
@@ -83,7 +84,7 @@ class TxAdminClient {
         const action = status ? 'approve' : 'deny';
 
         const response = await axios.post(
-            `${process.env.TX_ADMIN_ENDPOINT}whitelist/requests/${action}`,
+            `${Config.ENV.TX_ADMIN_ENDPOINT}whitelist/requests/${action}`,
             { reqId: requestId },
             this.getTxAdminRequestConfig(),
         );
@@ -147,7 +148,7 @@ class TxAdminClient {
         requestBody: object,
     ): Promise<void> {
         const response = await axios.post(
-            `${process.env.TX_ADMIN_ENDPOINT}player/${endpoint}?license=${player.identifiers.license.split(':')[1]}`,
+            `${Config.ENV.TX_ADMIN_ENDPOINT}player/${endpoint}?license=${player.identifiers.license.split(':')[1]}`,
             requestBody,
             this.getTxAdminRequestConfig(),
         );
