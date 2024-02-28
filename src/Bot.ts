@@ -1,3 +1,5 @@
+import 'dotenv/config'; // THIS NEED TO BE AT THE TOP !!!IMPORTANT
+import Config from '@Config';
 import { EENV } from '@enums/EENV';
 import { EventHandler } from '@events/EventHandler';
 import { CronJobService } from '@services/CronJobService';
@@ -7,16 +9,10 @@ import LogManager from '@utils/Logger';
 import { ExpressApp } from '@web/ExpressApp';
 import { CronJob } from 'cron';
 import { Client, Events, IntentsBitField, Partials } from 'discord.js';
-import 'dotenv/config'; // THIS NEED TO BE AT THE TOP !!!IMPORTANT
 
 LogManager.configure();
-
-const token =
-    process.env.NODE_ENV === 'production'
-        ? process.env.DISCORD_TOKEN_PROD
-        : process.env.DISCORD_TOKEN_DEV;
-
 LogManager.info('Bot is starting...');
+export const BotENV = process.env.NODE_ENV === 'production' ? EENV.PRODUCTION : EENV.DEVELOPMENT;
 
 const client = new Client({
     intents: [
@@ -33,10 +29,10 @@ const client = new Client({
 
 Cache.init();
 EventHandler.init(client);
-client.login(token);
+client.login(Config.ENV.DISCORD_TOKEN);
 client.once(Events.ClientReady, async () => {
     new ExpressApp();
-    if (process.env.NODE_ENV === 'production') {
+    if (BotENV === EENV.PRODUCTION) {
         CronManager.initCronManager({
             'fraktionen.finance': new CronJob('0 0 */8 * * *', () =>
                 CronJobService.logSocietyFinance(),
@@ -51,4 +47,3 @@ client.once(Events.ClientReady, async () => {
 });
 
 export const BotClient = client;
-export const BotENV = process.env.NODE_ENV === 'production' ? EENV.PRODUCTION : EENV.DEVELOPMENT;

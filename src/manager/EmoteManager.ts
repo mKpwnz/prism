@@ -1,5 +1,6 @@
-import { BotClient } from '@Bot';
+import { BotClient, BotENV } from '@Bot';
 import Config from '@Config';
+import { EENV } from '@enums/EENV';
 import { Helper } from '@utils/Helper';
 import LogManager from '@utils/Logger';
 import { Client, Guild, GuildEmoji } from 'discord.js';
@@ -39,7 +40,7 @@ export class EmoteManager {
 
     static async updateBotEmotes(client: Client, serverid: string): Promise<void> {
         LogManager.info('Cheking emotes...');
-        if (process.env.NODE_ENV !== 'production') {
+        if (BotENV !== EENV.PRODUCTION) {
             await this.initEmotes();
             LogManager.info('Emotes Initialised!');
             return;

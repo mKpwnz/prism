@@ -1,3 +1,4 @@
+import { BotENV } from '@Bot';
 import Config from '@Config';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
@@ -120,7 +121,7 @@ export abstract class Command {
         const { options, user } = interaction;
 
         // Override Channel in Devmode
-        if (process.env.NODE_ENV !== 'production') {
+        if (BotENV !== EENV.PRODUCTION) {
             this.DoNotCountUse = true;
             this.AllowedChannels = [
                 Config.Channels.DEV.PRISM_TESTING,

@@ -22,8 +22,36 @@ export class TestCommand extends Command {
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const profiler = new PerformanceProfiler('TestCommand');
         const livePlayer = await PlayerService.getPlayerById(1);
-        console.log(livePlayer);
-        await interaction.reply({ content: `Test` });
+        // await this.ad.bind({
+        //     user: process.env.ACTIVEDIRECTORY_USER || '',
+        //     pass: process.env.ACTIVEDIRECTORY_PASS || '',
+        // });
+        // const result = await this.ad.query({
+        //     base: 'OU=Benutzer,DC=immortaldev,DC=eu',
+        //     options: {
+        //         filter: `(&(objectclass=person)(userDiscordId=${interaction.user.id}))`,
+        //         scope: 'sub',
+        //         paged: true,
+        //     },
+        // });
+        // const _attri: { [key: string]: string } = {};
+        // const filterAttributes: string[] = [
+        //     'cn',
+        //     'distinguishedName',
+        //     'sAMAccountName',
+        //     'userPrincipalName',
+        //     'mail',
+        //     'userDiscordId',
+        //     'userSteamId',
+        // ];
+        // result[0].attributes.forEach((attr) => {
+        //     if (filterAttributes.includes(attr.type)) {
+        //         _attri[attr.type] = attr.vals[0];
+        //     }
+        // });
+        await this.replyWithEmbed({
+            description: `test`,
+        });
         await profiler.sendEmbed(interaction);
     }
 }

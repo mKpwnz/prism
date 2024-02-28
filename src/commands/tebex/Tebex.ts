@@ -70,11 +70,11 @@ export class Tebex extends Command {
 
     private async checkTebexOrder(tbx: string, useOldApi: boolean = false): Promise<void> {
         try {
-            const response = await axios.get(`${process.env.TEBEX_ENDPOINT}${tbx}`, {
+            const response = await axios.get(`${Config.ENV.TEBEX_ENDPOINT}${tbx}`, {
                 headers: {
                     'X-Tebex-Secret': useOldApi
-                        ? process.env.TEBEX_SECRET_OLD
-                        : process.env.TEBEX_SECRET,
+                        ? Config.ENV.TEBEX_SECRET_OLD
+                        : Config.ENV.TEBEX_SECRET,
                 },
             });
 
