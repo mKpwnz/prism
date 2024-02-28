@@ -20,7 +20,6 @@ import {
     TextInputBuilder,
     TextInputStyle,
 } from 'discord.js';
-import { BotENV } from '@Bot';
 import { EENV } from '@enums/EENV';
 
 export class CustomImageUpload {
@@ -47,7 +46,7 @@ export class CustomImageUpload {
     constructor(client: Client) {
         this.client = client;
         const channel =
-            BotENV === EENV.PRODUCTION
+            Config.ENV.NODE_ENV === 'production'
                 ? Config.Channels.PROD.PRISM_IMAGE_UPLOAD
                 : Config.Channels.DEV.PRISM_TESTING;
         client.on('messageCreate', async (message: Message) => {

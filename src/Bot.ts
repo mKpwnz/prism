@@ -12,7 +12,6 @@ import { Client, Events, IntentsBitField, Partials } from 'discord.js';
 
 LogManager.configure();
 LogManager.info('Bot is starting...');
-export const BotENV = process.env.NODE_ENV === 'production' ? EENV.PRODUCTION : EENV.DEVELOPMENT;
 
 const client = new Client({
     intents: [
@@ -32,7 +31,7 @@ EventHandler.init(client);
 client.login(Config.ENV.DISCORD_TOKEN);
 client.once(Events.ClientReady, async () => {
     new ExpressApp();
-    if (BotENV === EENV.PRODUCTION) {
+    if (Config.ENV.NODE_ENV === 'production') {
         CronManager.initCronManager({
             'fraktionen.finance': new CronJob('0 0 */8 * * *', () =>
                 CronJobService.logSocietyFinance(),

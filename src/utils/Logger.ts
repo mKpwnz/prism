@@ -1,4 +1,4 @@
-import { BotClient, BotENV } from '@Bot';
+import { BotClient } from '@Bot';
 import Config from '@Config';
 import { EENV } from '@enums/EENV';
 import chalk from 'chalk';
@@ -81,7 +81,7 @@ export default class LogManager {
         // }
 
         this.logger = createLogger({
-            level: BotENV !== EENV.PRODUCTION ? 'debug' : 'info',
+            level: Config.ENV.NODE_ENV === 'production' ? 'info' : 'debug',
             format: format.combine(
                 format.timestamp({
                     format: 'YYYY-MM-DD HH:mm:ss',

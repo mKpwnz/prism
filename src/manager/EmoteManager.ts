@@ -1,4 +1,4 @@
-import { BotClient, BotENV } from '@Bot';
+import { BotClient } from '@Bot';
 import Config from '@Config';
 import { EENV } from '@enums/EENV';
 import { Helper } from '@utils/Helper';
@@ -40,7 +40,7 @@ export class EmoteManager {
 
     static async updateBotEmotes(client: Client, serverid: string): Promise<void> {
         LogManager.info('Cheking emotes...');
-        if (BotENV !== EENV.PRODUCTION) {
+        if (Config.ENV.NODE_ENV === 'development') {
             await this.initEmotes();
             LogManager.info('Emotes Initialised!');
             return;
