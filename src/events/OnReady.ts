@@ -9,12 +9,7 @@ import { Client, Routes } from 'discord.js';
 
 export class OnReady extends DCEvent {
     async process(client: Client) {
-        const token =
-            process.env.NODE_ENV === 'production'
-                ? process.env.DISCORD_TOKEN_PROD
-                : process.env.DISCORD_TOKEN_DEV;
-
-        const rest = new REST({ version: '9' }).setToken(token as string);
+        const rest = new REST({ version: '9' }).setToken(Config.ENV.DISCORD_TOKEN);
         CommandHandler.initAll(client);
         new RconClient();
         const commandData = CommandHandler.commands.map((command) => command.scb.toJSON());

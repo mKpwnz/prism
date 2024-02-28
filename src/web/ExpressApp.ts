@@ -7,6 +7,8 @@ import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import handleError from './middleware/ErrorHandler';
 import v1Router from './router/api/v1/Router';
+import { BotENV } from '@Bot';
+import { EENV } from '@enums/EENV';
 
 export class ExpressApp {
     public app: Express = express();
@@ -29,7 +31,7 @@ export class ExpressApp {
         // this.app.use(() => {
         //     throw new CustomError({ code: EStatusCode.ClientErrorNotFound });
         // });
-        if (process.env.NODE_ENV !== 'production') this.app.use(errorhandler());
+        if (BotENV !== EENV.PRODUCTION) this.app.use(errorhandler());
         this.app.use(handleError);
         this.app.listen(3000, () => {
             LogManager.info('Web API is running on port 3000');

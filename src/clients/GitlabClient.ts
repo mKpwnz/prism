@@ -1,8 +1,9 @@
+import Config from '@Config';
 import { Gitlab } from '@gitbeaker/rest';
 
 export class GitlabClient {
     public static readonly API = new Gitlab({
-        host: process.env.GITLAB_HOST,
-        token: process.env.GITLAB_TOKEN ?? '',
+        host: Config.ENV.GITLAB_HOST,
+        token: Config.ENV.GITLAB_TOKEN,
     });
 }

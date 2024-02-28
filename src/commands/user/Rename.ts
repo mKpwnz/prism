@@ -1,3 +1,4 @@
+import { BotENV } from '@Bot';
 import Config from '@Config';
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
@@ -97,7 +98,7 @@ export class Rename extends Command {
                 color: EEmbedColors.SUCCESS,
             });
             const channel = await interaction.guild?.channels.fetch(
-                process.env.NODE_ENV === 'production'
+                BotENV === EENV.PRODUCTION
                     ? Config.Channels.PROD.S1_NAMECHANGE
                     : Config.Channels.DEV.PRISM_TEST_LOG,
             );

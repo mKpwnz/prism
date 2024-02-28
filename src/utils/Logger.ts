@@ -1,5 +1,6 @@
-import { BotClient } from '@Bot';
+import { BotClient, BotENV } from '@Bot';
 import Config from '@Config';
+import { EENV } from '@enums/EENV';
 import chalk from 'chalk';
 import colorize from 'json-colorizer';
 import winston, { createLogger, format, transports } from 'winston';
@@ -80,7 +81,7 @@ export default class LogManager {
         // }
 
         this.logger = createLogger({
-            level: process.env.NODE_ENV !== 'production' ? 'debug' : 'info',
+            level: BotENV !== EENV.PRODUCTION ? 'debug' : 'info',
             format: format.combine(
                 format.timestamp({
                     format: 'YYYY-MM-DD HH:mm:ss',

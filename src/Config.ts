@@ -1,3 +1,7 @@
+import { BotENV } from '@Bot';
+import { EENV } from '@enums/EENV';
+import { cleanEnv, email, host, port, str, url } from 'envalid';
+
 const UserConfig = {
     // Inhaber
     RIGU: '548588225455849483',
@@ -71,8 +75,8 @@ const ServerConfig = {
 
 const BotConfig = {
     ServerID: (() => {
-        switch (process.env.NODE_ENV) {
-            case 'production':
+        switch (BotENV) {
+            case EENV.PRODUCTION:
                 return [ServerConfig.IMMO_LOGS, ServerConfig.IMMO_TEAM];
             default:
                 return [ServerConfig.IMMO_DEVS];
@@ -165,6 +169,36 @@ const CommandConfig = {
     },
 };
 
+const envConfig = cleanEnv(process.env, {
+    DISCORD_APPID: str(),
+    DISCORD_PUBLICKEY: str(),
+    DISCORD_TOKEN: str(),
+    SQL_HOST: host(),
+    SQL_PORT: port(),
+    SQL_USER: str(),
+    SQL_PASS: str(),
+    SQL_DATABASE: str(),
+    RCON_HOST: host(),
+    RCON_PORT: port(),
+    RCON_PASSWORD: str(),
+    TEBEX_SECRET_OLD: str(),
+    TEBEX_SECRET: str(),
+    TEBEX_ENDPOINT: url(),
+    GITLAB_HOST: url(),
+    GITLAB_TOKEN: str(),
+    ACTIVEDIRECTORY_USER: email(),
+    ACTIVEDIRECTORY_PASS: str(),
+    POSTGRES_HOST: host(),
+    POSTGRES_PORT: port(),
+    POSTGRES_USER: str(),
+    POSTGRES_PASSWORD: str(),
+    POSTGRES_DB: str(),
+    TX_ADMIN_ENDPOINT: url(),
+    TX_ADMIN_USER: str(),
+    TX_ADMIN_PASS: str(),
+    LOGDB_URL: str(),
+});
+
 export const Config = {
     Bot: BotConfig,
     Users: UserConfig,
@@ -172,6 +206,7 @@ export const Config = {
     Servers: ServerConfig,
     Channels: ChannelConfig,
     Commands: CommandConfig,
+    ENV: envConfig,
 };
 
 export default Config;

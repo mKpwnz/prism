@@ -1,3 +1,4 @@
+import Config from '@Config';
 import LogManager from '@utils/Logger';
 import { createSocket, RemoteInfo, Socket } from 'dgram';
 
@@ -6,9 +7,9 @@ export class RconClient {
     private static socket: Socket | null = null;
 
     private static options = {
-        host: process.env.RCON_HOST ?? '',
-        port: parseInt(process.env.RCON_PORT ?? '0', 10),
-        password: process.env.RCON_PASSWORD ?? '',
+        host: Config.ENV.RCON_HOST,
+        port: Config.ENV.RCON_PORT,
+        password: Config.ENV.RCON_PASSWORD,
     };
 
     constructor() {

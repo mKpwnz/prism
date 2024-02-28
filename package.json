@@ -38,6 +38,7 @@
         "cron": "^3.1.6",
         "discord.js": "^14.14.1",
         "dotenv": "^16.4.5",
+        "envalid": "^8.0.0",
         "errorhandler": "^1.5.1",
         "express": "^4.18.2",
         "express-rate-limit": "^7.1.5",
@@ -50,7 +51,8 @@
         "request-ip": "^3.3.0",
         "typescript": "^5.3.3",
         "winston": "^3.11.0",
-        "winston-loki": "^6.0.8"
+        "winston-loki": "^6.0.8",
+        "zod": "^3.22.4"
     },
     "devDependencies": {
         "@typescript-eslint/eslint-plugin": "^7.0.2",
