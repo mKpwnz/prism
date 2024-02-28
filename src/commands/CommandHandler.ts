@@ -131,8 +131,8 @@ export class CommandHandler {
 
         new TestCommand();
         LogManager.info('CommandManager: All commands initialized!');
-        LogManager.info('Commands [PROD]:', CommandHandler.prodCommands);
-        LogManager.info('Commands [DEV]:', CommandHandler.devCommands);
+        // LogManager.info('Commands [PROD]:', CommandHandler.prodCommands);
+        // LogManager.info('Commands [DEV]:', CommandHandler.devCommands);
     }
 }
 

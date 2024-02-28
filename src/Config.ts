@@ -75,9 +75,10 @@ const ServerConfig = {
 
 const BotConfig = {
     ServerID: (() => {
-        switch (BotENV) {
-            case EENV.PRODUCTION:
+        switch (process.env.NODE_ENV) {
+            case 'production':
                 return [ServerConfig.IMMO_LOGS, ServerConfig.IMMO_TEAM];
+                break;
             default:
                 return [ServerConfig.IMMO_DEVS];
         }
