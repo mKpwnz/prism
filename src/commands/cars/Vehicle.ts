@@ -5,7 +5,7 @@ import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { PlayerService } from '@services/PlayerService';
 import { VehicleService } from '@services/VehicleService';
-import { Helper } from '@utils/helpers/Helper';
+import { attachmentFromObject } from '@utils/DiscordHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class Vehicle extends Command {
@@ -69,7 +69,7 @@ export class Vehicle extends Command {
             return;
         }
 
-        const file = Helper.attachmentFromObject(vehicle, 'VehicleInfo');
+        const file = attachmentFromObject(vehicle, 'VehicleInfo');
 
         await this.replyWithEmbed({
             description: `Fahrzeug Informationen für das Kennzeichen **${plate}**`,

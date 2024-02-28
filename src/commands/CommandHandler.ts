@@ -8,7 +8,7 @@ import {
     VehiclePop,
 } from '@commands/cars';
 import { EENV } from '@enums/EENV';
-import LogManager from '@utils/Logger';
+import LogManager from '@manager/LogManager';
 import {
     Client,
     Interaction,

@@ -4,7 +4,7 @@ import { GitlabClient } from '@clients/GitlabClient';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
-import LogManager from '@utils/Logger';
+import LogManager from '@manager/LogManager';
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -20,7 +20,7 @@ import {
     TextInputBuilder,
     TextInputStyle,
 } from 'discord.js';
-import { getEmbedBase } from '@utils/helpers/EmbedHelper';
+import { getEmbedBase } from '@utils/DiscordHelper';
 
 export class Issue extends Command {
     private allowedManagementGroups = [

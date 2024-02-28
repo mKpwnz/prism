@@ -11,7 +11,7 @@ import { ChartJSNodeCanvas } from 'chartjs-node-canvas';
 import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
-import { sendToChannel } from '@utils/helpers/EmbedHelper';
+import { sendToChannel } from '@utils/DiscordHelper';
 
 declare module 'chartjs-plugin-datalabels' {
     interface Context {

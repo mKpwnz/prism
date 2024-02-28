@@ -2,8 +2,8 @@ import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { ItemService } from '@services/ItemService';
 import Config from '@Config';
-import { Cache } from '@utils/Cache';
-import LogManager from '@utils/Logger';
+import { Cache } from '@class/Cache';
+import LogManager from '@manager/LogManager';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class CachePerformance extends Command {

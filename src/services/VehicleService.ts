@@ -1,7 +1,7 @@
 import { RconClient } from '@class/RconClient';
 import { GameDB } from '@sql/Database';
 import { IVehicle } from '@sql/schema/Vehicle.schema';
-import { Helper } from '@utils/helpers/Helper';
+import { formatNumberplate } from '@utils/FiveMHelper';
 import { ResultSetHeader } from 'mysql2';
 
 export class VehicleService {
@@ -11,7 +11,7 @@ export class VehicleService {
     ): Promise<IVehicle | undefined> {
         const [vehicles] = await GameDB.query<IVehicle[]>(
             `SELECT * FROM owned_vehicles WHERE plate = ?`,
-            [Helper.formatNumberplate(numberplate)],
+            [formatNumberplate(numberplate)],
         );
 
         return vehicles[0];
@@ -45,7 +45,7 @@ export class VehicleService {
                 `Das Kennzeichen **${newplate}** enthält ungültige Zeichen. \nDas Kennzeichen darf nur aus Buchstaben und Zahlen bestehen.`,
             );
         }
-        const newplatefmt = Helper.formatNumberplate(newplate);
+        const newplatefmt = formatNumberplate(newplate);
         const vehicle = await VehicleService.getVehicleByNumberplate(oldplate);
         if (!vehicle) {
             return new Error(`Es wurden keine Fahrzeuge mit dem Kennzeichen ${oldplate} gefunden.`);

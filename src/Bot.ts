@@ -2,9 +2,9 @@ import 'dotenv/config'; // THIS NEED TO BE AT THE TOP !!!IMPORTANT
 import Config from '@Config';
 import { EventHandler } from '@events/EventHandler';
 import { CronJobService } from '@services/CronJobService';
-import { Cache } from '@utils/Cache';
-import { CronManager } from '@utils/CronManager';
-import LogManager from '@utils/Logger';
+import { Cache } from '@class/Cache';
+import { CronManager } from '@manager/CronManager';
+import LogManager from '@manager/LogManager';
 import { ExpressApp } from '@web/ExpressApp';
 import { CronJob } from 'cron';
 import { Client, Events, IntentsBitField, Partials } from 'discord.js';

@@ -6,10 +6,10 @@ import Config from '@Config';
 import { GameDB } from '@sql/Database';
 import { IBilling } from '@sql/schema/Billing.schema';
 import { IJob } from '@sql/schema/Job.schema';
-import LogManager from '@utils/Logger';
+import LogManager from '@manager/LogManager';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
-import { sendToChannel } from '@utils/helpers/EmbedHelper';
+import { sendToChannel } from '@utils/DiscordHelper';
 
 export class Rechnung extends Command {
     constructor() {

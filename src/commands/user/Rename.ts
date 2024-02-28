@@ -7,7 +7,7 @@ import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
-import { sendToChannel } from '@utils/helpers/EmbedHelper';
+import { sendToChannel } from '@utils/DiscordHelper';
 
 export class Rename extends Command {
     constructor() {

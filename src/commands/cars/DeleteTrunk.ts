@@ -6,7 +6,7 @@ import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { VehicleService } from '@services/VehicleService';
 import { GameDB } from '@sql/Database';
-import { Helper } from '@utils/helpers/Helper';
+import { attachmentFromObject } from '@utils/DiscordHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
 
@@ -75,11 +75,12 @@ export class DeleteTrunk extends Command {
             );
             return;
         }
+
         await RconClient.sendCommand(`debugtrunk ${plate}`);
         await this.replyWithEmbed({
             description: `Der Kofferraum des Fahrzeugs mit dem Kennzeichen **${plate}** wurde erfolgreich gelöscht.`,
             color: EEmbedColors.SUCCESS,
-            files: [Helper.attachmentFromObject(vehicle, 'DeleteTrunkBackup')],
+            files: [attachmentFromObject(vehicle, 'DeleteTrunkBackup')],
         });
     }
 }

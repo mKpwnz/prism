@@ -2,7 +2,7 @@ import Config from '@Config';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { AlignmentEnum, AsciiTable3 } from 'ascii-table3';
 import { ChatInputCommandInteraction } from 'discord.js';
-import { getEmbedBase } from '@utils/helpers/EmbedHelper';
+import { getEmbedBase } from '@utils/DiscordHelper';
 
 export class PerformanceProfiler {
     private profilerName: string;

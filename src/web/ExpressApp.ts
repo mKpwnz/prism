@@ -1,4 +1,4 @@
-import LogManager from '@utils/Logger';
+import LogManager from '@manager/LogManager';
 import cors from 'cors';
 import errorhandler from 'errorhandler';
 import express, { Express } from 'express';

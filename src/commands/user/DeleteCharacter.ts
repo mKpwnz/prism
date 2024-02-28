@@ -8,7 +8,7 @@ import { PhoneService } from '@services/PhoneService';
 import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
 import { IUser } from '@sql/schema/User.schema';
-import LogManager from '@utils/Logger';
+import LogManager from '@manager/LogManager';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
 import { License } from './License';

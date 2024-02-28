@@ -2,11 +2,10 @@ import Config from '@Config';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { IEmbedOptions } from '@interfaces/IEmbed';
+import LogManager from '@manager/LogManager';
 import { BotDB } from '@sql/Database';
-import { Helper } from '@utils/helpers/Helper';
-import LogManager from '@utils/Logger';
+import { isUserAllowed, getEmbedBase } from '@utils/DiscordHelper';
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
-import { getEmbedBase } from '@utils/helpers/EmbedHelper';
 
 /**
  * @author mKpwnz
@@ -132,7 +131,7 @@ export abstract class Command {
         if (this.CheckPermissions) {
             // Check Permissions
             if (
-                (await Helper.IsUserAllowed(
+                (await isUserAllowed(
                     interaction,
                     this.AllowedChannels,
                     this.AllowedGroups,

@@ -5,7 +5,7 @@ import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { PlayerService } from '@services/PlayerService';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { mapDurationToTxAdminFormat } from '@utils/helpers/TxAdminHelper';
+import { mapDurationToTxAdminFormat } from '@utils/TxAdminHelper';
 
 export class TxAdminBan extends Command {
     constructor() {

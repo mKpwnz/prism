@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from 'axios';
 import util from 'util';
 import { IValidatedPlayer } from '@interfaces/IValidatedPlayer';
 import { TxAdminPlayerResponse } from '@interfaces/txadmin.interface';
-import { isTxAdminPlayerResponse } from '@utils/helpers/TxAdminHelper';
+import { isTxAdminPlayerResponse } from '@utils/TxAdminHelper';
 import Config from '@Config';
 
 /**

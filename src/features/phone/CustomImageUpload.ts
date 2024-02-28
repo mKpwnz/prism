@@ -3,8 +3,8 @@ import { IValidatedPlayer } from '@interfaces/IValidatedPlayer';
 import { EUniqueIdentifier } from '@enums/ESearchType';
 import Config from '@Config';
 import { GameDB } from '@sql/Database';
-import { Helper } from '@utils/helpers/Helper';
-import LogManager from '@utils/Logger';
+import { Helper } from '@utils/Helper';
+import LogManager from '@manager/LogManager';
 import axios from 'axios';
 import {
     ActionRowBuilder,

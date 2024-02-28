@@ -1,12 +1,12 @@
 import { ISocietyFinanceResponse } from '@interfaces/ISocietyFinanceResponse';
 import { BotDB, GameDB } from '@sql/Database';
-import LogManager from '@utils/Logger';
+import LogManager from '@manager/LogManager';
 import { PhonePhotosService } from '@services/PhonePhotosService';
 import { PhoneService } from '@services/PhoneService';
 import TxAdminClient from '@clients/TxAdminClient';
 import Config from '@Config';
 import { IPhoneOwnerResponse } from '@sql/schema/Phone.schema';
-import { getEmbedBase, sendToChannel } from '@utils/helpers/EmbedHelper';
+import { getEmbedBase, sendToChannel } from '@utils/DiscordHelper';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { PlayerService } from './PlayerService';
 

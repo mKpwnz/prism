@@ -1,6 +1,6 @@
 import { GameDB } from '@sql/Database';
 import { IInsurance } from '@sql/schema/Versicherung.schema';
-import { Helper } from '@utils/helpers/Helper';
+import { formatNumberplate } from '@utils/FiveMHelper';
 import { ResultSetHeader } from 'mysql2';
 
 export class InsuranceService {
@@ -11,7 +11,7 @@ export class InsuranceService {
     public static async getInsuranceByNumberplate(plate: string): Promise<IInsurance[]> {
         const [versicherungen] = await GameDB.query<IInsurance[]>(
             'SELECT * FROM `versicherungen` WHERE `plate` = ?',
-            [Helper.formatNumberplate(plate)],
+            [formatNumberplate(plate)],
         );
 
         return versicherungen;
@@ -24,7 +24,7 @@ export class InsuranceService {
     ): Promise<boolean> {
         const [result] = await GameDB.query<ResultSetHeader>(
             'INSERT INTO `versicherungen` (`plate`, `ts`, `premium`) VALUES (?, ADDDATE(NOW (), INTERVAL ? DAY), ?) ON DUPLICATE KEY UPDATE ts = ADDDATE(NOW (), INTERVAL ? DAY), premium = ? RETURNING * ',
-            [Helper.formatNumberplate(plate), dauer, premium ? 1 : 0, dauer, premium ? 1 : 0],
+            [formatNumberplate(plate), dauer, premium ? 1 : 0, dauer, premium ? 1 : 0],
         );
 
         return result.affectedRows > 0;

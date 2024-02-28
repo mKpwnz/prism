@@ -6,7 +6,7 @@ import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { PlayerService } from '@services/PlayerService';
 import { VehicleService } from '@services/VehicleService';
-import { Helper } from '@utils/helpers/Helper';
+import { formatNumberplate } from '@utils/FiveMHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class GiveCar extends Command {
@@ -63,7 +63,7 @@ export class GiveCar extends Command {
         }
 
         if (plate) {
-            const formattedPlate = Helper.formatNumberplate(plate);
+            const formattedPlate = formatNumberplate(plate);
 
             if (!formattedPlate) {
                 await this.replyError(`Das Kennzeichen \`${plate}\` ist ungültig.`);
