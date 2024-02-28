@@ -5,6 +5,7 @@ import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { PlayerService } from '@services/PlayerService';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { mapDurationToTxAdminFormat } from '@utils/helpers/TxAdminHelper';
 
 export class TxAdminBan extends Command {
     constructor() {
@@ -63,20 +64,6 @@ export class TxAdminBan extends Command {
         );
     }
 
-    /**
-     * @description Maps the duration and unit to the TxAdmin format
-     * @returns The duration in the TxAdmin format or null if it is invalid
-     */
-    private mapDurationToTxAdminFormat(duration: number | null, unit: string): string | null {
-        if (unit === 'permanent') {
-            return unit;
-        }
-        if (unit !== 'permanent' && !duration) {
-            return null;
-        }
-        return `${duration} ${unit}`;
-    }
-
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const identifier = interaction.options.getString('identifier', true);
         const unit = interaction.options.getString('unit', true);
@@ -84,7 +71,7 @@ export class TxAdminBan extends Command {
         const reason =
             interaction.options.getString('reason', false) ?? 'Prism: Kein Grund angegeben';
 
-        const txAdminDuration = this.mapDurationToTxAdminFormat(duration, unit);
+        const txAdminDuration = mapDurationToTxAdminFormat(duration, unit);
 
         if (!txAdminDuration) {
             await this.replyWithEmbed({
@@ -108,19 +95,11 @@ export class TxAdminBan extends Command {
             return;
         }
 
-        const banResponse = await txAdminClient.playerBan(player, reason, txAdminDuration);
+        await txAdminClient.playerBan(player, reason, txAdminDuration);
 
-        if (banResponse.success) {
-            await this.replyWithEmbed({
-                title: 'TxAdmin Ban',
-                description: `Spieler erfolgreich gebannt!\n\n **Identifier:** \`${identifier}\`\n **Dauer:** \`${duration}\`\n **Grund:** \`${reason}\`\n`,
-            });
-        } else {
-            await this.replyWithEmbed({
-                title: 'TxAdmin Ban',
-                description: `Fehler beim Bannen des Spielers! Prüfe die Logs für mehr Informationen.`,
-                ephemeral: true,
-            });
-        }
+        await this.replyWithEmbed({
+            title: 'TxAdmin Ban',
+            description: `Spieler erfolgreich gebannt!\n\n **Identifier:** \`${identifier}\`\n **Dauer:** \`${duration}\`\n **Grund:** \`${reason}\`\n`,
+        });
     }
 }

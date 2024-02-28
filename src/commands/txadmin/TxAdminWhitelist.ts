@@ -51,19 +51,11 @@ export class TxAdminWhitelist extends Command {
 
         const txAdminClient = await TxAdminClient.getInstance();
 
-        const whitelistResponse = await txAdminClient.whitelistRequestSet(requestId, true);
+        await txAdminClient.whitelistRequestSet(requestId, true);
 
-        if (whitelistResponse.success) {
-            await this.replyWithEmbed({
-                title: 'TxAdmin Whitelist',
-                description: `Whitelist erfolgreich freigegeben!\n\n **RequestId:** \`${requestId}\``,
-            });
-        } else {
-            await this.replyWithEmbed({
-                title: 'TxAdmin Ban',
-                description: `Fehler beim freigeben der Whitelist! Prüfe die Logs für mehr Informationen.`,
-                ephemeral: true,
-            });
-        }
+        await this.replyWithEmbed({
+            title: 'TxAdmin Whitelist',
+            description: `Whitelist erfolgreich freigegeben!\n\n **RequestId:** \`${requestId}\``,
+        });
     }
 }

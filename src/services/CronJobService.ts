@@ -96,25 +96,23 @@ export class CronJobService {
                 return;
             }
 
-            const banResponse = await txAdminClient.playerBan(
-                player,
-                'Bug Abuse (Custom Image Upload)',
-                'permanent',
-            );
+            const embed = getEmbedBase({
+                title: 'TxAdmin Ban',
+                description: `**SteamID:** \`${player.identifiers.steam}\`\n **Dauer:** \`permanent\`\n **Grund:** \`Bug Abuse (Custom Image Upload)\`\n`,
+                color: EEmbedColors.SUCCESS,
+            });
 
-            if (banResponse.success) {
-                const embed = getEmbedBase({
-                    title: 'TxAdmin Ban',
-                    description: `**SteamID:** \`${player.identifiers.steam}\`\n **Dauer:** \`permanent\`\n **Grund:** \`Bug Abuse (Custom Image Upload)\`\n`,
-                    color: EEmbedColors.SUCCESS,
-                });
+            try {
+                await txAdminClient.playerBan(
+                    player,
+                    'Bug Abuse (Custom Image Upload)',
+                    'permanent',
+                );
 
                 await sendToChannel(embed, Config.Channels.PROD.S1_CUSTOM_IMAGE_BANLIST);
                 await sendToChannel(embed, Config.Channels.PROD.S1_NVHX_BANS);
-            } else {
-                LogManager.error(
-                    `CronJobs: banPlayersWithIllegalPhoto() failed to ban the player with the identifier ${owner.steamID}.`,
-                );
+            } catch (error) {
+                LogManager.error(error);
             }
         }, Promise.resolve());
     }
