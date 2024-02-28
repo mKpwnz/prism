@@ -14,9 +14,18 @@ export class OnReady extends DCEvent {
         new RconClient();
         const commandData = CommandHandler.commands.map((command) => command.scb.toJSON());
         Config.Bot.ServerID.forEach(async (id) => {
-            await rest.put(Routes.applicationGuildCommands(client.user?.id ?? 'missing id', id), {
-                body: commandData,
-            });
+            try {
+                LogManager.info('Registering commands on Server ' + id);
+                await rest.put(
+                    Routes.applicationGuildCommands(client.user?.id ?? 'missing id', id),
+                    {
+                        body: commandData,
+                    },
+                );
+                LogManager.info(`Registering commands on Server ${id} done!`);
+            } catch (error) {
+                LogManager.error(error);
+            }
         });
         Config.Bot.ServerID.forEach(async (id) => {
             await EmoteManager.updateBotEmotes(client, id);

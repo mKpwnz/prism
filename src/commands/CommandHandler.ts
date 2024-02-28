@@ -149,11 +149,11 @@ export function RegisterCommand(
         cmd,
         scb,
     });
-    LogManager.debug({
-        command: scb.name,
-        description: scb.description,
-        usePermissions: cmd.CheckPermissions,
-        allowedChannels: cmd.AllowedChannels,
-        allowedGroups: cmd.AllowedGroups,
-    });
+    // LogManager.debug({
+    //     command: scb.name,
+    //     description: scb.description,
+    //     usePermissions: cmd.CheckPermissions,
+    //     allowedChannels: cmd.AllowedChannels,
+    //     allowedGroups: cmd.AllowedGroups,
+    // });
 }

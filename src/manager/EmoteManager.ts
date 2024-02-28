@@ -47,7 +47,7 @@ export class EmoteManager {
         }
         const guild = client.guilds.cache.get(serverid);
         if (!guild) {
-            LogManager.error('Guild not found!');
+            LogManager.error(`Guild not found!: ${serverid}`);
             return;
         }
         try {
