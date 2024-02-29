@@ -73,7 +73,7 @@ class TxAdminClient {
         requestid: string,
     ): Promise<TxAdminDatabaseWhitelistRequestsType | null> {
         const response = await axios.get(
-            `${Config.ENV.TX_ADMIN_ENDPOINT}whitelist/requests`,
+            `${Config.ENV.TX_ADMIN_ENDPOINT}whitelist/requests?searchString=${requestid}`,
             TxAdminClient.getTxAdminRequestConfig(),
         );
         if (!isTxAdminWhitelistRequests(response.data)) {
