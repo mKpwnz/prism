@@ -6,6 +6,6 @@ WORKDIR /usr/src/app
 # Install app dependencies
 COPY . .
 
-RUN npm install --omit=dev
+RUN npm install
 
 CMD [ "npm", "run",  "start" ]

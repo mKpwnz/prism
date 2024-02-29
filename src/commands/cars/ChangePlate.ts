@@ -54,7 +54,7 @@ export class ChangePlate extends Command {
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const oldplate = interaction.options.getString('oldplate', true);
         const newplate = interaction.options.getString('newplate', true);
-        
+
         const result = await VehicleService.changeVehiclePlate(oldplate, newplate);
         if (result instanceof Error) {
             await this.replyError(result.message);
