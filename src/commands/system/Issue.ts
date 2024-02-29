@@ -228,7 +228,7 @@ export class Issue extends Command {
             }).setAuthor(oldEmbed.author);
             await interaction.message.edit({ embeds: [embed] });
             await interaction.message.thread?.send({
-                content: `Der TODO Eintrag wurde von <@${interaction.user.id}> bearbeitet.\nAlter eintrag:`,
+                content: `Der TODO Eintrag wurde von ${interaction.user.displayName} bearbeitet.\nAlter eintrag:`,
                 embeds: [oldEmbed],
             });
             await interaction.reply({ content: 'Dein Issue wurde bearbeitet.', ephemeral: true });
@@ -322,7 +322,7 @@ export class Issue extends Command {
             return;
         }
         await message.thread?.send({
-            content: `Priorität wurde durch **<@${user.id}>** von **${oldPriority}** auf **${priority}** geändert.`,
+            content: `Priorität wurde durch **${user.displayName}** von **${oldPriority}** auf **${priority}** geändert.`,
         });
         await message.edit({ embeds: [embed] });
     }
@@ -393,7 +393,7 @@ export class Issue extends Command {
                     await message.reactions.removeAll();
                     await message.edit({ embeds: [embed] });
                     await message.thread?.send({
-                        content: `Der TODO Eintrag wurde von <@${user.id}> Freigegeben.`,
+                        content: `Der TODO Eintrag wurde von ${user.displayName} Freigegeben.`,
                     });
                 })
                 .catch(async (error) => {
@@ -410,7 +410,7 @@ export class Issue extends Command {
             await message.reactions.removeAll();
             await message.edit({ embeds: [embed] });
             await message.thread?.send({
-                content: `Der TODO Eintrag wurde von <@${user.id}> Abgelehnt.`,
+                content: `Der TODO Eintrag wurde von ${user.displayName} Abgelehnt.`,
             });
         }
     }
