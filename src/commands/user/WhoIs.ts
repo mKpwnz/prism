@@ -97,7 +97,7 @@ export class WhoIs extends Command {
         profiler.addStep('Validate Input');
         const pageSize = 18;
 
-        const page = interaction.options.getNumber('seite') ?? 1;
+        const page = interaction.options.getInteger('seite') ?? 1;
         const spalte = interaction.options.getString('spalte') ?? ESearchType.ALL;
         const filter = spalte ? `\nFilter: ${spalte}` : '';
 
