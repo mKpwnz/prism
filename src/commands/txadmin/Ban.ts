@@ -49,6 +49,8 @@ export class Ban extends Command {
                             { name: '8 Stunden', value: '8 hours' },
                             { name: '1 Tag', value: '1 day' },
                             { name: '2 Tage', value: '2 days' },
+                            { name: '3 Tage', value: '3 days' },
+                            { name: '5 Tage', value: '5 days' },
                             { name: '1 Woche', value: '1 week' },
                             { name: '2 Wochen', value: '2 weeks' },
                             { name: 'Permanent', value: 'permanent' },
