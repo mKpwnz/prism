@@ -32,7 +32,6 @@ client.once(Events.ClientReady, async () => {
     try {
         new ExpressApp();
         await CronJobService.txAdminAuthenticate();
-        LogManager.info('TXAdmin Authentication done.');
         if (Config.ENV.NODE_ENV === 'production') {
             CronManager.initCronManager({
                 'fraktionen.finance': new CronJob('0 0 */8 * * *', () =>

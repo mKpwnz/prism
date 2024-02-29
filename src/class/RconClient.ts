@@ -41,9 +41,9 @@ export class RconClient {
             const timeout = setTimeout(() => {
                 reject(new Error('Timeout: Server hat nicht innerhalb von 5 Sekunden geantwortet'));
             }, 5000); // Timeout nach 5 Sekunden
-
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             RconClient.socket!.once('message', (msg, rinfo) => {
+                LogManager.debug(msg);
                 clearTimeout(timeout);
                 const response = msg.toString('ascii');
                 resolve(response);

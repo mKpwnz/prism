@@ -106,7 +106,7 @@ export abstract class Command {
             this.CmdPerformanceStart = new Date();
             setTimeout(async () => {
                 if (interaction.replied || interaction.deferred) return;
-                await interaction.deferReply();
+                await interaction.deferReply({ ephemeral: true });
             }, 2000);
             await this.execute(interaction);
             this.currentInteraction = undefined;

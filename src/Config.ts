@@ -31,6 +31,8 @@ const envConfig = cleanEnv(process.env, {
     TX_ADMIN_PASS: str(),
     TX_ADMIN_VERSION: str(),
     LOGDB_URL: str(),
+    GAMESERVER_API_HOST: host(),
+    GAMESERVER_API_PORT: port(),
 });
 
 const UserConfig = {

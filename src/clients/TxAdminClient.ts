@@ -80,6 +80,9 @@ class TxAdminClient {
             LogManager.error(response.data);
             return null;
         }
+
+        LogManager.debug(response.data.requests);
+
         return response.data.requests.find((r) => r.id === requestid) ?? null;
     }
 

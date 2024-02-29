@@ -3,7 +3,9 @@ import {
     ChangePlate,
     DeleteTrunk,
     DeleteVehicle,
+    GarageList,
     GiveCar,
+    TransferVehicle,
     Vehicle,
     VehiclePop,
 } from '@commands/cars';
@@ -123,6 +125,8 @@ export class CommandHandler {
         new TestCommand();
         new Ban();
         new TxInfo();
+        new GarageList();
+        new TransferVehicle();
         new TxHistory();
         new Whitelist();
         LogManager.info('CommandManager: All commands initialized!');

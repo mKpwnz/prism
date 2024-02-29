@@ -1,6 +1,7 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
 import { PerformanceProfiler } from '@class/PerformanceProfiler';
+import GameserverClient from '@clients/GameserverClient';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
@@ -48,6 +49,8 @@ export class TestCommand extends Command {
         //         _attri[attr.type] = attr.vals[0];
         //     }
         // });
+        const gar = await GameserverClient.getAllGarages();
+        console.log(gar);
         await this.replyWithEmbed({
             description: `test`,
         });
