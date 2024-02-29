@@ -6,6 +6,6 @@ WORKDIR /usr/src/app
 # Install app dependencies
 COPY . .
 
-RUN npm install
+RUN npm install --omit=dev && prisma generate
 
 CMD [ "npm", "run",  "start" ]
