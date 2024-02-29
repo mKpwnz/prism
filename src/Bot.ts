@@ -29,24 +29,30 @@ Cache.init();
 EventHandler.init(client);
 client.login(Config.ENV.DISCORD_TOKEN);
 client.once(Events.ClientReady, async () => {
-    new ExpressApp();
-    if (Config.ENV.NODE_ENV === 'production') {
-        CronManager.initCronManager({
-            'fraktionen.finance': new CronJob('0 0 */8 * * *', () =>
-                CronJobService.logSocietyFinance(),
-            ),
-            'server.playercount': new CronJob('0 */10 * * * *', () => {
-                CronJobService.logPlayerCount();
-            }),
-            'txadmin.authenticate': new CronJob('0 0 */23 * * *', () => {
-                CronJobService.txAdminAuthenticate();
-            }),
-            'txadmin.banpillegalphoto': new CronJob('0 */30 * * * *', () => {
-                CronJobService.banPlayersWithIllegalPhoto();
-            }),
-        });
-    } else {
-        LogManager.debug('CronManager is disabled in DEV mode');
+    try {
+        new ExpressApp();
+        await CronJobService.txAdminAuthenticate();
+        LogManager.info('TXAdmin Authentication done.');
+        if (Config.ENV.NODE_ENV === 'production') {
+            CronManager.initCronManager({
+                'fraktionen.finance': new CronJob('0 0 */8 * * *', () =>
+                    CronJobService.logSocietyFinance(),
+                ),
+                'server.playercount': new CronJob('0 */10 * * * *', () => {
+                    CronJobService.logPlayerCount();
+                }),
+                'txadmin.authenticate': new CronJob('0 0 */23 * * *', () => {
+                    CronJobService.txAdminAuthenticate();
+                }),
+                'txadmin.banpillegalphoto': new CronJob('0 */30 * * * *', () => {
+                    CronJobService.banPlayersWithIllegalPhoto();
+                }),
+            });
+        } else {
+            LogManager.debug('CronManager is disabled in DEV mode');
+        }
+    } catch (e) {
+        LogManager.error('Error while starting the bot', e);
     }
 });
 

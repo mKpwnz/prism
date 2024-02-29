@@ -7,114 +7,33 @@ import { BotDB } from '@sql/Database';
 import { isUserAllowed, getEmbedBase } from '@utils/DiscordHelper';
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 
-/**
- * @author mKpwnz
- * @date 30.09.2023
- * @export
- * @abstract
- * @class Command
- */
 export abstract class Command {
-    /**
-     * @description Gibt an, in welchen Kanälen der Command ausgeführt werden darf (Discord) (ID)
-     * @type {string[]}
-     * @memberof Command
-     */
     AllowedChannels: string[] = [];
 
-    /**
-     * @description Gibt an, welche Gruppen den Command ausgeführt dürfen (Discord) (ID)
-     * @type {string[]}
-     * @memberof Command
-     */
     AllowedGroups: string[] = [];
 
-    /**
-     * @description Gibt an, welche User den Command ausführen dürfen (Unabhängig von Gruppenrechten) (Discord) (ID)
-     * @type {string[]}
-     * @memberof Command
-     */
     AllowedUsers: string[] = [];
 
-    /**
-     * @description Gibt an, welche User den Command nicht ausführen dürfen (Unabhängig von Gruppenrechten) (Discord) (ID)
-     * @type {string[]}
-     * @memberof Command
-     */
     BlockedUsers: string[] = [];
 
-    /**
-     * @description Gibt an, ob die Permissions geprüft werden sollen oder nicht.
-     * @type {Boolean} [CheckPermissions=true]
-     * @memberof Command
-     */
     CheckPermissions: Boolean = true;
 
-    /**
-     * @description Gibt an, in welcher Umgebung der Command ausgeführt werden darf.
-     * @type {EENV} [RunEnvironment=EENV.DEVELOPMENT]
-     * @memberof Command
-     */
     RunEnvironment: EENV = EENV.DEVELOPMENT;
 
-    /**
-     * @description Gibt an, ob der Command ein Beta Command ist oder nicht.
-     * @type {boolean} [IsBetaCommand=false]
-     * @memberof Command
-     */
     IsBetaCommand: boolean = false;
 
-    /**
-     * @description Gibt an, ob der Command nicht gezählt werden soll (Statistik)
-     * @type {boolean} [DoNotCountUse=false]
-     * @memberof Command
-     */
     DoNotCountUse: boolean = false;
 
-    /**
-     * @description Gibt an, wann der Command ausgeführt wurde. (Timestamp)
-     * @type {Date}
-     * @memberof Command
-     */
     private CmdPerformanceStart: Date | undefined = undefined;
 
-    /**
-     * @description Gibt an, wann der Command fertig ausgeführt wurde. (Timestamp)
-     * @type {Date}
-     * @memberof Command
-     */
     private CmdPerformanceStop: Date | undefined = undefined;
 
-    /**
-     * @description Gibt an, welcher EmbedTitle für Fehlermeldungen benutzt werden soll.
-     * @type {string}
-     * @memberof Command
-     */
     EmbedTitle: string = this.constructor.name;
 
-    /**
-     * @description
-     * @private
-     * @type {(ChatInputCommandInteraction | undefined)}
-     * @memberof Command
-     */
     private currentInteraction: ChatInputCommandInteraction | undefined;
 
-    /**
-     * @description Führt den Command aus. Muss in der Klasse, die von Command erbt, implementiert werden. (execute() { ... })
-     * @abstract
-     * @param {ChatInputCommandInteraction} interaction
-     * @returns {*}  {Promise<void>}
-     * @memberof Command
-     */
     abstract execute(interaction: ChatInputCommandInteraction): Promise<void>;
 
-    /**
-     * @description Wird vom CommandHandler ausgeführt
-     * @param {ChatInputCommandInteraction} interaction
-     * @returns {*}  {Promise<void>}
-     * @memberof Command
-     */
     async run(interaction: ChatInputCommandInteraction): Promise<void> {
         this.currentInteraction = interaction;
         const { options, user } = interaction;
@@ -185,6 +104,10 @@ export abstract class Command {
         }
         try {
             this.CmdPerformanceStart = new Date();
+            setTimeout(async () => {
+                if (interaction.replied || interaction.deferred) return;
+                await interaction.deferReply();
+            }, 2000);
             await this.execute(interaction);
             this.currentInteraction = undefined;
         } catch (error) {

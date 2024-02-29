@@ -54,7 +54,6 @@ export class VehiclePop extends Command {
         const spawnname = interaction.options.getString('spawnname', true);
         const noexport = interaction.options.getBoolean('noexport') ?? false;
         const hash = generateOAAThash(spawnname);
-        await interaction.deferReply();
 
         const [vehicles] = await GameDB.query<IVehicle[]>(
             `SELECT * FROM owned_vehicles WHERE JSON_EXTRACT(vehicle, '$.modelName') = ? OR JSON_EXTRACT(vehicle, '$.model') = ?`,

@@ -52,7 +52,6 @@ export class DeleteVehicle extends Command {
             );
             return;
         }
-        await interaction.deferReply();
         const vehicle = await VehicleService.getVehicleByNumberplate(plate);
         if (!vehicle) {
             await this.replyError(

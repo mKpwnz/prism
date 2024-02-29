@@ -93,3 +93,35 @@ export function attachmentFromJson(jsonInput: string, filename: string): Attachm
 export function attachmentFromObject(objInput: any, filename: string): AttachmentBuilder {
     return attachmentFromJson(JSON.stringify(objInput, null, 4), filename);
 }
+
+export function paginateApiResponse<T>(
+    rawData: T[],
+    compute: (ent: T) => string,
+    pageSize: number,
+): string[] {
+    const pages = [];
+    let currentPage = '';
+    const response: string[] = [];
+
+    for (const entrie of rawData) {
+        response.push(compute(entrie));
+    }
+
+    for (const action of response) {
+        // Überprüfe, ob die nächste Zeile hinzugefügt werden kann, ohne das Zeichenlimit zu überschreiten
+        if (currentPage.length + action.length + 1 <= pageSize) {
+            currentPage += `${action}\n`;
+        } else {
+            // Füge die aktuelle Seite zu den Seiten hinzu und beginne eine neue Seite
+            pages.push(currentPage);
+            currentPage = `${action}\n`;
+        }
+    }
+
+    // Füge die letzte Seite hinzu, wenn vorhanden
+    if (currentPage.length > 0) {
+        pages.push(currentPage);
+    }
+
+    return pages;
+}

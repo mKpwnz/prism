@@ -34,3 +34,35 @@ export interface TxAdminPlayerResponse {
     serverTime: number;
     player: TxAdminPlayer;
 }
+
+export interface TxAdminDatabaseWhitelistRequestsType {
+    id: string;
+    license: string;
+    playerDisplayName: string;
+    playerPureName: string;
+    discordTag?: string;
+    discordAvatar?: string;
+    tsLastAttempt: number;
+}
+
+export interface TxAdminWhitelistRequests {
+    cntTotal: number;
+    cntFiltered: number;
+    newest: number;
+    totalPages: number;
+    currPage: number;
+    requests: TxAdminDatabaseWhitelistRequestsType[];
+}
+
+export interface TxAdminAuthResponse {
+    name: string;
+    permissions: string[];
+    isMaster: boolean;
+    isTempPassword: boolean;
+    csrfToken: string;
+}
+
+export interface TxAdminApiResponse {
+    success: boolean;
+    actionId?: string;
+}

@@ -1,9 +1,14 @@
-import axios, { AxiosResponse } from 'axios';
-import util from 'util';
-import { IValidatedPlayer } from '@interfaces/IValidatedPlayer';
-import { TxAdminPlayerResponse } from '@interfaces/txadmin.interface';
-import { isTxAdminPlayerResponse } from '@utils/TxAdminHelper';
 import Config from '@Config';
+import TxAdminError from '@error/TxAdmin/TxAdminError';
+import {
+    TxAdminApiResponse,
+    TxAdminDatabaseWhitelistRequestsType,
+    TxAdminPlayerResponse,
+} from '@interfaces/ITxAdmin';
+import { IValidatedPlayer } from '@interfaces/IValidatedPlayer';
+import LogManager from '@manager/LogManager';
+import { isTxAdminPlayerResponse, isTxAdminWhitelistRequests } from '@utils/TxAdminHelper';
+import axios from 'axios';
 
 /**
  * @description TxAdminClient is a class to interact with the TxAdmin Backend.
@@ -11,22 +16,9 @@ import Config from '@Config';
 class TxAdminClient {
     private static instance: TxAdminClient;
 
-    private CsrfToken: string = '';
+    private static CsrfToken: string = '';
 
-    private sessionCookie: string = '';
-
-    private constructor() {
-        // private constructor, use getInstance() instead
-    }
-
-    public static async getInstance(): Promise<TxAdminClient> {
-        if (!TxAdminClient.instance) {
-            const client = new TxAdminClient();
-            await client.authenticate();
-            TxAdminClient.instance = client;
-        }
-        return TxAdminClient.instance;
-    }
+    private static sessionCookie: string = '';
 
     /**
      * @description Authenticates with the TxAdmin Backend and sets the sessionCookie and csrfToken for the TxAdminClient instance.
@@ -35,7 +27,7 @@ class TxAdminClient {
      *
      * Authentication is handled automatically via CronJob in Bot.ts
      */
-    public async authenticate() {
+    public static async authenticate() {
         const response = await axios.post(
             `${Config.ENV.TX_ADMIN_ENDPOINT}auth/password?uiVersion=${Config.ENV.TX_ADMIN_VERSION}`,
             {
@@ -57,73 +49,120 @@ class TxAdminClient {
             throw new Error('[TxAdminClient] Did not receive csrfToken from TxAdmin!');
         }
 
-        this.sessionCookie = sessionCookie;
-        this.CsrfToken = data.csrfToken;
+        TxAdminClient.sessionCookie = sessionCookie;
+        TxAdminClient.CsrfToken = data.csrfToken;
     }
 
-    public async getPlayerInfo(player: IValidatedPlayer): Promise<TxAdminPlayerResponse> {
+    public static async getPlayerInfo(
+        player: IValidatedPlayer,
+    ): Promise<TxAdminPlayerResponse | TxAdminError> {
         const response = await axios.get(
-            `${Config.ENV.TX_ADMIN_ENDPOINT}player?license=${player.identifiers.license.split(':')[1]}`,
-            this.getTxAdminRequestConfig(),
+            `${Config.ENV.TX_ADMIN_ENDPOINT}player?license=${
+                player.identifiers.license.split(':')[1]
+            }`,
+            TxAdminClient.getTxAdminRequestConfig(),
         );
 
-        const { data } = response;
-
-        if (isTxAdminPlayerResponse(data)) {
-            return data;
+        if (!isTxAdminPlayerResponse(response.data)) {
+            return new TxAdminError(response.data.error);
         }
-        throw new Error(`[TxAdminClient] Error while getting player info: ${util.inspect(data)}`);
+        return response.data;
+    }
+
+    public static async getWhitelistRequestById(
+        requestid: string,
+    ): Promise<TxAdminDatabaseWhitelistRequestsType | null> {
+        const response = await axios.get(
+            `${Config.ENV.TX_ADMIN_ENDPOINT}whitelist/requests`,
+            TxAdminClient.getTxAdminRequestConfig(),
+        );
+        if (!isTxAdminWhitelistRequests(response.data)) {
+            LogManager.error(response.data);
+            return null;
+        }
+        return response.data.requests.find((r) => r.id === requestid) ?? null;
     }
 
     /**
      * @description Method to approve or deny a whitelist request by id.
-     * @param requestId - The id of the whitelist request
-     * @param status - The status to set the whitelist request to. `true` for approve, `false` for deny.
      */
-    public async whitelistRequestSet(requestId: string, status: boolean): Promise<void> {
-        const action = status ? 'approve' : 'deny';
-
+    public static async handleWhitelistRequest(
+        requestId: string,
+        status: 'approve' | 'deny',
+    ): Promise<boolean | TxAdminError> {
         const response = await axios.post(
-            `${Config.ENV.TX_ADMIN_ENDPOINT}whitelist/requests/${action}`,
+            `${Config.ENV.TX_ADMIN_ENDPOINT}whitelist/requests/${status}`,
             { reqId: requestId },
-            this.getTxAdminRequestConfig(),
+            TxAdminClient.getTxAdminRequestConfig(),
         );
-
-        this.successOrThrow(response, 'Error while setting whitelist request status');
+        if (!response.data.success) {
+            return new TxAdminError(response.data.error);
+        }
+        return true;
     }
 
     /**
      * @description Method to set the whitelist status of a player.
      */
-    public async playerSetWhitelist(player: IValidatedPlayer, status: boolean): Promise<void> {
-        return this.playerAction('whitelist', player, { status });
+    public static async playerSetWhitelist(
+        player: IValidatedPlayer,
+        status: boolean,
+    ): Promise<boolean | TxAdminError> {
+        const response = await TxAdminClient.playerAction('whitelist', player, { status });
+        if (response instanceof TxAdminError) return response;
+        return response.success;
     }
 
-    public async playerWarn(player: IValidatedPlayer, reason: string): Promise<void> {
-        return this.playerAction('warn', player, { reason });
+    public static async playerWarn(
+        player: IValidatedPlayer,
+        reason: string,
+    ): Promise<string | TxAdminError> {
+        const response = await TxAdminClient.playerAction('warn', player, { reason });
+        if (response instanceof TxAdminError) return response;
+        if (!response?.actionId) return new TxAdminError("Couldn't get actionId from response!");
+        return response.actionId;
     }
 
-    public async playerKick(player: IValidatedPlayer, reason: string): Promise<void> {
-        return this.playerAction('kick', player, { reason });
+    public static async playerKick(
+        player: IValidatedPlayer,
+        reason: string,
+    ): Promise<string | TxAdminError> {
+        const response = await TxAdminClient.playerAction('kick', player, { reason });
+        if (response instanceof TxAdminError) return response;
+        if (!response?.actionId) return new TxAdminError("Couldn't get actionId from response!");
+        return response.actionId;
     }
 
-    public async playerMessage(player: IValidatedPlayer, message: string): Promise<void> {
-        return this.playerAction('message', player, { message });
+    public static async playerMessage(
+        player: IValidatedPlayer,
+        message: string,
+    ): Promise<boolean | TxAdminError> {
+        const response = await TxAdminClient.playerAction('message', player, { message });
+        if (response instanceof TxAdminError) return response;
+        return response.success;
     }
 
-    public async playerSaveNote(player: IValidatedPlayer, note: string): Promise<void> {
-        return this.playerAction('save_note', player, { note });
+    public static async playerSaveNote(
+        player: IValidatedPlayer,
+        note: string,
+    ): Promise<boolean | TxAdminError> {
+        const response = await TxAdminClient.playerAction('save_note', player, { note });
+        if (response instanceof TxAdminError) return response;
+        return response.success;
     }
 
-    public async playerBan(
+    public static async playerBan(
         player: IValidatedPlayer,
         reason: string,
         duration: string,
-    ): Promise<void> {
-        return this.playerAction('ban', player, { reason, duration });
+    ): Promise<string | TxAdminError> {
+        const response = await TxAdminClient.playerAction('ban', player, { reason, duration });
+        if (response instanceof TxAdminError) return response;
+        if (!response?.actionId) return new TxAdminError("Couldn't get actionId from response!");
+        return response.actionId;
     }
 
-    private getTxAdminRequestConfig() {
+    private static getTxAdminRequestConfig() {
         return {
             headers: {
                 Cookie: `${this.sessionCookie};`,
@@ -132,28 +171,22 @@ class TxAdminClient {
         };
     }
 
-    private successOrThrow(response: AxiosResponse<any, any>, errorMessage: string): void {
-        const { data } = response;
-
-        if (data?.success) {
-            return;
-        }
-
-        throw new Error(`[TxAdminClient] ${errorMessage}: ${util.inspect(data)}`);
-    }
-
-    private async playerAction(
+    private static async playerAction(
         endpoint: string,
         player: IValidatedPlayer,
         requestBody: object,
-    ): Promise<void> {
+    ): Promise<TxAdminApiResponse | TxAdminError> {
         const response = await axios.post(
-            `${Config.ENV.TX_ADMIN_ENDPOINT}player/${endpoint}?license=${player.identifiers.license.split(':')[1]}`,
+            `${Config.ENV.TX_ADMIN_ENDPOINT}player/${endpoint}?license=${
+                player.identifiers.license.split(':')[1]
+            }`,
             requestBody,
-            this.getTxAdminRequestConfig(),
+            TxAdminClient.getTxAdminRequestConfig(),
         );
-
-        this.successOrThrow(response, `Error while calling ${endpoint} for player`);
+        if (!response.data.success) {
+            return new TxAdminError(response.data.error);
+        }
+        return response.data as TxAdminApiResponse;
     }
 }
 

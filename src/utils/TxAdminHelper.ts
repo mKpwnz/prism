@@ -1,7 +1,11 @@
-import { TxAdminPlayerResponse } from '@interfaces/txadmin.interface';
+import { TxAdminPlayerResponse, TxAdminWhitelistRequests } from '@interfaces/ITxAdmin';
 
 export function isTxAdminPlayerResponse(obj: any): obj is TxAdminPlayerResponse {
     return 'serverTime' in obj && 'player' in obj;
+}
+
+export function isTxAdminWhitelistRequests(data: any): data is TxAdminWhitelistRequests {
+    return data && typeof data === 'object' && 'requests' in data;
 }
 
 /**

@@ -4,13 +4,6 @@ import { Client, Events, Interaction, Message } from 'discord.js';
 import { OnReady } from './OnReady';
 import { OnMessageCreate } from './OnMessageCreate';
 
-/**
- * @description Handles all events
- * @author mKpwnz
- * @date 30.09.2023
- * @export
- * @class EventHandler
- */
 export class EventHandler {
     static init(client: Client) {
         client.on(Events.ClientReady, async () => this.onReady(client));

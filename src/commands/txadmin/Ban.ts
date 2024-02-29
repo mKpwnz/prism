@@ -3,11 +3,12 @@ import { Command } from '@class/Command';
 import TxAdminClient from '@clients/TxAdminClient';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
+import TxAdminError from '@error/TxAdmin/TxAdminError';
+import LogManager from '@manager/LogManager';
 import { PlayerService } from '@services/PlayerService';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { mapDurationToTxAdminFormat } from '@utils/TxAdminHelper';
 
-export class TxAdminBan extends Command {
+export class Ban extends Command {
     constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
@@ -30,32 +31,28 @@ export class TxAdminBan extends Command {
         ];
         RegisterCommand(
             new SlashCommandBuilder()
-                .setName('txadminban')
+                .setName('ban')
                 .setDescription('Banne einen Spieler über TxAdmin')
                 .addStringOption((option) =>
                     option
-                        .setName('identifier')
-                        .setDescription('Identifier des Spielers')
+                        .setName('steamid')
+                        .setDescription('SteamID des Spielers')
                         .setRequired(true),
                 )
                 .addStringOption((option) =>
                     option
-                        .setName('unit')
+                        .setName('dauer')
                         .setDescription('Einheit der Bandauer')
                         .setRequired(true)
                         .addChoices(
+                            { name: '2 Stunden', value: '2 hours' },
+                            { name: '8 Stunden', value: '8 hours' },
+                            { name: '1 Tag', value: '1 day' },
+                            { name: '2 Tage', value: '2 days' },
+                            { name: '1 Woche', value: '1 week' },
+                            { name: '2 Wochen', value: '2 weeks' },
                             { name: 'Permanent', value: 'permanent' },
-                            { name: 'Stunden', value: 'hours' },
-                            { name: 'Tage', value: 'days' },
-                            { name: 'Wochen', value: 'weeks' },
-                            { name: 'Monate', value: 'months' },
                         ),
-                )
-                .addNumberOption((option) =>
-                    option
-                        .setName('duration')
-                        .setDescription('Dauer des Bans (optional bei Permanent)')
-                        .setRequired(false),
                 )
                 .addStringOption((option) =>
                     option.setName('reason').setDescription('Grund des Bans').setRequired(false),
@@ -65,26 +62,12 @@ export class TxAdminBan extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const identifier = interaction.options.getString('identifier', true);
-        const unit = interaction.options.getString('unit', true);
-        const duration = interaction.options.getNumber('duration', false);
+        const steamid = interaction.options.getString('steamid', true);
+        const duration = interaction.options.getString('dauer', true);
         const reason =
             interaction.options.getString('reason', false) ?? 'Prism: Kein Grund angegeben';
 
-        const txAdminDuration = mapDurationToTxAdminFormat(duration, unit);
-
-        if (!txAdminDuration) {
-            await this.replyWithEmbed({
-                title: 'TxAdmin Ban',
-                description: `Bitte gib eine Dauer für den Ban an, oder banne den Spieler Permanent!`,
-                ephemeral: true,
-            });
-            return;
-        }
-
-        const txAdminClient = await TxAdminClient.getInstance();
-
-        const player = await PlayerService.validatePlayer(identifier);
+        const player = await PlayerService.validatePlayer(steamid);
 
         if (!player) {
             await this.replyWithEmbed({
@@ -95,11 +78,17 @@ export class TxAdminBan extends Command {
             return;
         }
 
-        await txAdminClient.playerBan(player, reason, txAdminDuration);
+        const ban = await TxAdminClient.playerBan(player, reason, duration);
+        const history = await TxAdminClient.getPlayerInfo(player);
+        LogManager.debug(history);
+        if (ban instanceof TxAdminError) {
+            await this.replyError(`Fehler beim Bannen des Spielers: \`${ban.message}\``);
+            return;
+        }
 
         await this.replyWithEmbed({
             title: 'TxAdmin Ban',
-            description: `Spieler erfolgreich gebannt!\n\n **Identifier:** \`${identifier}\`\n **Dauer:** \`${duration}\`\n **Grund:** \`${reason}\`\n`,
+            description: `Spieler erfolgreich gebannt!\n\n **Identifier:** \`${steamid}\`\n **Dauer:** \`${duration}\`\n **Grund:** \`${reason}\`\n **ActionID:** \`${ban}\``,
         });
     }
 }

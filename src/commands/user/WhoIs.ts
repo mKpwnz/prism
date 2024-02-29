@@ -114,8 +114,6 @@ export class WhoIs extends Command {
             return;
         }
 
-        await interaction.deferReply();
-
         profiler.addStep('Get Global Bans');
         for (let i = pageSize * (page - 1); i < findUsers.length; i++) {
             // Pagination

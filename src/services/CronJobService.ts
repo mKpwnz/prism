@@ -1,13 +1,14 @@
+import Config from '@Config';
+import TxAdminClient from '@clients/TxAdminClient';
+import { EEmbedColors } from '@enums/EmbedColors';
+import TxAdminError from '@error/TxAdmin/TxAdminError';
 import { ISocietyFinanceResponse } from '@interfaces/ISocietyFinanceResponse';
-import { BotDB, GameDB } from '@sql/Database';
 import LogManager from '@manager/LogManager';
 import { PhonePhotosService } from '@services/PhonePhotosService';
 import { PhoneService } from '@services/PhoneService';
-import TxAdminClient from '@clients/TxAdminClient';
-import Config from '@Config';
+import { BotDB, GameDB } from '@sql/Database';
 import { IPhoneOwnerResponse } from '@sql/schema/Phone.schema';
 import { getEmbedBase, sendToChannel } from '@utils/DiscordHelper';
-import { EEmbedColors } from '@enums/EmbedColors';
 import { PlayerService } from './PlayerService';
 
 export class CronJobService {
@@ -49,7 +50,7 @@ export class CronJobService {
     }
 
     public static async txAdminAuthenticate() {
-        await (await TxAdminClient.getInstance()).authenticate();
+        await TxAdminClient.authenticate();
         LogManager.log('CronJobs: txAdminAuthenticate() done.');
     }
 
@@ -82,8 +83,6 @@ export class CronJobService {
             return;
         }
 
-        const txAdminClient = await TxAdminClient.getInstance();
-
         await phoneOwners.reduce(async (previousWork, owner) => {
             await previousWork;
 
@@ -102,18 +101,19 @@ export class CronJobService {
                 color: EEmbedColors.SUCCESS,
             });
 
-            try {
-                await txAdminClient.playerBan(
-                    player,
-                    'Bug Abuse (Custom Image Upload)',
-                    'permanent',
-                );
+            const ban = await TxAdminClient.playerBan(
+                player,
+                'Bug Abuse (Custom Image Upload)',
+                'permanent',
+            );
 
-                await sendToChannel(embed, Config.Channels.PROD.S1_CUSTOM_IMAGE_BANLIST);
-                await sendToChannel(embed, Config.Channels.PROD.S1_NVHX_BANS);
-            } catch (error) {
-                LogManager.error(error);
+            if (ban instanceof TxAdminError) {
+                LogManager.error(`Fehler beim Bannen des Spielers: \`${ban.message}\``);
+                return;
             }
+
+            await sendToChannel(embed, Config.Channels.PROD.S1_CUSTOM_IMAGE_BANLIST);
+            await sendToChannel(embed, Config.Channels.PROD.S1_NVHX_BANS);
         }, Promise.resolve());
     }
 }
