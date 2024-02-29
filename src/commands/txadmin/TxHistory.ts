@@ -66,7 +66,7 @@ export class TxHistory extends Command {
         }
 
         const pages = paginateApiResponse(
-            playerInfo.player.actionHistory,
+            playerInfo.player.actionHistory.reverse(),
             (res) => {
                 const lines = [];
                 const exp = res.exp ? new Date(res.exp * 1000).toLocaleString('de-DE') : 'N/A';
