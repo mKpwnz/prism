@@ -1,10 +1,10 @@
+import Config from '@Config';
 import { Command } from '@class/Command';
 import { RconClient } from '@class/RconClient';
 import { RegisterCommand } from '@commands/CommandHandler';
-import { ItemService } from '@services/ItemService';
 import { EENV } from '@enums/EENV';
-import Config from '@Config';
-import { Helper } from '@utils/Helper';
+import { ItemService } from '@services/ItemService';
+import { validateWeaponName } from '@utils/FiveMHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class Give extends Command {
@@ -106,7 +106,7 @@ export class Give extends Command {
         if (munition > 300) {
             munition = 300;
         }
-        const validateWeapon = Helper.validateWeaponName(waffe);
+        const validateWeapon = validateWeaponName(waffe);
         if (!validateWeapon) {
             await this.replyError('Waffe nicht gefunden!');
             return;

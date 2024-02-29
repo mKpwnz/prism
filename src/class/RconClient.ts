@@ -1,5 +1,5 @@
 import Config from '@Config';
-import LogManager from '@utils/Logger';
+import LogManager from '@manager/LogManager';
 import { createSocket, RemoteInfo, Socket } from 'dgram';
 
 // @TODO: Refactor this class

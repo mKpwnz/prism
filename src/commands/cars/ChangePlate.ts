@@ -4,7 +4,7 @@ import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { VehicleService } from '@services/VehicleService';
-import { Helper } from '@utils/Helper';
+import { formatNumberplate } from '@utils/FiveMHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class ChangePlate extends Command {
@@ -54,14 +54,14 @@ export class ChangePlate extends Command {
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const oldplate = interaction.options.getString('oldplate', true);
         const newplate = interaction.options.getString('newplate', true);
-        await interaction.deferReply();
+        
         const result = await VehicleService.changeVehiclePlate(oldplate, newplate);
         if (result instanceof Error) {
             await this.replyError(result.message);
             return;
         }
         await this.replyWithEmbed({
-            description: `Das Fahrzeugs mit dem Kennzeichen **${oldplate}** hat nun das Kennzeichen **${Helper.formatNumberplate(
+            description: `Das Fahrzeugs mit dem Kennzeichen **${oldplate}** hat nun das Kennzeichen **${formatNumberplate(
                 newplate,
             )}**.`,
             color: EEmbedColors.SUCCESS,

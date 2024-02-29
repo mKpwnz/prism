@@ -6,9 +6,10 @@ import Config from '@Config';
 import { GameDB } from '@sql/Database';
 import { IBilling } from '@sql/schema/Billing.schema';
 import { IJob } from '@sql/schema/Job.schema';
-import LogManager from '@utils/Logger';
+import LogManager from '@manager/LogManager';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
+import { sendToChannel } from '@utils/DiscordHelper';
 
 export class Rechnung extends Command {
     constructor() {
@@ -291,10 +292,8 @@ export class Rechnung extends Command {
             title: 'Rechnung bezahlen',
             description: `Die Rechnung #${rechnungsnummer} wurde erfolgreich durch den Support bezahlt!`,
         });
-        const channel = await interaction.guild?.channels.fetch(
-            Config.Channels.PROD.S1_IMMO_BILLING,
-        );
-        if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] });
+
+        await sendToChannel(embed, Config.Channels.PROD.S1_IMMO_BILLING);
         await interaction.reply({ embeds: [embed] });
     }
 
@@ -331,10 +330,7 @@ export class Rechnung extends Command {
             title: 'Rechnung löschen',
             description: `Die Rechnung #${rechnungsnummer} wurde erfolgreich durch den Support gelöscht!`,
         });
-        const channel = await interaction.guild?.channels.fetch(
-            Config.Channels.PROD.S1_IMMO_BILLING,
-        );
-        if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] });
+        await sendToChannel(embed, Config.Channels.PROD.S1_IMMO_BILLING);
         await interaction.reply({ embeds: [embed] });
     }
 
@@ -405,10 +401,7 @@ export class Rechnung extends Command {
             description: ' ',
             fields: [field],
         });
-        const channel = await interaction.guild?.channels.fetch(
-            Config.Channels.PROD.S1_IMMO_BILLING,
-        );
-        if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] });
+        await sendToChannel(embed, Config.Channels.PROD.S1_IMMO_BILLING);
         await interaction.reply({ embeds: [embed] });
     }
 }

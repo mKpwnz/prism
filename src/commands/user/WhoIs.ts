@@ -10,7 +10,7 @@ import { PlayerService } from '@services/PlayerService';
 import { BotDB, GameDB } from '@sql/Database';
 import { IFindUser } from '@sql/schema/User.schema';
 import { Helper } from '@utils/Helper';
-import LogManager from '@utils/Logger';
+import LogManager from '@manager/LogManager';
 import {
     AttachmentBuilder,
     ChatInputCommandInteraction,
@@ -113,8 +113,6 @@ export class WhoIs extends Command {
             });
             return;
         }
-
-        await interaction.deferReply();
 
         profiler.addStep('Get Global Bans');
         for (let i = pageSize * (page - 1); i < findUsers.length; i++) {

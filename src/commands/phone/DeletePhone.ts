@@ -18,7 +18,7 @@ import {
     IPhoneTwitterAccounts,
     IPhoneTwitterTweets,
 } from '@sql/schema/Phone.schema';
-import LogManager from '@utils/Logger';
+import LogManager from '@manager/LogManager';
 import { AttachmentBuilder, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { readFileSync, writeFileSync } from 'fs';
 

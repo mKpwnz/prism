@@ -1,13 +1,13 @@
-import LogManager from '@utils/Logger';
+import LogManager from '@manager/LogManager';
 import cors from 'cors';
 import errorhandler from 'errorhandler';
 import express, { Express } from 'express';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
-import handleError from './middleware/ErrorHandler';
-import v1Router from './router/api/v1/Router';
 import Config from '@Config';
 import * as bodyParser from 'body-parser';
+import handleError from './middleware/ErrorHandler';
+import v1Router from './router/api/v1/Router';
 
 export class ExpressApp {
     public app: Express = express();

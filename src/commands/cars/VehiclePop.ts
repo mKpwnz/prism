@@ -5,7 +5,8 @@ import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { GameDB } from '@sql/Database';
 import { IVehicle } from '@sql/schema/Vehicle.schema';
-import { Helper } from '@utils/Helper';
+import { attachmentFromObject } from '@utils/DiscordHelper';
+import { generateOAAThash } from '@utils/FiveMHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class VehiclePop extends Command {
@@ -52,8 +53,7 @@ export class VehiclePop extends Command {
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const spawnname = interaction.options.getString('spawnname', true);
         const noexport = interaction.options.getBoolean('noexport') ?? false;
-        const hash = Helper.generateOAAThash(spawnname);
-        await interaction.deferReply();
+        const hash = generateOAAThash(spawnname);
 
         const [vehicles] = await GameDB.query<IVehicle[]>(
             `SELECT * FROM owned_vehicles WHERE JSON_EXTRACT(vehicle, '$.modelName') = ? OR JSON_EXTRACT(vehicle, '$.model') = ?`,
@@ -83,7 +83,7 @@ export class VehiclePop extends Command {
                     modSuspension: vehData.modSuspension,
                 });
             }
-            attachments.push(Helper.attachmentFromObject(reponseList, 'VehiclePopBackup'));
+            attachments.push(attachmentFromObject(reponseList, 'VehiclePopBackup'));
         }
 
         await this.replyWithEmbed({

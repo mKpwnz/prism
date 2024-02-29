@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import LogManager from '@utils/Logger';
+import LogManager from '@manager/LogManager';
 import { CustomError } from '@web/CustomError';
 import { NextFunction, Request, Response } from 'express';
 

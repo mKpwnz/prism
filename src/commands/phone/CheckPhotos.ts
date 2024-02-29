@@ -70,8 +70,6 @@ export class CheckPhotos extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        await interaction.deferReply();
-
         const date: Date = new Date();
         const year: number = interaction.options.getNumber('year') ?? date.getFullYear();
         const month: number = interaction.options.getNumber('month') ?? date.getMonth() + 1;

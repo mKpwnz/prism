@@ -1,5 +1,5 @@
-import { Cache } from '@utils/Cache';
-import LogManager from '@utils/Logger';
+import { Cache } from '@class/Cache';
+import LogManager from '@manager/LogManager';
 import axios from 'axios';
 
 /**

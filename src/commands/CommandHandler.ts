@@ -8,7 +8,7 @@ import {
     VehiclePop,
 } from '@commands/cars';
 import { EENV } from '@enums/EENV';
-import LogManager from '@utils/Logger';
+import LogManager from '@manager/LogManager';
 import {
     Client,
     Interaction,
@@ -19,16 +19,8 @@ import { RestartDropbox, ValidateTrunk } from './cars';
 import { ChangeHouseOwner, GetHouse, SchufaCheck } from './housing';
 import { Nvhx, NvhxBan } from './nvhx';
 import { CheckImageOwner, CheckPhotos, Darkchat, DeletePhone } from './phone';
-import {
-    BotStats,
-    CachePerformance,
-    Help,
-    Issue,
-    Ping,
-    SysInfo,
-    TestCommand,
-    Wahl,
-} from './system';
+import { BotStats, Help, Issue, Ping, SysInfo, TestCommand, Wahl } from './system';
+import { Tebex } from './tebex';
 import {
     ChangeBirthday,
     Fraksperre,
@@ -46,7 +38,7 @@ import {
     TeamNote,
     WhoIs,
 } from './user';
-import { Tebex } from './tebex';
+import { Ban, TxHistory, TxInfo, Whitelist } from './txadmin';
 
 export class CommandHandler {
     static commands: {
@@ -125,11 +117,14 @@ export class CommandHandler {
         // new Versicherung()
         new SysInfo();
         new BotStats();
-        new CachePerformance();
 
         new Issue(client);
 
         new TestCommand();
+        new Ban();
+        new TxInfo();
+        new TxHistory();
+        new Whitelist();
         LogManager.info('CommandManager: All commands initialized!');
         // LogManager.info('Commands [PROD]:', CommandHandler.prodCommands);
         // LogManager.info('Commands [DEV]:', CommandHandler.devCommands);

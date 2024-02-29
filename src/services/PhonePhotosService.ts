@@ -1,6 +1,6 @@
 import Config from '@Config';
 import { GameDB } from '@sql/Database';
-import LogManager from '@utils/Logger';
+import LogManager from '@manager/LogManager';
 import { ChatInputCommandInteraction } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
 import {

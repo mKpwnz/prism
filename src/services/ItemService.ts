@@ -1,6 +1,6 @@
 import { GameDB } from '@sql/Database';
 import { IItem } from '@sql/schema/Item.schema';
-import { Cache } from '@utils/Cache';
+import { Cache } from '@class/Cache';
 
 /**
  * @description Service für Items.

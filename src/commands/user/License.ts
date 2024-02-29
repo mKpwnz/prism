@@ -9,7 +9,7 @@ import Config from '@Config';
 import { GameDB } from '@sql/Database';
 import { IUserLicense } from '@sql/schema/UserLicense.schema';
 import { Helper } from '@utils/Helper';
-import LogManager from '@utils/Logger';
+import LogManager from '@manager/LogManager';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
 

@@ -4,7 +4,7 @@ import { EUniqueIdentifier } from '@enums/ESearchType';
 import Config from '@Config';
 import { GameDB } from '@sql/Database';
 import { Helper } from '@utils/Helper';
-import LogManager from '@utils/Logger';
+import LogManager from '@manager/LogManager';
 import axios from 'axios';
 import {
     ActionRowBuilder,
@@ -20,7 +20,6 @@ import {
     TextInputBuilder,
     TextInputStyle,
 } from 'discord.js';
-import { EENV } from '@enums/EENV';
 
 export class CustomImageUpload {
     private client: Client | null;

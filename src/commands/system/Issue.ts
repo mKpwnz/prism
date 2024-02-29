@@ -4,7 +4,7 @@ import { GitlabClient } from '@clients/GitlabClient';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
-import LogManager from '@utils/Logger';
+import LogManager from '@manager/LogManager';
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -20,6 +20,7 @@ import {
     TextInputBuilder,
     TextInputStyle,
 } from 'discord.js';
+import { getEmbedBase } from '@utils/DiscordHelper';
 
 export class Issue extends Command {
     private allowedManagementGroups = [
@@ -104,7 +105,7 @@ export class Issue extends Command {
             const description = interaction.fields.getTextInputValue('issueDescription');
             const attachments = interaction.fields.getTextInputValue('issueAttachments') ?? 'Keine';
 
-            const embed = Command.getEmbedBase({
+            const embed = getEmbedBase({
                 title: 'TODO Eintrag (warte auf Freigabe)',
                 description: ` `,
                 fields: [
@@ -197,7 +198,7 @@ export class Issue extends Command {
             const description = interaction.fields.getTextInputValue('issueDescription');
             const attachments = interaction.fields.getTextInputValue('issueAttachments') ?? 'Keine';
             const oldEmbed = interaction.message.embeds[0];
-            const embed = Command.getEmbedBase({
+            const embed = getEmbedBase({
                 title: 'TODO Eintrag (warte auf Freigabe)',
                 description: ` `,
                 fields: [
@@ -244,8 +245,8 @@ export class Issue extends Command {
 
         const embed = message.embeds[0];
         const userRoleCache = message.guild?.members.cache.get(user.id);
-        const userHasManagementRole = this.allowedManagementGroups.some(
-            (roleID) => userRoleCache?.roles.cache.has(roleID),
+        const userHasManagementRole = this.allowedManagementGroups.some((roleID) =>
+            userRoleCache?.roles.cache.has(roleID),
         );
         const authorID = embed.author?.name.split(' ').at(-1);
         if (!userHasManagementRole && authorID !== user.id) {
@@ -383,7 +384,7 @@ export class Issue extends Command {
                             value: `[Issue #${response.iid}](${response.web_url})`,
                         });
                     }
-                    const embed = Command.getEmbedBase({
+                    const embed = getEmbedBase({
                         title: 'TODO Eintrag (Freigegeben)',
                         description: ' ',
                         fields,
@@ -400,7 +401,7 @@ export class Issue extends Command {
                     await message.channel.send('Es ist ein Fehler aufgetreten.');
                 });
         } else {
-            const embed = Command.getEmbedBase({
+            const embed = getEmbedBase({
                 title: 'TODO Eintrag (Abgelehnt)',
                 description: ' ',
                 fields,

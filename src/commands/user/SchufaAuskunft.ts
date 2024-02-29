@@ -4,7 +4,7 @@ import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { UserService } from '@services/UserService';
 import { ISchufaUser } from '@sql/schema/User.schema';
-import { Helper } from '@utils/Helper';
+import { attachmentFromObject } from '@utils/DiscordHelper';
 import { AttachmentBuilder, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class SchufaAuskunft extends Command {
@@ -53,7 +53,7 @@ export class SchufaAuskunft extends Command {
         const pages = this.splitApiResponse(schufaUsers, 2000);
 
         if (jsonexport) {
-            attachments.push(Helper.attachmentFromObject(schufaUsers, 'schufaUsers'));
+            attachments.push(attachmentFromObject(schufaUsers, 'schufaUsers'));
         }
 
         await this.replyWithEmbed({
