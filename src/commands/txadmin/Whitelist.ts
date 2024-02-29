@@ -154,7 +154,7 @@ export class Whitelist extends Command {
 
         await this.replyWithEmbed({
             title: 'TxAdmin Whitelist',
-            description: status
+            description: status === 'approve'
                 ? 'Whitelist erfolgreich freigegeben'
                 : 'Whitelist erfolgreich abgelehnt',
             color: status ? EEmbedColors.SUCCESS : EEmbedColors.ALERT,
