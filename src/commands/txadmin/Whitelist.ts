@@ -11,6 +11,8 @@ export class Whitelist extends Command {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [
+            Config.Channels.PROD.PRISM_BOT,
+            Config.Channels.PROD.PRISM_HIGHTEAM,
             Config.Channels.PROD.TEAM_WHITELIST_REQUEST,
 
             Config.Channels.PROD.PRISM_TESTING,
