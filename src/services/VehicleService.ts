@@ -1,31 +1,22 @@
 import { RconClient } from '@class/RconClient';
 import GameserverClient from '@clients/GameserverClient';
 import { TFiveMVehicleType } from '@interfaces/IFiveM';
-import { GameDB } from '@sql/Database';
 import { IVehicle } from '@sql/schema/Vehicle.schema';
-import { formatNumberplate } from '@utils/FiveMHelper';
-import { ResultSetHeader } from 'mysql2';
+import { formatNumberplate, generateOAAThash, validateNumberplate } from '@utils/FiveMHelper';
+import { VehicleRepository } from '@repositories/VehicleRepository';
+import { IValidatedPlayer } from '@interfaces/IValidatedPlayer';
 
 export class VehicleService {
-    // @TODO Is a Vehicle truly unique to a plate?
-    public static async getVehicleByNumberplate(
-        numberplate: string,
-    ): Promise<IVehicle | undefined> {
-        const [vehicles] = await GameDB.query<IVehicle[]>(
-            `SELECT * FROM owned_vehicles WHERE plate = ?`,
-            [formatNumberplate(numberplate)],
-        );
+    public static async getVehicleOrErrorByPlate(plate: string): Promise<IVehicle | Error> {
+        const formattedPlate = formatNumberplate(plate);
+        const vehicle = await VehicleRepository.getVehicleByNumberplate(formattedPlate);
+        if (!vehicle) {
+            return new Error(
+                `Es konnte kein Fahrzeug mit dem Kennzeichen ${plate} gefunden werden.`,
+            );
+        }
 
-        return vehicles[0];
-    }
-
-    public static async getNewestVehicleByOwner(identifier: string): Promise<IVehicle | undefined> {
-        const [vehicles] = await GameDB.query<IVehicle[]>(
-            `SELECT * FROM owned_vehicles WHERE owner = ? ORDER BY inserted DESC LIMIT 1`,
-            [identifier],
-        );
-
-        return vehicles[0];
+        return vehicle;
     }
 
     public static async transferVehicle(
@@ -33,7 +24,14 @@ export class VehicleService {
         type: TFiveMVehicleType,
         newlocation: number,
     ): Promise<boolean | Error> {
-        const vehicle = await VehicleService.getVehicleByNumberplate(plate);
+        const vehicle = await VehicleService.getVehicleOrErrorByPlate(plate);
+        if (vehicle instanceof Error) return vehicle;
+        if (vehicle.garage === newlocation) {
+            return new Error(
+                `Das Fahrzeug mit dem Kennzeichen **${plate}** ist bereits in der Garage **${newlocation}** geparkt.`,
+            );
+        }
+
         const garages = await GameserverClient.getAllGarages();
         if (garages instanceof Error) {
             return new Error(garages.message);
@@ -42,23 +40,14 @@ export class VehicleService {
         if (!garage) {
             return new Error(`Es wurde keine Garage mit der ID ${newlocation} gefunden.`);
         }
-        if (!vehicle) {
-            return new Error(`Es wurden keine Fahrzeuge mit dem Kennzeichen ${plate} gefunden.`);
-        }
-        if (vehicle.garage === newlocation) {
-            return new Error(
-                `Das Fahrzeug mit dem Kennzeichen **${plate}** ist bereits in der Garage **${newlocation}** geparkt.`,
-            );
-        }
-        const [res] = await GameDB.execute<ResultSetHeader>(
-            `UPDATE owned_vehicles SET garage = ?, type = ? WHERE plate = ?`,
-            [newlocation, type, vehicle.plate],
+
+        const result = await VehicleRepository.updateVehicleGarage(
+            newlocation,
+            type,
+            vehicle.plate,
         );
-        if (res.affectedRows === 0) {
-            return new Error(
-                `Es ist ein Fehler aufgetreten. Das Fahrzeug mit dem Kennzeichen ${plate} konnte nicht bearbeitet werden.`,
-            );
-        }
+        if (result instanceof Error) return result;
+
         await RconClient.sendCommand(`unloadtrunk ${plate}`);
         await RconClient.sendCommand(`debugtrunk ${plate}`);
         return true;
@@ -68,47 +57,103 @@ export class VehicleService {
         oldplate: string,
         newplate: string,
     ): Promise<boolean | Error> {
-        if (oldplate.length > 8) {
-            return new Error(
-                `Das Kennzeichen **${oldplate}** ist zu lang. \nDas Kennzeichen darf maximal 8 Zeichen lang sein.`,
-            );
-        }
-        if (newplate.length > 8) {
-            return new Error(
-                `Das Kennzeichen **${newplate}** ist zu lang. \nDas Kennzeichen darf maximal 8 Zeichen lang sein.`,
-            );
-        }
-        if (!newplate.toUpperCase().match(/^[A-Z0-9 ]*$/g)) {
-            return new Error(
-                `Das Kennzeichen **${newplate}** enthält ungültige Zeichen. \nDas Kennzeichen darf nur aus Buchstaben und Zahlen bestehen.`,
-            );
-        }
-        const newplatefmt = formatNumberplate(newplate);
-        const vehicle = await VehicleService.getVehicleByNumberplate(oldplate);
-        if (!vehicle) {
-            return new Error(`Es wurden keine Fahrzeuge mit dem Kennzeichen ${oldplate} gefunden.`);
-        }
+        const oldplateValid = validateNumberplate(oldplate);
+        if (oldplateValid instanceof Error) return oldplateValid;
+
+        const newplateValid = validateNumberplate(newplate);
+        if (newplateValid instanceof Error) return newplateValid;
+
+        const vehicle = await VehicleService.getVehicleOrErrorByPlate(oldplate);
+        if (vehicle instanceof Error) return vehicle;
         if (vehicle.garage < 0) {
             return new Error(
                 `Das Fahrzeug mit dem Kennzeichen **${oldplate}** ist nicht in einer Garage geparkt und kann daher nicht bearbeitet werden.`,
             );
         }
-        const newplatevehicle = await VehicleService.getVehicleByNumberplate(newplate);
+
+        const newplatevehicle = await VehicleRepository.getVehicleByNumberplate(newplate);
         if (newplatevehicle) {
             return new Error(`Es existiert bereits ein Fahrzeug mit dem Kennzeichen ${newplate}.`);
         }
-        const [res] = await GameDB.execute<ResultSetHeader>(
-            `UPDATE owned_vehicles SET plate = ?, vehicle = JSON_SET(vehicle, '$.plate', ?) WHERE plate = ?`,
-            [newplatefmt, newplatefmt, vehicle.plate],
-        );
 
-        if (res.affectedRows === 0) {
-            return new Error(
-                `Es ist ein Fehler aufgetreten. Des Fahrzeug mit dem Kennzeichen ${oldplate} konnte nicht bearbeitet werden.`,
-            );
-        }
+        const newplatefmt = formatNumberplate(newplate);
+        const plateUpdated = await VehicleRepository.updateVehiclePlate(oldplate, newplatefmt);
+        if (plateUpdated instanceof Error) return plateUpdated;
+
         await RconClient.sendCommand(`unloadtrunk ${oldplate}`);
         await RconClient.sendCommand(`debugtrunk ${oldplate}`);
         return true;
+    }
+
+    public static async deleteTrunk(plate: string): Promise<IVehicle | Error> {
+        const plateValid = validateNumberplate(plate);
+        if (plateValid instanceof Error) return plateValid;
+
+        const vehicle = await VehicleService.getVehicleOrErrorByPlate(plate);
+        if (vehicle instanceof Error) return vehicle;
+
+        const deleted = await VehicleRepository.deleteTrunk(vehicle.plate);
+        if (deleted instanceof Error) return deleted;
+
+        await RconClient.sendCommand(`debugtrunk ${plate}`);
+
+        return vehicle;
+    }
+
+    public static async deleteVehicle(plate: string): Promise<IVehicle | Error> {
+        const plateValid = validateNumberplate(plate);
+        if (plateValid instanceof Error) return plateValid;
+
+        const vehicle = await VehicleService.getVehicleOrErrorByPlate(plate);
+        if (vehicle instanceof Error) return vehicle;
+
+        const deleted = await VehicleRepository.deleteVehicle(vehicle.plate);
+        if (deleted instanceof Error) return deleted;
+
+        return vehicle;
+    }
+
+    public static async getVehiclesBySpawnName(spawnname: string): Promise<IVehicle[] | Error> {
+        return VehicleRepository.getVehiclesBySpawnName(spawnname, generateOAAThash(spawnname));
+    }
+
+    public static async createVehicle(
+        player: IValidatedPlayer,
+        vehicleName: string,
+        plate: string | null,
+    ): Promise<string | Error> {
+        let formattedPlate: string | undefined;
+        if (plate) {
+            const plateValid = validateNumberplate(plate);
+            if (plateValid instanceof Error) {
+                return new Error(plateValid.message);
+            }
+
+            formattedPlate = formatNumberplate(plate);
+            if (!formattedPlate) {
+                return new Error(`Das Kennzeichen \`${plate}\` ist ungültig.`);
+            }
+
+            const vehicle = await VehicleRepository.getVehicleByNumberplate(formattedPlate);
+            if (vehicle) {
+                return new Error(`Es gibt das Kennzeichen \`${formattedPlate}\` schon.`);
+            }
+        }
+
+        await RconClient.sendCommand(
+            `givecardiscord ${player.identifiers.steam} ${vehicleName} ${formattedPlate ?? 'random'}`,
+        );
+
+        const car = await VehicleRepository.getNewestVehicleByOwner(player.identifiers.steam);
+        if (!car) {
+            return new Error(`Das Fahrzeug konnte nicht erstellt werden.`);
+        }
+
+        const inserted = new Date(car.inserted);
+        if (inserted < new Date(Date.now() - 1000 * 60)) {
+            return new Error(`Das Fahrzeug konnte nicht erstellt werden.`);
+        }
+
+        return `Das Fahrzeug wurde erstellt und hat das Kennzeichen \`${car.plate}\`.`;
     }
 }

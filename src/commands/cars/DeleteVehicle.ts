@@ -4,9 +4,8 @@ import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { VehicleService } from '@services/VehicleService';
-import { GameDB } from '@sql/Database';
-import { AttachmentBuilder, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { ResultSetHeader } from 'mysql2';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { attachmentFromObject } from '@utils/DiscordHelper';
 
 export class DeleteVehicle extends Command {
     constructor() {
@@ -42,38 +41,17 @@ export class DeleteVehicle extends Command {
         );
     }
 
-    // @TODO: Rewrite to Service structure
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const plate = interaction.options.getString('plate', true);
 
-        if (plate.length > 8) {
-            await this.replyError(
-                `Das Kennzeichen **${plate}** ist zu lang. \nDas Kennzeichen darf maximal 8 Zeichen lang sein.`,
-            );
+        const vehicle = await VehicleService.deleteVehicle(plate);
+        if (vehicle instanceof Error) {
+            await this.replyError(vehicle.message);
             return;
         }
-        const vehicle = await VehicleService.getVehicleByNumberplate(plate);
-        if (!vehicle) {
-            await this.replyError(
-                `Es wurden keine Fahrzeuge mit dem Kennzeichen ${plate} gefunden.`,
-            );
-            return;
-        }
-        const jsonString = JSON.stringify(vehicle, null, 4);
-        const buffer = Buffer.from(jsonString, 'utf-8');
-        const attachment = new AttachmentBuilder(buffer, {
-            name: `PRISM_DeleteVehicleBackup_${plate}_${new Date().toLocaleString('de-DE')}.json`,
-        });
-        const [res] = await GameDB.execute<ResultSetHeader>(
-            `DELETE FROM owned_vehicles WHERE plate = ?`,
-            [vehicle.plate],
-        );
-        if (res.affectedRows === 0) {
-            await this.replyError(
-                `Es ist ein Fehler aufgetreten. Des Fahrzeug mit dem Kennzeichen ${plate} konnte nicht gelöscht werden.`,
-            );
-            return;
-        }
+
+        const attachment = attachmentFromObject(vehicle, `DeleteVehicleBackup_${plate}`);
+
         await this.replyWithEmbed({
             description: `Das Fahrzeugs mit dem Kennzeichen **${plate}** wurde erfolgreich gelöscht.`,
             color: EEmbedColors.SUCCESS,

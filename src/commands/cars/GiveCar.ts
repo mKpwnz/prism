@@ -1,12 +1,10 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
-import { RconClient } from '@class/RconClient';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { PlayerService } from '@services/PlayerService';
 import { VehicleService } from '@services/VehicleService';
-import { formatNumberplate } from '@utils/FiveMHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class GiveCar extends Command {
@@ -62,55 +60,14 @@ export class GiveCar extends Command {
             return;
         }
 
-        if (plate) {
-            const formattedPlate = formatNumberplate(plate);
-
-            if (!formattedPlate) {
-                await this.replyError(`Das Kennzeichen \`${plate}\` ist ungültig.`);
-                return;
-            }
-            const vehicle = await VehicleService.getVehicleByNumberplate(formattedPlate);
-            if (vehicle) {
-                await this.replyError(`Es gibt das Kennzeichen \`${formattedPlate}\` schon.`);
-                return;
-            }
-
-            let result = await RconClient.sendCommand(
-                `givecardiscord ${vPlayer.identifiers.steam} ${vehicleName} ${formattedPlate}`,
-            );
-
-            const car = await VehicleService.getNewestVehicleByOwner(vPlayer.identifiers.steam);
-            if (car != null) {
-                result = `\n\nDas Fahrzeug hat das Kennzeichen \`${car.plate}\``;
-            }
-            await this.replyWithEmbed({
-                description: result,
-                color: EEmbedColors.SUCCESS,
-            });
-        } else {
-            await RconClient.sendCommand(
-                `givecardiscord ${vPlayer.identifiers.steam} ${vehicleName} random`,
-            );
-            let result: string;
-
-            const car = await VehicleService.getNewestVehicleByOwner(vPlayer.identifiers.steam);
-            if (car != null) {
-                const inserted = new Date(car.inserted);
-                if (inserted > new Date(Date.now() - 1000 * 60)) {
-                    result = `Das Fahrzeug wurde erstellt und hat das Kennzeichen \`${car.plate}\`.`;
-                } else {
-                    await this.replyError(`Das Fahrzeug konnte nicht erstellt werden.`);
-                    return;
-                }
-            } else {
-                await this.replyError(`Das Fahrzeug konnte nicht erstellt werden.`);
-                return;
-            }
-
-            await this.replyWithEmbed({
-                description: result,
-                color: EEmbedColors.SUCCESS,
-            });
+        const result = await VehicleService.createVehicle(vPlayer, vehicleName, plate);
+        if (result instanceof Error) {
+            await this.replyError(result.message);
         }
+
+        await this.replyWithEmbed({
+            description: result as string,
+            color: EEmbedColors.SUCCESS,
+        });
     }
 }

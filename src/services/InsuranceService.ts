@@ -4,17 +4,34 @@ import { formatNumberplate } from '@utils/FiveMHelper';
 import { ResultSetHeader } from 'mysql2';
 
 export class InsuranceService {
-    public static async deleteVersicherungenByNumberplate(versicherung: IInsurance): Promise<void> {
-        await GameDB.query('DELETE FROM `versicherungen` WHERE `plate` = ?', [versicherung.plate]);
+    public static async deleteInsurance(versicherung: IInsurance): Promise<boolean | Error> {
+        const [res] = await GameDB.execute<ResultSetHeader>(
+            'DELETE FROM `versicherungen` WHERE `plate` = ?',
+            [versicherung.plate],
+        );
+
+        if (res.affectedRows === 0) {
+            return new Error(
+                `Es ist ein Fehler aufgetreten. Die Versicherung des Fahrzeug mit dem Kennzeichen ${versicherung.plate} konnte nicht gelöscht werden.`,
+            );
+        }
+        return true;
     }
 
-    public static async getInsuranceByNumberplate(plate: string): Promise<IInsurance[]> {
-        const [versicherungen] = await GameDB.query<IInsurance[]>(
+    public static async getInsuranceByNumberplate(plate: string): Promise<IInsurance[] | Error> {
+        const [insurances] = await GameDB.query<IInsurance[]>(
             'SELECT * FROM `versicherungen` WHERE `plate` = ?',
             [formatNumberplate(plate)],
         );
 
-        return versicherungen;
+        if (insurances.length !== 1) {
+            let message;
+            if (insurances.length === 0) message = `Keine Versicherung für ${plate} gefunden!`;
+            else message = `Es wurden ${insurances.length} Versicherungen für ${plate} gefunden!`;
+            return new Error(message);
+        }
+
+        return insurances;
     }
 
     public static async addInsurance(
