@@ -34,7 +34,7 @@ export class ChangePlate extends Command {
         initCommandOld(
             new SlashCommandBuilder()
                 .setName('changeplate')
-                .setDescription('Löscht das Fahrzeug')
+                .setDescription('Ändert das Kennzeichen des Fahrzeugs')
                 .addStringOption((option) =>
                     option
                         .setName('oldplate')
@@ -61,7 +61,7 @@ export class ChangePlate extends Command {
             return;
         }
         await this.replyWithEmbed({
-            description: `Das Fahrzeugs mit dem Kennzeichen **${oldplate}** hat nun das Kennzeichen **${formatNumberplate(
+            description: `Das Fahrzeug mit dem Kennzeichen **${oldplate}** hat nun das Kennzeichen **${formatNumberplate(
                 newplate,
             )}**.`,
             color: EEmbedColors.SUCCESS,

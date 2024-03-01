@@ -36,7 +36,7 @@ export class TransferVehicle extends Command {
                 .addStringOption((option) =>
                     option
                         .setName('plate')
-                        .setDescription('Kennezichen des Fahrzeugs')
+                        .setDescription('Kennzeichen des Fahrzeugs')
                         .setMaxLength(8)
                         .setRequired(true),
                 )
@@ -102,7 +102,7 @@ export class TransferVehicle extends Command {
             LogManager.error(garages.message);
             return;
         }
-        let filtered = garages;
+        let filtered;
         if (focusedValue.value) {
             filtered = garages.filter(
                 (choice) =>

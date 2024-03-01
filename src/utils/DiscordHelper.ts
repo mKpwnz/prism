@@ -90,6 +90,7 @@ export function attachmentFromJson(jsonInput: string, filename: string): Attachm
     });
 }
 
+// TODO use everywhere we build an attachment
 export function attachmentFromObject(objInput: any, filename: string): AttachmentBuilder {
     return attachmentFromJson(JSON.stringify(objInput, null, 4), filename);
 }

@@ -3,11 +3,9 @@ import { Command } from '@class/Command';
 import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
-import { GameDB } from '@sql/Database';
-import { IVehicle } from '@sql/schema/Vehicle.schema';
 import { attachmentFromObject } from '@utils/DiscordHelper';
-import { generateOAAThash } from '@utils/FiveMHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { VehicleService } from '@services/VehicleService';
 
 export class VehiclePop extends Command {
     constructor() {
@@ -49,23 +47,16 @@ export class VehiclePop extends Command {
         );
     }
 
-    // @TODO: Rewrite to Service structure
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const spawnname = interaction.options.getString('spawnname', true);
         const noexport = interaction.options.getBoolean('noexport') ?? false;
-        const hash = generateOAAThash(spawnname);
 
-        const [vehicles] = await GameDB.query<IVehicle[]>(
-            `SELECT * FROM owned_vehicles WHERE JSON_EXTRACT(vehicle, '$.modelName') = ? OR JSON_EXTRACT(vehicle, '$.model') = ?`,
-            [spawnname, hash],
-        );
-
-        if (!vehicles.length) {
-            await this.replyError(
-                `Es konnten keine Fahrzeuge mit dem Spawnname **${spawnname}** gefunden werden.`,
-            );
+        const vehicles = await VehicleService.getVehiclesBySpawnName(spawnname);
+        if (vehicles instanceof Error) {
+            await this.replyError(vehicles.message);
             return;
         }
+
         const attachments = [];
         if (!noexport) {
             const reponseList = [];
