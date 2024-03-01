@@ -1,5 +1,5 @@
 import Config from '@Config';
-import TxAdminError from '@error/TxAdmin/TxAdminError';
+import TxAdminError from '@error/TxAdmin.error';
 import {
     TxAdminApiResponse,
     TxAdminDatabaseWhitelistRequestsType,
@@ -194,3 +194,4 @@ class TxAdminClient {
 }
 
 export default TxAdminClient;
+

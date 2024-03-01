@@ -1,6 +1,6 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
@@ -29,7 +29,7 @@ export class Resetpos extends Command {
             Config.Groups.DEV.BOTTEST,
         ];
         this.IsBetaCommand = true;
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('resetpos')
                 .setDescription('Setze die Position eines Spielers zum Würfelpark zurück')

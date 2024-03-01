@@ -1,7 +1,7 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
 import { PerformanceProfiler } from '@class/PerformanceProfiler';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { ESearchType } from '@enums/ESearchType';
 import { EmoteManager } from '@manager/EmoteManager';
@@ -39,7 +39,7 @@ export class WhoIs extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('whois')
                 .setDescription('Suche nach Spielern')

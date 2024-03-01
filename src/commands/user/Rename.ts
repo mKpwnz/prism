@@ -1,6 +1,6 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { PlayerService } from '@services/PlayerService';
@@ -28,7 +28,7 @@ export class Rename extends Command {
             Config.Groups.DEV.BOTTEST,
         ];
         this.AllowedUsers = [Config.Users.L33V33N, Config.Users.ZMASTER, Config.Users.MANU];
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('rename')
                 .setDescription('Suche nach Spielern')

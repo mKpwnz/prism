@@ -1,7 +1,7 @@
 import { Config } from '@Config';
 import { DCEvent } from '@class/DCEvent';
 import { RconClient } from '@class/RconClient';
-import { CommandHandler } from '@commands/CommandHandler';
+import CommandManager from '@manager/CommandManager';
 import { EmoteManager } from '@manager/EmoteManager';
 import LogManager from '@manager/LogManager';
 import { Client, REST, Routes } from 'discord.js';
@@ -9,9 +9,11 @@ import { Client, REST, Routes } from 'discord.js';
 export class OnReady extends DCEvent {
     async process(client: Client) {
         const rest = new REST({ version: '9' }).setToken(Config.ENV.DISCORD_TOKEN);
-        CommandHandler.initAll(client);
+        CommandManager.loadCommands();
+        // CommandHandler.initAll(client);
+
         new RconClient();
-        const commandData = CommandHandler.commands.map((command) => command.scb.toJSON());
+        const commandData = CommandManager.getCommands().map((command) => command.scb.toJSON());
         Config.Bot.ServerID.forEach(async (id) => {
             try {
                 LogManager.info(`Registering commands on Server ${id}`);

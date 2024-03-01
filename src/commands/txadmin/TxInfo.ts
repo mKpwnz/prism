@@ -1,10 +1,10 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
 import TxAdminClient from '@clients/TxAdminClient';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
-import TxAdminError from '@error/TxAdmin/TxAdminError';
+import TxAdminError from '@error/TxAdmin.error';
 import LogManager from '@manager/LogManager';
 import { PlayerService } from '@services/PlayerService';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
@@ -30,7 +30,7 @@ export class TxInfo extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('txinfo')
                 .setDescription('Zeigt Informationen zu einem Spieler über TxAdmin')
@@ -129,3 +129,4 @@ export class TxInfo extends Command {
         });
     }
 }
+

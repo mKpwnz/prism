@@ -1,6 +1,6 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { PhonePhotosService } from '@services/PhonePhotosService';
 import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
@@ -27,7 +27,7 @@ export class CheckPhotos extends Command {
             Config.Groups.DEV.BOTTEST,
         ];
         this.IsBetaCommand = true;
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('checkphotos')
                 .setDescription('Check Photos!')

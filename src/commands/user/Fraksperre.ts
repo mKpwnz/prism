@@ -1,6 +1,6 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
@@ -28,7 +28,7 @@ export class Fraksperre extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('fraksperre')
                 .setDescription('Befehle zur Fraksperre')

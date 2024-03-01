@@ -1,6 +1,6 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { PlayerService } from '@services/PlayerService';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
@@ -34,7 +34,7 @@ export class IsOnline extends Command {
             Config.Groups.DEV.BOTTEST,
             Config.Groups.PROD.BOT_DEV,
         ];
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('isonline')
                 .setDescription('Ist ein Spieler online?')

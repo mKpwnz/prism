@@ -1,6 +1,6 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { UserService } from '@services/UserService';
 import { ISchufaUser } from '@sql/schema/User.schema';
@@ -28,7 +28,7 @@ export class SchufaAuskunft extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('schufaauskunft')
                 .setDescription(
@@ -93,3 +93,4 @@ export class SchufaAuskunft extends Command {
         return pages;
     }
 }
+

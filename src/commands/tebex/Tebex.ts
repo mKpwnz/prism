@@ -1,6 +1,6 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { GameDB } from '@sql/Database';
 import { ITebexTransactions } from '@sql/schema/Tebex.schema';
@@ -30,7 +30,7 @@ export class Tebex extends Command {
             Config.Groups.DEV.BOTTEST,
         ];
 
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('tebex')
                 .setDescription('Get system information')

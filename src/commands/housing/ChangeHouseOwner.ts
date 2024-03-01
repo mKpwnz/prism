@@ -1,6 +1,6 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
@@ -34,7 +34,7 @@ export class ChangeHouseOwner extends Command {
             Config.Groups.PROD.BOT_DEV,
         ];
         this.AllowedUsers = [Config.Users.FABI, Config.Users.KREAAMZY];
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('changehouseowner')
                 .setDescription('Ändere den Hausbesitzer')

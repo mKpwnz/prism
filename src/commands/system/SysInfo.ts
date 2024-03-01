@@ -1,6 +1,6 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { SlashCommandBuilder } from 'discord.js';
 
@@ -16,7 +16,7 @@ export class SysInfo extends Command {
             Config.Channels.DEV.PRISM_TESTING,
         ];
 
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder().setName('sysinfo').setDescription('Get system information'),
             this,
         );

@@ -1,7 +1,7 @@
 import Config from '@Config';
 import TxAdminClient from '@clients/TxAdminClient';
 import { EEmbedColors } from '@enums/EmbedColors';
-import TxAdminError from '@error/TxAdmin/TxAdminError';
+import TxAdminError from '@error/TxAdmin.error';
 import { ISocietyFinanceResponse } from '@interfaces/ISocietyFinanceResponse';
 import LogManager from '@manager/LogManager';
 import { PhonePhotosService } from '@services/PhonePhotosService';

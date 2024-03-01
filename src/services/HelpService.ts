@@ -1,6 +1,6 @@
 import { BotClient } from '@Bot';
 import Config from '@Config';
-import { CommandHandler } from '@commands/CommandHandler';
+import CommandHandler from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { ICmdPrintInformation } from '@interfaces/ICmdPrintInformation';
 import { ICmdPrintInformationOption } from '@interfaces/ICmdPrintInformationOption';

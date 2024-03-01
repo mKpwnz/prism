@@ -1,7 +1,7 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
 import { RconClient } from '@class/RconClient';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { PlayerService } from '@services/PlayerService';
@@ -22,7 +22,7 @@ export class GiveCar extends Command {
         ];
         this.AllowedGroups = [Config.Groups.PROD.BOT_DEV, Config.Groups.DEV.BOTTEST];
         this.AllowedUsers = [Config.Users.SCHLAUCHI];
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('givecar')
                 .setDescription('Schenke einem Spieler ein Fahrzeug')

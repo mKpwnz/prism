@@ -1,6 +1,7 @@
-import { CommandHandler } from '@commands/CommandHandler';
+import CommandHandler from '@commands/CommandHandler';
 import { TransferVehicle } from '@commands/cars/TransferVehicle';
 import { CustomImageUpload } from '@features/phone/CustomImageUpload';
+import CommandManager from '@manager/CommandManager';
 import { Client, Events, Interaction, Message } from 'discord.js';
 import { OnMessageCreate } from './OnMessageCreate';
 import { OnReady } from './OnReady';
@@ -22,6 +23,7 @@ export class EventHandler {
 
     private static onInteractionCreate(interaction: Interaction) {
         CommandHandler.onInteraction(interaction);
+        CommandManager.onInteraction(interaction);
         TransferVehicle.autocomplete(interaction);
     }
 

@@ -21,7 +21,7 @@ import { RestartDropbox, ValidateTrunk } from './cars';
 import { ChangeHouseOwner, GetHouse, SchufaCheck } from './housing';
 import { Nvhx, NvhxBan } from './nvhx';
 import { CheckImageOwner, CheckPhotos, Darkchat, DeletePhone } from './phone';
-import { BotStats, Help, Issue, Ping, SysInfo, TestCommand, Wahl } from './system';
+import { BotStats, Help, Issue, Ping, SysInfo, Wahl } from './system';
 import { Tebex } from './tebex';
 import {
     ChangeBirthday,
@@ -42,7 +42,7 @@ import {
 } from './user';
 import { Ban, TxHistory, TxInfo, Whitelist } from './txadmin';
 
-export class CommandHandler {
+export default class CommandHandler {
     static commands: {
         cmd: Command;
         scb:
@@ -122,7 +122,6 @@ export class CommandHandler {
 
         new Issue(client);
 
-        new TestCommand();
         new Ban();
         new TxInfo();
         new GarageList();
@@ -133,9 +132,25 @@ export class CommandHandler {
         // LogManager.info('Commands [PROD]:', CommandHandler.prodCommands);
         // LogManager.info('Commands [DEV]:', CommandHandler.devCommands);
     }
+
+    static initCommand(scb: SlashCommandBuilder, cmd: Command) {
+        if (cmd.RunEnvironment === EENV.PRODUCTION) CommandHandler.prodCommands.push(scb.name);
+        if (cmd.RunEnvironment === EENV.DEVELOPMENT) CommandHandler.devCommands.push(scb.name);
+        CommandHandler.commands.push({
+            cmd,
+            scb,
+        });
+        // LogManager.debug({
+        //     command: scb.name,
+        //     description: scb.description,
+        //     usePermissions: cmd.CheckPermissions,
+        //     allowedChannels: cmd.AllowedChannels,
+        //     allowedGroups: cmd.AllowedGroups,
+        // });
+    }
 }
 
-export function RegisterCommand(
+export function initCommandOld(
     scb:
         | SlashCommandBuilder
         | SlashCommandSubcommandsOnlyBuilder

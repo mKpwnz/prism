@@ -1,6 +1,6 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { PlayerService } from '@services/PlayerService';
@@ -31,7 +31,7 @@ export class Vehicle extends Command {
         ];
         this.EmbedTitle = 'Vehicle Info';
 
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('vehicle')
                 .setDescription('Gibt Informationen zu einem Fahrzeug')
@@ -95,3 +95,4 @@ export class Vehicle extends Command {
         });
     }
 }
+

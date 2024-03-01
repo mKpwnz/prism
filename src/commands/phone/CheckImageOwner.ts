@@ -1,6 +1,6 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { PhoneService } from '@services/PhoneService';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
@@ -26,7 +26,7 @@ export class CheckImageOwner extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('pcheckimageowner')
                 .setDescription('Check who created an Ingame image')

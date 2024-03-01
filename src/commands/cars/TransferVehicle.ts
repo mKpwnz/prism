@@ -1,7 +1,7 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
 import GameserverClient from '@clients/GameserverClient';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import LogManager from '@manager/LogManager';
 import { VehicleService } from '@services/VehicleService';
@@ -29,7 +29,7 @@ export class TransferVehicle extends Command {
             Config.Groups.DEV.BOTTEST,
         ];
 
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('transfervehicle')
                 .setDescription('Ändert den Standort oder Fahrzeugtypen')
@@ -124,3 +124,4 @@ export class TransferVehicle extends Command {
         );
     }
 }
+

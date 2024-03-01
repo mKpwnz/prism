@@ -1,7 +1,7 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
 import TxAdminClient from '@clients/TxAdminClient';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
@@ -36,7 +36,7 @@ export class Whitelist extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('whitelist')
                 .setDescription('Setze einen Spieler auf die Whitelist')
@@ -154,9 +154,10 @@ export class Whitelist extends Command {
 
         await this.replyWithEmbed({
             title: 'TxAdmin Whitelist',
-            description: status === 'approve'
-                ? 'Whitelist erfolgreich freigegeben'
-                : 'Whitelist erfolgreich abgelehnt',
+            description:
+                status === 'approve'
+                    ? 'Whitelist erfolgreich freigegeben'
+                    : 'Whitelist erfolgreich abgelehnt',
             color: status ? EEmbedColors.SUCCESS : EEmbedColors.ALERT,
             fields: [
                 {
@@ -179,3 +180,4 @@ export class Whitelist extends Command {
         });
     }
 }
+

@@ -1,7 +1,9 @@
-export default class TxAdminError extends Error {
+export default class ErrorTemplate extends Error {
+    public name: string = this.constructor.name;
+
     constructor(public message: string = '') {
         super(message);
-        this.name = 'TxAdminError';
         this.stack = (<any>new Error()).stack;
     }
 }
+

@@ -1,7 +1,7 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
 import { GitlabClient } from '@clients/GitlabClient';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import LogManager from '@manager/LogManager';
@@ -55,7 +55,7 @@ export class Issue extends Command {
 
             Config.Groups.DEV.BOTTEST,
         ];
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('issue')
                 .setDescription('Erzeuge ein neues Issue für die Entwickler.'),
@@ -415,3 +415,4 @@ export class Issue extends Command {
         }
     }
 }
+

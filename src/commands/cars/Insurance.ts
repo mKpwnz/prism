@@ -1,6 +1,6 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { InsuranceService } from '@services/InsuranceService';
 import { IInsurance } from '@sql/schema/Versicherung.schema';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
@@ -25,7 +25,7 @@ export class Insurance extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('versicherung')
                 .setDescription('Befehle Rund um die Versicherung')

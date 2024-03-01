@@ -1,7 +1,7 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
 import GameserverClient from '@clients/GameserverClient';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { paginateApiResponse } from '@utils/DiscordHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
@@ -28,7 +28,7 @@ export class GarageList extends Command {
             Config.Groups.DEV.BOTTEST,
         ];
 
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('garagelist')
                 .setDescription('Gibt eine liste aller Garagen inc. IDs, Name und Coordinaten')
@@ -68,3 +68,4 @@ export class GarageList extends Command {
         });
     }
 }
+

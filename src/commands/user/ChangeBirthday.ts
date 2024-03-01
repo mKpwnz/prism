@@ -1,5 +1,5 @@
 import { Command } from '@class/Command';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { GameDB } from '@sql/Database';
@@ -28,7 +28,7 @@ export class ChangeBirthday extends Command {
             Config.Groups.DEV.BOTTEST,
         ];
         this.AllowedUsers = [Config.Users.L33V33N, Config.Users.ZMASTER, Config.Users.MANU];
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('changebirthday')
                 .setDescription('Ändert den Geburtstag eines Nutzers')

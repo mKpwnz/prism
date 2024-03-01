@@ -1,6 +1,6 @@
 import { Command } from '@class/Command';
 import { NonEmptyArray } from '@class/NonEmptyArray';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { PlayerService } from '@services/PlayerService';
 import { IValidatedPlayer } from '@interfaces/IValidatedPlayer';
 import { EENV } from '@enums/EENV';
@@ -34,7 +34,7 @@ export class License extends Command {
             Config.Groups.DEV.BOTTEST,
         ];
         this.IsBetaCommand = true;
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('lizenz')
                 .setDescription('Befehle zu den IC Lizenzen')

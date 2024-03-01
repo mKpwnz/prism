@@ -1,6 +1,6 @@
 import { Command } from '@class/Command';
 import { RconClient } from '@class/RconClient';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 
 import Config from '@Config';
@@ -26,7 +26,7 @@ export class NvhxBan extends Command {
         ];
         this.AllowedUsers = [Config.Users.MIKA];
         this.IsBetaCommand = true;
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('nvhxban')
                 .setDescription('Bannt einen Nutzer')

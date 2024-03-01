@@ -1,9 +1,9 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
 import TxAdminClient from '@clients/TxAdminClient';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
-import TxAdminError from '@error/TxAdmin/TxAdminError';
+import TxAdminError from '@error/TxAdmin.error';
 import LogManager from '@manager/LogManager';
 import { PlayerService } from '@services/PlayerService';
 import { paginateApiResponse } from '@utils/DiscordHelper';
@@ -31,7 +31,7 @@ export class TxHistory extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('txhistory')
                 .setDescription('Zeigt die Aktionen eines Spielers über TxAdmin')
@@ -101,3 +101,4 @@ export class TxHistory extends Command {
         });
     }
 }
+

@@ -1,7 +1,7 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
 import { RconClient } from '@class/RconClient';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { ILivePlayer } from '@interfaces/ILivePlayer';
 import { EmoteManager } from '@manager/EmoteManager';
@@ -31,7 +31,7 @@ export class Nvhx extends Command {
             Config.Groups.DEV.BOTTEST,
         ];
         this.IsBetaCommand = true;
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('nvhx')
                 .setDescription('Neverhax Commands')

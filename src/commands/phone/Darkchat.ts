@@ -1,6 +1,6 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { PhoneDarkchatService } from '@services/PhoneDarkchatService';
@@ -29,7 +29,7 @@ export class Darkchat extends Command {
             Config.Groups.DEV.BOTTEST,
         ];
         this.IsBetaCommand = true;
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('darkchat')
                 .setDescription('Darkchat Commands')

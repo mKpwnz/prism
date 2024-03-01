@@ -1,7 +1,7 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
 import { RconClient } from '@class/RconClient';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { ItemService } from '@services/ItemService';
 import { validateWeaponName } from '@utils/FiveMHelper';
@@ -27,7 +27,7 @@ export class Give extends Command {
             Config.Groups.DEV.BOTTEST,
         ];
         this.IsBetaCommand = true;
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('give')
                 .setDescription('Befehle zur Fraksperre')

@@ -1,7 +1,7 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
 import { RconClient } from '@class/RconClient';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { SlashCommandBuilder } from 'discord.js';
 
@@ -33,7 +33,7 @@ export class RestartDropbox extends Command {
         ];
         this.AllowedUsers = [Config.Users.SCHLAUCHI];
         this.IsBetaCommand = true;
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('restartdropbox')
                 .setDescription('Startet die Tebexausgabe neu'),

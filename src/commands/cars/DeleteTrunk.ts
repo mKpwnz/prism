@@ -1,7 +1,7 @@
 import Config from '@Config';
 import { Command } from '@class/Command';
 import { RconClient } from '@class/RconClient';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { VehicleService } from '@services/VehicleService';
@@ -31,7 +31,7 @@ export class DeleteTrunk extends Command {
             Config.Groups.DEV.BOTTEST,
         ];
 
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('deletetrunk')
                 .setDescription('Löscht den Kofferraum eines Fahrzeugs')
@@ -83,3 +83,4 @@ export class DeleteTrunk extends Command {
         });
     }
 }
+

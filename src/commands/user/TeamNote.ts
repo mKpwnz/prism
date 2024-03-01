@@ -1,5 +1,5 @@
 import { Command } from '@class/Command';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { initCommandOld } from '@commands/CommandHandler';
 import { PlayerService } from '@services/PlayerService';
 import { EENV } from '@enums/EENV';
 import Config from '@Config';
@@ -27,7 +27,7 @@ export class TeamNote extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        RegisterCommand(
+        initCommandOld(
             new SlashCommandBuilder()
                 .setName('teamnote')
                 .setDescription('Team Notizen')
