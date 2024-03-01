@@ -13,6 +13,7 @@ export class TestCommand extends Command {
         this.AllowedChannels = [Config.Channels.DEV.PRISM_TESTING];
         this.AllowedGroups = [Config.Groups.PROD.BOT_DEV, Config.Groups.DEV.BOTTEST];
         this.DoNotCountUse = true;
+        console.log('TestCommand from constructor');
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
