@@ -7,6 +7,7 @@ import { PlayerService } from '@services/PlayerService';
 import { VehicleService } from '@services/VehicleService';
 import { attachmentFromObject } from '@utils/DiscordHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { validatePlate } from '@utils/FiveMHelper';
 
 export class Vehicle extends Command {
     constructor() {
@@ -45,23 +46,21 @@ export class Vehicle extends Command {
         );
     }
 
-    // @TODO: Rewrite to Service structure
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const plate = interaction.options.getString('plate', true);
-        if (plate.length > 8) {
-            await this.replyError(
-                'Das Kennzeichen ist zu lang. \nDas Kennzeichen darf maximal 8 Zeichen lang sein.',
-            );
+
+        const plateValid = validatePlate(plate);
+        if (plateValid instanceof Error) {
+            await this.replyError(plateValid.message);
             return;
         }
 
-        const vehicle = await VehicleService.getVehicleByNumberplate(plate);
-        if (!vehicle) {
-            await this.replyError(
-                `Es wurden keine Fahrzeuge mit dem Kennzeichen ${plate} gefunden.`,
-            );
+        const vehicle = await VehicleService.getVehicleByPlate(plate);
+        if (vehicle instanceof Error) {
+            await this.replyError(vehicle.message);
             return;
         }
+
         const player = await PlayerService.validatePlayer(vehicle.owner);
         if (!player) {
             await this.replyError(`Der Besitzer des Fahrzeugs konnte nicht gefunden werden.`);

@@ -42,44 +42,6 @@ export class ValidateTrunk extends Command {
         );
     }
 
-    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const plate = interaction.options.getString('plate', true);
-        const vehicle = await VehicleService.getVehicleByNumberplate(plate);
-
-        if (!vehicle) {
-            await this.replyError(
-                `Es konnte kein Fahrzeug mit dem Kennzeichen ${plate} gefunden werden.`,
-            );
-            return;
-        }
-
-        if (!vehicle.kofferraum) {
-            await this.replyWithEmbed({
-                description: `Der Kofferraum des Fahrzeugs mit dem Kennzeichen \`${vehicle.plate}\` ist leer.`,
-            });
-            return;
-        }
-
-        const scuffedItems: { item: string; count: number }[] =
-            await ValidateTrunk.getScuffedItemsFromTrunk(vehicle.kofferraum);
-
-        if (!scuffedItems.length) {
-            await this.replyWithEmbed({
-                description: `Der Kofferraum des Fahrzeugs mit dem Kennzeichen \`${vehicle.plate}\` ist valid.`,
-                color: EEmbedColors.SUCCESS,
-            });
-        } else {
-            await this.replyWithEmbed({
-                description: `Der Kofferraum des Fahrzeugs mit dem Kennzeichen \`${
-                    vehicle.plate
-                }\` ist nicht valid.\nFolgende Items sind nicht mehr im Spiel:\n\`\`\`${scuffedItems
-                    .map((itm) => `${itm.item} (${itm.count})`)
-                    .join('\n')}\`\`\``,
-                color: EEmbedColors.ALERT,
-            });
-        }
-    }
-
     private static async getScuffedItemsFromTrunk(
         trunk: string,
     ): Promise<{ item: string; count: number }[]> {
@@ -95,5 +57,42 @@ export class ValidateTrunk extends Command {
             }
         }
         return scuffedItems;
+    }
+
+    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+        const plate = interaction.options.getString('plate', true);
+
+        const vehicle = await VehicleService.getVehicleByPlate(plate);
+        if (vehicle instanceof Error) {
+            await this.replyError(vehicle.message);
+            return;
+        }
+
+        if (!vehicle.kofferraum) {
+            await this.replyWithEmbed({
+                description: `Der Kofferraum des Fahrzeugs mit dem Kennzeichen \`${vehicle.plate}\` ist leer.`,
+            });
+            return;
+        }
+
+        const scuffedItems: { item: string; count: number }[] =
+            await ValidateTrunk.getScuffedItemsFromTrunk(vehicle.kofferraum);
+
+        if (scuffedItems.length) {
+            await this.replyWithEmbed({
+                description: `Der Kofferraum des Fahrzeugs mit dem Kennzeichen \`${
+                    vehicle.plate
+                }\` ist nicht valid.\nFolgende Items sind nicht mehr im Spiel:\n\`\`\`${scuffedItems
+                    .map((itm) => `${itm.item} (${itm.count})`)
+                    .join('\n')}\`\`\``,
+                color: EEmbedColors.ALERT,
+            });
+            return;
+        }
+
+        await this.replyWithEmbed({
+            description: `Der Kofferraum des Fahrzeugs mit dem Kennzeichen \`${vehicle.plate}\` ist valid.`,
+            color: EEmbedColors.SUCCESS,
+        });
     }
 }

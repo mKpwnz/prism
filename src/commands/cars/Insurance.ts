@@ -2,7 +2,6 @@ import Config from '@Config';
 import { Command } from '@class/Command';
 import { RegisterCommand } from '@commands/CommandHandler';
 import { InsuranceService } from '@services/InsuranceService';
-import { IInsurance } from '@sql/schema/Versicherung.schema';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class Insurance extends Command {
@@ -102,15 +101,12 @@ export class Insurance extends Command {
     private async checkInsurance(interaction: ChatInputCommandInteraction): Promise<void> {
         const plate = interaction.options.getString('kennzeichen', true);
 
-        const insurances: IInsurance[] = await InsuranceService.getInsuranceByNumberplate(plate);
-
-        if (insurances.length !== 1) {
-            let message;
-            if (insurances.length === 0) message = `Keine Versicherung für ${plate} gefunden!`;
-            else message = `Es wurden ${insurances.length} Versicherungen für ${plate} gefunden!`;
-            await interaction.reply({ content: message, ephemeral: true });
+        const insurances = await InsuranceService.getInsuranceByPlate(plate);
+        if (insurances instanceof Error) {
+            await this.replyError(insurances.message);
             return;
         }
+
         const insurance = insurances[0];
         const status = insurance.ts > new Date() ? '**Versichert**' : '**Nicht Versichert**';
         await this.replyWithEmbed({
@@ -128,7 +124,7 @@ export class Insurance extends Command {
         const dauer: number = options.getNumber('dauer', true);
         const premium: boolean = options.getBoolean('premium') ?? false;
 
-        const result = await InsuranceService.addInsurance(plate, dauer, premium);
+        const result = await InsuranceService.createInsurance(plate, dauer, premium);
 
         if (!result) {
             await interaction.reply({
@@ -156,20 +152,20 @@ export class Insurance extends Command {
 
     private async removeInsurance(interaction: ChatInputCommandInteraction): Promise<void> {
         const { options } = interaction;
-
         const plate = options.getString('kennzeichen', true);
 
-        const insurances: IInsurance[] = await InsuranceService.getInsuranceByNumberplate(plate);
-
-        if (insurances.length !== 1) {
-            let message;
-            if (insurances.length === 0) message = `Keine Versicherung für ${plate} gefunden!`;
-            else message = `Es wurden ${insurances.length} Versicherungen für ${plate} gefunden!`;
-            await interaction.reply({ content: message, ephemeral: true });
+        const insurances = await InsuranceService.getInsuranceByPlate(plate);
+        if (insurances instanceof Error) {
+            await this.replyError(insurances.message);
             return;
         }
+
         const insurance = insurances[0];
-        await InsuranceService.deleteVersicherungenByNumberplate(insurance);
+        const result = await InsuranceService.deleteInsuranceByPlate(insurance.plate);
+        if (result instanceof Error) {
+            await this.replyError(result.message);
+            return;
+        }
 
         await this.replyWithEmbed({
             title: 'Versicherung Entfernen',

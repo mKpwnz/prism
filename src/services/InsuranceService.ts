@@ -1,30 +1,47 @@
 import { GameDB } from '@sql/Database';
 import { IInsurance } from '@sql/schema/Versicherung.schema';
-import { formatNumberplate } from '@utils/FiveMHelper';
+import { formatPlate } from '@utils/FiveMHelper';
 import { ResultSetHeader } from 'mysql2';
 
 export class InsuranceService {
-    public static async deleteVersicherungenByNumberplate(versicherung: IInsurance): Promise<void> {
-        await GameDB.query('DELETE FROM `versicherungen` WHERE `plate` = ?', [versicherung.plate]);
-    }
-
-    public static async getInsuranceByNumberplate(plate: string): Promise<IInsurance[]> {
-        const [versicherungen] = await GameDB.query<IInsurance[]>(
-            'SELECT * FROM `versicherungen` WHERE `plate` = ?',
-            [formatNumberplate(plate)],
+    public static async deleteInsuranceByPlate(plate: string): Promise<boolean | Error> {
+        const [res] = await GameDB.execute<ResultSetHeader>(
+            'DELETE FROM `versicherungen` WHERE `plate` = ?',
+            [plate],
         );
 
-        return versicherungen;
+        if (res.affectedRows === 0) {
+            return new Error(
+                `Es ist ein Fehler aufgetreten. Die Versicherung des Fahrzeug mit dem Kennzeichen ${plate} konnte nicht gelöscht werden.`,
+            );
+        }
+        return true;
     }
 
-    public static async addInsurance(
+    public static async getInsuranceByPlate(plate: string): Promise<IInsurance[] | Error> {
+        const [insurances] = await GameDB.query<IInsurance[]>(
+            'SELECT * FROM `versicherungen` WHERE `plate` = ?',
+            [formatPlate(plate)],
+        );
+
+        if (insurances.length !== 1) {
+            let message;
+            if (insurances.length === 0) message = `Keine Versicherung für ${plate} gefunden!`;
+            else message = `Es wurden ${insurances.length} Versicherungen für ${plate} gefunden!`;
+            return new Error(message);
+        }
+
+        return insurances;
+    }
+
+    public static async createInsurance(
         plate: string,
         dauer: number,
         premium: boolean,
     ): Promise<boolean> {
         const [result] = await GameDB.query<ResultSetHeader>(
             'INSERT INTO `versicherungen` (`plate`, `ts`, `premium`) VALUES (?, ADDDATE(NOW (), INTERVAL ? DAY), ?) ON DUPLICATE KEY UPDATE ts = ADDDATE(NOW (), INTERVAL ? DAY), premium = ? RETURNING * ',
-            [formatNumberplate(plate), dauer, premium ? 1 : 0, dauer, premium ? 1 : 0],
+            [formatPlate(plate), dauer, premium ? 1 : 0, dauer, premium ? 1 : 0],
         );
 
         return result.affectedRows > 0;
