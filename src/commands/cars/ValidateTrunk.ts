@@ -39,6 +39,21 @@ export class ValidateTrunk extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
+<<<<<<< 335dae1077f2b35fcfc09014661255ef238761f8
+=======
+        RegisterCommand(
+            new SlashCommandBuilder()
+                .setName('validatetrunk')
+                .setDescription('Validiere den Inhalt eines Kofferraums')
+                .addStringOption((option) =>
+                    option
+                        .setName('plate')
+                        .setDescription('Das Kennzeichen des Fahrzeugs')
+                        .setRequired(true),
+                ),
+            this,
+        );
+>>>>>>> 071a1afc0885ae01e4c467a8c01e6abb9c851ce6
     }
 
     private static async getScuffedItemsFromTrunk(
