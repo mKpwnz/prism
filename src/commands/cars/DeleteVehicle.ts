@@ -44,7 +44,7 @@ export class DeleteVehicle extends Command {
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const plate = interaction.options.getString('plate', true);
 
-        const vehicle = await VehicleService.deleteVehicle(plate);
+        const vehicle = await VehicleService.deleteVehicleByPlate(plate);
         if (vehicle instanceof Error) {
             await this.replyError(vehicle.message);
             return;
