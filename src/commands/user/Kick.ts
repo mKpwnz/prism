@@ -1,10 +1,19 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
+import Command from '@class/Command';
 import { RconClient } from '@class/RconClient';
-import { initCommandOld } from '@commands/CommandHandler';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('kick')
+        .setDescription('Kickt einen Spieler')
+        .addIntegerOption((option) =>
+            option.setName('id').setDescription('ID des Spielers').setRequired(true),
+        )
+        .addStringOption((option) => option.setName('grund').setDescription('Grund des Kicks')),
+)
 export class Kick extends Command {
     constructor() {
         super();
@@ -27,18 +36,6 @@ export class Kick extends Command {
             Config.Groups.DEV.BOTTEST,
         ];
         this.IsBetaCommand = true;
-        initCommandOld(
-            new SlashCommandBuilder()
-                .setName('kick')
-                .setDescription('Kickt einen Spieler')
-                .addIntegerOption((option) =>
-                    option.setName('id').setDescription('ID des Spielers').setRequired(true),
-                )
-                .addStringOption((option) =>
-                    option.setName('grund').setDescription('Grund des Kicks'),
-                ),
-            this,
-        );
     }
 
     // await interaction.reply({ content: 'Command nicht gefunden.', ephemeral: true })

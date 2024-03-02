@@ -1,14 +1,29 @@
-import { Command } from '@class/Command';
-import { initCommandOld } from '@commands/CommandHandler';
+import Config from '@Config';
+import Command from '@class/Command';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
+import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
+import { Helper } from '@utils/Helper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
-import { PlayerService } from '@services/PlayerService';
-import { Helper } from '@utils/Helper';
-import Config from '@Config';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('changebirthday')
+        .setDescription('Ändert den Geburtstag eines Nutzers')
+        .setDMPermission(true)
+        .addStringOption((option) =>
+            option.setName('steam').setDescription('Steam ID des Nutzers').setRequired(true),
+        )
+        .addStringOption((option) =>
+            option
+                .setName('datum')
+                .setDescription('Neuer Geburtstag des Spielers (dd.mm.yyyy)')
+                .setRequired(true),
+        ),
+)
 export class ChangeBirthday extends Command {
     constructor() {
         super();
@@ -28,25 +43,6 @@ export class ChangeBirthday extends Command {
             Config.Groups.DEV.BOTTEST,
         ];
         this.AllowedUsers = [Config.Users.L33V33N, Config.Users.ZMASTER, Config.Users.MANU];
-        initCommandOld(
-            new SlashCommandBuilder()
-                .setName('changebirthday')
-                .setDescription('Ändert den Geburtstag eines Nutzers')
-                .setDMPermission(true)
-                .addStringOption((option) =>
-                    option
-                        .setName('steam')
-                        .setDescription('Steam ID des Nutzers')
-                        .setRequired(true),
-                )
-                .addStringOption((option) =>
-                    option
-                        .setName('datum')
-                        .setDescription('Neuer Geburtstag des Spielers (dd.mm.yyyy)')
-                        .setRequired(true),
-                ),
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

@@ -1,7 +1,7 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
+import Command from '@class/Command';
 import TxAdminClient from '@clients/TxAdminClient';
-import { initCommandOld } from '@commands/CommandHandler';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import TxAdminError from '@error/TxAdmin.error';
@@ -9,6 +9,14 @@ import LogManager from '@manager/LogManager';
 import { PlayerService } from '@services/PlayerService';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('txinfo')
+        .setDescription('Zeigt Informationen zu einem Spieler über TxAdmin')
+        .addStringOption((option) =>
+            option.setName('steamid').setDescription('SteamID des Spielers').setRequired(true),
+        ),
+)
 export class TxInfo extends Command {
     constructor() {
         super();
@@ -30,18 +38,6 @@ export class TxInfo extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        initCommandOld(
-            new SlashCommandBuilder()
-                .setName('txinfo')
-                .setDescription('Zeigt Informationen zu einem Spieler über TxAdmin')
-                .addStringOption((option) =>
-                    option
-                        .setName('steamid')
-                        .setDescription('SteamID des Spielers')
-                        .setRequired(true),
-                ),
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

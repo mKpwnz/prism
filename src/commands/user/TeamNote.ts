@@ -1,11 +1,49 @@
-import { Command } from '@class/Command';
-import { initCommandOld } from '@commands/CommandHandler';
-import { PlayerService } from '@services/PlayerService';
-import { EENV } from '@enums/EENV';
 import Config from '@Config';
+import Command from '@class/Command';
+import { RegisterCommand } from '@decorators';
+import { EENV } from '@enums/EENV';
+import { PlayerService } from '@services/PlayerService';
 import { BotDB } from '@sql/Database';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('teamnote')
+        .setDescription('Team Notizen')
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('hinzufügen')
+                .setDescription('Fügt eine Notiz hinzu')
+                .addStringOption((option) =>
+                    option
+                        .setName('steamid')
+                        .setDescription('SteamID des Spielers')
+                        .setRequired(true),
+                )
+                .addStringOption((option) =>
+                    option.setName('notiz').setDescription('Die Notiz').setRequired(true),
+                ),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('auflisten')
+                .setDescription('Zeigt alle Notizen eines Spielers an')
+                .addStringOption((option) =>
+                    option
+                        .setName('steamid')
+                        .setDescription('SteamID des Spielers')
+                        .setRequired(true),
+                ),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('anzeigen')
+                .setDescription('Zeigt eine Notiz an')
+                .addIntegerOption((option) =>
+                    option.setName('id').setDescription('ID der Notiz').setRequired(true),
+                ),
+        ),
+)
 export class TeamNote extends Command {
     constructor() {
         super();
@@ -27,45 +65,6 @@ export class TeamNote extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        initCommandOld(
-            new SlashCommandBuilder()
-                .setName('teamnote')
-                .setDescription('Team Notizen')
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('hinzufügen')
-                        .setDescription('Fügt eine Notiz hinzu')
-                        .addStringOption((option) =>
-                            option
-                                .setName('steamid')
-                                .setDescription('SteamID des Spielers')
-                                .setRequired(true),
-                        )
-                        .addStringOption((option) =>
-                            option.setName('notiz').setDescription('Die Notiz').setRequired(true),
-                        ),
-                )
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('auflisten')
-                        .setDescription('Zeigt alle Notizen eines Spielers an')
-                        .addStringOption((option) =>
-                            option
-                                .setName('steamid')
-                                .setDescription('SteamID des Spielers')
-                                .setRequired(true),
-                        ),
-                )
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('anzeigen')
-                        .setDescription('Zeigt eine Notiz an')
-                        .addIntegerOption((option) =>
-                            option.setName('id').setDescription('ID der Notiz').setRequired(true),
-                        ),
-                ),
-            this,
-        );
         this.IsBetaCommand = true;
     }
 

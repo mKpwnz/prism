@@ -1,14 +1,19 @@
-import { Command } from '@class/Command';
+import Command from '@class/Command';
 import { EENV } from '@enums/EENV';
-import { Interaction, SlashCommandBuilder } from 'discord.js';
+import { Interaction, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js';
 
 import '@commands';
 import BotCommandNotValidError from '@error/BotCommandNotValid.error';
 import { CommandClassRegistry } from '@decorators/RegisterCommand';
 import LogManager from './LogManager';
 
+export type TcustomSCB =
+    | SlashCommandBuilder
+    | SlashCommandSubcommandsOnlyBuilder
+    | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'>;
+
 export default class CommandManager {
-    private static commands: { cmd: Command; scb: SlashCommandBuilder }[] = [];
+    private static commands: { cmd: Command; scb: TcustomSCB }[] = [];
 
     private static prodCommands: string[] = [];
 
@@ -25,11 +30,11 @@ export default class CommandManager {
                 throw new BotCommandNotValidError('Command is not valid. It must extend Command.');
             }
             const command = new Cmd();
-            CommandManager.init(scb, command);
+            this.init(scb, command);
         }
     }
 
-    public static init(scb: SlashCommandBuilder, cmd: Command) {
+    public static init(scb: TcustomSCB, cmd: Command) {
         LogManager.debug(`INIT: ${scb.name}`);
         if (cmd.RunEnvironment === EENV.PRODUCTION) CommandManager.prodCommands.push(scb.name);
         if (cmd.RunEnvironment === EENV.DEVELOPMENT) CommandManager.devCommands.push(scb.name);

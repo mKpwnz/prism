@@ -1,18 +1,82 @@
-import { Command } from '@class/Command';
+import Config from '@Config';
+import Command from '@class/Command';
 import { NonEmptyArray } from '@class/NonEmptyArray';
-import { initCommandOld } from '@commands/CommandHandler';
-import { PlayerService } from '@services/PlayerService';
-import { IValidatedPlayer } from '@interfaces/IValidatedPlayer';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { ELicenses } from '@enums/ELicenses';
-import Config from '@Config';
+import { IValidatedPlayer } from '@interfaces/IValidatedPlayer';
+import LogManager from '@manager/LogManager';
+import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
 import { IUserLicense } from '@sql/schema/UserLicense.schema';
 import { Helper } from '@utils/Helper';
-import LogManager from '@manager/LogManager';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('lizenz')
+        .setDescription('Befehle zu den IC Lizenzen')
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('entfernen')
+                .setDescription('Entferne die Lizenz eines Spielers')
+                .addStringOption((option) =>
+                    option
+                        .setName('steamid')
+                        .setDescription('SteamID des Spielers')
+                        .setRequired(true),
+                )
+                .addStringOption((option) =>
+                    option
+                        .setName('lizenz')
+                        .setDescription('Lizenz auswählen')
+                        .setRequired(true)
+                        .setChoices(
+                            { name: 'Alle', value: ELicenses.ALL },
+                            { name: 'Flugschein', value: ELicenses.AIRCRAFT },
+                            { name: 'Bootsschein', value: ELicenses.BOATING },
+                            { name: 'Diplomatenausweis', value: ELicenses.DIPLO },
+                            { name: 'Verkehrssicherheit', value: ELicenses.DMV },
+                            { name: 'Führerschein Klasse A', value: ELicenses.DRIVE_BIKE },
+                            { name: 'Führerschein Klasse B', value: ELicenses.DRIVE },
+                            { name: 'Führerschein Klasse C', value: ELicenses.DRIVE_TRUCK },
+                            { name: 'Führerschein Klasse D', value: ELicenses.DRIVE_BUS },
+                            { name: 'Dienstausweis', value: ELicenses.JOBLIC },
+                            { name: 'Waffenschein', value: ELicenses.WEAPON },
+                        ),
+                ),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('hinzufügen')
+                .setDescription('Füge dem Spieler eine Lizenz hinzu')
+                .addStringOption((option) =>
+                    option
+                        .setName('steamid')
+                        .setDescription('SteamID des Spielers')
+                        .setRequired(true),
+                )
+                .addStringOption((option) =>
+                    option
+                        .setName('lizenz')
+                        .setDescription('Lizenz auswählen')
+                        .setRequired(true)
+                        .setChoices(
+                            { name: 'Flugschein', value: ELicenses.AIRCRAFT },
+                            { name: 'Bootsschein', value: ELicenses.BOATING },
+                            { name: 'Diplomatenausweis', value: ELicenses.DIPLO },
+                            { name: 'Verkehrssicherheit', value: ELicenses.DMV },
+                            { name: 'Führerschein Klasse A', value: ELicenses.DRIVE_BIKE },
+                            { name: 'Führerschein Klasse B', value: ELicenses.DRIVE },
+                            { name: 'Führerschein Klasse C', value: ELicenses.DRIVE_TRUCK },
+                            { name: 'Führerschein Klasse D', value: ELicenses.DRIVE_BUS },
+                            { name: 'Dienstausweis', value: ELicenses.JOBLIC },
+                            { name: 'Waffenschein', value: ELicenses.WEAPON },
+                        ),
+                ),
+        ),
+)
 export class License extends Command {
     constructor() {
         super();
@@ -34,71 +98,6 @@ export class License extends Command {
             Config.Groups.DEV.BOTTEST,
         ];
         this.IsBetaCommand = true;
-        initCommandOld(
-            new SlashCommandBuilder()
-                .setName('lizenz')
-                .setDescription('Befehle zu den IC Lizenzen')
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('entfernen')
-                        .setDescription('Entferne die Lizenz eines Spielers')
-                        .addStringOption((option) =>
-                            option
-                                .setName('steamid')
-                                .setDescription('SteamID des Spielers')
-                                .setRequired(true),
-                        )
-                        .addStringOption((option) =>
-                            option
-                                .setName('lizenz')
-                                .setDescription('Lizenz auswählen')
-                                .setRequired(true)
-                                .setChoices(
-                                    { name: 'Alle', value: ELicenses.ALL },
-                                    { name: 'Flugschein', value: ELicenses.AIRCRAFT },
-                                    { name: 'Bootsschein', value: ELicenses.BOATING },
-                                    { name: 'Diplomatenausweis', value: ELicenses.DIPLO },
-                                    { name: 'Verkehrssicherheit', value: ELicenses.DMV },
-                                    { name: 'Führerschein Klasse A', value: ELicenses.DRIVE_BIKE },
-                                    { name: 'Führerschein Klasse B', value: ELicenses.DRIVE },
-                                    { name: 'Führerschein Klasse C', value: ELicenses.DRIVE_TRUCK },
-                                    { name: 'Führerschein Klasse D', value: ELicenses.DRIVE_BUS },
-                                    { name: 'Dienstausweis', value: ELicenses.JOBLIC },
-                                    { name: 'Waffenschein', value: ELicenses.WEAPON },
-                                ),
-                        ),
-                )
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('hinzufügen')
-                        .setDescription('Füge dem Spieler eine Lizenz hinzu')
-                        .addStringOption((option) =>
-                            option
-                                .setName('steamid')
-                                .setDescription('SteamID des Spielers')
-                                .setRequired(true),
-                        )
-                        .addStringOption((option) =>
-                            option
-                                .setName('lizenz')
-                                .setDescription('Lizenz auswählen')
-                                .setRequired(true)
-                                .setChoices(
-                                    { name: 'Flugschein', value: ELicenses.AIRCRAFT },
-                                    { name: 'Bootsschein', value: ELicenses.BOATING },
-                                    { name: 'Diplomatenausweis', value: ELicenses.DIPLO },
-                                    { name: 'Verkehrssicherheit', value: ELicenses.DMV },
-                                    { name: 'Führerschein Klasse A', value: ELicenses.DRIVE_BIKE },
-                                    { name: 'Führerschein Klasse B', value: ELicenses.DRIVE },
-                                    { name: 'Führerschein Klasse C', value: ELicenses.DRIVE_TRUCK },
-                                    { name: 'Führerschein Klasse D', value: ELicenses.DRIVE_BUS },
-                                    { name: 'Dienstausweis', value: ELicenses.JOBLIC },
-                                    { name: 'Waffenschein', value: ELicenses.WEAPON },
-                                ),
-                        ),
-                ),
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

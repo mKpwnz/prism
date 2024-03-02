@@ -1,12 +1,44 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
-import { initCommandOld } from '@commands/CommandHandler';
+import Command from '@class/Command';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('fraksperre')
+        .setDescription('Befehle zur Fraksperre')
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('entfernen')
+                .setDescription('Entferne die Fraktionssperre eines Spielers')
+                .addStringOption((option) =>
+                    option
+                        .setName('steamid')
+                        .setDescription('SteamID des Spielers')
+                        .setRequired(true),
+                ),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('setzen')
+                .setDescription('Setze dem Spieler eine Fraksperre')
+                .addStringOption((option) =>
+                    option
+                        .setName('steamid')
+                        .setDescription('SteamID des Spielers')
+                        .setRequired(true),
+                )
+                .addIntegerOption((option) =>
+                    option
+                        .setName('zeit')
+                        .setDescription('Setze die Zeit in Tagen (Default: 5 Tage)'),
+                ),
+        ),
+)
 export class Fraksperre extends Command {
     constructor() {
         super();
@@ -28,39 +60,6 @@ export class Fraksperre extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        initCommandOld(
-            new SlashCommandBuilder()
-                .setName('fraksperre')
-                .setDescription('Befehle zur Fraksperre')
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('entfernen')
-                        .setDescription('Entferne die Fraktionssperre eines Spielers')
-                        .addStringOption((option) =>
-                            option
-                                .setName('steamid')
-                                .setDescription('SteamID des Spielers')
-                                .setRequired(true),
-                        ),
-                )
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('setzen')
-                        .setDescription('Setze dem Spieler eine Fraksperre')
-                        .addStringOption((option) =>
-                            option
-                                .setName('steamid')
-                                .setDescription('SteamID des Spielers')
-                                .setRequired(true),
-                        )
-                        .addIntegerOption((option) =>
-                            option
-                                .setName('zeit')
-                                .setDescription('Setze die Zeit in Tagen (Default: 5 Tage)'),
-                        ),
-                ),
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

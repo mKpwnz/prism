@@ -1,7 +1,8 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
-import { initCommandOld } from '@commands/CommandHandler';
+import Command from '@class/Command';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
+import LogManager from '@manager/LogManager';
 import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
 import {
@@ -18,11 +19,21 @@ import {
     IPhoneTwitterAccounts,
     IPhoneTwitterTweets,
 } from '@sql/schema/Phone.schema';
-import LogManager from '@manager/LogManager';
 import { AttachmentBuilder, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { readFileSync, writeFileSync } from 'fs';
 
 // TODO refactor
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('deletephone')
+        .setDescription('Löscht ein Handy')
+        .addStringOption((option) =>
+            option.setName('steamid').setDescription('SteamID').setRequired(true),
+        )
+        .addBooleanOption((option) =>
+            option.setName('reset').setDescription('Nummer bleibt, Accounts werden gelöscht'),
+        ),
+)
 export class DeletePhone extends Command {
     constructor() {
         super();
@@ -42,20 +53,6 @@ export class DeletePhone extends Command {
             Config.Groups.DEV.BOTTEST,
         ];
         this.IsBetaCommand = true;
-        initCommandOld(
-            new SlashCommandBuilder()
-                .setName('deletephone')
-                .setDescription('Löscht ein Handy')
-                .addStringOption((option) =>
-                    option.setName('steamid').setDescription('SteamID').setRequired(true),
-                )
-                .addBooleanOption((option) =>
-                    option
-                        .setName('reset')
-                        .setDescription('Nummer bleibt, Accounts werden gelöscht'),
-                ),
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

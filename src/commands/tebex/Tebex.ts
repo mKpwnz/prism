@@ -1,6 +1,6 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
-import { initCommandOld } from '@commands/CommandHandler';
+import Command from '@class/Command';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { GameDB } from '@sql/Database';
 import { ITebexTransactions } from '@sql/schema/Tebex.schema';
@@ -8,6 +8,27 @@ import axios from 'axios';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 // @TODO: Rewrite to Service structure
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('tebex')
+        .setDescription('Get system information')
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('check')
+                .setDescription('Überpüft die Bestellung anhand der TBX Nummer')
+                .addStringOption((option) =>
+                    option.setName('tbx').setDescription('Tebex Nummer').setRequired(true),
+                ),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('checkold')
+                .setDescription('Überprüft eine alte Bestellung anhand der TBX Nummer')
+                .addStringOption((option) =>
+                    option.setName('tbx').setDescription('Tebex Nummer').setRequired(true),
+                ),
+        ),
+)
 export class Tebex extends Command {
     constructor() {
         super();
@@ -29,30 +50,6 @@ export class Tebex extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-
-        initCommandOld(
-            new SlashCommandBuilder()
-                .setName('tebex')
-                .setDescription('Get system information')
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('check')
-                        .setDescription('Überpüft die Bestellung anhand der TBX Nummer')
-                        .addStringOption((option) =>
-                            option.setName('tbx').setDescription('Tebex Nummer').setRequired(true),
-                        ),
-                )
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('checkold')
-                        .setDescription('Überprüft eine alte Bestellung anhand der TBX Nummer')
-                        .addStringOption((option) =>
-                            option.setName('tbx').setDescription('Tebex Nummer').setRequired(true),
-                        ),
-                ),
-
-            this,
-        );
     }
 
     // TODO: Change to Service Structure

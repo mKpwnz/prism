@@ -1,13 +1,20 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
-import { RconClient } from '@class/RconClient';
-import { initCommandOld } from '@commands/CommandHandler';
+import Command from '@class/Command';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { VehicleService } from '@services/VehicleService';
 import { attachmentFromObject } from '@utils/DiscordHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('deletetrunk')
+        .setDescription('Löscht den Kofferraum eines Fahrzeugs')
+        .addStringOption((option) =>
+            option.setName('plate').setDescription('Kennzeichen des Fahrzeugs').setRequired(true),
+        ),
+)
 export class DeleteTrunk extends Command {
     constructor() {
         super();
@@ -28,19 +35,6 @@ export class DeleteTrunk extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-
-        initCommandOld(
-            new SlashCommandBuilder()
-                .setName('deletetrunk')
-                .setDescription('Löscht den Kofferraum eines Fahrzeugs')
-                .addStringOption((option) =>
-                    option
-                        .setName('plate')
-                        .setDescription('Kennzeichen des Fahrzeugs')
-                        .setRequired(true),
-                ),
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

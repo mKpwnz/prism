@@ -1,12 +1,44 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
-import { initCommandOld } from '@commands/CommandHandler';
+import Command from '@class/Command';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { PhoneDarkchatService } from '@services/PhoneDarkchatService';
 import { EEmbedColors } from '@enums/EmbedColors';
+import { PhoneDarkchatService } from '@services/PhoneDarkchatService';
 import { IPhoneDarkchatSearch } from '@sql/schema/Phone.schema';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('darkchat')
+        .setDescription('Darkchat Commands')
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('getmessages')
+                .setDescription('Nachrichten aus dem Darkchat abrufen')
+                .addStringOption((option) =>
+                    option
+                        .setName('filterby')
+                        .setDescription('Filter Nach')
+                        .addChoices(
+                            { name: 'Channel', value: 'byChannel' },
+                            { name: 'SteamID', value: 'bySteamID' },
+                            { name: 'Telefonnummer', value: 'byPhoneNumber' },
+                            { name: 'Darkchat Username', value: 'byDarkchatName' },
+                        )
+                        .setRequired(true),
+                )
+                .addStringOption((option) =>
+                    option.setName('filtervalue').setDescription('Filter Wert').setRequired(true),
+                )
+                .addStringOption((option) =>
+                    option.setName('von').setDescription('Format: YYYY-MM-DD'),
+                )
+                .addStringOption((option) =>
+                    option.setName('bis').setDescription('Format: YYYY-MM-DD'),
+                )
+                .addIntegerOption((option) => option.setName('page').setDescription('Seite')),
+        ),
+)
 export class Darkchat extends Command {
     constructor() {
         super();
@@ -29,44 +61,6 @@ export class Darkchat extends Command {
             Config.Groups.DEV.BOTTEST,
         ];
         this.IsBetaCommand = true;
-        initCommandOld(
-            new SlashCommandBuilder()
-                .setName('darkchat')
-                .setDescription('Darkchat Commands')
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('getmessages')
-                        .setDescription('Nachrichten aus dem Darkchat abrufen')
-                        .addStringOption((option) =>
-                            option
-                                .setName('filterby')
-                                .setDescription('Filter Nach')
-                                .addChoices(
-                                    { name: 'Channel', value: 'byChannel' },
-                                    { name: 'SteamID', value: 'bySteamID' },
-                                    { name: 'Telefonnummer', value: 'byPhoneNumber' },
-                                    { name: 'Darkchat Username', value: 'byDarkchatName' },
-                                )
-                                .setRequired(true),
-                        )
-                        .addStringOption((option) =>
-                            option
-                                .setName('filtervalue')
-                                .setDescription('Filter Wert')
-                                .setRequired(true),
-                        )
-                        .addStringOption((option) =>
-                            option.setName('von').setDescription('Format: YYYY-MM-DD'),
-                        )
-                        .addStringOption((option) =>
-                            option.setName('bis').setDescription('Format: YYYY-MM-DD'),
-                        )
-                        .addIntegerOption((option) =>
-                            option.setName('page').setDescription('Seite'),
-                        ),
-                ),
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

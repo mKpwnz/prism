@@ -1,9 +1,63 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
-import { initCommandOld } from '@commands/CommandHandler';
+import Command from '@class/Command';
+import { RegisterCommand } from '@decorators';
 import { InsuranceService } from '@services/InsuranceService';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('versicherung')
+        .setDescription('Befehle Rund um die Versicherung')
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('prüfen')
+                .setDescription('Prüft ob ein Fahrzeug versichert ist')
+                .addStringOption((option) =>
+                    option
+                        .setName('kennzeichen')
+                        .setDescription('Kennzeichen des Fahrzeuges')
+                        .setRequired(true),
+                ),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('hinzufügen')
+                .setDescription('Fügt eine Versicherung hinzu')
+                .addStringOption((option) =>
+                    option
+                        .setName('kennzeichen')
+                        .setDescription('Kennzeichen des Fahrzeuges')
+                        .setRequired(true),
+                )
+                .addNumberOption((option) =>
+                    option
+                        .setName('dauer')
+                        .setDescription('(Hinzufügen): Dauer')
+                        .setRequired(true)
+                        .addChoices(
+                            { name: '1 Tag', value: 1 },
+                            { name: '3 Tage', value: 3 },
+                            { name: '7 Tage', value: 7 },
+                            { name: '14 Tage', value: 14 },
+                            { name: '30 Tage', value: 30 },
+                        ),
+                )
+                .addBooleanOption((option) =>
+                    option.setName('premium').setDescription('Premium Versicherung?'),
+                ),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('entfernen')
+                .setDescription('Entfernt eine Versicherung')
+                .addStringOption((option) =>
+                    option
+                        .setName('kennzeichen')
+                        .setDescription('Kennzeichen des Fahrzeuges')
+                        .setRequired(true),
+                ),
+        ),
+)
 export class Insurance extends Command {
     constructor() {
         super();
@@ -24,61 +78,6 @@ export class Insurance extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        initCommandOld(
-            new SlashCommandBuilder()
-                .setName('versicherung')
-                .setDescription('Befehle Rund um die Versicherung')
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('prüfen')
-                        .setDescription('Prüft ob ein Fahrzeug versichert ist')
-                        .addStringOption((option) =>
-                            option
-                                .setName('kennzeichen')
-                                .setDescription('Kennzeichen des Fahrzeuges')
-                                .setRequired(true),
-                        ),
-                )
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('hinzufügen')
-                        .setDescription('Fügt eine Versicherung hinzu')
-                        .addStringOption((option) =>
-                            option
-                                .setName('kennzeichen')
-                                .setDescription('Kennzeichen des Fahrzeuges')
-                                .setRequired(true),
-                        )
-                        .addNumberOption((option) =>
-                            option
-                                .setName('dauer')
-                                .setDescription('(Hinzufügen): Dauer')
-                                .setRequired(true)
-                                .addChoices(
-                                    { name: '1 Tag', value: 1 },
-                                    { name: '3 Tage', value: 3 },
-                                    { name: '7 Tage', value: 7 },
-                                    { name: '14 Tage', value: 14 },
-                                    { name: '30 Tage', value: 30 },
-                                ),
-                        )
-                        .addBooleanOption((option) =>
-                            option.setName('premium').setDescription('Premium Versicherung?'),
-                        ),
-                )
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('entfernen')
-                        .setDescription('Entfernt eine Versicherung')
-                        .addStringOption((option) =>
-                            option
-                                .setName('kennzeichen')
-                                .setDescription('Kennzeichen des Fahrzeuges')
-                                .setRequired(true),
-                        ),
-                ),
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

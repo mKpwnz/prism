@@ -1,16 +1,16 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
+import Command from '@class/Command';
 import { PerformanceProfiler } from '@class/PerformanceProfiler';
-import { initCommandOld } from '@commands/CommandHandler';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { ESearchType } from '@enums/ESearchType';
 import { EmoteManager } from '@manager/EmoteManager';
+import LogManager from '@manager/LogManager';
 import { NvhxService } from '@services/NvhxService';
 import { PlayerService } from '@services/PlayerService';
 import { BotDB, GameDB } from '@sql/Database';
 import { IFindUser } from '@sql/schema/User.schema';
 import { Helper } from '@utils/Helper';
-import LogManager from '@manager/LogManager';
 import {
     AttachmentBuilder,
     ChatInputCommandInteraction,
@@ -18,6 +18,40 @@ import {
     SlashCommandBuilder,
 } from 'discord.js';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('whois')
+        .setDescription('Suche nach Spielern')
+        .setDMPermission(true)
+        .addStringOption((option) =>
+            option.setName('input').setDescription('Identifier des Spielers').setRequired(true),
+        )
+        .addBooleanOption((option) =>
+            option.setName('export').setDescription('Gibt eine JSON Datei aus'),
+        )
+        .addIntegerOption((option) => option.setName('seite').setDescription('Seitenzahl'))
+        .addStringOption((option) =>
+            option
+                .setName('spalte')
+                .setDescription('Sucht in einer speziellen Spalte')
+                .addChoices(
+                    { name: 'Identifier', value: ESearchType.IDENTIFIER },
+                    { name: 'SteamID', value: ESearchType.STEAMID },
+                    { name: 'Lizenz', value: ESearchType.LICENSE },
+                    { name: 'LiveID', value: ESearchType.LIVEID },
+                    { name: 'XBLID', value: ESearchType.XBLID },
+                    { name: 'Discord', value: ESearchType.DISCORD },
+                    { name: 'PlayerIP', value: ESearchType.PLAYERIP },
+                    { name: 'Name', value: ESearchType.NAME },
+                    { name: 'Playername', value: ESearchType.PLAYERNAME },
+                    { name: 'Vorname', value: ESearchType.FIRSTNAME },
+                    { name: 'Nachname', value: ESearchType.LASTNAME },
+                    { name: 'Job', value: ESearchType.JOB },
+                    { name: 'Gruppe', value: ESearchType.GROUP },
+                    { name: 'Telefonnummer', value: ESearchType.PHONENUMBER },
+                ),
+        ),
+)
 export class WhoIs extends Command {
     constructor() {
         super();
@@ -39,45 +73,6 @@ export class WhoIs extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        initCommandOld(
-            new SlashCommandBuilder()
-                .setName('whois')
-                .setDescription('Suche nach Spielern')
-                // add string option
-                .setDMPermission(true)
-                .addStringOption((option) =>
-                    option
-                        .setName('input')
-                        .setDescription('Identifier des Spielers')
-                        .setRequired(true),
-                )
-                .addBooleanOption((option) =>
-                    option.setName('export').setDescription('Gibt eine JSON Datei aus'),
-                )
-                .addIntegerOption((option) => option.setName('seite').setDescription('Seitenzahl'))
-                .addStringOption((option) =>
-                    option
-                        .setName('spalte')
-                        .setDescription('Sucht in einer speziellen Spalte')
-                        .addChoices(
-                            { name: 'Identifier', value: ESearchType.IDENTIFIER },
-                            { name: 'SteamID', value: ESearchType.STEAMID },
-                            { name: 'Lizenz', value: ESearchType.LICENSE },
-                            { name: 'LiveID', value: ESearchType.LIVEID },
-                            { name: 'XBLID', value: ESearchType.XBLID },
-                            { name: 'Discord', value: ESearchType.DISCORD },
-                            { name: 'PlayerIP', value: ESearchType.PLAYERIP },
-                            { name: 'Name', value: ESearchType.NAME },
-                            { name: 'Playername', value: ESearchType.PLAYERNAME },
-                            { name: 'Vorname', value: ESearchType.FIRSTNAME },
-                            { name: 'Nachname', value: ESearchType.LASTNAME },
-                            { name: 'Job', value: ESearchType.JOB },
-                            { name: 'Gruppe', value: ESearchType.GROUP },
-                            { name: 'Telefonnummer', value: ESearchType.PHONENUMBER },
-                        ),
-                ),
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

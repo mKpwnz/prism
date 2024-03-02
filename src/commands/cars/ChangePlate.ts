@@ -1,12 +1,29 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
-import { initCommandOld } from '@commands/CommandHandler';
+import Command from '@class/Command';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { VehicleService } from '@services/VehicleService';
 import { formatPlate } from '@utils/FiveMHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('changeplate')
+        .setDescription('Ändert das Kennzeichen des Fahrzeugs')
+        .addStringOption((option) =>
+            option
+                .setName('oldplate')
+                .setDescription('Aktuelles Kennzeichen des Fahrzeugs')
+                .setRequired(true),
+        )
+        .addStringOption((option) =>
+            option
+                .setName('newplate')
+                .setDescription('Neues Kennzeichen des Fahrzeugs')
+                .setRequired(true),
+        ),
+)
 export class ChangePlate extends Command {
     constructor() {
         super();
@@ -30,25 +47,6 @@ export class ChangePlate extends Command {
             Config.Users.LUCASJHW,
             Config.Users.JUNGLEJANIS,
         ];
-
-        initCommandOld(
-            new SlashCommandBuilder()
-                .setName('changeplate')
-                .setDescription('Ändert das Kennzeichen des Fahrzeugs')
-                .addStringOption((option) =>
-                    option
-                        .setName('oldplate')
-                        .setDescription('Aktuelles Kennzeichen des Fahrzeugs')
-                        .setRequired(true),
-                )
-                .addStringOption((option) =>
-                    option
-                        .setName('newplate')
-                        .setDescription('Neues Kennzeichen des Fahrzeugs')
-                        .setRequired(true),
-                ),
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

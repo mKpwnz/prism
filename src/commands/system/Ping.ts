@@ -1,9 +1,10 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
-import { initCommandOld } from '@commands/CommandHandler';
+import Command from '@class/Command';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { SlashCommandBuilder } from 'discord.js';
 
+@RegisterCommand(new SlashCommandBuilder().setName('ping').setDescription('Pong!'))
 export class Ping extends Command {
     constructor() {
         super();
@@ -15,7 +16,6 @@ export class Ping extends Command {
             Config.Channels.PROD.PRISM_TESTING,
             Config.Channels.DEV.PRISM_TESTING,
         ];
-        initCommandOld(new SlashCommandBuilder().setName('ping').setDescription('Pong!'), this);
     }
 
     async execute(): Promise<void> {

@@ -1,13 +1,41 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
+import Command from '@class/Command';
 import TxAdminClient from '@clients/TxAdminClient';
-import { initCommandOld } from '@commands/CommandHandler';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import TxAdminError from '@error/TxAdmin.error';
 import LogManager from '@manager/LogManager';
 import { PlayerService } from '@services/PlayerService';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('ban')
+        .setDescription('Banne einen Spieler über TxAdmin')
+        .addStringOption((option) =>
+            option.setName('steamid').setDescription('SteamID des Spielers').setRequired(true),
+        )
+        .addStringOption((option) =>
+            option
+                .setName('dauer')
+                .setDescription('Einheit der Bandauer')
+                .setRequired(true)
+                .addChoices(
+                    { name: '2 Stunden', value: '2 hours' },
+                    { name: '8 Stunden', value: '8 hours' },
+                    { name: '1 Tag', value: '1 day' },
+                    { name: '2 Tage', value: '2 days' },
+                    { name: '3 Tage', value: '3 days' },
+                    { name: '5 Tage', value: '5 days' },
+                    { name: '1 Woche', value: '1 week' },
+                    { name: '2 Wochen', value: '2 weeks' },
+                    { name: 'Permanent', value: 'permanent' },
+                ),
+        )
+        .addStringOption((option) =>
+            option.setName('reason').setDescription('Grund des Bans').setRequired(false),
+        ),
+)
 export class Ban extends Command {
     constructor() {
         super();
@@ -29,38 +57,6 @@ export class Ban extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        initCommandOld(
-            new SlashCommandBuilder()
-                .setName('ban')
-                .setDescription('Banne einen Spieler über TxAdmin')
-                .addStringOption((option) =>
-                    option
-                        .setName('steamid')
-                        .setDescription('SteamID des Spielers')
-                        .setRequired(true),
-                )
-                .addStringOption((option) =>
-                    option
-                        .setName('dauer')
-                        .setDescription('Einheit der Bandauer')
-                        .setRequired(true)
-                        .addChoices(
-                            { name: '2 Stunden', value: '2 hours' },
-                            { name: '8 Stunden', value: '8 hours' },
-                            { name: '1 Tag', value: '1 day' },
-                            { name: '2 Tage', value: '2 days' },
-                            { name: '3 Tage', value: '3 days' },
-                            { name: '5 Tage', value: '5 days' },
-                            { name: '1 Woche', value: '1 week' },
-                            { name: '2 Wochen', value: '2 weeks' },
-                            { name: 'Permanent', value: 'permanent' },
-                        ),
-                )
-                .addStringOption((option) =>
-                    option.setName('reason').setDescription('Grund des Bans').setRequired(false),
-                ),
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

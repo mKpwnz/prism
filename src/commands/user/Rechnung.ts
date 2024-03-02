@@ -1,16 +1,103 @@
-import { Command } from '@class/Command';
-import { initCommandOld } from '@commands/CommandHandler';
-import { PlayerService } from '@services/PlayerService';
-import { EENV } from '@enums/EENV';
 import Config from '@Config';
+import Command from '@class/Command';
+import { RegisterCommand } from '@decorators';
+import { EENV } from '@enums/EENV';
+import LogManager from '@manager/LogManager';
+import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
 import { IBilling } from '@sql/schema/Billing.schema';
 import { IJob } from '@sql/schema/Job.schema';
-import LogManager from '@manager/LogManager';
+import { sendToChannel } from '@utils/DiscordHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
-import { sendToChannel } from '@utils/DiscordHelper';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('rechnung')
+        .setDescription('Befehle rund um das Rechnungsmenü')
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('suchen')
+                .setDescription('Suche nach Rechnungen eines bestimmten Spielers')
+                .addStringOption((option) =>
+                    option
+                        .setName('steamid')
+                        .setDescription('SteamID des Spielers')
+                        .setRequired(true),
+                )
+                .addStringOption((option) =>
+                    option
+                        .setName('status')
+                        .setDescription('Filtert nach einem Status')
+                        .addChoices(
+                            { name: 'Unbezahlt', value: 'unpaid' },
+                            { name: 'Bezahlt', value: 'paid' },
+                            { name: 'Automatisch Bezahlt', value: 'autopaid' },
+                            { name: 'Alle', value: 'all' },
+                        ),
+                )
+                .addIntegerOption((option) => option.setName('page').setDescription('Seitenzahl'))
+                .addIntegerOption((option) =>
+                    option
+                        .setName('limit')
+                        .setDescription('Limit an Ergebnissen Default: 5 Max: 10'),
+                ),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('anzeigen')
+                .setDescription('Zeigt eine bestimmte Rechnung anhand der ID an')
+                .addIntegerOption((option) =>
+                    option.setName('id').setDescription('ID der Rechnung').setRequired(true),
+                ),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('bezahlen')
+                .setDescription('Bezahle die Rechnung eines Spielers')
+                .addIntegerOption((option) =>
+                    option.setName('id').setDescription('ID der Rechnung').setRequired(true),
+                ),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('löschen')
+                .setDescription('Löscht die Rechnung eines Spielers')
+                .addIntegerOption((option) =>
+                    option.setName('id').setDescription('ID der Rechnung').setRequired(true),
+                ),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('erstellen')
+                .setDescription('Stelle eine Rechnung für einen Spieler aus')
+                .addStringOption((option) =>
+                    option
+                        .setName('steamid')
+                        .setDescription('SteamID des Spielers')
+                        .setRequired(true),
+                )
+                .addIntegerOption((option) =>
+                    option
+                        .setName('betrag')
+                        .setDescription('Betrag der Rechnung')
+                        .setRequired(true),
+                )
+                .addStringOption((option) =>
+                    option.setName('grund').setDescription('Grund der Rechnung').setRequired(true),
+                )
+                .addStringOption((option) =>
+                    option
+                        .setName('sender')
+                        .setDescription(
+                            'Sender der Rechunng (Fraktionsname) Beispiel: police Default: dortmund',
+                        ),
+                )
+                .addStringOption((option) =>
+                    option.setName('beschreibung').setDescription('Beschreibung der Rechnung'),
+                ),
+        ),
+)
 export class Rechnung extends Command {
     constructor() {
         super();
@@ -32,111 +119,6 @@ export class Rechnung extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        initCommandOld(
-            new SlashCommandBuilder()
-                .setName('rechnung')
-                .setDescription('Befehle rund um das Rechnungsmenü')
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('suchen')
-                        .setDescription('Suche nach Rechnungen eines bestimmten Spielers')
-                        .addStringOption((option) =>
-                            option
-                                .setName('steamid')
-                                .setDescription('SteamID des Spielers')
-                                .setRequired(true),
-                        )
-                        .addStringOption((option) =>
-                            option
-                                .setName('status')
-                                .setDescription('Filtert nach einem Status')
-                                .addChoices(
-                                    { name: 'Unbezahlt', value: 'unpaid' },
-                                    { name: 'Bezahlt', value: 'paid' },
-                                    { name: 'Automatisch Bezahlt', value: 'autopaid' },
-                                    { name: 'Alle', value: 'all' },
-                                ),
-                        )
-                        .addIntegerOption((option) =>
-                            option.setName('page').setDescription('Seitenzahl'),
-                        )
-                        .addIntegerOption((option) =>
-                            option
-                                .setName('limit')
-                                .setDescription('Limit an Ergebnissen Default: 5 Max: 10'),
-                        ),
-                )
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('anzeigen')
-                        .setDescription('Zeigt eine bestimmte Rechnung anhand der ID an')
-                        .addIntegerOption((option) =>
-                            option
-                                .setName('id')
-                                .setDescription('ID der Rechnung')
-                                .setRequired(true),
-                        ),
-                )
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('bezahlen')
-                        .setDescription('Bezahle die Rechnung eines Spielers')
-                        .addIntegerOption((option) =>
-                            option
-                                .setName('id')
-                                .setDescription('ID der Rechnung')
-                                .setRequired(true),
-                        ),
-                )
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('löschen')
-                        .setDescription('Löscht die Rechnung eines Spielers')
-                        .addIntegerOption((option) =>
-                            option
-                                .setName('id')
-                                .setDescription('ID der Rechnung')
-                                .setRequired(true),
-                        ),
-                )
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('erstellen')
-                        .setDescription('Stelle eine Rechnung für einen Spieler aus')
-                        .addStringOption((option) =>
-                            option
-                                .setName('steamid')
-                                .setDescription('SteamID des Spielers')
-                                .setRequired(true),
-                        )
-                        .addIntegerOption((option) =>
-                            option
-                                .setName('betrag')
-                                .setDescription('Betrag der Rechnung')
-                                .setRequired(true),
-                        )
-                        .addStringOption((option) =>
-                            option
-                                .setName('grund')
-                                .setDescription('Grund der Rechnung')
-                                .setRequired(true),
-                        )
-                        .addStringOption((option) =>
-                            option
-                                .setName('sender')
-                                .setDescription(
-                                    'Sender der Rechunng (Fraktionsname) Beispiel: police Default: dortmund',
-                                ),
-                        )
-                        .addStringOption((option) =>
-                            option
-                                .setName('beschreibung')
-                                .setDescription('Beschreibung der Rechnung'),
-                        ),
-                ),
-
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

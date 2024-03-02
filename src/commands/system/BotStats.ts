@@ -1,6 +1,6 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
-import { RegisterCommand } from '@decorators/RegisterCommand';
+import Command from '@class/Command';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { BotDB } from '@sql/Database';
 import { AlignmentEnum, AsciiTable3 } from 'ascii-table3';

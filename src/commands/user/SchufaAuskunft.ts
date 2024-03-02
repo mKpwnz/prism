@@ -1,12 +1,23 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
-import { initCommandOld } from '@commands/CommandHandler';
+import Command from '@class/Command';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { UserService } from '@services/UserService';
 import { ISchufaUser } from '@sql/schema/User.schema';
 import { attachmentFromObject } from '@utils/DiscordHelper';
 import { AttachmentBuilder, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('schufaauskunft')
+        .setDescription(
+            'Gibt eine liste vom allen usern mit negativem Kontostand aus (Grüngeld, Schwarzgeld, Bank)',
+        )
+        .addIntegerOption((option) => option.setName('page').setDescription('Seite'))
+        .addBooleanOption((option) =>
+            option.setName('jsonexport').setDescription('Json Export ausgeben'),
+        ),
+)
 export class SchufaAuskunft extends Command {
     constructor() {
         super();
@@ -28,18 +39,6 @@ export class SchufaAuskunft extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        initCommandOld(
-            new SlashCommandBuilder()
-                .setName('schufaauskunft')
-                .setDescription(
-                    'Gibt eine liste vom allen usern mit negativem Kontostand aus (Grüngeld, Schwarzgeld, Bank)',
-                )
-                .addIntegerOption((option) => option.setName('page').setDescription('Seite'))
-                .addBooleanOption((option) =>
-                    option.setName('jsonexport').setDescription('Json Export ausgeben'),
-                ),
-            this,
-        );
         this.IsBetaCommand = true;
     }
 

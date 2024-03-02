@@ -1,11 +1,19 @@
-import { Command } from '@class/Command';
+import Command from '@class/Command';
 import { RconClient } from '@class/RconClient';
-import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 
 import Config from '@Config';
+import { RegisterCommand } from '@decorators';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('nvhxban')
+        .setDescription('Bannt einen Nutzer')
+        .addIntegerOption((option) =>
+            option.setName('id').setDescription('SpielerID').setRequired(true),
+        ),
+)
 export class NvhxBan extends Command {
     constructor() {
         super();
@@ -26,15 +34,6 @@ export class NvhxBan extends Command {
         ];
         this.AllowedUsers = [Config.Users.MIKA];
         this.IsBetaCommand = true;
-        initCommandOld(
-            new SlashCommandBuilder()
-                .setName('nvhxban')
-                .setDescription('Bannt einen Nutzer')
-                .addIntegerOption((option) =>
-                    option.setName('id').setDescription('SpielerID').setRequired(true),
-                ),
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

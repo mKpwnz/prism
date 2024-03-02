@@ -1,9 +1,10 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
-import { initCommandOld } from '@commands/CommandHandler';
+import Command from '@class/Command';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { SlashCommandBuilder } from 'discord.js';
 
+@RegisterCommand(new SlashCommandBuilder().setName('help').setDescription('Liste aller Befehle!'))
 export class Help extends Command {
     constructor() {
         super();
@@ -25,10 +26,6 @@ export class Help extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        initCommandOld(
-            new SlashCommandBuilder().setName('help').setDescription('Liste aller Befehle!'),
-            this,
-        );
     }
 
     async execute(): Promise<void> {

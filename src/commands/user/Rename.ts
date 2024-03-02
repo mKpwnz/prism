@@ -1,14 +1,28 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
-import { initCommandOld } from '@commands/CommandHandler';
+import Command from '@class/Command';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
+import { sendToChannel } from '@utils/DiscordHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
-import { sendToChannel } from '@utils/DiscordHelper';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('rename')
+        .setDescription('Suche nach Spielern')
+        .addStringOption((option) =>
+            option.setName('steam').setDescription('Steam ID des Nutzers').setRequired(true),
+        )
+        .addStringOption((option) =>
+            option.setName('vorname').setDescription('Vorname des Spielers'),
+        )
+        .addStringOption((option) =>
+            option.setName('nachname').setDescription('Nachname des Spielers'),
+        ),
+)
 export class Rename extends Command {
     constructor() {
         super();
@@ -28,24 +42,6 @@ export class Rename extends Command {
             Config.Groups.DEV.BOTTEST,
         ];
         this.AllowedUsers = [Config.Users.L33V33N, Config.Users.ZMASTER, Config.Users.MANU];
-        initCommandOld(
-            new SlashCommandBuilder()
-                .setName('rename')
-                .setDescription('Suche nach Spielern')
-                .addStringOption((option) =>
-                    option
-                        .setName('steam')
-                        .setDescription('Steam ID des Nutzers')
-                        .setRequired(true),
-                )
-                .addStringOption((option) =>
-                    option.setName('vorname').setDescription('Vorname des Spielers'),
-                )
-                .addStringOption((option) =>
-                    option.setName('nachname').setDescription('Nachname des Spielers'),
-                ),
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

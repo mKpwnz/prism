@@ -1,10 +1,18 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
-import { initCommandOld } from '@commands/CommandHandler';
+import Command from '@class/Command';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { PhoneService } from '@services/PhoneService';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('pcheckimageowner')
+        .setDescription('Check who created an Ingame image')
+        .addStringOption((option) =>
+            option.setName('imageurl').setDescription('Image URL').setRequired(true),
+        ),
+)
 export class CheckImageOwner extends Command {
     constructor() {
         super();
@@ -26,15 +34,6 @@ export class CheckImageOwner extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        initCommandOld(
-            new SlashCommandBuilder()
-                .setName('pcheckimageowner')
-                .setDescription('Check who created an Ingame image')
-                .addStringOption((option) =>
-                    option.setName('imageurl').setDescription('Image URL').setRequired(true),
-                ),
-            this,
-        );
     }
 
     private normalizeLink(link: string): string | null {

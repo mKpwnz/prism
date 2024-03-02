@@ -1,7 +1,7 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
+import Command from '@class/Command';
 import TxAdminClient from '@clients/TxAdminClient';
-import { initCommandOld } from '@commands/CommandHandler';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import TxAdminError from '@error/TxAdmin.error';
 import LogManager from '@manager/LogManager';
@@ -10,6 +10,15 @@ import { paginateApiResponse } from '@utils/DiscordHelper';
 import { Helper } from '@utils/Helper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('txhistory')
+        .setDescription('Zeigt die Aktionen eines Spielers über TxAdmin')
+        .addStringOption((option) =>
+            option.setName('steamid').setDescription('SteamID des Spielers').setRequired(true),
+        )
+        .addIntegerOption((option) => option.setName('page').setDescription('Seite')),
+)
 export class TxHistory extends Command {
     constructor() {
         super();
@@ -31,19 +40,6 @@ export class TxHistory extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        initCommandOld(
-            new SlashCommandBuilder()
-                .setName('txhistory')
-                .setDescription('Zeigt die Aktionen eines Spielers über TxAdmin')
-                .addStringOption((option) =>
-                    option
-                        .setName('steamid')
-                        .setDescription('SteamID des Spielers')
-                        .setRequired(true),
-                )
-                .addIntegerOption((option) => option.setName('page').setDescription('Seite')),
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

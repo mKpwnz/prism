@@ -1,11 +1,55 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
+import Command from '@class/Command';
 import TxAdminClient from '@clients/TxAdminClient';
-import { initCommandOld } from '@commands/CommandHandler';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('whitelist')
+        .setDescription('Setze einen Spieler auf die Whitelist')
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('accept')
+                .setDescription('Akzeptiere eine Whitelist Anfrage')
+                .addStringOption((option) =>
+                    option
+                        .setName('requestid')
+                        .setDescription('Whitelist Request ID')
+                        .setMinLength(5)
+                        .setMaxLength(5)
+                        .setRequired(true),
+                ),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('deny')
+                .setDescription('Akzeptiere eine Whitelist Anfrage')
+                .addStringOption((option) =>
+                    option
+                        .setName('requestid')
+                        .setDescription('Whitelist Request ID')
+                        .setMinLength(5)
+                        .setMaxLength(5)
+                        .setRequired(true),
+                ),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('info')
+                .setDescription('Zeige Informationen zu einem Whitelist Request')
+                .addStringOption((option) =>
+                    option
+                        .setName('requestid')
+                        .setDescription('Whitelist Request ID')
+                        .setMinLength(5)
+                        .setMaxLength(5)
+                        .setRequired(true),
+                ),
+        ),
+)
 export class Whitelist extends Command {
     constructor() {
         super();
@@ -36,51 +80,6 @@ export class Whitelist extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        initCommandOld(
-            new SlashCommandBuilder()
-                .setName('whitelist')
-                .setDescription('Setze einen Spieler auf die Whitelist')
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('accept')
-                        .setDescription('Akzeptiere eine Whitelist Anfrage')
-                        .addStringOption((option) =>
-                            option
-                                .setName('requestid')
-                                .setDescription('Whitelist Request ID')
-                                .setMinLength(5)
-                                .setMaxLength(5)
-                                .setRequired(true),
-                        ),
-                )
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('deny')
-                        .setDescription('Akzeptiere eine Whitelist Anfrage')
-                        .addStringOption((option) =>
-                            option
-                                .setName('requestid')
-                                .setDescription('Whitelist Request ID')
-                                .setMinLength(5)
-                                .setMaxLength(5)
-                                .setRequired(true),
-                        ),
-                )
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('info')
-                        .setDescription('Zeige Informationen zu einem Whitelist Request')
-                        .addStringOption((option) =>
-                            option
-                                .setName('requestid')
-                                .setDescription('Whitelist Request ID')
-                                .setMinLength(5)
-                                .setMaxLength(5)
-                                .setRequired(true),
-                        ),
-                ),
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

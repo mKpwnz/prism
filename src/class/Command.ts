@@ -7,7 +7,7 @@ import { BotDB } from '@sql/Database';
 import { getEmbedBase, isUserAllowed } from '@utils/DiscordHelper';
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 
-export abstract class Command {
+export default abstract class Command {
     AllowedChannels: string[] = [];
 
     AllowedGroups: string[] = [];

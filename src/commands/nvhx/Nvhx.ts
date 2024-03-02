@@ -1,7 +1,7 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
+import Command from '@class/Command';
 import { RconClient } from '@class/RconClient';
-import { initCommandOld } from '@commands/CommandHandler';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { ILivePlayer } from '@interfaces/ILivePlayer';
 import { EmoteManager } from '@manager/EmoteManager';
@@ -9,6 +9,30 @@ import { NvhxService } from '@services/NvhxService';
 import { PlayerService } from '@services/PlayerService';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('nvhx')
+        .setDescription('Neverhax Commands')
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('sc')
+                .setDescription('Triggert Neverhax Screenshot')
+                .addIntegerOption((option) =>
+                    option.setName('id').setDescription('SpielerID').setRequired(true),
+                ),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('unban')
+                .setDescription('Entbanne einen Nutzer')
+                .addStringOption((option) =>
+                    option.setName('banid').setDescription('BanID des Banns').setRequired(true),
+                ),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand.setName('checkplayerbans').setDescription('Triggert Neverhax Info'),
+        ),
+)
 export class Nvhx extends Command {
     constructor() {
         super();
@@ -31,34 +55,6 @@ export class Nvhx extends Command {
             Config.Groups.DEV.BOTTEST,
         ];
         this.IsBetaCommand = true;
-        initCommandOld(
-            new SlashCommandBuilder()
-                .setName('nvhx')
-                .setDescription('Neverhax Commands')
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('sc')
-                        .setDescription('Triggert Neverhax Screenshot')
-                        .addIntegerOption((option) =>
-                            option.setName('id').setDescription('SpielerID').setRequired(true),
-                        ),
-                )
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('unban')
-                        .setDescription('Entbanne einen Nutzer')
-                        .addStringOption((option) =>
-                            option
-                                .setName('banid')
-                                .setDescription('BanID des Banns')
-                                .setRequired(true),
-                        ),
-                )
-                .addSubcommand((subcommand) =>
-                    subcommand.setName('checkplayerbans').setDescription('Triggert Neverhax Info'),
-                ),
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

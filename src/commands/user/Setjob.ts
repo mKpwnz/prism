@@ -1,7 +1,7 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
+import Command from '@class/Command';
 import { RconClient } from '@class/RconClient';
-import { initCommandOld } from '@commands/CommandHandler';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
@@ -9,6 +9,46 @@ import { IJob } from '@sql/schema/Job.schema';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('setjob')
+        .setDescription('Befehle um einen User in einen Job zu setzen')
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('online')
+                .setDescription('Setze den Job eines Spieler, der online ist')
+                .addIntegerOption((option) =>
+                    option.setName('id').setDescription('ID des Spielers').setRequired(true),
+                )
+                .addStringOption((option) =>
+                    option.setName('jobname').setDescription('Name des Jobs').setRequired(true),
+                )
+                .addIntegerOption((option) =>
+                    option
+                        .setName('grade')
+                        .setDescription('Grade des Spielers (Startet ab 0) (Default: 0)'),
+                ),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('offline')
+                .setDescription('Setze den Job eines Spieler, der offline ist')
+                .addStringOption((option) =>
+                    option
+                        .setName('steamid')
+                        .setDescription('SteamID des Spielers')
+                        .setRequired(true),
+                )
+                .addStringOption((option) =>
+                    option.setName('jobname').setDescription('Name des Jobs').setRequired(true),
+                )
+                .addIntegerOption((option) =>
+                    option
+                        .setName('grade')
+                        .setDescription('Grade des Spielers (Startet ab 0) (Default: 0)'),
+                ),
+        ),
+)
 export class Setjob extends Command {
     constructor() {
         super();
@@ -31,56 +71,6 @@ export class Setjob extends Command {
             Config.Groups.DEV.BOTTEST,
         ];
         this.IsBetaCommand = true;
-        initCommandOld(
-            new SlashCommandBuilder()
-                .setName('setjob')
-                .setDescription('Befehle um einen User in einen Job zu setzen')
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('online')
-                        .setDescription('Setze den Job eines Spieler, der online ist')
-                        .addIntegerOption((option) =>
-                            option
-                                .setName('id')
-                                .setDescription('ID des Spielers')
-                                .setRequired(true),
-                        )
-                        .addStringOption((option) =>
-                            option
-                                .setName('jobname')
-                                .setDescription('Name des Jobs')
-                                .setRequired(true),
-                        )
-                        .addIntegerOption((option) =>
-                            option
-                                .setName('grade')
-                                .setDescription('Grade des Spielers (Startet ab 0) (Default: 0)'),
-                        ),
-                )
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('offline')
-                        .setDescription('Setze den Job eines Spieler, der offline ist')
-                        .addStringOption((option) =>
-                            option
-                                .setName('steamid')
-                                .setDescription('SteamID des Spielers')
-                                .setRequired(true),
-                        )
-                        .addStringOption((option) =>
-                            option
-                                .setName('jobname')
-                                .setDescription('Name des Jobs')
-                                .setRequired(true),
-                        )
-                        .addIntegerOption((option) =>
-                            option
-                                .setName('grade')
-                                .setDescription('Grade des Spielers (Startet ab 0) (Default: 0)'),
-                        ),
-                ),
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

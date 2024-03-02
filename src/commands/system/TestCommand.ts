@@ -1,7 +1,7 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
+import Command from '@class/Command';
 import { PerformanceProfiler } from '@class/PerformanceProfiler';
-import { RegisterCommand } from '@decorators/RegisterCommand';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
