@@ -7,7 +7,7 @@ import { PlayerService } from '@services/PlayerService';
 import { VehicleService } from '@services/VehicleService';
 import { attachmentFromObject } from '@utils/DiscordHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { validateNumberplate } from '@utils/FiveMHelper';
+import { validatePlate } from '@utils/FiveMHelper';
 
 export class Vehicle extends Command {
     constructor() {
@@ -49,13 +49,13 @@ export class Vehicle extends Command {
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const plate = interaction.options.getString('plate', true);
 
-        const plateValid = validateNumberplate(plate);
+        const plateValid = validatePlate(plate);
         if (plateValid instanceof Error) {
             await this.replyError(plateValid.message);
             return;
         }
 
-        const vehicle = await VehicleService.getVehicleOrErrorByPlate(plate);
+        const vehicle = await VehicleService.getVehicleByPlate(plate);
         if (vehicle instanceof Error) {
             await this.replyError(vehicle.message);
             return;

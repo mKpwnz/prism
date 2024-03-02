@@ -45,7 +45,7 @@ export class DeleteTrunk extends Command {
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const plate = interaction.options.getString('plate', true);
 
-        const vehicle = await VehicleService.deleteTrunk(plate);
+        const vehicle = await VehicleService.deleteTrunkByPlate(plate);
         if (vehicle instanceof Error) {
             await this.replyError(vehicle.message);
             return;

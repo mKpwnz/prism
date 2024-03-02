@@ -4,7 +4,7 @@ import { initCommandOld } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { VehicleService } from '@services/VehicleService';
-import { formatNumberplate } from '@utils/FiveMHelper';
+import { formatPlate } from '@utils/FiveMHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 export class ChangePlate extends Command {
@@ -61,7 +61,7 @@ export class ChangePlate extends Command {
             return;
         }
         await this.replyWithEmbed({
-            description: `Das Fahrzeug mit dem Kennzeichen **${oldplate}** hat nun das Kennzeichen **${formatNumberplate(
+            description: `Das Fahrzeug mit dem Kennzeichen **${oldplate}** hat nun das Kennzeichen **${formatPlate(
                 newplate,
             )}**.`,
             color: EEmbedColors.SUCCESS,

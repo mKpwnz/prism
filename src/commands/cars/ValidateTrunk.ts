@@ -62,7 +62,7 @@ export class ValidateTrunk extends Command {
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const plate = interaction.options.getString('plate', true);
 
-        const vehicle = await VehicleService.getVehicleOrErrorByPlate(plate);
+        const vehicle = await VehicleService.getVehicleByPlate(plate);
         if (vehicle instanceof Error) {
             await this.replyError(vehicle.message);
             return;
@@ -87,6 +87,7 @@ export class ValidateTrunk extends Command {
                     .join('\n')}\`\`\``,
                 color: EEmbedColors.ALERT,
             });
+            return;
         }
 
         await this.replyWithEmbed({

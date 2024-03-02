@@ -101,7 +101,7 @@ export class Insurance extends Command {
     private async checkInsurance(interaction: ChatInputCommandInteraction): Promise<void> {
         const plate = interaction.options.getString('kennzeichen', true);
 
-        const insurances = await InsuranceService.getInsuranceByNumberplate(plate);
+        const insurances = await InsuranceService.getInsuranceByPlate(plate);
         if (insurances instanceof Error) {
             await this.replyError(insurances.message);
             return;
@@ -124,7 +124,7 @@ export class Insurance extends Command {
         const dauer: number = options.getNumber('dauer', true);
         const premium: boolean = options.getBoolean('premium') ?? false;
 
-        const result = await InsuranceService.addInsurance(plate, dauer, premium);
+        const result = await InsuranceService.createInsurance(plate, dauer, premium);
 
         if (!result) {
             await interaction.reply({
@@ -154,14 +154,14 @@ export class Insurance extends Command {
         const { options } = interaction;
         const plate = options.getString('kennzeichen', true);
 
-        const insurances = await InsuranceService.getInsuranceByNumberplate(plate);
+        const insurances = await InsuranceService.getInsuranceByPlate(plate);
         if (insurances instanceof Error) {
             await this.replyError(insurances.message);
             return;
         }
 
         const insurance = insurances[0];
-        const result = await InsuranceService.deleteInsurance(insurance);
+        const result = await InsuranceService.deleteInsuranceByPlate(insurance.plate);
         if (result instanceof Error) {
             await this.replyError(result.message);
             return;

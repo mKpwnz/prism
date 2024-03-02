@@ -1,4 +1,4 @@
-export function formatNumberplate(platetext: string): string {
+export function formatPlate(platetext: string): string {
     platetext = platetext.toUpperCase().replace(/[^A-Z0-9 ]*/g, '');
     if (platetext.length === 0) {
         return '        ';
@@ -23,7 +23,7 @@ export function formatNumberplate(platetext: string): string {
     return platetext;
 }
 
-export function validateNumberplate(numberplate: string): boolean | Error {
+export function validatePlate(numberplate: string): boolean | Error {
     if (numberplate.length > 8) {
         return new Error(
             `Das Kennzeichen **${numberplate}** ist zu lang. \nDas Kennzeichen darf maximal 8 Zeichen lang sein.`,
