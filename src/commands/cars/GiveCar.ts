@@ -1,11 +1,6 @@
 import Config from '@Config';
-<<<<<<< 335dae1077f2b35fcfc09014661255ef238761f8
 import Command from '@class/Command';
 import { RegisterCommand } from '@decorators';
-=======
-import { Command } from '@class/Command';
-import { RegisterCommand } from '@commands/CommandHandler';
->>>>>>> 071a1afc0885ae01e4c467a8c01e6abb9c851ce6
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { PlayerService } from '@services/PlayerService';
@@ -69,3 +64,4 @@ export class GiveCar extends Command {
         });
     }
 }
+

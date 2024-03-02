@@ -47,28 +47,6 @@ export class ChangePlate extends Command {
             Config.Users.LUCASJHW,
             Config.Users.JUNGLEJANIS,
         ];
-<<<<<<< 335dae1077f2b35fcfc09014661255ef238761f8
-=======
-
-        RegisterCommand(
-            new SlashCommandBuilder()
-                .setName('changeplate')
-                .setDescription('Ändert das Kennzeichen des Fahrzeugs')
-                .addStringOption((option) =>
-                    option
-                        .setName('oldplate')
-                        .setDescription('Aktuelles Kennzeichen des Fahrzeugs')
-                        .setRequired(true),
-                )
-                .addStringOption((option) =>
-                    option
-                        .setName('newplate')
-                        .setDescription('Neues Kennzeichen des Fahrzeugs')
-                        .setRequired(true),
-                ),
-            this,
-        );
->>>>>>> 071a1afc0885ae01e4c467a8c01e6abb9c851ce6
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
@@ -88,3 +66,4 @@ export class ChangePlate extends Command {
         });
     }
 }
+

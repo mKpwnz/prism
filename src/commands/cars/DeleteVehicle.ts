@@ -5,10 +5,7 @@ import { EEmbedColors } from '@enums/EmbedColors';
 import { VehicleService } from '@services/VehicleService';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { attachmentFromObject } from '@utils/DiscordHelper';
-<<<<<<< 335dae1077f2b35fcfc09014661255ef238761f8
 import { RegisterCommand } from '@decorators';
-=======
->>>>>>> 071a1afc0885ae01e4c467a8c01e6abb9c851ce6
 
 @RegisterCommand(
     new SlashCommandBuilder()
@@ -57,3 +54,4 @@ export class DeleteVehicle extends Command {
         });
     }
 }
+
