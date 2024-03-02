@@ -1,16 +1,17 @@
+import { BotClient } from '@Bot';
 import Config from '@Config';
-import { Command } from '@class/Command';
+import Command from '@class/Command';
 import { GitlabClient } from '@clients/GitlabClient';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import LogManager from '@manager/LogManager';
+import { getEmbedBase } from '@utils/DiscordHelper';
 import {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
     ChatInputCommandInteraction,
-    Client,
     Events,
     Interaction,
     ModalBuilder,
@@ -20,8 +21,12 @@ import {
     TextInputBuilder,
     TextInputStyle,
 } from 'discord.js';
-import { getEmbedBase } from '@utils/DiscordHelper';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('issue')
+        .setDescription('Erzeuge ein neues Issue für die Entwickler.'),
+)
 export class Issue extends Command {
     private allowedManagementGroups = [
         Config.Groups.PROD.TEAM_INHABER,
@@ -34,7 +39,7 @@ export class Issue extends Command {
         Config.Groups.DEV.BOTTEST,
     ];
 
-    constructor(client: Client) {
+    constructor() {
         super();
         this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [
@@ -55,13 +60,7 @@ export class Issue extends Command {
 
             Config.Groups.DEV.BOTTEST,
         ];
-        RegisterCommand(
-            new SlashCommandBuilder()
-                .setName('issue')
-                .setDescription('Erzeuge ein neues Issue für die Entwickler.'),
-            this,
-        );
-        client.on(Events.InteractionCreate, async (interaction) => this.onInteract(interaction));
+        BotClient.on(Events.InteractionCreate, async (interaction) => this.onInteract(interaction));
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
@@ -415,3 +414,4 @@ export class Issue extends Command {
         }
     }
 }
+

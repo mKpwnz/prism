@@ -1,12 +1,20 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
-import { RegisterCommand } from '@commands/CommandHandler';
+import Command from '@class/Command';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { VehicleService } from '@services/VehicleService';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { attachmentFromObject } from '@utils/DiscordHelper';
+import { RegisterCommand } from '@decorators';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('deletevehicle')
+        .setDescription('Löscht das Fahrzeug')
+        .addStringOption((option) =>
+            option.setName('plate').setDescription('Kennzeichen des Fahrzeugs').setRequired(true),
+        ),
+)
 export class DeleteVehicle extends Command {
     constructor() {
         super();
@@ -26,19 +34,6 @@ export class DeleteVehicle extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-
-        RegisterCommand(
-            new SlashCommandBuilder()
-                .setName('deletevehicle')
-                .setDescription('Löscht das Fahrzeug')
-                .addStringOption((option) =>
-                    option
-                        .setName('plate')
-                        .setDescription('Kennzeichen des Fahrzeugs')
-                        .setRequired(true),
-                ),
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
@@ -59,3 +54,4 @@ export class DeleteVehicle extends Command {
         });
     }
 }
+

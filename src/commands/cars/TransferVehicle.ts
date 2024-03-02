@@ -1,12 +1,42 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
+import Command from '@class/Command';
 import GameserverClient from '@clients/GameserverClient';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import LogManager from '@manager/LogManager';
 import { VehicleService } from '@services/VehicleService';
 import { ChatInputCommandInteraction, Interaction, SlashCommandBuilder } from 'discord.js';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('transfervehicle')
+        .setDescription('Ändert den Standort oder Fahrzeugtypen')
+        .addStringOption((option) =>
+            option
+                .setName('plate')
+                .setDescription('Kennzeichen des Fahrzeugs')
+                .setMaxLength(8)
+                .setRequired(true),
+        )
+        .addStringOption((option) =>
+            option
+                .setName('newtype')
+                .setDescription('Neuer Fahrzeug Typ')
+                .setRequired(true)
+                .addChoices(
+                    { name: 'Auto (car)', value: 'car' },
+                    { name: 'Flugzeug / Helikopter (air)', value: 'air' },
+                    { name: 'Boot (boat)', value: 'boat' },
+                ),
+        )
+        .addIntegerOption((option) =>
+            option
+                .setName('newlocation')
+                .setDescription('Neuer Standort')
+                .setRequired(true)
+                .setAutocomplete(true),
+        ),
+)
 export class TransferVehicle extends Command {
     constructor() {
         super();
@@ -28,38 +58,6 @@ export class TransferVehicle extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-
-        RegisterCommand(
-            new SlashCommandBuilder()
-                .setName('transfervehicle')
-                .setDescription('Ändert den Standort oder Fahrzeugtypen')
-                .addStringOption((option) =>
-                    option
-                        .setName('plate')
-                        .setDescription('Kennzeichen des Fahrzeugs')
-                        .setMaxLength(8)
-                        .setRequired(true),
-                )
-                .addStringOption((option) =>
-                    option
-                        .setName('newtype')
-                        .setDescription('Neuer Fahrzeug Typ')
-                        .setRequired(true)
-                        .addChoices(
-                            { name: 'Auto (car)', value: 'car' },
-                            { name: 'Flugzeug / Helikopter (air)', value: 'air' },
-                            { name: 'Boot (boat)', value: 'boat' },
-                        ),
-                )
-                .addIntegerOption((option) =>
-                    option
-                        .setName('newlocation')
-                        .setDescription('Neuer Standort')
-                        .setRequired(true)
-                        .setAutocomplete(true),
-                ),
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
@@ -124,3 +122,4 @@ export class TransferVehicle extends Command {
         );
     }
 }
+

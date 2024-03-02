@@ -1,12 +1,20 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
-import { RegisterCommand } from '@commands/CommandHandler';
+import Command from '@class/Command';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { RowDataPacket } from 'mysql2';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('resetpos')
+        .setDescription('Setze die Position eines Spielers zum Würfelpark zurück')
+        .addStringOption((option) =>
+            option.setName('steam').setDescription('Steam ID des Nutzers').setRequired(true),
+        ),
+)
 export class Resetpos extends Command {
     constructor() {
         super();
@@ -29,18 +37,6 @@ export class Resetpos extends Command {
             Config.Groups.DEV.BOTTEST,
         ];
         this.IsBetaCommand = true;
-        RegisterCommand(
-            new SlashCommandBuilder()
-                .setName('resetpos')
-                .setDescription('Setze die Position eines Spielers zum Würfelpark zurück')
-                .addStringOption((option) =>
-                    option
-                        .setName('steam')
-                        .setDescription('Steam ID des Nutzers')
-                        .setRequired(true),
-                ),
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

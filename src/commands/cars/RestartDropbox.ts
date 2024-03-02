@@ -1,10 +1,15 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
+import Command from '@class/Command';
 import { RconClient } from '@class/RconClient';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { SlashCommandBuilder } from 'discord.js';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('restartdropbox')
+        .setDescription('Startet die Tebexausgabe neu'),
+)
 export class RestartDropbox extends Command {
     constructor() {
         super();
@@ -25,12 +30,6 @@ export class RestartDropbox extends Command {
         ];
         this.AllowedUsers = [Config.Users.SCHLAUCHI];
         this.IsBetaCommand = true;
-        RegisterCommand(
-            new SlashCommandBuilder()
-                .setName('restartdropbox')
-                .setDescription('Startet die Tebexausgabe neu'),
-            this,
-        );
     }
 
     async execute(): Promise<void> {
@@ -41,3 +40,4 @@ export class RestartDropbox extends Command {
         });
     }
 }
+

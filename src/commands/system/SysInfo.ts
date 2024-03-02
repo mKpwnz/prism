@@ -1,9 +1,12 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
-import { RegisterCommand } from '@commands/CommandHandler';
+import Command from '@class/Command';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { SlashCommandBuilder } from 'discord.js';
 
+@RegisterCommand(
+    new SlashCommandBuilder().setName('sysinfo').setDescription('Get system information'),
+)
 export class SysInfo extends Command {
     constructor() {
         super();
@@ -15,11 +18,6 @@ export class SysInfo extends Command {
             Config.Channels.PROD.PRISM_TESTING,
             Config.Channels.DEV.PRISM_TESTING,
         ];
-
-        RegisterCommand(
-            new SlashCommandBuilder().setName('sysinfo').setDescription('Get system information'),
-            this,
-        );
     }
 
     async execute(): Promise<void> {

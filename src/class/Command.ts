@@ -4,10 +4,10 @@ import { EEmbedColors } from '@enums/EmbedColors';
 import { IEmbedOptions } from '@interfaces/IEmbed';
 import LogManager from '@manager/LogManager';
 import { BotDB } from '@sql/Database';
-import { isUserAllowed, getEmbedBase } from '@utils/DiscordHelper';
+import { getEmbedBase, isUserAllowed } from '@utils/DiscordHelper';
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 
-export abstract class Command {
+export default abstract class Command {
     AllowedChannels: string[] = [];
 
     AllowedGroups: string[] = [];

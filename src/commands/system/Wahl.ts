@@ -1,17 +1,17 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
-import { RegisterCommand } from '@commands/CommandHandler';
+import Command from '@class/Command';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
 import { IElection } from '@sql/schema/Election.schema';
 import { IElectionParticipant } from '@sql/schema/ElectionParticipant.schema';
+import { sendToChannel } from '@utils/DiscordHelper';
 import { Chart, ChartConfiguration } from 'chart.js';
 import { ChartJSNodeCanvas } from 'chartjs-node-canvas';
 import ChartDataLabels, { Context } from 'chartjs-plugin-datalabels';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
-import { sendToChannel } from '@utils/DiscordHelper';
 
 declare module 'chartjs-plugin-datalabels' {
     interface Context {
@@ -24,6 +24,121 @@ interface IVote extends RowDataPacket {
     vote_count: number;
 }
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('wahl')
+        .setDescription('Wahlverwaltung!')
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('erstellen')
+                .setDescription('Erstellt eine Wahl')
+                .addStringOption((option) =>
+                    option
+                        .setName('name')
+                        .setDescription('Gib der Wahl einen Namen')
+                        .setRequired(true),
+                )
+                .addStringOption((option) => option.setName('job').setDescription('Gib den Job an'))
+                .addBooleanOption((option) =>
+                    option.setName('enthaltung').setDescription('Enthaltung aktivieren'),
+                ),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('status')
+                .setDescription('Ändert den Status einer Wahl')
+                .addNumberOption((option) =>
+                    option.setName('wahlid').setDescription('Gib die WahlID an').setRequired(true),
+                )
+                .addNumberOption((option) =>
+                    option
+                        .setName('option_status')
+                        .setDescription('Status der Wahl')
+                        .addChoices(
+                            { name: 'Erstellt', value: 0 },
+                            { name: 'Gestartet', value: 1 },
+                            { name: 'Beendet', value: 2 },
+                            { name: 'Löschen', value: 3 },
+                        )
+                        .setRequired(true),
+                ),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('user')
+                .setDescription('Einstellungen zum User')
+                .addStringOption((option) =>
+                    option
+                        .setName('operation')
+                        .setDescription('hinzufügen/entfernen eines Spielers zur Wahl')
+                        .addChoices(
+                            { name: 'hinzufügen', value: 'add' },
+                            { name: 'entfernen', value: 'remove' },
+                        )
+                        .setRequired(true),
+                )
+                .addNumberOption((option) =>
+                    option.setName('wahlid').setDescription('Gib die WahlID an').setRequired(true),
+                )
+                .addStringOption((option) =>
+                    option
+                        .setName('steamid')
+                        .setDescription('Gib die SteamID an')
+                        .setRequired(true),
+                ),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('ergebnis')
+                .setDescription('Zeigt das Wahlergebnis an')
+                .addNumberOption((option) =>
+                    option.setName('wahlid').setDescription('Gib die WahlID an').setRequired(true),
+                ),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand.setName('liste').setDescription('Zeigt alle offenen Wahlen an'),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('kandidaten')
+                .setDescription('Zeigt alle Kandidaten zu einer Wahl an')
+                .addNumberOption((option) =>
+                    option.setName('wahlid').setDescription('Gib die WahlID an').setRequired(true),
+                ),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('manipulieren')
+                .setDescription('Manipuliert eine Wahl')
+                .addStringOption((option) =>
+                    option
+                        .setName('operation')
+                        .setDescription('hinzufügen/entfernen von Stimmen')
+                        .addChoices(
+                            { name: 'hinzufügen', value: 'add' },
+                            { name: 'entfernen', value: 'remove' },
+                        )
+                        .setRequired(true),
+                )
+                .addNumberOption((option) =>
+                    option.setName('wahlid').setDescription('Gib die WahlID an').setRequired(true),
+                )
+                .addStringOption((option) =>
+                    option
+                        .setName('kandidatennr')
+                        .setDescription(
+                            'Gib die Kandidatennummer an, diese findest du bei /wahl kandidaten',
+                        )
+                        .setRequired(true),
+                )
+                .addNumberOption((option) =>
+                    option
+                        .setName('stimmen')
+                        .setDescription('Gib die Anzahl der Stimmen an an')
+                        .setRequired(true),
+                ),
+        ),
+)
 export class Wahl extends Command {
     constructor() {
         super();
@@ -43,139 +158,6 @@ export class Wahl extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        RegisterCommand(
-            new SlashCommandBuilder()
-                .setName('wahl')
-                .setDescription('Wahlverwaltung!')
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('erstellen')
-                        .setDescription('Erstellt eine Wahl')
-                        .addStringOption((option) =>
-                            option
-                                .setName('name')
-                                .setDescription('Gib der Wahl einen Namen')
-                                .setRequired(true),
-                        )
-                        .addStringOption((option) =>
-                            option.setName('job').setDescription('Gib den Job an'),
-                        )
-                        .addBooleanOption((option) =>
-                            option.setName('enthaltung').setDescription('Enthaltung aktivieren'),
-                        ),
-                )
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('status')
-                        .setDescription('Ändert den Status einer Wahl')
-                        .addNumberOption((option) =>
-                            option
-                                .setName('wahlid')
-                                .setDescription('Gib die WahlID an')
-                                .setRequired(true),
-                        )
-                        .addNumberOption((option) =>
-                            option
-                                .setName('option_status')
-                                .setDescription('Status der Wahl')
-                                .addChoices(
-                                    { name: 'Erstellt', value: 0 },
-                                    { name: 'Gestartet', value: 1 },
-                                    { name: 'Beendet', value: 2 },
-                                    { name: 'Löschen', value: 3 },
-                                )
-                                .setRequired(true),
-                        ),
-                )
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('user')
-                        .setDescription('Einstellungen zum User')
-                        .addStringOption((option) =>
-                            option
-                                .setName('operation')
-                                .setDescription('hinzufügen/entfernen eines Spielers zur Wahl')
-                                .addChoices(
-                                    { name: 'hinzufügen', value: 'add' },
-                                    { name: 'entfernen', value: 'remove' },
-                                )
-                                .setRequired(true),
-                        )
-                        .addNumberOption((option) =>
-                            option
-                                .setName('wahlid')
-                                .setDescription('Gib die WahlID an')
-                                .setRequired(true),
-                        )
-                        .addStringOption((option) =>
-                            option
-                                .setName('steamid')
-                                .setDescription('Gib die SteamID an')
-                                .setRequired(true),
-                        ),
-                )
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('ergebnis')
-                        .setDescription('Zeigt das Wahlergebnis an')
-                        .addNumberOption((option) =>
-                            option
-                                .setName('wahlid')
-                                .setDescription('Gib die WahlID an')
-                                .setRequired(true),
-                        ),
-                )
-                .addSubcommand((subcommand) =>
-                    subcommand.setName('liste').setDescription('Zeigt alle offenen Wahlen an'),
-                )
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('kandidaten')
-                        .setDescription('Zeigt alle Kandidaten zu einer Wahl an')
-                        .addNumberOption((option) =>
-                            option
-                                .setName('wahlid')
-                                .setDescription('Gib die WahlID an')
-                                .setRequired(true),
-                        ),
-                )
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('manipulieren')
-                        .setDescription('Manipuliert eine Wahl')
-                        .addStringOption((option) =>
-                            option
-                                .setName('operation')
-                                .setDescription('hinzufügen/entfernen von Stimmen')
-                                .addChoices(
-                                    { name: 'hinzufügen', value: 'add' },
-                                    { name: 'entfernen', value: 'remove' },
-                                )
-                                .setRequired(true),
-                        )
-                        .addNumberOption((option) =>
-                            option
-                                .setName('wahlid')
-                                .setDescription('Gib die WahlID an')
-                                .setRequired(true),
-                        )
-                        .addStringOption((option) =>
-                            option
-                                .setName('kandidatennr')
-                                .setDescription(
-                                    'Gib die Kandidatennummer an, diese findest du bei /wahl kandidaten',
-                                )
-                                .setRequired(true),
-                        )
-                        .addNumberOption((option) =>
-                            option
-                                .setName('stimmen')
-                                .setDescription('Gib die Anzahl der Stimmen an an')
-                                .setRequired(true),
-                        ),
-                ),
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

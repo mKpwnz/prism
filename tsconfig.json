@@ -7,9 +7,17 @@
         "strict": true,
         "moduleResolution": "NodeNext",
         "allowJs": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
         "paths": {
-            "@*": ["./src/*"]
+            "@*": [
+                "./src/*"
+            ]
         }
     },
-    "include": ["./src", "types", "./src/types"]
+    "include": [
+        "./src",
+        "types",
+        "./src/types"
+    ]
 }

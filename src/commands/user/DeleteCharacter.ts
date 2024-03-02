@@ -1,18 +1,29 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
-import { RegisterCommand } from '@commands/CommandHandler';
+import Command from '@class/Command';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { ELicenses } from '@enums/ELicenses';
 import { IValidatedPlayer } from '@interfaces/IValidatedPlayer';
+import LogManager from '@manager/LogManager';
 import { PhoneService } from '@services/PhoneService';
 import { PlayerService } from '@services/PlayerService';
 import { GameDB } from '@sql/Database';
 import { IUser } from '@sql/schema/User.schema';
-import LogManager from '@manager/LogManager';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
 import { License } from './License';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('deletecharacter')
+        .setDescription('Löscht einen Charakter von einem Spieler')
+        .addStringOption((option) =>
+            option
+                .setName('steamid')
+                .setDescription('SteamID des zu löschenden Spielers')
+                .setRequired(true),
+        ),
+)
 export class DeleteCharacter extends Command {
     constructor() {
         super();
@@ -32,18 +43,6 @@ export class DeleteCharacter extends Command {
             Config.Groups.DEV.BOTTEST,
         ];
         this.IsBetaCommand = true;
-        RegisterCommand(
-            new SlashCommandBuilder()
-                .setName('deletecharacter')
-                .setDescription('Löscht einen Charakter von einem Spieler')
-                .addStringOption((option) =>
-                    option
-                        .setName('steamid')
-                        .setDescription('SteamID des zu löschenden Spielers')
-                        .setRequired(true),
-                ),
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

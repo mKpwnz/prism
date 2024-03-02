@@ -1,12 +1,23 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
-import { RegisterCommand } from '@commands/CommandHandler';
+import Command from '@class/Command';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { attachmentFromObject } from '@utils/DiscordHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { VehicleService } from '@services/VehicleService';
+import { RegisterCommand } from '@decorators';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('vehiclepop')
+        .setDescription('VehiclePop')
+        .addStringOption((option) =>
+            option.setName('spawnname').setDescription('Spawnname des Fahrzeugs').setRequired(true),
+        )
+        .addBooleanOption((option) =>
+            option.setName('noexport').setDescription('Ohne Export, nur zählen'),
+        ),
+)
 export class VehiclePop extends Command {
     constructor() {
         super();
@@ -28,23 +39,6 @@ export class VehiclePop extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-
-        RegisterCommand(
-            new SlashCommandBuilder()
-                .setName('vehiclepop')
-                .setDescription('VehiclePop')
-                .addStringOption((option) =>
-                    option
-                        .setName('spawnname')
-                        .setDescription('Spawnname des Fahrzeugs')
-                        .setRequired(true),
-                )
-                .addBooleanOption((option) =>
-                    option.setName('noexport').setDescription('Ohne Export, nur zählen'),
-                ),
-
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
@@ -84,3 +78,4 @@ export class VehiclePop extends Command {
         });
     }
 }
+

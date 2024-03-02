@@ -1,12 +1,48 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
-import { RegisterCommand } from '@commands/CommandHandler';
+import Command from '@class/Command';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { PhonePhotosService } from '@services/PhonePhotosService';
 import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 
 // TODO add typedoc for this command
 // TODO refactor
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('checkphotos')
+        .setDescription('Check Photos!')
+        .addBooleanOption((option) =>
+            option.setName('delete').setDescription('Bilder auch löschen?'),
+        )
+        .addNumberOption((option) =>
+            option
+                .addChoices(
+                    { name: 'Januar', value: 1 },
+                    { name: 'Februar', value: 2 },
+                    { name: 'März', value: 3 },
+                    { name: 'April', value: 4 },
+                    { name: 'Mai', value: 5 },
+                    { name: 'Juni', value: 6 },
+                    { name: 'Juli', value: 7 },
+                    { name: 'August', value: 8 },
+                    { name: 'September', value: 9 },
+                    { name: 'Oktober', value: 10 },
+                    { name: 'November', value: 11 },
+                    { name: 'Dezember', value: 12 },
+                )
+                .setName('month')
+                .setDescription('Monat'),
+        )
+        .addStringOption((option) =>
+            option
+                .setName('year')
+                .setDescription('Jahr')
+                .addChoices({ name: '2023', value: '2023' }, { name: '2024', value: '2024' }),
+        )
+        .addBooleanOption((option) =>
+            option.setName('selectall').setDescription('Alle auswählen?'),
+        ),
+)
 export class CheckPhotos extends Command {
     constructor() {
         super();
@@ -27,46 +63,6 @@ export class CheckPhotos extends Command {
             Config.Groups.DEV.BOTTEST,
         ];
         this.IsBetaCommand = true;
-        RegisterCommand(
-            new SlashCommandBuilder()
-                .setName('checkphotos')
-                .setDescription('Check Photos!')
-                .addBooleanOption((option) =>
-                    option.setName('delete').setDescription('Bilder auch löschen?'),
-                )
-                .addNumberOption((option) =>
-                    option
-                        .addChoices(
-                            { name: 'Januar', value: 1 },
-                            { name: 'Februar', value: 2 },
-                            { name: 'März', value: 3 },
-                            { name: 'April', value: 4 },
-                            { name: 'Mai', value: 5 },
-                            { name: 'Juni', value: 6 },
-                            { name: 'Juli', value: 7 },
-                            { name: 'August', value: 8 },
-                            { name: 'September', value: 9 },
-                            { name: 'Oktober', value: 10 },
-                            { name: 'November', value: 11 },
-                            { name: 'Dezember', value: 12 },
-                        )
-                        .setName('month')
-                        .setDescription('Monat'),
-                )
-                .addStringOption((option) =>
-                    option
-                        .setName('year')
-                        .setDescription('Jahr')
-                        .addChoices(
-                            { name: '2023', value: '2023' },
-                            { name: '2024', value: '2024' },
-                        ),
-                )
-                .addBooleanOption((option) =>
-                    option.setName('selectall').setDescription('Alle auswählen?'),
-                ),
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

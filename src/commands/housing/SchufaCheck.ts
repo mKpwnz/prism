@@ -1,19 +1,16 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
-import { RegisterCommand } from '@commands/CommandHandler';
+import Command from '@class/Command';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { UserService } from '@services/UserService';
 import { ISchufaUser } from '@sql/schema/User.schema';
 import { SlashCommandBuilder } from 'discord.js';
 
-/**
- * @description Klasse zum Überprüfen von Hausbesitzern mit negativem Kontostand.
- * @author mKpwnz
- * @date 28.12.2023
- * @export
- * @class SchufaCheck
- * @extends {Command}
- */
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('schufacheck')
+        .setDescription('Prüfe nach Hausbesitzern mit negativem Kontostand'),
+)
 export class SchufaCheck extends Command {
     constructor() {
         super();
@@ -35,12 +32,6 @@ export class SchufaCheck extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        RegisterCommand(
-            new SlashCommandBuilder()
-                .setName('schufacheck')
-                .setDescription('Prüfe nach Hausbesitzern mit negativem Kontostand'),
-            this,
-        );
     }
 
     async execute(): Promise<void> {

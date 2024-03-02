@@ -1,6 +1,5 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
-import { RegisterCommand } from '@commands/CommandHandler';
+import Command from '@class/Command';
 import { EENV } from '@enums/EENV';
 import { EEmbedColors } from '@enums/EmbedColors';
 import { PlayerService } from '@services/PlayerService';
@@ -8,7 +7,16 @@ import { VehicleService } from '@services/VehicleService';
 import { attachmentFromObject } from '@utils/DiscordHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { validatePlate } from '@utils/FiveMHelper';
+import { RegisterCommand } from '@decorators';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('vehicle')
+        .setDescription('Gibt Informationen zu einem Fahrzeug')
+        .addStringOption((option) =>
+            option.setName('plate').setDescription('Kennzeichen des Fahrzeugs').setRequired(true),
+        ),
+)
 export class Vehicle extends Command {
     constructor() {
         super();
@@ -30,20 +38,6 @@ export class Vehicle extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        this.EmbedTitle = 'Vehicle Info';
-
-        RegisterCommand(
-            new SlashCommandBuilder()
-                .setName('vehicle')
-                .setDescription('Gibt Informationen zu einem Fahrzeug')
-                .addStringOption((option) =>
-                    option
-                        .setName('plate')
-                        .setDescription('Kennzeichen des Fahrzeugs')
-                        .setRequired(true),
-                ),
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
@@ -94,3 +88,4 @@ export class Vehicle extends Command {
         });
     }
 }
+

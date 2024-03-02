@@ -1,10 +1,27 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
+import Command from '@class/Command';
 import { RconClient } from '@class/RconClient';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('rts')
+        .setDescription('Request to Support')
+        .addBooleanOption((option) =>
+            option
+                .setName('anzeigen')
+                .setDescription('True = Anzeigen | False = Ausblenden')
+                .setRequired(true),
+        )
+        .addIntegerOption((option) =>
+            option.setName('spielerid').setDescription('ID des Spielers').setRequired(true),
+        )
+        .addStringOption((option) =>
+            option.setName('nachricht').setDescription('Nachricht an den Spieler'),
+        ),
+)
 export class RequestToSupport extends Command {
     constructor() {
         super();
@@ -26,24 +43,6 @@ export class RequestToSupport extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        RegisterCommand(
-            new SlashCommandBuilder()
-                .setName('rts')
-                .setDescription('Request to Support')
-                .addBooleanOption((option) =>
-                    option
-                        .setName('anzeigen')
-                        .setDescription('True = Anzeigen | False = Ausblenden')
-                        .setRequired(true),
-                )
-                .addIntegerOption((option) =>
-                    option.setName('spielerid').setDescription('ID des Spielers').setRequired(true),
-                )
-                .addStringOption((option) =>
-                    option.setName('nachricht').setDescription('Nachricht an den Spieler'),
-                ),
-            this,
-        );
         this.IsBetaCommand = true;
     }
 

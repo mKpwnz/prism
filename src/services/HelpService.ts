@@ -1,14 +1,14 @@
 import { BotClient } from '@Bot';
 import Config from '@Config';
-import { CommandHandler } from '@commands/CommandHandler';
 import { EENV } from '@enums/EENV';
 import { ICmdPrintInformation } from '@interfaces/ICmdPrintInformation';
 import { ICmdPrintInformationOption } from '@interfaces/ICmdPrintInformationOption';
+import CommandManager from '@manager/CommandManager';
 
 export class HelpService {
     public static getCommands(): ICmdPrintInformation[] {
         const CmdPrintInformation: ICmdPrintInformation[] = [];
-        CommandHandler.commands.forEach((cmd) => {
+        CommandManager.getCommands().forEach((cmd) => {
             const cmdOptions: ICmdPrintInformationOption[] = [];
             const subCommands: ICmdPrintInformation[] = [];
             cmd.scb.options?.forEach((opt) => {

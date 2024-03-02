@@ -1,10 +1,21 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
+import Command from '@class/Command';
 import { RconClient } from '@class/RconClient';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('revive')
+        .setDescription('Revive einen Spieler')
+        .addIntegerOption((option) =>
+            option.setName('id').setDescription('ID des Spielers').setRequired(true),
+        )
+        .addBooleanOption((option) =>
+            option.setName('kampfunfähig').setDescription('Kampfunfähigkeit hinzufügen?'),
+        ),
+)
 export class Revive extends Command {
     constructor() {
         super();
@@ -26,18 +37,6 @@ export class Revive extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        RegisterCommand(
-            new SlashCommandBuilder()
-                .setName('revive')
-                .setDescription('Revive einen Spieler')
-                .addIntegerOption((option) =>
-                    option.setName('id').setDescription('ID des Spielers').setRequired(true),
-                )
-                .addBooleanOption((option) =>
-                    option.setName('kampfunfähig').setDescription('Kampfunfähigkeit hinzufügen?'),
-                ),
-            this,
-        );
         this.IsBetaCommand = true;
     }
 

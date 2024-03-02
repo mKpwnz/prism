@@ -1,12 +1,45 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
+import Command from '@class/Command';
 import { RconClient } from '@class/RconClient';
-import { RegisterCommand } from '@commands/CommandHandler';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { ItemService } from '@services/ItemService';
 import { validateWeaponName } from '@utils/FiveMHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('give')
+        .setDescription('Befehle zur Fraksperre')
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('item')
+                .setDescription('Gib einem Spieler ein Item')
+                .addIntegerOption((option) =>
+                    option.setName('id').setDescription('ID des Spielers').setRequired(true),
+                )
+                .addStringOption((option) =>
+                    option.setName('item').setDescription('Itemname').setRequired(true),
+                )
+                .addIntegerOption((option) =>
+                    option.setName('anzahl').setDescription('Anzahl der Items').setRequired(true),
+                ),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('weapon')
+                .setDescription('Gib einem Spieler eine Waffe')
+                .addIntegerOption((option) =>
+                    option.setName('id').setDescription('ID des Spielers').setRequired(true),
+                )
+                .addStringOption((option) =>
+                    option.setName('waffe').setDescription('Waffenname').setRequired(true),
+                )
+                .addIntegerOption((option) =>
+                    option.setName('munition').setDescription('Anzahl der Munition (Default: 300)'),
+                ),
+        ),
+)
 export class Give extends Command {
     constructor() {
         super();
@@ -27,51 +60,6 @@ export class Give extends Command {
             Config.Groups.DEV.BOTTEST,
         ];
         this.IsBetaCommand = true;
-        RegisterCommand(
-            new SlashCommandBuilder()
-                .setName('give')
-                .setDescription('Befehle zur Fraksperre')
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('item')
-                        .setDescription('Gib einem Spieler ein Item')
-                        .addIntegerOption((option) =>
-                            option
-                                .setName('id')
-                                .setDescription('ID des Spielers')
-                                .setRequired(true),
-                        )
-                        .addStringOption((option) =>
-                            option.setName('item').setDescription('Itemname').setRequired(true),
-                        )
-                        .addIntegerOption((option) =>
-                            option
-                                .setName('anzahl')
-                                .setDescription('Anzahl der Items')
-                                .setRequired(true),
-                        ),
-                )
-                .addSubcommand((subcommand) =>
-                    subcommand
-                        .setName('weapon')
-                        .setDescription('Gib einem Spieler eine Waffe')
-                        .addIntegerOption((option) =>
-                            option
-                                .setName('id')
-                                .setDescription('ID des Spielers')
-                                .setRequired(true),
-                        )
-                        .addStringOption((option) =>
-                            option.setName('waffe').setDescription('Waffenname').setRequired(true),
-                        )
-                        .addIntegerOption((option) =>
-                            option
-                                .setName('munition')
-                                .setDescription('Anzahl der Munition (Default: 300)'),
-                        ),
-                ),
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

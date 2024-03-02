@@ -1,18 +1,18 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
-import { RegisterCommand } from '@commands/CommandHandler';
+import Command from '@class/Command';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { PlayerService } from '@services/PlayerService';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
-/**
- * @description Befehl zum Prüfen ob ein Spieler online ist
- * @author sirjxsh
- * @date 09.02.2024
- * @export
- * @class IsOnline
- * @extends {Command}
- */
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('isonline')
+        .setDescription('Ist ein Spieler online?')
+        .addStringOption((option) =>
+            option.setName('spieler').setDescription('SteamID des Spielers').setRequired(true),
+        ),
+)
 export class IsOnline extends Command {
     constructor() {
         super();
@@ -34,18 +34,6 @@ export class IsOnline extends Command {
             Config.Groups.DEV.BOTTEST,
             Config.Groups.PROD.BOT_DEV,
         ];
-        RegisterCommand(
-            new SlashCommandBuilder()
-                .setName('isonline')
-                .setDescription('Ist ein Spieler online?')
-                .addStringOption((option) =>
-                    option
-                        .setName('spieler')
-                        .setDescription('SteamID des Spielers')
-                        .setRequired(true),
-                ),
-            this,
-        );
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

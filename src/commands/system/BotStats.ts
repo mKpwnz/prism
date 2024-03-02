@@ -1,11 +1,16 @@
 import Config from '@Config';
-import { Command } from '@class/Command';
-import { RegisterCommand } from '@commands/CommandHandler';
+import Command from '@class/Command';
+import { RegisterCommand } from '@decorators';
 import { EENV } from '@enums/EENV';
 import { BotDB } from '@sql/Database';
 import { AlignmentEnum, AsciiTable3 } from 'ascii-table3';
 import { SlashCommandBuilder } from 'discord.js';
 
+@RegisterCommand(
+    new SlashCommandBuilder()
+        .setName('botstats')
+        .setDescription('Zeigt die aktuellen Nutzungsstatistiken des bots.'),
+)
 export class BotStats extends Command {
     constructor() {
         super();
@@ -27,12 +32,6 @@ export class BotStats extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        RegisterCommand(
-            new SlashCommandBuilder()
-                .setName('botstats')
-                .setDescription('Zeigt die aktuellen Nutzungsstatistiken des bots.'),
-            this,
-        );
         this.DoNotCountUse = true;
     }
 
