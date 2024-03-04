@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import LogManager from '@manager/LogManager';
-import { CustomError } from '@web/CustomError';
+import LogManager from '@prism/manager/LogManager';
+import { CustomError } from '@prism/web/CustomError';
 import { NextFunction, Request, Response } from 'express';
 
 /**

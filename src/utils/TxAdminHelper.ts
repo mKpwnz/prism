@@ -1,4 +1,4 @@
-import { TxAdminPlayerResponse, TxAdminWhitelistRequests } from '@interfaces/ITxAdmin';
+import { TxAdminPlayerResponse, TxAdminWhitelistRequests } from '@prism/interfaces/ITxAdmin';
 
 export function isTxAdminPlayerResponse(obj: any): obj is TxAdminPlayerResponse {
     return 'serverTime' in obj && 'player' in obj;

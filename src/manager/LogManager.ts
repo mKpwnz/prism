@@ -1,5 +1,5 @@
-import { BotClient } from '@Bot';
-import Config from '@Config';
+import { BotClient } from '@prism/Bot';
+import Config from '@prism/Config';
 import chalk from 'chalk';
 import colorize from 'json-colorizer';
 import winston, { createLogger, format, transports } from 'winston';

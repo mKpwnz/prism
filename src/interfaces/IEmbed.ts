@@ -1,4 +1,4 @@
-import { EEmbedColors } from '@enums/EmbedColors';
+import { EEmbedColors } from '@prism/enums/EmbedColors';
 import { AttachmentBuilder } from 'discord.js';
 
 export interface IEmbedField {

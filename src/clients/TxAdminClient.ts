@@ -1,13 +1,13 @@
-import Config from '@Config';
-import TxAdminError from '@error/TxAdmin.error';
+import Config from '@prism/Config';
+import TxAdminError from '@prism/error/TxAdmin.error';
 import {
     TxAdminApiResponse,
     TxAdminDatabaseWhitelistRequestsType,
     TxAdminPlayerResponse,
-} from '@interfaces/ITxAdmin';
-import { IValidatedPlayer } from '@interfaces/IValidatedPlayer';
-import LogManager from '@manager/LogManager';
-import { isTxAdminPlayerResponse, isTxAdminWhitelistRequests } from '@utils/TxAdminHelper';
+} from '@prism/interfaces/ITxAdmin';
+import { IValidatedPlayer } from '@prism/interfaces/IValidatedPlayer';
+import LogManager from '@prism/manager/LogManager';
+import { isTxAdminPlayerResponse, isTxAdminWhitelistRequests } from '@prism/utils/TxAdminHelper';
 import axios from 'axios';
 
 /**
@@ -194,4 +194,3 @@ class TxAdminClient {
 }
 
 export default TxAdminClient;
-

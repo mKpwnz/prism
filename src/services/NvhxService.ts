@@ -1,5 +1,5 @@
-import { Cache } from '@class/Cache';
-import LogManager from '@manager/LogManager';
+import { Cache } from '@prism/class/Cache';
+import LogManager from '@prism/manager/LogManager';
 import axios from 'axios';
 
 /**

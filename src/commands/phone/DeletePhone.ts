@@ -1,10 +1,10 @@
-import Config from '@Config';
-import Command from '@class/Command';
-import { RegisterCommand } from '@decorators';
-import { EENV } from '@enums/EENV';
-import LogManager from '@manager/LogManager';
-import { PlayerService } from '@services/PlayerService';
-import { GameDB } from '@sql/Database';
+import Config from '@prism/Config';
+import Command from '@prism/class/Command';
+import { RegisterCommand } from '@prism/decorators';
+import { EENV } from '@prism/enums/EENV';
+import LogManager from '@prism/manager/LogManager';
+import { PlayerService } from '@prism/services/PlayerService';
+import { GameDB } from '@prism/sql/Database';
 import {
     IPhone,
     IPhoneDarkchatAccounts,
@@ -18,7 +18,7 @@ import {
     IPhoneTinderAccounts,
     IPhoneTwitterAccounts,
     IPhoneTwitterTweets,
-} from '@sql/schema/Phone.schema';
+} from '@prism/sql/schema/Phone.schema';
 import { AttachmentBuilder, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { readFileSync, writeFileSync } from 'fs';
 

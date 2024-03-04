@@ -1,7 +1,7 @@
-import { BotClient } from '@Bot';
-import Config from '@Config';
-import { Helper } from '@utils/Helper';
-import LogManager from '@manager/LogManager';
+import { BotClient } from '@prism/Bot';
+import Config from '@prism/Config';
+import { Helper } from '@prism/utils/Helper';
+import LogManager from '@prism/manager/LogManager';
 import { Client, Guild, GuildEmoji } from 'discord.js';
 
 /**

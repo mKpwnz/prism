@@ -1,7 +1,7 @@
-import Config from '@Config';
-import { Cache } from '@class/Cache';
-import { TFiveMGarage } from '@interfaces/IFiveM';
-import LogManager from '@manager/LogManager';
+import Config from '@prism/Config';
+import { Cache } from '@prism/class/Cache';
+import { TFiveMGarage } from '@prism/interfaces/IFiveM';
+import LogManager from '@prism/manager/LogManager';
 import axios from 'axios';
 
 export default class GameserverClient {

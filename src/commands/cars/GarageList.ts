@@ -1,9 +1,9 @@
-import Config from '@Config';
-import Command from '@class/Command';
-import GameserverClient from '@clients/GameserverClient';
-import { RegisterCommand } from '@decorators';
-import { EENV } from '@enums/EENV';
-import { paginateApiResponse } from '@utils/DiscordHelper';
+import Config from '@prism/Config';
+import Command from '@prism/class/Command';
+import GameserverClient from '@prism/clients/GameserverClient';
+import { RegisterCommand } from '@prism/decorators';
+import { EENV } from '@prism/enums/EENV';
+import { paginateApiResponse } from '@prism/utils/DiscordHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 @RegisterCommand(
@@ -66,4 +66,3 @@ export class GarageList extends Command {
         });
     }
 }
-

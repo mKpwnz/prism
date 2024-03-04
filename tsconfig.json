@@ -10,14 +10,8 @@
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "paths": {
-            "@*": [
-                "./src/*"
-            ]
+            "@prism/*": ["./src/*"]
         }
     },
-    "include": [
-        "./src",
-        "types",
-        "./src/types"
-    ]
+    "include": ["./src"]
 }

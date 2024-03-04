@@ -1,10 +1,10 @@
-import { IValidatedPlayer } from '@interfaces/IValidatedPlayer';
-import { EUniqueIdentifier } from '@enums/ESearchType';
-import { ILivePlayer } from '@interfaces/ILivePlayer';
-import { GameDB } from '@sql/Database';
-import { IValidatedPlayerResponse } from '@sql/schema/Player.schema';
-import { Cache } from '@class/Cache';
-import LogManager from '@manager/LogManager';
+import { IValidatedPlayer } from '@prism/interfaces/IValidatedPlayer';
+import { EUniqueIdentifier } from '@prism/enums/ESearchType';
+import { ILivePlayer } from '@prism/interfaces/ILivePlayer';
+import { GameDB } from '@prism/sql/Database';
+import { IValidatedPlayerResponse } from '@prism/sql/schema/Player.schema';
+import { Cache } from '@prism/class/Cache';
+import LogManager from '@prism/manager/LogManager';
 import axios from 'axios';
 
 /**

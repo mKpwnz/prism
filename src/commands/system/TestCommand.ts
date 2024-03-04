@@ -1,8 +1,8 @@
-import Config from '@Config';
-import Command from '@class/Command';
-import { PerformanceProfiler } from '@class/PerformanceProfiler';
-import { RegisterCommand } from '@decorators';
-import { EENV } from '@enums/EENV';
+import Config from '@prism/Config';
+import Command from '@prism/class/Command';
+import { PerformanceProfiler } from '@prism/class/PerformanceProfiler';
+import { RegisterCommand } from '@prism/decorators';
+import { EENV } from '@prism/enums/EENV';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 @RegisterCommand(new SlashCommandBuilder().setName('testcommand').setDescription('Test Command'))
@@ -13,7 +13,6 @@ export class TestCommand extends Command {
         this.AllowedChannels = [Config.Channels.DEV.PRISM_TESTING];
         this.AllowedGroups = [Config.Groups.PROD.BOT_DEV, Config.Groups.DEV.BOTTEST];
         this.DoNotCountUse = true;
-        console.log('TestCommand from constructor');
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
@@ -49,6 +48,6 @@ export class TestCommand extends Command {
         await this.replyWithEmbed({
             description: `test`,
         });
-        await profiler.sendEmbed(interaction);
+        await profiler.sendEmbed(interaction.channelId, interaction.user);
     }
 }

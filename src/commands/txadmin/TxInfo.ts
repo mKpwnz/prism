@@ -1,12 +1,12 @@
-import Config from '@Config';
-import Command from '@class/Command';
-import TxAdminClient from '@clients/TxAdminClient';
-import { RegisterCommand } from '@decorators';
-import { EENV } from '@enums/EENV';
-import { EEmbedColors } from '@enums/EmbedColors';
-import TxAdminError from '@error/TxAdmin.error';
-import LogManager from '@manager/LogManager';
-import { PlayerService } from '@services/PlayerService';
+import Config from '@prism/Config';
+import Command from '@prism/class/Command';
+import TxAdminClient from '@prism/clients/TxAdminClient';
+import { RegisterCommand } from '@prism/decorators';
+import { EENV } from '@prism/enums/EENV';
+import { EEmbedColors } from '@prism/enums/EmbedColors';
+import TxAdminError from '@prism/error/TxAdmin.error';
+import LogManager from '@prism/manager/LogManager';
+import { PlayerService } from '@prism/services/PlayerService';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 @RegisterCommand(
@@ -44,10 +44,9 @@ export class TxInfo extends Command {
         const steamid = interaction.options.getString('steamid', true);
         const vPlayer = await PlayerService.validatePlayer(steamid);
         if (!vPlayer) {
-            await this.replyWithEmbed({
-                description: `Spieler nicht gefunden! Prüfe deine Eingabe und versuche es erneut.`,
-                ephemeral: true,
-            });
+            await this.replyError(
+                `Spieler nicht gefunden! Prüfe deine Eingabe und versuche es erneut.`,
+            );
             return;
         }
 
@@ -125,4 +124,3 @@ export class TxInfo extends Command {
         });
     }
 }
-

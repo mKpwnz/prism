@@ -1,5 +1,5 @@
-import { GameDB } from '@sql/Database';
-import { IPhoneDarkchatSearch } from '@sql/schema/Phone.schema';
+import { GameDB } from '@prism/sql/Database';
+import { IPhoneDarkchatSearch } from '@prism/sql/schema/Phone.schema';
 import { ResultSetHeader } from 'mysql2';
 
 export class PhoneDarkchatService {

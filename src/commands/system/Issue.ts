@@ -1,12 +1,12 @@
-import { BotClient } from '@Bot';
-import Config from '@Config';
-import Command from '@class/Command';
-import { GitlabClient } from '@clients/GitlabClient';
-import { RegisterCommand } from '@decorators';
-import { EENV } from '@enums/EENV';
-import { EEmbedColors } from '@enums/EmbedColors';
-import LogManager from '@manager/LogManager';
-import { getEmbedBase } from '@utils/DiscordHelper';
+import Config from '@prism/Config';
+import Command from '@prism/class/Command';
+import { GitlabClient } from '@prism/clients/GitlabClient';
+import { RegisterCommand, RegisterEvent } from '@prism/decorators';
+import { EENV } from '@prism/enums/EENV';
+import { EEmbedColors } from '@prism/enums/EmbedColors';
+import LogManager from '@prism/manager/LogManager';
+import { ArgsOf } from '@prism/types/PrismTypes';
+import { getEmbedBase } from '@prism/utils/DiscordHelper';
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -28,7 +28,7 @@ import {
         .setDescription('Erzeuge ein neues Issue für die Entwickler.'),
 )
 export class Issue extends Command {
-    private allowedManagementGroups = [
+    private static allowedManagementGroups = [
         Config.Groups.PROD.TEAM_INHABER,
         Config.Groups.PROD.TEAM_PROJEKTLEITUNG,
         Config.Groups.PROD.TEAM_STLV_PROJEKTLEITUNG,
@@ -60,7 +60,6 @@ export class Issue extends Command {
 
             Config.Groups.DEV.BOTTEST,
         ];
-        BotClient.on(Events.InteractionCreate, async (interaction) => this.onInteract(interaction));
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
@@ -95,7 +94,8 @@ export class Issue extends Command {
         await interaction.showModal(modal);
     }
 
-    async onInteract(interaction: Interaction) {
+    @RegisterEvent(Events.InteractionCreate)
+    async onInteract([interaction]: ArgsOf<Events.InteractionCreate>) {
         if (interaction.isModalSubmit() && interaction.customId === 'issue_submit') {
             if (!interaction.guildId) return;
             if (!interaction.channel || !interaction.channel.isTextBased()) return;
@@ -176,15 +176,15 @@ export class Issue extends Command {
             await embedMessage.startThread({ name: `Issue: ${title}` });
             await interaction.reply({ content: 'Dein Issue wurde erstellt.', ephemeral: true });
         } else if (interaction.isButton() && interaction.customId === 'issue_accept') {
-            await this.acceptIssue(interaction, true);
+            await Issue.acceptIssue(interaction, true);
             await interaction.message.edit({ components: [] });
             await interaction.reply({ content: 'Das Issue wurde freigegeben.', ephemeral: true });
         } else if (interaction.isButton() && interaction.customId === 'issue_deny') {
-            await this.acceptIssue(interaction, false);
+            await Issue.acceptIssue(interaction, false);
             await interaction.message.edit({ components: [] });
             await interaction.reply({ content: 'Das Issue wurde abgelehnt.', ephemeral: true });
         } else if (interaction.isButton() && interaction.customId === 'issue_edit') {
-            await this.editIssue(interaction);
+            await Issue.editIssue(interaction);
         } else if (interaction.isModalSubmit() && interaction.customId === 'issue_edit_submit') {
             if (!interaction.message || !interaction.message.embeds[0]) {
                 await interaction.reply({
@@ -232,19 +232,19 @@ export class Issue extends Command {
             });
             await interaction.reply({ content: 'Dein Issue wurde bearbeitet.', ephemeral: true });
         } else if (interaction.isStringSelectMenu() && interaction.customId === 'issue_priority') {
-            await this.updateIssuePriority(interaction, interaction.values[0]);
+            await Issue.updateIssuePriority(interaction, interaction.values[0]);
             await interaction.reply({ content: 'Die Priorität wurde geändert.', ephemeral: true });
         }
     }
 
-    async editIssue(interaction: Interaction) {
+    static async editIssue(interaction: Interaction) {
         if (!interaction.isButton()) return;
         const { message, user } = interaction;
         if (!message.embeds[0]) return;
 
         const embed = message.embeds[0];
         const userRoleCache = message.guild?.members.cache.get(user.id);
-        const userHasManagementRole = this.allowedManagementGroups.some((roleID) =>
+        const userHasManagementRole = Issue.allowedManagementGroups.some((roleID) =>
             userRoleCache?.roles.cache.has(roleID),
         );
         const authorID = embed.author?.name.split(' ').at(-1);
@@ -296,12 +296,12 @@ export class Issue extends Command {
         await interaction.showModal(modal);
     }
 
-    async updateIssuePriority(interaction: Interaction, priority: string): Promise<void> {
+    static async updateIssuePriority(interaction: Interaction, priority: string): Promise<void> {
         if (!interaction.isStringSelectMenu()) return;
         const { message, user } = interaction;
         const userRoleCache = message.guild?.members.cache.get(user.id);
         if (
-            !this.allowedManagementGroups.some((roleID) => userRoleCache?.roles.cache.has(roleID))
+            !Issue.allowedManagementGroups.some((roleID) => userRoleCache?.roles.cache.has(roleID))
         ) {
             await interaction.reply({
                 content: 'Du hast keine Berechtigung um diese Aktion auszuführen.',
@@ -326,12 +326,12 @@ export class Issue extends Command {
         await message.edit({ embeds: [embed] });
     }
 
-    async acceptIssue(interaction: Interaction, status: boolean): Promise<void> {
+    static async acceptIssue(interaction: Interaction, status: boolean): Promise<void> {
         if (!interaction.isButton()) return;
         const { message, user } = interaction;
         const userRoleCache = message.guild?.members.cache.get(user.id);
         if (
-            !this.allowedManagementGroups.some((roleID) => userRoleCache?.roles.cache.has(roleID))
+            !Issue.allowedManagementGroups.some((roleID) => userRoleCache?.roles.cache.has(roleID))
         ) {
             await interaction.reply({
                 content: 'Du hast keine Berechtigung um diese Aktion auszuführen.',
@@ -414,4 +414,3 @@ export class Issue extends Command {
         }
     }
 }
-

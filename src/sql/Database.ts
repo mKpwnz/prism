@@ -1,4 +1,4 @@
-import Config from '@Config';
+import Config from '@prism/Config';
 import { PrismaClient } from '@prisma/client';
 import { createPool } from 'mysql2/promise';
 

@@ -1,10 +1,10 @@
-import LogManager from '@manager/LogManager';
+import LogManager from '@prism/manager/LogManager';
 import cors from 'cors';
 import errorhandler from 'errorhandler';
 import express, { Express } from 'express';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
-import Config from '@Config';
+import Config from '@prism/Config';
 import * as bodyParser from 'body-parser';
 import handleError from './middleware/ErrorHandler';
 import v1Router from './router/api/v1/Router';
@@ -27,9 +27,7 @@ export class ExpressApp {
             res.redirect(301, '/api/v1/commandhelplist');
         });
         this.app.use('/api/v1', v1Router);
-        // this.app.use(() => {
-        //     throw new CustomError({ code: EStatusCode.ClientErrorNotFound });
-        // });
+
         if (Config.ENV.NODE_ENV === 'development') this.app.use(errorhandler());
         this.app.use(handleError);
         this.app.listen(3000, () => {

@@ -1,11 +1,12 @@
-import Config from '@Config';
-import Command from '@class/Command';
-import TxAdminClient from '@clients/TxAdminClient';
-import { RegisterCommand } from '@decorators';
-import { EENV } from '@enums/EENV';
-import TxAdminError from '@error/TxAdmin.error';
-import LogManager from '@manager/LogManager';
-import { PlayerService } from '@services/PlayerService';
+import Config from '@prism/Config';
+import Command from '@prism/class/Command';
+import TxAdminClient from '@prism/clients/TxAdminClient';
+import { RegisterCommand } from '@prism/decorators';
+import { EENV } from '@prism/enums/EENV';
+import { EEmbedColors } from '@prism/enums/EmbedColors';
+import TxAdminError from '@prism/error/TxAdmin.error';
+import LogManager from '@prism/manager/LogManager';
+import { PlayerService } from '@prism/services/PlayerService';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 @RegisterCommand(
@@ -65,29 +66,64 @@ export class Ban extends Command {
         const reason =
             interaction.options.getString('reason', false) ?? 'Prism: Kein Grund angegeben';
 
-        const player = await PlayerService.validatePlayer(steamid);
-
-        if (!player) {
-            await this.replyWithEmbed({
-                title: 'TxAdmin Ban',
-                description: `Spieler nicht gefunden! Prüfe deine Eingabe und versuche es erneut.`,
-                ephemeral: true,
-            });
+        const vPlayer = await PlayerService.validatePlayer(steamid);
+        if (!vPlayer) {
+            await this.replyError(
+                `Spieler nicht gefunden! Prüfe deine Eingabe und versuche es erneut.`,
+            );
+            return;
+        }
+        const playerInfo = await TxAdminClient.getPlayerInfo(vPlayer);
+        if (playerInfo instanceof TxAdminError) {
+            LogManager.error(playerInfo);
+            await this.replyError(`\`${playerInfo}\``);
             return;
         }
 
-        const ban = await TxAdminClient.playerBan(player, reason, duration);
-        const history = await TxAdminClient.getPlayerInfo(player);
-        LogManager.debug(history);
+        const ban = await TxAdminClient.playerBan(vPlayer, reason, duration);
         if (ban instanceof TxAdminError) {
             await this.replyError(`Fehler beim Bannen des Spielers: \`${ban.message}\``);
             return;
         }
-
+        const fields = [
+            {
+                name: 'Anzeige Name',
+                value: playerInfo.player.displayName,
+                inline: true,
+            },
+            {
+                name: 'Beitrittsdatum',
+                value: new Date((playerInfo.player.tsJoined ?? 0) * 1000).toLocaleString('de-DE'),
+                inline: true,
+            },
+            { name: '\u200B', value: '\u200B', inline: true },
+            {
+                name: 'Letzte Verbindung',
+                value: new Date((playerInfo.player.tsLastConnection ?? 0) * 1000).toLocaleString(
+                    'de-DE',
+                ),
+                inline: true,
+            },
+            {
+                name: 'BanID',
+                value: ban,
+                inline: true,
+            },
+            { name: '\u200B', value: '\u200B', inline: true },
+            {
+                name: 'Ban Grund',
+                value: `\`\`\`${reason}\`\`\``,
+            },
+            {
+                name: 'Identifier',
+                value: `\`\`\`${playerInfo.player.ids.join('\n')}\`\`\``,
+            },
+        ];
         await this.replyWithEmbed({
             title: 'TxAdmin Ban',
-            description: `Spieler erfolgreich gebannt!\n\n **Identifier:** \`${steamid}\`\n **Dauer:** \`${duration}\`\n **Grund:** \`${reason}\`\n **ActionID:** \`${ban}\``,
+            description: `Spieler erfolgreich gebannt!`,
+            fields,
+            color: EEmbedColors.ALERT,
         });
     }
 }
-

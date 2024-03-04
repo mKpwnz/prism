@@ -1,5 +1,5 @@
-import { ISchufaUser, ISchufaUserRaw } from '@sql/schema/User.schema';
-import { GameDB } from '@sql/Database';
+import { ISchufaUser, ISchufaUserRaw } from '@prism/sql/schema/User.schema';
+import { GameDB } from '@prism/sql/Database';
 
 export class UserService {
     private static async parseSchufaUsers(users: ISchufaUserRaw[]): Promise<ISchufaUser[]> {

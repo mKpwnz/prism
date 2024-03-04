@@ -1,6 +1,6 @@
-import { GameDB } from '@sql/Database';
-import { IInsurance } from '@sql/schema/Versicherung.schema';
-import { formatPlate } from '@utils/FiveMHelper';
+import { GameDB } from '@prism/sql/Database';
+import { IInsurance } from '@prism/sql/schema/Versicherung.schema';
+import { formatPlate } from '@prism/utils/FiveMHelper';
 import { ResultSetHeader } from 'mysql2';
 
 export class InsuranceService {

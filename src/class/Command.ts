@@ -1,10 +1,10 @@
-import Config from '@Config';
-import { EENV } from '@enums/EENV';
-import { EEmbedColors } from '@enums/EmbedColors';
-import { IEmbedOptions } from '@interfaces/IEmbed';
-import LogManager from '@manager/LogManager';
-import { BotDB } from '@sql/Database';
-import { getEmbedBase, isUserAllowed } from '@utils/DiscordHelper';
+import Config from '@prism/Config';
+import { EENV } from '@prism/enums/EENV';
+import { EEmbedColors } from '@prism/enums/EmbedColors';
+import { IEmbedOptions } from '@prism/interfaces/IEmbed';
+import LogManager from '@prism/manager/LogManager';
+import { BotDB } from '@prism/sql/Database';
+import { getEmbedBase, isUserAllowed } from '@prism/utils/DiscordHelper';
 import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 
 export default abstract class Command {
@@ -44,6 +44,7 @@ export default abstract class Command {
             this.AllowedChannels = [
                 Config.Channels.DEV.PRISM_TESTING,
                 Config.Channels.DEV.PRISM_TESTING_2,
+                Config.Channels.DEV.PRISM_IMAGE_UPLOAD,
             ];
             this.AllowedGroups = [Config.Groups.DEV.BOTTEST];
         }
