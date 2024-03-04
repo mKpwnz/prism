@@ -1,9 +1,9 @@
-import Config from '@Config';
-import Command from '@class/Command';
-import { RegisterCommand } from '@decorators';
-import { EENV } from '@enums/EENV';
-import { UserService } from '@services/UserService';
-import { ISchufaUser } from '@sql/schema/User.schema';
+import Config from '@prism/Config';
+import Command from '@prism/class/Command';
+import { RegisterCommand } from '@prism/decorators';
+import { EENV } from '@prism/enums/EENV';
+import { UserService } from '@prism/services/UserService';
+import { ISchufaUser } from '@prism/sql/schema/User.schema';
 import { SlashCommandBuilder } from 'discord.js';
 
 @RegisterCommand(

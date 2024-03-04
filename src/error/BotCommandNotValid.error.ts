@@ -5,4 +5,3 @@ export default class BotCommandNotValidError extends ErrorTemplate {
         super(message);
     }
 }
-

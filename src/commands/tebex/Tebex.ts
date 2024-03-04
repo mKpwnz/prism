@@ -1,9 +1,9 @@
-import Config from '@Config';
-import Command from '@class/Command';
-import { RegisterCommand } from '@decorators';
-import { EENV } from '@enums/EENV';
-import { GameDB } from '@sql/Database';
-import { ITebexTransactions } from '@sql/schema/Tebex.schema';
+import Config from '@prism/Config';
+import Command from '@prism/class/Command';
+import { RegisterCommand } from '@prism/decorators';
+import { EENV } from '@prism/enums/EENV';
+import { GameDB } from '@prism/sql/Database';
+import { ITebexTransactions } from '@prism/sql/schema/Tebex.schema';
 import axios from 'axios';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 

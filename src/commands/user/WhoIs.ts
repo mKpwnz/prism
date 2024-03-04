@@ -1,16 +1,16 @@
-import Config from '@Config';
-import Command from '@class/Command';
-import { PerformanceProfiler } from '@class/PerformanceProfiler';
-import { RegisterCommand } from '@decorators';
-import { EENV } from '@enums/EENV';
-import { ESearchType } from '@enums/ESearchType';
-import { EmoteManager } from '@manager/EmoteManager';
-import LogManager from '@manager/LogManager';
-import { NvhxService } from '@services/NvhxService';
-import { PlayerService } from '@services/PlayerService';
-import { BotDB, GameDB } from '@sql/Database';
-import { IFindUser } from '@sql/schema/User.schema';
-import { Helper } from '@utils/Helper';
+import Config from '@prism/Config';
+import Command from '@prism/class/Command';
+import { PerformanceProfiler } from '@prism/class/PerformanceProfiler';
+import { RegisterCommand } from '@prism/decorators';
+import { EENV } from '@prism/enums/EENV';
+import { ESearchType } from '@prism/enums/ESearchType';
+import { EmoteManager } from '@prism/manager/EmoteManager';
+import LogManager from '@prism/manager/LogManager';
+import { NvhxService } from '@prism/services/NvhxService';
+import { PlayerService } from '@prism/services/PlayerService';
+import { BotDB, GameDB } from '@prism/sql/Database';
+import { IFindUser } from '@prism/sql/schema/User.schema';
+import { Helper } from '@prism/utils/Helper';
 import {
     AttachmentBuilder,
     ChatInputCommandInteraction,
@@ -184,7 +184,7 @@ export class WhoIs extends Command {
                 fields: embedFields,
             });
         }
-        await profiler.sendEmbed(interaction);
+        await profiler.sendEmbed(interaction.channelId, interaction.user);
     }
 
     private async EmbedFieldsBuilder(

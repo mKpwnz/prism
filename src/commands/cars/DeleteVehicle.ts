@@ -1,11 +1,11 @@
-import Config from '@Config';
-import Command from '@class/Command';
-import { EENV } from '@enums/EENV';
-import { EEmbedColors } from '@enums/EmbedColors';
-import { VehicleService } from '@services/VehicleService';
+import Config from '@prism/Config';
+import Command from '@prism/class/Command';
+import { EENV } from '@prism/enums/EENV';
+import { EEmbedColors } from '@prism/enums/EmbedColors';
+import { VehicleService } from '@prism/services/VehicleService';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { attachmentFromObject } from '@utils/DiscordHelper';
-import { RegisterCommand } from '@decorators';
+import { attachmentFromObject } from '@prism/utils/DiscordHelper';
+import { RegisterCommand } from '@prism/decorators';
 
 @RegisterCommand(
     new SlashCommandBuilder()
@@ -54,4 +54,3 @@ export class DeleteVehicle extends Command {
         });
     }
 }
-

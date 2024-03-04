@@ -1,10 +1,11 @@
-import Config from '@Config';
-import Command from '@class/Command';
-import { RegisterCommand } from '@decorators';
-import { EENV } from '@enums/EENV';
-import { UserService } from '@services/UserService';
-import { ISchufaUser } from '@sql/schema/User.schema';
-import { attachmentFromObject } from '@utils/DiscordHelper';
+import Config from '@prism/Config';
+import Command from '@prism/class/Command';
+import { RegisterCommand } from '@prism/decorators';
+import { EENV } from '@prism/enums/EENV';
+import { PlayerService } from '@prism/services/PlayerService';
+import { UserService } from '@prism/services/UserService';
+import { ISchufaUser } from '@prism/sql/schema/User.schema';
+import { attachmentFromObject } from '@prism/utils/DiscordHelper';
 import { AttachmentBuilder, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 @RegisterCommand(
@@ -49,7 +50,7 @@ export class SchufaAuskunft extends Command {
         const schufaUsers: ISchufaUser[] = await UserService.getSchufaUsers();
         const attachments: AttachmentBuilder[] = [];
 
-        const pages = this.splitApiResponse(schufaUsers, 2000);
+        const pages = await this.splitApiResponse(schufaUsers, 2000);
 
         if (jsonexport) {
             attachments.push(attachmentFromObject(schufaUsers, 'schufaUsers'));
@@ -62,14 +63,15 @@ export class SchufaAuskunft extends Command {
         });
     }
 
-    splitApiResponse(schufausers: ISchufaUser[], pageSize: number): string[] {
+    async splitApiResponse(schufausers: ISchufaUser[], pageSize: number): Promise<string[]> {
         const pages = [];
         let currentPage = '';
         const users: string[] = [];
 
         for (const user of schufausers) {
+            const id = await PlayerService.getPlayerId(user.steamId);
             users.push(
-                `**${user.firstname} ${user.lastname}** ( ${user.steamId} )\`\`\`Grüngeld: ${user.accounts.money}\nSchwarzgeld: ${user.accounts.black_money}\nBank: ${user.accounts.bank}\`\`\`\n`,
+                `**${user.firstname} ${user.lastname}** ( ${user.steamId} ) ${id > -1 ? `:green_circle: **ID: ${id} **` : ':red_circle: **Offine** '} \`\`\`Grüngeld: ${user.accounts.money}\nSchwarzgeld: ${user.accounts.black_money}\nBank: ${user.accounts.bank}\`\`\`\n`,
             );
         }
 
@@ -92,4 +94,3 @@ export class SchufaAuskunft extends Command {
         return pages;
     }
 }
-

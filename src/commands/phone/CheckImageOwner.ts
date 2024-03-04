@@ -1,8 +1,8 @@
-import Config from '@Config';
-import Command from '@class/Command';
-import { RegisterCommand } from '@decorators';
-import { EENV } from '@enums/EENV';
-import { PhoneService } from '@services/PhoneService';
+import Config from '@prism/Config';
+import Command from '@prism/class/Command';
+import { RegisterCommand } from '@prism/decorators';
+import { EENV } from '@prism/enums/EENV';
+import { PhoneService } from '@prism/services/PhoneService';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 @RegisterCommand(

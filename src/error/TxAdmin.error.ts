@@ -5,4 +5,3 @@ export default class TxAdminError extends ErrorTemplate {
         super(message);
     }
 }
-

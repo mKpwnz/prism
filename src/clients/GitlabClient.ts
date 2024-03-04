@@ -1,4 +1,4 @@
-import Config from '@Config';
+import Config from '@prism/Config';
 import { Gitlab } from '@gitbeaker/rest';
 
 export class GitlabClient {

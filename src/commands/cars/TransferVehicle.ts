@@ -1,11 +1,12 @@
-import Config from '@Config';
-import Command from '@class/Command';
-import GameserverClient from '@clients/GameserverClient';
-import { RegisterCommand } from '@decorators';
-import { EENV } from '@enums/EENV';
-import LogManager from '@manager/LogManager';
-import { VehicleService } from '@services/VehicleService';
-import { ChatInputCommandInteraction, Interaction, SlashCommandBuilder } from 'discord.js';
+import Config from '@prism/Config';
+import Command from '@prism/class/Command';
+import GameserverClient from '@prism/clients/GameserverClient';
+import { RegisterCommand, RegisterEvent } from '@prism/decorators';
+import { EENV } from '@prism/enums/EENV';
+import LogManager from '@prism/manager/LogManager';
+import { VehicleService } from '@prism/services/VehicleService';
+import { ArgsOf } from '@prism/types/PrismTypes';
+import { ChatInputCommandInteraction, Events, SlashCommandBuilder } from 'discord.js';
 
 @RegisterCommand(
     new SlashCommandBuilder()
@@ -90,7 +91,8 @@ export class TransferVehicle extends Command {
         });
     }
 
-    public static async autocomplete(interaction: Interaction): Promise<void> {
+    @RegisterEvent(Events.InteractionCreate)
+    async autocomplete([interaction]: ArgsOf<Events.InteractionCreate>): Promise<void> {
         if (!interaction.isAutocomplete()) return;
         const focusedValue = interaction.options.getFocused(true);
         if (focusedValue.name !== 'newlocation') return;
@@ -122,4 +124,3 @@ export class TransferVehicle extends Command {
         );
     }
 }
-

@@ -1,15 +1,15 @@
-import Config from '@Config';
-import Command from '@class/Command';
-import { NonEmptyArray } from '@class/NonEmptyArray';
-import { RegisterCommand } from '@decorators';
-import { EENV } from '@enums/EENV';
-import { ELicenses } from '@enums/ELicenses';
-import { IValidatedPlayer } from '@interfaces/IValidatedPlayer';
-import LogManager from '@manager/LogManager';
-import { PlayerService } from '@services/PlayerService';
-import { GameDB } from '@sql/Database';
-import { IUserLicense } from '@sql/schema/UserLicense.schema';
-import { Helper } from '@utils/Helper';
+import Config from '@prism/Config';
+import Command from '@prism/class/Command';
+import { RegisterCommand } from '@prism/decorators';
+import { EENV } from '@prism/enums/EENV';
+import { ELicenses } from '@prism/enums/ELicenses';
+import { IValidatedPlayer } from '@prism/interfaces/IValidatedPlayer';
+import LogManager from '@prism/manager/LogManager';
+import { PlayerService } from '@prism/services/PlayerService';
+import { GameDB } from '@prism/sql/Database';
+import { IUserLicense } from '@prism/sql/schema/UserLicense.schema';
+import { NonEmptyArray } from '@prism/types/NonEmptyArray';
+import { Helper } from '@prism/utils/Helper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
 

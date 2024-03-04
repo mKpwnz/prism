@@ -1,9 +1,9 @@
-import { IEmbedOptions } from '@interfaces/IEmbed';
+import { IEmbedOptions } from '@prism/interfaces/IEmbed';
 import { AttachmentBuilder, CommandInteraction, EmbedBuilder, TextChannel } from 'discord.js';
-import { EEmbedColors } from '@enums/EmbedColors';
-import Config from '@Config';
-import LogManager from '@manager/LogManager';
-import { BotClient } from '@Bot';
+import { EEmbedColors } from '@prism/enums/EmbedColors';
+import Config from '@prism/Config';
+import LogManager from '@prism/manager/LogManager';
+import { BotClient } from '@prism/Bot';
 
 export async function isUserAllowed(
     interaction: CommandInteraction,

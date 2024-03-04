@@ -1,4 +1,4 @@
-import { cleanEnv, email, host, port, str, url } from 'envalid';
+import { bool, cleanEnv, email, host, port, str, url } from 'envalid';
 
 // envalid Documentation für Types: https://www.npmjs.com/package/envalid
 const envConfig = cleanEnv(process.env, {
@@ -33,6 +33,12 @@ const envConfig = cleanEnv(process.env, {
     LOGDB_URL: str(),
     GAMESERVER_API_HOST: host(),
     GAMESERVER_API_PORT: port(),
+    MINIO_ENDPOINT: host(),
+    MINIO_PORT: port(),
+    MINIO_SSL: bool(),
+    MINIO_ACCESSKEY: str(),
+    MINIO_SECRETKEY: str(),
+    MINIO_REGION: str(),
 });
 
 const UserConfig = {
@@ -187,6 +193,7 @@ const ChannelConfig = {
         S1_CUSTOM_IMAGE_BANLIST: '1202965967567847444',
     },
     DEV: {
+        PRISM_IMAGE_UPLOAD: '1214172693553750136',
         PRISM_TESTING: '1193147826641842266',
         PRISM_TESTING_2: '1209556376859189269',
         PRISM_TEST_LOG: '1204133095586926622',
@@ -198,7 +205,8 @@ const CommandConfig = {
         DefaultPosition: { x: 229.28, heading: 0.0, z: 30.5, y: -886.76 },
     },
     PhonePictures: {
-        AllowedDiscordChannels: [
+        PhoneQueryWildcardStrings: [
+            'https://s3.immortaldev.eu/prism-phone-images/',
             '1158521623448666112',
             '1000335817853636649',
             '1115622919511474176',

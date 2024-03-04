@@ -1,9 +1,9 @@
-import Command from '@class/Command';
-import { RconClient } from '@class/RconClient';
-import { EENV } from '@enums/EENV';
+import Command from '@prism/class/Command';
+import { RconClient } from '@prism/class/RconClient';
+import { EENV } from '@prism/enums/EENV';
 
-import Config from '@Config';
-import { RegisterCommand } from '@decorators';
+import Config from '@prism/Config';
+import { RegisterCommand } from '@prism/decorators';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 @RegisterCommand(

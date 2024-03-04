@@ -1,16 +1,15 @@
-import Command from '@class/Command';
-import BotCommandNotValidError from '@error/BotCommandNotValid.error';
-import { TcustomSCB } from '@manager/CommandManager';
+import Command from '@prism/class/Command';
+import BotCommandNotValidError from '@prism/error/BotCommandNotValid.error';
+import { PrismSCB } from '@prism/types/PrismTypes';
 
-export const CommandClassRegistry: { scb: TcustomSCB; Cmd: any }[] = [];
+export const CommandRegistry: { scb: PrismSCB; Cmd: any }[] = [];
 
-export function RegisterCommand(scb: TcustomSCB) {
-    return function exec(Cmd: any) {
+export function RegisterCommand(scb: PrismSCB) {
+    return function (Cmd: any) {
         if (!(Cmd.prototype instanceof Command)) {
             throw new BotCommandNotValidError('Command is not valid. It must extend Command.');
         }
-        CommandClassRegistry.push({ scb, Cmd });
+        CommandRegistry.push({ scb, Cmd });
         return Cmd;
     };
 }
-

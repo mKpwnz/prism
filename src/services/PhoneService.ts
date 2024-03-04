@@ -1,5 +1,5 @@
-import { IPhoneOwnerResponse } from '@sql/schema/Phone.schema';
-import { GameDB } from '@sql/Database';
+import { IPhoneOwnerResponse } from '@prism/sql/schema/Phone.schema';
+import { GameDB } from '@prism/sql/Database';
 import { ResultSetHeader } from 'mysql2';
 
 export class PhoneService {

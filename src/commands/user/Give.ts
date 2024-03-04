@@ -1,10 +1,10 @@
-import Config from '@Config';
-import Command from '@class/Command';
-import { RconClient } from '@class/RconClient';
-import { RegisterCommand } from '@decorators';
-import { EENV } from '@enums/EENV';
-import { ItemService } from '@services/ItemService';
-import { validateWeaponName } from '@utils/FiveMHelper';
+import Config from '@prism/Config';
+import Command from '@prism/class/Command';
+import { RconClient } from '@prism/class/RconClient';
+import { RegisterCommand } from '@prism/decorators';
+import { EENV } from '@prism/enums/EENV';
+import { ItemService } from '@prism/services/ItemService';
+import { validateWeaponName } from '@prism/utils/FiveMHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 @RegisterCommand(

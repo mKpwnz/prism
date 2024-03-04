@@ -1,10 +1,10 @@
-import Config from '@Config';
-import Command from '@class/Command';
-import { RegisterCommand } from '@decorators';
-import { EENV } from '@enums/EENV';
-import { EEmbedColors } from '@enums/EmbedColors';
-import { PhoneDarkchatService } from '@services/PhoneDarkchatService';
-import { IPhoneDarkchatSearch } from '@sql/schema/Phone.schema';
+import Config from '@prism/Config';
+import Command from '@prism/class/Command';
+import { RegisterCommand } from '@prism/decorators';
+import { EENV } from '@prism/enums/EENV';
+import { EEmbedColors } from '@prism/enums/EmbedColors';
+import { PhoneDarkchatService } from '@prism/services/PhoneDarkchatService';
+import { IPhoneDarkchatSearch } from '@prism/sql/schema/Phone.schema';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 @RegisterCommand(

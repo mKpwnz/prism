@@ -1,11 +1,11 @@
-import Config from '@Config';
-import Command from '@class/Command';
-import { RconClient } from '@class/RconClient';
-import { RegisterCommand } from '@decorators';
-import { EENV } from '@enums/EENV';
-import { PlayerService } from '@services/PlayerService';
-import { GameDB } from '@sql/Database';
-import { IJob } from '@sql/schema/Job.schema';
+import Config from '@prism/Config';
+import Command from '@prism/class/Command';
+import { RconClient } from '@prism/class/RconClient';
+import { RegisterCommand } from '@prism/decorators';
+import { EENV } from '@prism/enums/EENV';
+import { PlayerService } from '@prism/services/PlayerService';
+import { GameDB } from '@prism/sql/Database';
+import { IJob } from '@prism/sql/schema/Job.schema';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
 

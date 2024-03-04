@@ -1,4 +1,4 @@
-import { HelpService } from '@services/HelpService';
+import { HelpService } from '@prism/services/HelpService';
 import { Router } from 'express';
 
 const v1Router: Router = Router();

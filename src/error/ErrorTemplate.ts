@@ -6,4 +6,3 @@ export default class ErrorTemplate extends Error {
         this.stack = (<any>new Error()).stack;
     }
 }
-

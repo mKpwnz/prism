@@ -1,10 +1,10 @@
-import Config from '@Config';
-import Command from '@class/Command';
-import { RegisterCommand } from '@decorators';
-import { EENV } from '@enums/EENV';
-import { EEmbedColors } from '@enums/EmbedColors';
-import { ItemService } from '@services/ItemService';
-import { VehicleService } from '@services/VehicleService';
+import Config from '@prism/Config';
+import Command from '@prism/class/Command';
+import { RegisterCommand } from '@prism/decorators';
+import { EENV } from '@prism/enums/EENV';
+import { EEmbedColors } from '@prism/enums/EmbedColors';
+import { ItemService } from '@prism/services/ItemService';
+import { VehicleService } from '@prism/services/VehicleService';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 @RegisterCommand(
@@ -95,4 +95,3 @@ export class ValidateTrunk extends Command {
         });
     }
 }
-

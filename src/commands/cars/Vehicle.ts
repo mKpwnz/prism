@@ -1,13 +1,13 @@
-import Config from '@Config';
-import Command from '@class/Command';
-import { EENV } from '@enums/EENV';
-import { EEmbedColors } from '@enums/EmbedColors';
-import { PlayerService } from '@services/PlayerService';
-import { VehicleService } from '@services/VehicleService';
-import { attachmentFromObject } from '@utils/DiscordHelper';
+import Config from '@prism/Config';
+import Command from '@prism/class/Command';
+import { EENV } from '@prism/enums/EENV';
+import { EEmbedColors } from '@prism/enums/EmbedColors';
+import { PlayerService } from '@prism/services/PlayerService';
+import { VehicleService } from '@prism/services/VehicleService';
+import { attachmentFromObject } from '@prism/utils/DiscordHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { validatePlate } from '@utils/FiveMHelper';
-import { RegisterCommand } from '@decorators';
+import { validatePlate } from '@prism/utils/FiveMHelper';
+import { RegisterCommand } from '@prism/decorators';
 
 @RegisterCommand(
     new SlashCommandBuilder()
@@ -88,4 +88,3 @@ export class Vehicle extends Command {
         });
     }
 }
-

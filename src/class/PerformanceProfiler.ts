@@ -1,8 +1,9 @@
-import Config from '@Config';
-import { EEmbedColors } from '@enums/EmbedColors';
+import Config from '@prism/Config';
+import { EEmbedColors } from '@prism/enums/EmbedColors';
+import { getEmbedBase } from '@prism/utils/DiscordHelper';
 import { AlignmentEnum, AsciiTable3 } from 'ascii-table3';
-import { ChatInputCommandInteraction } from 'discord.js';
-import { getEmbedBase } from '@utils/DiscordHelper';
+import { User } from 'discord.js';
+import { BotClient } from '../Bot';
 
 export class PerformanceProfiler {
     private profilerName: string;
@@ -19,8 +20,8 @@ export class PerformanceProfiler {
         this.ProfilerData.push({ profilerStep, timestamp: new Date().getTime() });
     }
 
-    async sendEmbed(interaction: ChatInputCommandInteraction) {
-        if (interaction.channel?.id !== Config.Channels.DEV.PRISM_TESTING) return;
+    async sendEmbed(channelid: string, user: User) {
+        if (channelid !== Config.Channels.DEV.PRISM_TESTING) return;
 
         this.ProfilerData.push({ profilerStep: 'Profiler End', timestamp: new Date().getTime() });
         const table = new AsciiTable3('Performance Profiler')
@@ -43,10 +44,10 @@ export class PerformanceProfiler {
             description: `\`\`\`\n${table.toString()}\`\`\``,
             color: EEmbedColors.DEBUG,
         }).setFooter({
-            text: `${interaction.user.displayName ?? ''}`,
-            iconURL: interaction.user.avatarURL() ?? '',
+            text: `${user.displayName ?? ''}`,
+            iconURL: user.avatarURL() ?? '',
         });
-
-        await interaction.channel?.send({ embeds: [embed] });
+        const channel = await BotClient.channels.fetch(channelid);
+        if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] });
     }
 }

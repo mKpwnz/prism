@@ -1,6 +1,6 @@
-import { GameDB } from '@sql/Database';
-import { IItem } from '@sql/schema/Item.schema';
-import { Cache } from '@class/Cache';
+import { GameDB } from '@prism/sql/Database';
+import { IItem } from '@prism/sql/schema/Item.schema';
+import { Cache } from '@prism/class/Cache';
 
 /**
  * @description Service für Items.

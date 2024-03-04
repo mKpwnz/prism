@@ -1,12 +1,12 @@
-import Config from '@Config';
-import Command from '@class/Command';
-import { RconClient } from '@class/RconClient';
-import { RegisterCommand } from '@decorators';
-import { EENV } from '@enums/EENV';
-import { ILivePlayer } from '@interfaces/ILivePlayer';
-import { EmoteManager } from '@manager/EmoteManager';
-import { NvhxService } from '@services/NvhxService';
-import { PlayerService } from '@services/PlayerService';
+import Config from '@prism/Config';
+import Command from '@prism/class/Command';
+import { RconClient } from '@prism/class/RconClient';
+import { RegisterCommand } from '@prism/decorators';
+import { EENV } from '@prism/enums/EENV';
+import { ILivePlayer } from '@prism/interfaces/ILivePlayer';
+import { EmoteManager } from '@prism/manager/EmoteManager';
+import { NvhxService } from '@prism/services/NvhxService';
+import { PlayerService } from '@prism/services/PlayerService';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 @RegisterCommand(

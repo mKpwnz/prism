@@ -1,10 +1,10 @@
-import { RconClient } from '@class/RconClient';
-import GameserverClient from '@clients/GameserverClient';
-import { TFiveMVehicleType } from '@interfaces/IFiveM';
-import { IVehicle } from '@sql/schema/Vehicle.schema';
-import { formatPlate, generateOAAThash, validatePlate } from '@utils/FiveMHelper';
-import { IValidatedPlayer } from '@interfaces/IValidatedPlayer';
-import { GameDB } from '@sql/Database';
+import { RconClient } from '@prism/class/RconClient';
+import GameserverClient from '@prism/clients/GameserverClient';
+import { TFiveMVehicleType } from '@prism/interfaces/IFiveM';
+import { IVehicle } from '@prism/sql/schema/Vehicle.schema';
+import { formatPlate, generateOAAThash, validatePlate } from '@prism/utils/FiveMHelper';
+import { IValidatedPlayer } from '@prism/interfaces/IValidatedPlayer';
+import { GameDB } from '@prism/sql/Database';
 import { ResultSetHeader } from 'mysql2';
 
 export class VehicleService {

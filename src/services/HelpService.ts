@@ -1,9 +1,9 @@
-import { BotClient } from '@Bot';
-import Config from '@Config';
-import { EENV } from '@enums/EENV';
-import { ICmdPrintInformation } from '@interfaces/ICmdPrintInformation';
-import { ICmdPrintInformationOption } from '@interfaces/ICmdPrintInformationOption';
-import CommandManager from '@manager/CommandManager';
+import { BotClient } from '@prism/Bot';
+import Config from '@prism/Config';
+import { EENV } from '@prism/enums/EENV';
+import { ICmdPrintInformation } from '@prism/interfaces/ICmdPrintInformation';
+import { ICmdPrintInformationOption } from '@prism/interfaces/ICmdPrintInformationOption';
+import CommandManager from '@prism/manager/CommandManager';
 
 export class HelpService {
     public static getCommands(): ICmdPrintInformation[] {

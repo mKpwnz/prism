@@ -1,13 +1,13 @@
-import Config from '@Config';
-import Command from '@class/Command';
-import TxAdminClient from '@clients/TxAdminClient';
-import { RegisterCommand } from '@decorators';
-import { EENV } from '@enums/EENV';
-import TxAdminError from '@error/TxAdmin.error';
-import LogManager from '@manager/LogManager';
-import { PlayerService } from '@services/PlayerService';
-import { paginateApiResponse } from '@utils/DiscordHelper';
-import { Helper } from '@utils/Helper';
+import Config from '@prism/Config';
+import Command from '@prism/class/Command';
+import TxAdminClient from '@prism/clients/TxAdminClient';
+import { RegisterCommand } from '@prism/decorators';
+import { EENV } from '@prism/enums/EENV';
+import TxAdminError from '@prism/error/TxAdmin.error';
+import LogManager from '@prism/manager/LogManager';
+import { PlayerService } from '@prism/services/PlayerService';
+import { paginateApiResponse } from '@prism/utils/DiscordHelper';
+import { Helper } from '@prism/utils/Helper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 @RegisterCommand(
@@ -97,4 +97,3 @@ export class TxHistory extends Command {
         });
     }
 }
-
