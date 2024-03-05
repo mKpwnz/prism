@@ -26,7 +26,7 @@ export class Clear extends Command {
             Config.Channels.DEV.PRISM_IMAGE_UPLOAD,
         ];
         this.AllowedGroups = [Config.Groups.DEV.BOTTEST];
-        this.DoNotCountUse = true;
+        this.DoNotLog = true;
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

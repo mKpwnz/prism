@@ -32,7 +32,7 @@ export class BotStats extends Command {
             Config.Groups.PROD.BOT_DEV,
             Config.Groups.DEV.BOTTEST,
         ];
-        this.DoNotCountUse = true;
+        this.DoNotLog = true;
     }
 
     async execute(): Promise<void> {

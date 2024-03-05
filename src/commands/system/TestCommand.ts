@@ -12,7 +12,7 @@ export class TestCommand extends Command {
         this.RunEnvironment = EENV.PRODUCTION;
         this.AllowedChannels = [Config.Channels.DEV.PRISM_TESTING];
         this.AllowedGroups = [Config.Groups.PROD.BOT_DEV, Config.Groups.DEV.BOTTEST];
-        this.DoNotCountUse = true;
+        this.DoNotLog = true;
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

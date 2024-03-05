@@ -19,7 +19,6 @@ export class Ping extends Command {
     }
 
     async execute(): Promise<void> {
-        console.log(this);
         await this.replyWithEmbed({ description: 'Pong!' });
     }
 }

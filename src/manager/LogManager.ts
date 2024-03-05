@@ -1,4 +1,3 @@
-import { BotClient } from '@prism/Bot';
 import Config from '@prism/Config';
 import chalk from 'chalk';
 import colorize from 'json-colorizer';
@@ -156,20 +155,5 @@ export default class LogManager {
      */
     public static debug(...args: any[]) {
         args.forEach((arg) => this.logger.debug(arg));
-    }
-
-    /**
-     * @description Loggt eine Nachricht in den Bot Log Channel auf Discord.
-     * @author mKpwnz
-     * @date 14.10.2023
-     * @static
-     * @param {string} message
-     * @memberof LogManager
-     */
-    public static discordActionLog(message: string) {
-        const channel = BotClient.channels.cache.get(Config.Channels.PROD.BOT_LOG);
-        if (channel && channel.isTextBased()) {
-            channel.send(message);
-        }
     }
 }

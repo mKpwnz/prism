@@ -22,7 +22,7 @@ export default abstract class Command {
 
     IsBetaCommand: boolean = false;
 
-    DoNotCountUse: boolean = false;
+    DoNotLog: boolean = false;
 
     private CmdPerformanceStart: Date | undefined = undefined;
 
@@ -40,7 +40,7 @@ export default abstract class Command {
 
         // Override Channel in Devmode
         if (Config.ENV.NODE_ENV !== 'production') {
-            this.DoNotCountUse = true;
+            this.DoNotLog = true;
             this.AllowedChannels = [
                 Config.Channels.DEV.PRISM_TESTING,
                 Config.Channels.DEV.PRISM_TESTING_2,
@@ -75,17 +75,8 @@ export default abstract class Command {
             command: interaction.commandName,
             options: inputFields,
         };
-        LogManager.discordActionLog(
-            `\` ${interaction.user.displayName} (${user.id}) \` hat im Kanal <#${
-                interaction.channelId
-            }> den Befehl \`${interaction.commandName}\` ausgeführt:\`\`\`json\n${JSON.stringify(
-                cmdPrint,
-                null,
-                4,
-            )}\`\`\``,
-        );
         let { commandName } = interaction;
-        if (!this.DoNotCountUse) {
+        if (!this.DoNotLog) {
             try {
                 if (interaction.options.getSubcommand()) {
                     commandName += ` ${interaction.options.getSubcommand()}`;
@@ -93,7 +84,7 @@ export default abstract class Command {
             } catch (e) {
                 commandName = interaction.commandName;
             }
-            await BotDB.command_log.create({
+            BotDB.command_log.create({
                 data: {
                     command: commandName,
                     user: user.id,
@@ -143,7 +134,6 @@ export default abstract class Command {
 
     async replyWithEmbed(opt: IEmbedOptions): Promise<void> {
         if (!this.currentInteraction) throw new Error('Unknown Interaction in Command Class');
-
         const embed = this.getEmbedTemplate(opt);
 
         if (this.currentInteraction.deferred) {

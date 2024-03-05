@@ -20,6 +20,11 @@ export class PerformanceProfiler {
         this.ProfilerData.push({ profilerStep, timestamp: new Date().getTime() });
     }
 
+    reset() {
+        this.ProfilerData = [];
+        this.ProfilerData.push({ profilerStep: 'Profiler Start', timestamp: new Date().getTime() });
+    }
+
     async sendEmbed(channelid: string, user: User) {
         if (channelid !== Config.Channels.DEV.PRISM_TESTING) return;
 
