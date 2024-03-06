@@ -1,3 +1,4 @@
+import { SentryClient } from '@prism/Bot';
 import Config from '@prism/Config';
 import Command from '@prism/class/Command';
 import { RegisterCommand } from '@prism/decorators';
@@ -138,6 +139,7 @@ export class Tebex extends Command {
                 fields,
             });
         } catch (error) {
+            SentryClient.captureException(error);
             await this.replyError('Fehler beim ausführen der Anfrage.');
         }
     }

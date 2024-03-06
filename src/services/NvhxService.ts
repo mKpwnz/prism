@@ -1,3 +1,4 @@
+import { SentryClient } from '@prism/Bot';
 import { Cache } from '@prism/class/Cache';
 import LogManager from '@prism/manager/LogManager';
 import axios from 'axios';
@@ -32,6 +33,7 @@ export class NvhxService {
                     );
                 }
             } catch (error: any) {
+                SentryClient.captureException(error);
                 LogManager.error(`Error while fetching NVHX global bans: ${error.message}`);
             }
         }

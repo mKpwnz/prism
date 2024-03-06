@@ -34,3 +34,4 @@ EventManager.init(client);
 client.login(Config.ENV.DISCORD_TOKEN);
 
 export const BotClient = client;
+export const SentryClient = Sentry;
