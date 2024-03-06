@@ -1,8 +1,9 @@
-import { SentryClient } from '@prism/Bot';
+import { Sentry } from '@prism/Bot';
 import Config from '@prism/Config';
 import Command from '@prism/class/Command';
 import { RegisterCommand } from '@prism/decorators';
 import { EENV } from '@prism/enums/EENV';
+import LogManager from '@prism/manager/LogManager';
 import { GameDB } from '@prism/sql/Database';
 import { ITebexTransactions } from '@prism/sql/schema/Tebex.schema';
 import axios from 'axios';
@@ -139,7 +140,8 @@ export class Tebex extends Command {
                 fields,
             });
         } catch (error) {
-            SentryClient.captureException(error);
+            Sentry.captureException(error);
+            LogManager.error(`Error while fetching Tebex order: ${error}`);
             await this.replyError('Fehler beim ausführen der Anfrage.');
         }
     }

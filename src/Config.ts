@@ -39,6 +39,7 @@ const envConfig = cleanEnv(process.env, {
     MINIO_ACCESSKEY: str(),
     MINIO_SECRETKEY: str(),
     MINIO_REGION: str(),
+    SENTRY_DSN: url(),
 });
 
 const UserConfig = {

@@ -1,4 +1,4 @@
-import { SentryClient } from '@prism/Bot';
+import { Sentry } from '@prism/Bot';
 import Config from '@prism/Config';
 import { EENV } from '@prism/enums/EENV';
 import { EEmbedColors } from '@prism/enums/EmbedColors';
@@ -83,7 +83,7 @@ export default abstract class Command {
                     commandName += ` ${interaction.options.getSubcommand()}`;
                 }
             } catch (e) {
-                SentryClient.captureException(e);
+                Sentry.captureException(e);
                 commandName = interaction.commandName;
             }
             BotDB.command_log.create({
@@ -105,7 +105,7 @@ export default abstract class Command {
             await this.execute(interaction);
             this.currentInteraction = undefined;
         } catch (error) {
-            SentryClient.captureException(error);
+            Sentry.captureException(error);
             const errobj: { [k: string]: any } = {};
             if (error instanceof Error) {
                 errobj.name = error.name;

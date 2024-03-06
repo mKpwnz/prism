@@ -1,4 +1,4 @@
-import { SentryClient } from '@prism/Bot';
+import { Sentry } from '@prism/Bot';
 import Config from '@prism/Config';
 import Command from '@prism/class/Command';
 import { RegisterCommand } from '@prism/decorators';
@@ -110,7 +110,7 @@ export class DeleteCharacter extends Command {
             }
             return false;
         } catch (error) {
-            SentryClient.captureException(error);
+            Sentry.captureException(error);
             LogManager.error(error);
             return false;
         }
