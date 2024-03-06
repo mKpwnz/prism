@@ -10,7 +10,12 @@ import * as Sentry from '@sentry/node';
 Sentry.init({
     dsn: 'https://f5d2f24f4aad4f35ed7524557e01b8ae@sentry.immortaldev.eu//2',
     environment: Config.ENV.NODE_ENV,
+<<<<<<< 582a5877771c1f7b4b389574e21fcefc6a209b47
+    // Performance Monitoring
+    tracesSampleRate: 1.0, //  Capture 100% of the transactions
+=======
     tracesSampleRate: 1.0,
+>>>>>>> 8515f8c038e2cb52b08fc460cb14b8da20d75589
 });
 
 LogManager.configure();
