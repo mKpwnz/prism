@@ -1,4 +1,4 @@
-import { SentryClient } from '@prism/Bot';
+import { Sentry } from '@prism/Bot';
 import Config from '@prism/Config';
 import Command from '@prism/class/Command';
 import { RegisterCommand } from '@prism/decorators';
@@ -147,7 +147,7 @@ export class DeletePhone extends Command {
         try {
             await GameDB.execute('DELETE FROM phone_phones WHERE id = ?', [steamid]);
         } catch (error) {
-            SentryClient.captureException(error);
+            Sentry.captureException(error);
             LogManager.error(error);
             return Error('Error while deleting Phone');
         }
@@ -239,7 +239,7 @@ export class DeletePhone extends Command {
             ]);
             return returnstring.join('\n');
         } catch (error) {
-            SentryClient.captureException(error);
+            Sentry.captureException(error);
             LogManager.error(error);
             return Error('Error while deleting Darkchat Account');
         }
@@ -303,7 +303,7 @@ export class DeletePhone extends Command {
             ]);
             return returnstring.join('\n');
         } catch (error) {
-            SentryClient.captureException(error);
+            Sentry.captureException(error);
             LogManager.error(error);
             return Error('Error while deleting Instagram Account');
         }
@@ -378,7 +378,7 @@ export class DeletePhone extends Command {
             ]);
             return returnstring.join('\n');
         } catch (error) {
-            SentryClient.captureException(error);
+            Sentry.captureException(error);
             LogManager.error(error);
             return Error('Error while deleting Tiktok Account');
         }
@@ -410,7 +410,7 @@ export class DeletePhone extends Command {
             ${account.interested_women}
             );`;
         } catch (error) {
-            SentryClient.captureException(error);
+            Sentry.captureException(error);
             LogManager.error(error);
             return Error('Error while deleting Tinder Account');
         }
@@ -479,7 +479,7 @@ export class DeletePhone extends Command {
             ]);
             return returnstring.join('\n');
         } catch (error) {
-            SentryClient.captureException(error);
+            Sentry.captureException(error);
             LogManager.error(error);
             return Error('Error while deleting Twitter Account');
         }
@@ -509,7 +509,7 @@ export class DeletePhone extends Command {
             await GameDB.execute('DELETE FROM phone_photos WHERE phone_number = ?', [phonenumber]);
             return returnstring.join('\n');
         } catch (error) {
-            SentryClient.captureException(error);
+            Sentry.captureException(error);
             LogManager.error(error);
             return Error('Error while deleting Photos');
         }
@@ -539,7 +539,7 @@ export class DeletePhone extends Command {
             await GameDB.execute('DELETE FROM phone_photos WHERE phone_number = ?', [phonenumber]);
             return returnstring.join('\n');
         } catch (error) {
-            SentryClient.captureException(error);
+            Sentry.captureException(error);
             LogManager.error(error);
             return Error('Error while deleting Notes');
         }
