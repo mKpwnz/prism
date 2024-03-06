@@ -1,4 +1,4 @@
-import { BotClient } from '@prism/Bot';
+import { BotClient, Sentry } from '@prism/Bot';
 import Config from '@prism/Config';
 import { RconClient } from '@prism/class/RconClient';
 import { RegisterEvent } from '@prism/decorators';
@@ -74,6 +74,7 @@ export class BotReady {
                 ),
             });
         } catch (error) {
+            Sentry.captureException(error);
             LogManager.error(error);
         }
     }
