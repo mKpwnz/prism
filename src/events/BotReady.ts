@@ -26,25 +26,53 @@ export class BotReady {
     async onceReady() {
         try {
             new ExpressApp();
-            await CronJobService.txAdminAuthenticate();
-            if (Config.ENV.NODE_ENV === 'production') {
-                CronManager.initCronManager({
-                    'fraktionen.finance': new CronJob('0 0 */8 * * *', () =>
-                        CronJobService.logSocietyFinance(),
-                    ),
-                    'server.playercount': new CronJob('0 */10 * * * *', () => {
-                        CronJobService.logPlayerCount();
-                    }),
-                    'txadmin.authenticate': new CronJob('0 0 */23 * * *', () => {
-                        CronJobService.txAdminAuthenticate();
-                    }),
-                    'txadmin.banpillegalphoto': new CronJob('0 */30 * * * *', () => {
-                        CronJobService.banPlayersWithIllegalPhoto();
-                    }),
-                });
-            } else {
-                LogManager.debug('CronManager is disabled in DEV mode');
-            }
+            CronManager.initCronManager({
+                'fraktionen.finance': new CronJob(
+                    '0 0 */8 * * *',
+                    () => CronJobService.logSocietyFinance(),
+                    null,
+                    null,
+                    null,
+                    null,
+                    true,
+                ),
+                'server.playercount': new CronJob(
+                    '0 */10 * * * *',
+                    () => CronJobService.logPlayerCount(),
+                    null,
+                    null,
+                    null,
+                    null,
+                    true,
+                ),
+                'txadmin.authenticate': new CronJob(
+                    '0 0 */23 * * *',
+                    () => CronJobService.txAdminAuthenticate(),
+                    null,
+                    null,
+                    null,
+                    null,
+                    true,
+                ),
+                'txadmin.banpillegalphoto': new CronJob(
+                    '0 */30 * * * *',
+                    () => CronJobService.banPlayersWithIllegalPhoto(),
+                    null,
+                    null,
+                    null,
+                    null,
+                    true,
+                ),
+                'server.checkDeadImages': new CronJob(
+                    '0 */60 * * * *',
+                    () => CronJobService.checkDeadImages(),
+                    null,
+                    null,
+                    null,
+                    null,
+                    true,
+                ),
+            });
         } catch (e) {
             LogManager.error('Error while starting the bot', e);
         }

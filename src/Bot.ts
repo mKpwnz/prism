@@ -5,6 +5,14 @@ import { Cache } from '@prism/class/Cache';
 import EventManager from '@prism/manager/EventManager';
 import LogManager from '@prism/manager/LogManager';
 import { Client, IntentsBitField, Partials } from 'discord.js';
+import * as Sentry from '@sentry/node';
+
+Sentry.init({
+    dsn: 'https://f5d2f24f4aad4f35ed7524557e01b8ae@sentry.immortaldev.eu//2',
+    environment: Config.ENV.NODE_ENV,
+    // Performance Monitoring
+    tracesSampleRate: 1.0, //  Capture 100% of the transactions
+});
 
 LogManager.configure();
 LogManager.info('Bot is starting...');

@@ -55,4 +55,23 @@ export class PerformanceProfiler {
         const channel = await BotClient.channels.fetch(channelid);
         if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] });
     }
+
+    async sendToConsole() {
+        this.ProfilerData.push({ profilerStep: 'Profiler End', timestamp: new Date().getTime() });
+        const table = new AsciiTable3('Performance Profiler')
+            .setStyle('unicode-single')
+            .setHeading('Step Name', 'Δ TSS', 'Δ TPS')
+            .setAlign(1, AlignmentEnum.LEFT)
+            .setAlign(2, AlignmentEnum.RIGHT)
+            .setAlign(3, AlignmentEnum.RIGHT);
+
+        this.ProfilerData.forEach((d, i) => {
+            table.addRow(
+                d.profilerStep,
+                i === 0 ? 0 : d.timestamp - this.ProfilerData[0].timestamp,
+                i === 0 ? 0 : d.timestamp - this.ProfilerData[i - 1].timestamp,
+            );
+        });
+        console.log(table.toString());
+    }
 }
