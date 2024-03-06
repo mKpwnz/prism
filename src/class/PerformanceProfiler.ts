@@ -1,5 +1,6 @@
 import Config from '@prism/Config';
 import { EEmbedColors } from '@prism/enums/EmbedColors';
+import LogManager from '@prism/manager/LogManager';
 import { getEmbedBase } from '@prism/utils/DiscordHelper';
 import { AlignmentEnum, AsciiTable3 } from 'ascii-table3';
 import { User } from 'discord.js';
@@ -72,6 +73,6 @@ export class PerformanceProfiler {
                 i === 0 ? 0 : d.timestamp - this.ProfilerData[i - 1].timestamp,
             );
         });
-        console.log(table.toString());
+        LogManager.info(table.toString());
     }
 }
