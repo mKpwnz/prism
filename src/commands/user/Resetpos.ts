@@ -1,8 +1,9 @@
-import { SentryClient } from '@prism/Bot';
+import { Sentry } from '@prism/Bot';
 import Config from '@prism/Config';
 import Command from '@prism/class/Command';
 import { RegisterCommand } from '@prism/decorators';
 import { EENV } from '@prism/enums/EENV';
+import LogManager from '@prism/manager/LogManager';
 import { PlayerService } from '@prism/services/PlayerService';
 import { GameDB } from '@prism/sql/Database';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
@@ -63,7 +64,8 @@ export class Resetpos extends Command {
                 await this.replyError('Der Versuch, die Position zu ändern, ist fehlgeschlagen!');
             }
         } catch (error) {
-            SentryClient.captureException(error);
+            Sentry.captureException(error);
+            LogManager.error(error);
             await this.replyError('Es ist ein Fehler aufgetreten!');
         }
     }

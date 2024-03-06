@@ -1,4 +1,4 @@
-import { BotClient, SentryClient } from '@prism/Bot';
+import { BotClient, Sentry } from '@prism/Bot';
 import Config from '@prism/Config';
 import { Helper } from '@prism/utils/Helper';
 import LogManager from '@prism/manager/LogManager';
@@ -56,9 +56,8 @@ export class EmoteManager {
             await this.initEmotes();
             LogManager.info('Emotes Initialised!');
         } catch (error) {
-            SentryClient.captureException(error);
+            Sentry.captureException(error);
             LogManager.error('Error while updating emotes!');
-            LogManager.error(error);
         }
     }
 

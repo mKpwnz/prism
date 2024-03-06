@@ -1,4 +1,4 @@
-import { BotClient, SentryClient } from '@prism/Bot';
+import { BotClient } from '@prism/Bot';
 import Config from '@prism/Config';
 import { RconClient } from '@prism/class/RconClient';
 import { RegisterEvent } from '@prism/decorators';
@@ -74,8 +74,7 @@ export class BotReady {
                 ),
             });
         } catch (error) {
-            SentryClient.captureException(error);
-            LogManager.error('Error while starting the bot', error);
+            LogManager.error(error);
         }
     }
 }

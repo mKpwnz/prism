@@ -1,4 +1,4 @@
-import { SentryClient } from '@prism/Bot';
+import { Sentry } from '@prism/Bot';
 import Config from '@prism/Config';
 import S3Client from '@prism/clients/S3Client';
 import { RegisterEvent } from '@prism/decorators';
@@ -102,7 +102,7 @@ export class CustomImageUpload {
 
             return result.affectedRows > 0;
         } catch (error) {
-            SentryClient.captureException(error);
+            Sentry.captureException(error);
             LogManager.error(error);
             return false;
         }
@@ -195,7 +195,7 @@ export class CustomImageUpload {
             });
             await checkingMsg.delete();
         } catch (error) {
-            SentryClient.captureException(error);
+            Sentry.captureException(error);
             LogManager.error(error);
             embed
                 .setDescription(`Es gab einen Fehler beim Hochladen des Bildes.\n ${error}`)
