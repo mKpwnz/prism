@@ -1,7 +1,4 @@
-<<<<<<< af8577b6b8a36041add23243c245e5c114e314b8
 import { Sentry } from '@prism/Bot';
-=======
->>>>>>> 292f09d6afe23dd9b8daff8eb9af9dfc7b7be462
 import { Cache } from '@prism/class/Cache';
 import LogManager from '@prism/manager/LogManager';
 import axios from 'axios';
@@ -38,10 +35,7 @@ export class NvhxService {
                     );
                 }
             } catch (error: any) {
-<<<<<<< af8577b6b8a36041add23243c245e5c114e314b8
                 Sentry.captureException(error);
-=======
->>>>>>> 292f09d6afe23dd9b8daff8eb9af9dfc7b7be462
                 LogManager.error(`Error while fetching NVHX global bans: ${error.message}`);
             }
         }
