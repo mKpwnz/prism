@@ -18,6 +18,7 @@
     "dependencies": {
         "@gitbeaker/rest": "^39.34.3",
         "@prisma/client": "^5.10.2",
+        "@sentry/node": "^7.105.0",
         "@types/body-parser": "^1.19.5",
         "@types/cors": "^2.8.17",
         "@types/errorhandler": "^1.5.3",
