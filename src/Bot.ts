@@ -11,6 +11,7 @@ Sentry.init({
     dsn: 'https://f5d2f24f4aad4f35ed7524557e01b8ae@sentry.immortaldev.eu//2',
     environment: Config.ENV.NODE_ENV,
     tracesSampleRate: 1.0,
+    profilesSampleRate: 1.0,
 });
 
 LogManager.configure();

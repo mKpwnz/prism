@@ -73,7 +73,6 @@ export class BotReady {
                     true,
                 ),
             });
-            throw new Error('Test');
         } catch (error) {
             SentryClient.captureException(error);
             LogManager.error('Error while starting the bot', error);
