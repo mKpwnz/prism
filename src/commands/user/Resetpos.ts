@@ -1,3 +1,4 @@
+import { SentryClient } from '@prism/Bot';
 import Config from '@prism/Config';
 import Command from '@prism/class/Command';
 import { RegisterCommand } from '@prism/decorators';
@@ -62,6 +63,7 @@ export class Resetpos extends Command {
                 await this.replyError('Der Versuch, die Position zu ändern, ist fehlgeschlagen!');
             }
         } catch (error) {
+            SentryClient.captureException(error);
             await this.replyError('Es ist ein Fehler aufgetreten!');
         }
     }

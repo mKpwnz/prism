@@ -1,3 +1,4 @@
+import { SentryClient } from '@prism/Bot';
 import Config from '@prism/Config';
 import Command from '@prism/class/Command';
 import { PerformanceProfiler } from '@prism/class/PerformanceProfiler';
@@ -326,6 +327,7 @@ export class WhoIs extends Command {
             const [rows] = await GameDB.execute(query); // Verwenden Sie await und die execute-Funktion
             return rows as IFindUser[]; // Casten Sie das Ergebnis in das gewünschte Format
         } catch (error) {
+            SentryClient.captureException(error);
             LogManager.error(error);
             return [];
         }

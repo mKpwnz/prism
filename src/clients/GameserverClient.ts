@@ -1,3 +1,4 @@
+import { SentryClient } from '@prism/Bot';
 import Config from '@prism/Config';
 import { Cache } from '@prism/class/Cache';
 import { TFiveMGarage } from '@prism/interfaces/IFiveM';
@@ -30,6 +31,7 @@ export default class GameserverClient {
                 garages = TempGarages;
                 await Cache.set('FiveMGarages', TempGarages);
             } catch (error: any) {
+                SentryClient.captureException(error);
                 LogManager.error(error);
                 return new Error(`Failed to fetch garages from the gameserver: ${error.message}`);
             }

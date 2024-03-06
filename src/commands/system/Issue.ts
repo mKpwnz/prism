@@ -1,3 +1,4 @@
+import { SentryClient } from '@prism/Bot';
 import Config from '@prism/Config';
 import Command from '@prism/class/Command';
 import { GitlabClient } from '@prism/clients/GitlabClient';
@@ -396,6 +397,7 @@ export class Issue extends Command {
                     });
                 })
                 .catch(async (error) => {
+                    SentryClient.captureException(error);
                     LogManager.error(error);
                     await message.channel.send('Es ist ein Fehler aufgetreten.');
                 });

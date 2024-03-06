@@ -1,3 +1,4 @@
+import { SentryClient } from '@prism/Bot';
 import Config from '@prism/Config';
 import Command from '@prism/class/Command';
 import { RegisterCommand } from '@prism/decorators';
@@ -118,6 +119,7 @@ export class License extends Command {
         try {
             license = Helper.enumFromValue(lizenzStr, ELicenses);
         } catch (error) {
+            SentryClient.captureException(error);
             await this.replyError('Bitte gib eine gültige Lizenz an!');
             return;
         }

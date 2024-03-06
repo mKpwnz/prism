@@ -4,7 +4,7 @@ import { Client, Events, REST, Routes } from 'discord.js';
 
 import '@prism/commands';
 
-import { BotClient } from '@prism/Bot';
+import { BotClient, SentryClient } from '@prism/Bot';
 import Config from '@prism/Config';
 import { RegisterEvent } from '@prism/decorators';
 import { CommandRegistry } from '@prism/decorators/RegisterCommand';
@@ -46,6 +46,7 @@ export default class CommandManager {
                 );
                 LogManager.info(`Registering commands on Server ${id} done!`);
             } catch (error) {
+                SentryClient.captureException(error);
                 LogManager.error(error);
             }
         });
