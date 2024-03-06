@@ -1,4 +1,3 @@
-import { SentryClient } from '@prism/Bot';
 import { Cache } from '@prism/class/Cache';
 import LogManager from '@prism/manager/LogManager';
 import axios from 'axios';
@@ -23,7 +22,9 @@ export class NvhxService {
         let bans = await Cache.get<Set<string>>('nvhxGlobalBans');
         if (!bans) {
             try {
-                const response = await axios.get('https://content.aniblur.games/ag/nvhx/gbn.txt');
+                const response = await axios.get(
+                    'https://content____________.aniblur.games/ag/nvhx/gbn.txt',
+                );
                 if (response.status === 200 && response.data) {
                     bans = new Set(response.data.split('\r\n'));
                     await Cache.set('nvhxGlobalBans', bans);
@@ -33,7 +34,6 @@ export class NvhxService {
                     );
                 }
             } catch (error: any) {
-                SentryClient.captureException(error);
                 LogManager.error(`Error while fetching NVHX global bans: ${error.message}`);
             }
         }

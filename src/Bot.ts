@@ -4,13 +4,16 @@ import Config from '@prism/Config';
 import { Cache } from '@prism/class/Cache';
 import EventManager from '@prism/manager/EventManager';
 import LogManager from '@prism/manager/LogManager';
+import { nodeProfilingIntegration } from '@sentry/profiling-node';
 import { Client, IntentsBitField, Partials } from 'discord.js';
-import * as Sentry from '@sentry/node';
+import * as SentryNode from '@sentry/node';
 
-Sentry.init({
-    dsn: 'https://f5d2f24f4aad4f35ed7524557e01b8ae@sentry.immortaldev.eu//2',
+SentryNode.init({
+    dsn: Config.ENV.SENTRY_DSN,
     environment: Config.ENV.NODE_ENV,
     tracesSampleRate: 1.0,
+    profilesSampleRate: 1.0,
+    integrations: [nodeProfilingIntegration()],
 });
 
 LogManager.configure();
@@ -34,4 +37,4 @@ EventManager.init(client);
 client.login(Config.ENV.DISCORD_TOKEN);
 
 export const BotClient = client;
-export const SentryClient = Sentry;
+export const Sentry = SentryNode;
