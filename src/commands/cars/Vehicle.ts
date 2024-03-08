@@ -54,6 +54,12 @@ export class Vehicle extends Command {
             await this.replyError(vehicle.message);
             return;
         }
+        if (!vehicle.owner) {
+            await this.replyError(
+                `Das Fahrzeug mit dem Kennzeichen **${plate}** hat keinen Besitzer.`,
+            );
+            return;
+        }
 
         const player = await PlayerService.validatePlayer(vehicle.owner);
         if (!player) {
@@ -88,3 +94,4 @@ export class Vehicle extends Command {
         });
     }
 }
+

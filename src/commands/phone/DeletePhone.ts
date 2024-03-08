@@ -216,7 +216,7 @@ export class DeletePhone extends Command {
                 `INSERT INTO phone_darkchat_accounts (phone_number, username) VALUES (${account.phone_number}, ${account.username});`,
             );
             const [channels] = await GameDB.query<IPhoneDarkchatMembers[]>(
-                'SELECT * FROM phone_darkchat_members WHERE sender = ?',
+                'SELECT * FROM phone_darkchat_members WHERE username = ?',
                 [account.username],
             );
             if (channels.length === 0) {
