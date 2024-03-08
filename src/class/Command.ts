@@ -78,12 +78,9 @@ export default abstract class Command {
         };
         let { commandName } = interaction;
         if (!this.DoNotLog) {
-            try {
-                if (interaction.options.getSubcommand()) {
-                    commandName += ` ${interaction.options.getSubcommand()}`;
-                }
-            } catch (e) {
-                Sentry.captureException(e);
+            if (interaction.options.getSubcommand()) {
+                commandName += ` ${interaction.options.getSubcommand()}`;
+            } else {
                 commandName = interaction.commandName;
             }
             BotDB.command_log.create({
