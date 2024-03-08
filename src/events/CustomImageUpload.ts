@@ -120,7 +120,7 @@ export class CustomImageUpload {
             description: ' ',
         }).setFooter({
             text: `${message.author.displayName ?? ''}`,
-            iconURL: message.author.avatarURL() ?? '',
+            iconURL: message.author.avatarURL() ?? Config.Bot.BOT_LOGO,
         });
 
         if (attachments.size === 0) {
@@ -213,7 +213,7 @@ export class CustomImageUpload {
             description: ' ',
         }).setFooter({
             text: `${interaction.user.displayName ?? ''}`,
-            iconURL: interaction.user.avatarURL() ?? '',
+            iconURL: interaction.user.avatarURL() ?? Config.Bot.BOT_LOGO,
         });
 
         // @TODO Bild auch von von allen Spielern löschen
@@ -438,3 +438,4 @@ export class CustomImageUpload {
         }
     }
 }
+

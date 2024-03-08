@@ -134,7 +134,7 @@ export class Issue extends Command {
                 ],
             }).setAuthor({
                 name: `${interaction.user.displayName} | ${interaction.user.id}`,
-                iconURL: interaction.user.avatarURL() ?? '',
+                iconURL: interaction.user.avatarURL() ?? Config.Bot.BOT_LOGO,
             });
             const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
                 new ButtonBuilder()
@@ -416,3 +416,4 @@ export class Issue extends Command {
         }
     }
 }
+

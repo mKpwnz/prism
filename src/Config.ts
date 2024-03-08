@@ -123,19 +123,10 @@ const BotConfig = {
                 return [ServerConfig.IMMO_DEVS];
         }
     })(),
-    Emotes: [
-        {
-            name: 'pbot_beta',
-            link: 'https://i.imgur.com/akyHolt.png',
-        },
-        {
-            name: 'pbot_banned',
-            link: 'https://i.imgur.com/ZvpqMBv.png',
-        },
-    ],
+    Emotes: ['pbot_beta', 'pbot_banned'],
     BOT_NAME: 'PRISM | Immortal V',
-    BOT_LOGO: 'https://i.imgur.com/NkZDE8l.png',
-    WHITESPACE: 'https://i.imgur.com/pdkIDFc.png',
+    BOT_LOGO: 'https://s3.immortaldev.eu/prism-static/bot_logo.png',
+    WHITESPACE: 'https://s3.immortaldev.eu/prism-static/bot_whitespace.png',
     GlobalBlockedUsers: [''],
     GlobalWhitelistUsers: [
         UserConfig.SPARTA,
