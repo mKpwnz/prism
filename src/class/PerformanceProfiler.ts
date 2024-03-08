@@ -51,7 +51,7 @@ export class PerformanceProfiler {
             color: EEmbedColors.DEBUG,
         }).setFooter({
             text: `${user.displayName ?? ''}`,
-            iconURL: user.avatarURL() ?? '',
+            iconURL: user.avatarURL() ?? Config.Bot.BOT_LOGO,
         });
         const channel = await BotClient.channels.fetch(channelid);
         if (channel && channel.isTextBased()) await channel.send({ embeds: [embed] });
@@ -76,3 +76,4 @@ export class PerformanceProfiler {
         LogManager.info(table.toString());
     }
 }
+

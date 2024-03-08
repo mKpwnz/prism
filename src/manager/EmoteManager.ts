@@ -24,7 +24,7 @@ export class EmoteManager {
     }
 
     static getEmoteByName(name: string) {
-        return Config.Bot.Emotes.find((emote) => emote.name === name);
+        return Config.Bot.Emotes.find((emote) => emote === name);
     }
 
     static async fetchEmoteFromAPI(
@@ -64,7 +64,7 @@ export class EmoteManager {
     static async initEmotes(): Promise<void> {
         Config.Bot.ServerID.forEach(async (serverid) => {
             for (const emote of EmoteManager.getAllBotEmotes()) {
-                const e = await EmoteManager.fetchEmoteFromAPI(emote.name, serverid);
+                const e = await EmoteManager.fetchEmoteFromAPI(emote, serverid);
                 if (e && e.name) {
                     if (!this.Emotes.has(serverid)) {
                         this.Emotes.set(serverid, new Map());
@@ -98,8 +98,8 @@ export class EmoteManager {
         for (const emote of EmoteManager.getAllBotEmotes()) {
             if (isTimeout) throw new Error('Timeout while adding the bot emotes!');
             const newEmote = await guild.emojis.create({
-                name: emote.name,
-                attachment: emote.link,
+                name: emote,
+                attachment: `https://s3.immortaldev.eu/prism-static/emotes/${emote}.png`,
             });
             LogManager.info(`Added/Updated emote ${newEmote.name} (${newEmote.id})`);
         }

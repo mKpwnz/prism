@@ -131,7 +131,7 @@ export default abstract class Command {
 
         return getEmbedBase(opt).setFooter({
             text: `${this.currentInteraction.user.displayName ?? ''} • ET: ${executionTime}ms`,
-            iconURL: this.currentInteraction.user.avatarURL() ?? '',
+            iconURL: this.currentInteraction.user.avatarURL() ?? Config.Bot.BOT_LOGO,
         });
     }
 
