@@ -2,7 +2,6 @@ import Config from '@prism/Config';
 import chalk from 'chalk';
 import colorize from 'json-colorizer';
 import winston, { createLogger, format, transports } from 'winston';
-import SentryTransport from 'winston-transport-sentry-node';
 
 /**
  * @description Logger class for logging to console and loki
@@ -63,10 +62,7 @@ export default class LogManager {
     }
 
     public static async configure() {
-        const logTransports: winston.transport[] = [
-            new transports.Console(),
-            new SentryTransport({ sentry: { dsn: Config.ENV.SENTRY_DSN }, level: 'warn' }),
-        ];
+        const logTransports: winston.transport[] = [new transports.Console()];
 
         // INFO: Disabled Loki Transport for now cuz of missing Loki instance
         // if (process.env.NODE_ENV === 'production') {
@@ -163,3 +159,4 @@ export default class LogManager {
         args.forEach((arg) => this.logger.debug(arg));
     }
 }
+
