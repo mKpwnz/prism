@@ -78,7 +78,7 @@ export default abstract class Command {
         };
         let { commandName } = interaction;
         if (!this.DoNotLog) {
-            if (interaction.options.getSubcommand()) {
+            if (interaction.options.getSubcommand(false)) {
                 commandName += ` ${interaction.options.getSubcommand()}`;
             } else {
                 commandName = interaction.commandName;
