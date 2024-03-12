@@ -1,4 +1,4 @@
-import { ISchufaUser, ISchufaUserRaw } from '@prism/sql/schema/User.schema';
+import { ISchufaUser, ISchufaUserRaw } from '@prism/sql/gameSchema/User.schema';
 import { GameDB } from '@prism/sql/Database';
 
 export class UserService {

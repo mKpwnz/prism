@@ -4,7 +4,9 @@ import { RegisterCommand } from '@prism/decorators';
 import { EENV } from '@prism/enums/EENV';
 import { PlayerService } from '@prism/services/PlayerService';
 import { BotDB } from '@prism/sql/Database';
+import { teamNotes } from '@prism/sql/botSchema/BotSchema';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { desc, eq } from 'drizzle-orm';
 
 @RegisterCommand(
     new SlashCommandBuilder()
@@ -95,14 +97,15 @@ export class TeamNote extends Command {
             return;
         }
 
-        const data = await BotDB.team_notes.create({
-            data: {
+        const data = await BotDB.insert(teamNotes)
+            .values({
                 user: vPlayer.identifiers.steam,
-                noterId: interaction.user.id,
+                noterId: Number(interaction.user.id),
                 noterName: interaction.user.username,
                 note,
-            },
-        });
+            })
+            .returning()
+            .then((res) => res[0]);
 
         await this.replyWithEmbed({
             title: `Teamnote | Hinzugefügt (ID: ${data.id})`,
@@ -126,7 +129,7 @@ export class TeamNote extends Command {
                 },
                 {
                     name: 'Hinzugefügt am',
-                    value: data.created_at.toLocaleString('de-DE'),
+                    value: data.createdAt.toLocaleString('de-DE'),
                     inline: true,
                 },
                 {
@@ -146,19 +149,16 @@ export class TeamNote extends Command {
             return;
         }
 
-        const data = await BotDB.team_notes.findMany({
-            where: {
-                user: vPlayer.identifiers.steam,
-            },
-            orderBy: {
-                created_at: 'desc',
-            },
-        });
+        const data = await BotDB.select()
+            .from(teamNotes)
+            .where(eq(teamNotes.user, vPlayer.identifiers.steam))
+            .orderBy(desc(teamNotes.createdAt));
+
         let notes = '';
         data.slice(0, 5).forEach((note) => {
             notes += `ID: **${note.id}** | Erstellt von: **${
                 note.noterName
-            }** | Erstellt am **${note.created_at.toLocaleString('de-DE')}**\n\`\`\`${
+            }** | Erstellt am **${note.createdAt.toLocaleString('de-DE')}**\n\`\`\`${
                 note.note
             }\`\`\`\n`;
         });
@@ -180,11 +180,11 @@ export class TeamNote extends Command {
     private async viewNote(interaction: ChatInputCommandInteraction): Promise<void> {
         const id = interaction.options.getInteger('id', true);
 
-        const data = await BotDB.team_notes.findUnique({
-            where: {
-                id,
-            },
-        });
+        const data = await BotDB.selectDistinct()
+            .from(teamNotes)
+            .where(eq(teamNotes.id, id))
+            .then((res) => res[0]);
+
         if (!data) {
             await this.replyError('Die angegebene ID ist ungültig.');
             return;
@@ -196,7 +196,7 @@ export class TeamNote extends Command {
                     vPlayer.identifiers.steam
                 })\n\nID: **${data.id}** | Erstellt von: **${
                     data.noterName
-                }** | Erstellt am **${data.created_at.toLocaleString('de-DE')}**\n\`\`\`${
+                }** | Erstellt am **${data.createdAt.toLocaleString('de-DE')}**\n\`\`\`${
                     data.note
                 }\`\`\`\n`,
             });
@@ -206,7 +206,7 @@ export class TeamNote extends Command {
                     data.user
                 }** \n\nID: **${data.id}** | Erstellt von: **${
                     data.noterName
-                }** | Erstellt am **${data.created_at.toLocaleString('de-DE')}**\n\`\`\`${
+                }** | Erstellt am **${data.createdAt.toLocaleString('de-DE')}**\n\`\`\`${
                     data.note
                 }\`\`\`\n`,
             });

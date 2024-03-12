@@ -1,6 +1,10 @@
 import { BotClient, Sentry } from '@prism/Bot';
 import Config from '@prism/Config';
 import { RconClient } from '@prism/class/RconClient';
+import TxAdminClient from '@prism/clients/TxAdminClient';
+import { checkDeadImages } from '@prism/cronjobs/CheckDeadImages.cron';
+import { doFinancialAnalytics } from '@prism/cronjobs/FinancialAnalytics.cron';
+import { logPlayerCount } from '@prism/cronjobs/LogPlayerCount.cron';
 import { RegisterEvent } from '@prism/decorators';
 import CommandManager from '@prism/manager/CommandManager';
 import { CronManager } from '@prism/manager/CronManager';
@@ -27,18 +31,9 @@ export class BotReady {
         try {
             new ExpressApp();
             CronManager.initCronManager({
-                'fraktionen.finance': new CronJob(
-                    '0 0 */8 * * *',
-                    () => CronJobService.logSocietyFinance(),
-                    null,
-                    null,
-                    null,
-                    null,
-                    true,
-                ),
                 'server.playercount': new CronJob(
                     '0 */10 * * * *',
-                    () => CronJobService.logPlayerCount(),
+                    () => logPlayerCount(),
                     null,
                     null,
                     null,
@@ -47,7 +42,10 @@ export class BotReady {
                 ),
                 'txadmin.authenticate': new CronJob(
                     '0 0 */23 * * *',
-                    () => CronJobService.txAdminAuthenticate(),
+                    async () => {
+                        await TxAdminClient.authenticate();
+                        LogManager.log('CronJobs: txAdminAuthenticate() done.');
+                    },
                     null,
                     null,
                     null,
@@ -65,7 +63,16 @@ export class BotReady {
                 ),
                 'server.checkDeadImages': new CronJob(
                     '0 */60 * * * *',
-                    () => CronJobService.checkDeadImages(),
+                    () => checkDeadImages(),
+                    null,
+                    null,
+                    null,
+                    null,
+                    true,
+                ),
+                'server.doFinancialAnalytics': new CronJob(
+                    '0 */20 * * * *',
+                    () => doFinancialAnalytics(),
                     null,
                     null,
                     null,

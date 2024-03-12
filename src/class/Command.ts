@@ -1,5 +1,6 @@
 import { Sentry } from '@prism/Bot';
 import Config from '@prism/Config';
+import { commandLog } from '@prism/sql/botSchema/BotSchema';
 import { EENV } from '@prism/enums/EENV';
 import { EEmbedColors } from '@prism/enums/EmbedColors';
 import { IEmbedOptions } from '@prism/interfaces/IEmbed';
@@ -83,14 +84,13 @@ export default abstract class Command {
             } else {
                 commandName = interaction.commandName;
             }
-            BotDB.command_log.create({
-                data: {
-                    command: commandName,
-                    user: user.id,
-                    channel: interaction.channelId,
-                    options: cmdPrint.options,
-                    jsonData: cmdPrint,
-                },
+
+            BotDB.insert(commandLog).values({
+                command: commandName,
+                user: user.id,
+                channel: interaction.channelId,
+                options: cmdPrint.options,
+                jsonData: cmdPrint,
             });
         }
         try {

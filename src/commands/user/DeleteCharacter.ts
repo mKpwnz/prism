@@ -9,7 +9,7 @@ import LogManager from '@prism/manager/LogManager';
 import { PhoneService } from '@prism/services/PhoneService';
 import { PlayerService } from '@prism/services/PlayerService';
 import { GameDB } from '@prism/sql/Database';
-import { IUser } from '@prism/sql/schema/User.schema';
+import { IUser } from '@prism/sql/gameSchema/User.schema';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
 import { License } from './License';

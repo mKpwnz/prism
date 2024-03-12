@@ -3,8 +3,9 @@ import Command from '@prism/class/Command';
 import { RegisterCommand } from '@prism/decorators';
 import { EENV } from '@prism/enums/EENV';
 import { BotDB } from '@prism/sql/Database';
-import { AlignmentEnum, AsciiTable3 } from 'ascii-table3';
+import { commandLog } from '@prism/sql/botSchema/BotSchema';
 import { SlashCommandBuilder } from 'discord.js';
+import { count } from 'drizzle-orm';
 
 @RegisterCommand(
     new SlashCommandBuilder()
@@ -36,29 +37,24 @@ export class BotStats extends Command {
     }
 
     async execute(): Promise<void> {
-        const data = await BotDB.command_log.groupBy({
-            by: ['command'],
-            _count: {
-                command: true,
-            },
-            orderBy: {
-                _count: {
-                    command: 'desc',
-                },
-            },
-        });
+        const data = await BotDB.select({ count: count(commandLog.command) })
+            .from(commandLog)
+            .groupBy(commandLog.command);
 
-        const table = new AsciiTable3('Command Stats')
-            .setStyle('unicode-single')
-            .setHeading('Command', 'Count')
-            .setAlign(1, AlignmentEnum.LEFT)
-            .setAlign(2, AlignmentEnum.RIGHT);
-        data.forEach((d) => {
-            table.addRow(d.command, d._count.command);
-        });
+        console.log(data);
+
+        // const table = new AsciiTable3('Command Stats')
+        //     .setStyle('unicode-single')
+        //     .setHeading('Command', 'Count')
+        //     .setAlign(1, AlignmentEnum.LEFT)
+        //     .setAlign(2, AlignmentEnum.RIGHT);
+        // data.forEach((d) => {
+        //     table.addRow(d.command, d._count.command);
+        // });
 
         await this.replyWithEmbed({
-            description: `\`\`\`\n${table.toString()}\`\`\``,
+            // description: `\`\`\`\n${table.toString()}\`\`\``,
+            description: `\`\`\`\n.\`\`\``,
         });
     }
 }

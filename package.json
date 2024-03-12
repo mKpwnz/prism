@@ -10,14 +10,14 @@
         "lint-fix": "eslint . --ext .ts --fix",
         "format-check": "prettier . --check",
         "format-fix": "prettier . --check --write",
-        "check": "npm run format-fix && npm run lint-check"
+        "check": "npm run format-fix && npm run lint-check",
+        "generate": "drizzle-kit generate:pg --config=src/drizzle.config.ts"
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
     "dependencies": {
         "@gitbeaker/rest": "^39.34.3",
-        "@prisma/client": "^5.10.2",
         "@sentry/node": "^7.105.0",
         "@sentry/profiling-node": "^7.105.0",
         "@types/body-parser": "^1.19.5",
@@ -38,6 +38,7 @@
         "cross-env": "^7.0.3",
         "discord.js": "^14.14.1",
         "dotenv": "^16.4.5",
+        "drizzle-orm": "^0.30.1",
         "envalid": "^8.0.0",
         "errorhandler": "^1.5.1",
         "express": "^4.18.2",
@@ -46,7 +47,7 @@
         "json-colorizer": "^2.2.2",
         "minio": "^7.1.3",
         "mysql2": "^3.9.1",
-        "prisma": "^5.10.2",
+        "pg": "^8.11.3",
         "ts-node": "^10.9.2",
         "tsconfig-paths": "^4.2.0",
         "typescript": "^5.3.3",
@@ -55,8 +56,10 @@
         "zod": "^3.22.4"
     },
     "devDependencies": {
+        "@types/pg": "^8.11.2",
         "@typescript-eslint/eslint-plugin": "^6.15.0",
         "@typescript-eslint/parser": "^6.15.0",
+        "drizzle-kit": "^0.20.14",
         "eslint": "^8.56.0",
         "eslint-config-airbnb-base": "^15.0.0",
         "eslint-config-airbnb-typescript": "^17.1.0",

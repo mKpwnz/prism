@@ -5,7 +5,7 @@ import { RegisterCommand } from '@prism/decorators';
 import { EENV } from '@prism/enums/EENV';
 import { PlayerService } from '@prism/services/PlayerService';
 import { GameDB } from '@prism/sql/Database';
-import { IJob } from '@prism/sql/schema/Job.schema';
+import { IJob } from '@prism/sql/gameSchema/Job.schema';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
 

@@ -4,7 +4,7 @@ import { RegisterCommand } from '@prism/decorators';
 import { EENV } from '@prism/enums/EENV';
 import { PlayerService } from '@prism/services/PlayerService';
 import { UserService } from '@prism/services/UserService';
-import { ISchufaUser } from '@prism/sql/schema/User.schema';
+import { ISchufaUser } from '@prism/sql/gameSchema/User.schema';
 import { attachmentFromObject } from '@prism/utils/DiscordHelper';
 import { AttachmentBuilder, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 

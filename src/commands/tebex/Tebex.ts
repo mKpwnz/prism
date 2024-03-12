@@ -5,7 +5,7 @@ import { RegisterCommand } from '@prism/decorators';
 import { EENV } from '@prism/enums/EENV';
 import LogManager from '@prism/manager/LogManager';
 import { GameDB } from '@prism/sql/Database';
-import { ITebexTransactions } from '@prism/sql/schema/Tebex.schema';
+import { ITebexTransactions } from '@prism/sql/gameSchema/Tebex.schema';
 import axios from 'axios';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 

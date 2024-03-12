@@ -12,7 +12,7 @@ import {
     IPhonePhotos,
     IPhoneTiktokMessages,
     IPhoneTinderMessages,
-} from '@prism/sql/schema/Phone.schema';
+} from '@prism/sql/gameSchema/Phone.schema';
 
 export class PhonePhotosService {
     public static async checkPhotos(start: Date, end: Date): Promise<IPhonePhotos[]> {

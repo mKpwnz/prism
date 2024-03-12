@@ -1,7 +1,7 @@
 import { RconClient } from '@prism/class/RconClient';
 import { GameDB } from '@prism/sql/Database';
 import { ResultSetHeader } from 'mysql2';
-import { IJob } from '../sql/schema/Job.schema';
+import { IJob } from '../sql/gameSchema/Job.schema';
 import { ItemService } from './ItemService';
 
 export class FraktionService {

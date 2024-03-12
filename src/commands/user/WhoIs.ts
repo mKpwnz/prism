@@ -10,7 +10,7 @@ import LogManager from '@prism/manager/LogManager';
 import { NvhxService } from '@prism/services/NvhxService';
 import { PlayerService } from '@prism/services/PlayerService';
 import { BotDB, GameDB } from '@prism/sql/Database';
-import { IFindUser } from '@prism/sql/schema/User.schema';
+import { IFindUser } from '@prism/sql/gameSchema/User.schema';
 import { Helper } from '@prism/utils/Helper';
 import {
     AttachmentBuilder,
@@ -18,6 +18,8 @@ import {
     GuildEmoji,
     SlashCommandBuilder,
 } from 'discord.js';
+import { count, eq } from 'drizzle-orm';
+import { teamNotes } from '@prism/sql/botSchema/BotSchema';
 
 @RegisterCommand(
     new SlashCommandBuilder()
@@ -121,11 +123,10 @@ export class WhoIs extends Command {
             const fraksperreString = this.getFraksperreByUser(findUsers[i]);
             const levelString = this.getLevelByUser(findUsers[i]);
 
-            const teamNoteCount = await BotDB.team_notes.count({
-                where: {
-                    user: findUsers[i].identifier,
-                },
-            });
+            const teamNoteCount = await BotDB.select({ count: count() })
+                .from(teamNotes)
+                .where(eq(teamNotes.user, findUsers[i].identifier))
+                .then((res) => res[0]);
 
             const nvhxBanned = await NvhxService.CheckIfUserIsBanned([
                 findUsers[i].identifier,
@@ -144,7 +145,7 @@ export class WhoIs extends Command {
                     steamId,
                     fraksperreString,
                     levelString,
-                    teamNoteCount,
+                    teamNoteCount.count,
                     pageSize,
                     embedFields.length,
                 ),
