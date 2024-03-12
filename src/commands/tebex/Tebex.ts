@@ -111,7 +111,7 @@ export class Tebex extends Command {
                                     ? `Abgeholt am ${new Date(transaction.taketime).toLocaleString(
                                           'de-DE',
                                       )}`
-                                    : 'Nicht abgeholz'
+                                    : 'Nicht abgeholt'
                             }`,
                         );
                     }
