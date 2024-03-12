@@ -9,9 +9,18 @@
         "allowJs": true,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
+        "skipLibCheck": true,
         "paths": {
-            "@prism/*": ["./src/*"]
+            "@prism/*": [
+                "./src/*"
+            ]
         }
     },
-    "include": ["./src"]
+    "include": [
+        "./src",
+        "../drizzle.config.ts"
+    ],
+    "exclude": [
+        "node_modules",
+    ],
 }

@@ -19,7 +19,7 @@ import {
     IPhoneTinderAccounts,
     IPhoneTwitterAccounts,
     IPhoneTwitterTweets,
-} from '@prism/sql/schema/Phone.schema';
+} from '@prism/sql/gameSchema/Phone.schema';
 import { AttachmentBuilder, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { readFileSync, writeFileSync } from 'fs';
 

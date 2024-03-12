@@ -3,7 +3,7 @@ import Command from '@prism/class/Command';
 import { RegisterCommand } from '@prism/decorators';
 import { EENV } from '@prism/enums/EENV';
 import { UserService } from '@prism/services/UserService';
-import { ISchufaUser } from '@prism/sql/schema/User.schema';
+import { ISchufaUser } from '@prism/sql/gameSchema/User.schema';
 import { SlashCommandBuilder } from 'discord.js';
 
 @RegisterCommand(

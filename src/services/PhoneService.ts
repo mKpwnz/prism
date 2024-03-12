@@ -1,4 +1,4 @@
-import { IPhoneOwnerResponse } from '@prism/sql/schema/Phone.schema';
+import { IPhoneOwnerResponse } from '@prism/sql/gameSchema/Phone.schema';
 import { GameDB } from '@prism/sql/Database';
 import { ResultSetHeader } from 'mysql2';
 

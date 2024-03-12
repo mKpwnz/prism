@@ -4,9 +4,10 @@ import Config from '@prism/Config';
 import { Cache } from '@prism/class/Cache';
 import EventManager from '@prism/manager/EventManager';
 import LogManager from '@prism/manager/LogManager';
+import { InitDatabase } from '@prism/sql/Database';
+import * as SentryNode from '@sentry/node';
 import { nodeProfilingIntegration } from '@sentry/profiling-node';
 import { Client, IntentsBitField, Partials } from 'discord.js';
-import * as SentryNode from '@sentry/node';
 
 SentryNode.init({
     dsn: Config.ENV.SENTRY_DSN,
@@ -18,6 +19,8 @@ SentryNode.init({
 
 LogManager.configure();
 LogManager.info('Bot is starting...');
+
+InitDatabase();
 
 const client = new Client({
     intents: [

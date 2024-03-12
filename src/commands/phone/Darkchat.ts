@@ -4,7 +4,7 @@ import { RegisterCommand } from '@prism/decorators';
 import { EENV } from '@prism/enums/EENV';
 import { EEmbedColors } from '@prism/enums/EmbedColors';
 import { PhoneDarkchatService } from '@prism/services/PhoneDarkchatService';
-import { IPhoneDarkchatSearch } from '@prism/sql/schema/Phone.schema';
+import { IPhoneDarkchatSearch } from '@prism/sql/gameSchema/Phone.schema';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 @RegisterCommand(

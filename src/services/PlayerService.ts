@@ -2,7 +2,7 @@ import { IValidatedPlayer } from '@prism/interfaces/IValidatedPlayer';
 import { EUniqueIdentifier } from '@prism/enums/ESearchType';
 import { ILivePlayer } from '@prism/interfaces/ILivePlayer';
 import { GameDB } from '@prism/sql/Database';
-import { IValidatedPlayerResponse } from '@prism/sql/schema/Player.schema';
+import { IValidatedPlayerResponse } from '@prism/sql/gameSchema/Player.schema';
 import { Cache } from '@prism/class/Cache';
 import LogManager from '@prism/manager/LogManager';
 import axios from 'axios';

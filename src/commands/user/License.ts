@@ -8,7 +8,7 @@ import { IValidatedPlayer } from '@prism/interfaces/IValidatedPlayer';
 import LogManager from '@prism/manager/LogManager';
 import { PlayerService } from '@prism/services/PlayerService';
 import { GameDB } from '@prism/sql/Database';
-import { IUserLicense } from '@prism/sql/schema/UserLicense.schema';
+import { IUserLicense } from '@prism/sql/gameSchema/UserLicense.schema';
 import { NonEmptyArray } from '@prism/types/NonEmptyArray';
 import { Helper } from '@prism/utils/Helper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';

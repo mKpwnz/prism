@@ -4,7 +4,11 @@ import { RegisterCommand } from '@prism/decorators';
 import { EENV } from '@prism/enums/EENV';
 import { PlayerService } from '@prism/services/PlayerService';
 import { GameDB } from '@prism/sql/Database';
-import { IHouseLocation, IHouseLocationCoords, IHousing } from '@prism/sql/schema/Housing.schema';
+import {
+    IHouseLocation,
+    IHouseLocationCoords,
+    IHousing,
+} from '@prism/sql/gameSchema/Housing.schema';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 @RegisterCommand(

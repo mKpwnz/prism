@@ -1,5 +1,5 @@
 import { GameDB } from '@prism/sql/Database';
-import { IItem } from '@prism/sql/schema/Item.schema';
+import { IItem } from '@prism/sql/gameSchema/Item.schema';
 import { Cache } from '@prism/class/Cache';
 
 /**

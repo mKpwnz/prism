@@ -6,3 +6,4 @@ export * from './TestCommand';
 export * from './SysInfo';
 export * from './Issue';
 export * from './Clear';
+export * from './FaInfo';
