@@ -73,6 +73,7 @@ export interface IFindUser extends RowDataPacket {
     black_money: number;
     fraksperre: Date;
     crafting_level: number;
+    updated: Date;
 }
 
 /**

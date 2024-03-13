@@ -208,6 +208,15 @@ export class WhoIs extends Command {
                     nvhxBanned ? `${bannedEmote} **NVHX Global Ban Detected** ${bannedEmote}\n` : ''
                 }` +
                 `${id > -1 ? `:green_circle: **Online mit ID: ${id} **` : ''}\n` +
+                `Last Save: ${user.updated.toLocaleString('de-DE', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false,
+                    timeZone: 'Europe/Berlin',
+                })}\n` +
                 `SteamID: [${
                     user.identifier
                 }](https://steamid.pro/de/lookup/${steamId})\nDiscord: ${
@@ -319,7 +328,8 @@ export class WhoIs extends Command {
             `cast( json_extract( \`users\`.\`accounts\`, '$.money' ) AS signed ) AS money, ` +
             `cast( json_extract( \`users\`.\`accounts\`, '$.black_money' ) AS signed ) AS black_money, ` +
             `users.fraksperre, ` +
-            `users.crafting_level ` +
+            `users.crafting_level, ` +
+            `users.updated ` +
             `FROM users ` +
             `LEFT JOIN baninfo ON users.identifier = baninfo.identifier ` +
             `JOIN phone_phones ON users.identifier = phone_phones.id ` +

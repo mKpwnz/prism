@@ -42,7 +42,7 @@ export default abstract class Command {
 
         // Override Channel in Devmode
         if (Config.ENV.NODE_ENV !== 'production') {
-            // this.DoNotLog = true;
+            this.DoNotLog = true;
             this.AllowedChannels = [
                 Config.Channels.DEV.PRISM_TESTING,
                 Config.Channels.DEV.PRISM_TESTING_2,
@@ -79,7 +79,6 @@ export default abstract class Command {
         };
         let { commandName } = interaction;
         if (!this.DoNotLog) {
-            LogManager.debug('Command: ', cmdPrint);
             if (interaction.options.getSubcommand(false)) {
                 commandName += ` ${interaction.options.getSubcommand()}`;
             } else {
