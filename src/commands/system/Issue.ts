@@ -389,7 +389,7 @@ export class Issue extends Command {
                         description: ' ',
                         fields,
                         color: EEmbedColors.SUCCESS,
-                    });
+                    }).setAuthor(Embed.author);
                     await message.reactions.removeAll();
                     await message.edit({ embeds: [embed] });
                     await message.thread?.send({
@@ -407,7 +407,7 @@ export class Issue extends Command {
                 description: ' ',
                 fields,
                 color: EEmbedColors.ALERT,
-            });
+            }).setAuthor(Embed.author);
             await message.reactions.removeAll();
             await message.edit({ embeds: [embed] });
             await message.thread?.send({
@@ -416,4 +416,3 @@ export class Issue extends Command {
         }
     }
 }
-
