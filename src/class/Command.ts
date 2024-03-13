@@ -42,7 +42,7 @@ export default abstract class Command {
 
         // Override Channel in Devmode
         if (Config.ENV.NODE_ENV !== 'production') {
-            this.DoNotLog = true;
+            // this.DoNotLog = true;
             this.AllowedChannels = [
                 Config.Channels.DEV.PRISM_TESTING,
                 Config.Channels.DEV.PRISM_TESTING_2,
@@ -79,19 +79,22 @@ export default abstract class Command {
         };
         let { commandName } = interaction;
         if (!this.DoNotLog) {
+            LogManager.debug('Command: ', cmdPrint);
             if (interaction.options.getSubcommand(false)) {
                 commandName += ` ${interaction.options.getSubcommand()}`;
             } else {
                 commandName = interaction.commandName;
             }
 
-            BotDB.insert(commandLog).values({
-                command: commandName,
-                user: user.id,
-                channel: interaction.channelId,
-                options: cmdPrint.options,
-                jsonData: cmdPrint,
-            });
+            BotDB.insert(commandLog)
+                .values({
+                    command: commandName,
+                    user: user.id,
+                    channel: interaction.channelId,
+                    options: cmdPrint.options,
+                    jsonData: cmdPrint,
+                })
+                .execute();
         }
         try {
             this.CmdPerformanceStart = new Date();
