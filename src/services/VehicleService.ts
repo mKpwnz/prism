@@ -132,7 +132,7 @@ export class VehicleService {
 
         const [res] = await GameDB.execute<ResultSetHeader>(
             `DELETE FROM owned_vehicles WHERE plate = ?`,
-            [plate],
+            [vehicle.plate],
         );
 
         if (res.affectedRows === 0) {
