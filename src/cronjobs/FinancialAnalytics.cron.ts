@@ -283,9 +283,9 @@ export async function doFinancialAnalytics() {
     }
     LogManager.info('Starting Financial Analytics');
     const deleteOldScans = await BotDB.delete(faScans).where(
-        lt(faScans.createdAt, new Date(Date.now() - 2 * 60 * 60 * 1000)),
+        lt(faScans.createdAt, new Date(Date.now() - 8 * 60 * 60 * 1000)),
     );
-    LogManager.info(`Deleted ${deleteOldScans.rowCount} old Scans (older than 7 Days)`);
+    LogManager.info(`Deleted ${deleteOldScans.rowCount} old Scans (older than 8 hours)`);
     LogManager.info('Creating Scan for Financial Analytics');
     const scan = await BotDB.insert(faScans)
         .values({})
