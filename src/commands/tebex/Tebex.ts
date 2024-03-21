@@ -59,7 +59,7 @@ export class Tebex extends Command {
         const tbxNummer = interaction.options.getString('tbx', true);
         const useOldApi = interaction.options.getSubcommand() === 'checkold';
 
-        if (!/tbx-[0-9a-f]{13,14}-[0-9a-f]{6}/.test(tbxNummer)) {
+        if (!/tbx-[0-9a-f]{12,14}-[0-9a-f]{6}/.test(tbxNummer)) {
             await this.replyError('Ungültige Tebex Nummer.');
             return;
         }
