@@ -60,11 +60,12 @@ const UserConfig = {
     JUNGLEJANIS: '917031374890876938',
     TES4: '372395897071468545',
     EFORCE: '418762151881211907',
+    SKY: '806975734521921606',
     // Admin
     MIKA: '530485414453051402',
+    LIZ: '167525544932409344',
     // Senior Moderator
     ANNY: '288084816363126786',
-    LIZ: '167525544932409344',
     // Moderator
     REALYEET: '344263375938912257',
     AMBERLICE: '596792325511053312',
@@ -92,6 +93,7 @@ const UserConfig = {
     // Server Engineer
     ELSINAR: '153507094933274624',
     SIRJXSH: '257564404428701697',
+    RIKZ: '625243313548558347',
     // Developer
     SQUEEZLEX: '319783009018707970',
     MANU: '219123072295370754',
@@ -118,7 +120,6 @@ const BotConfig = {
         switch (envConfig.NODE_ENV) {
             case 'production':
                 return [ServerConfig.IMMO_LOGS, ServerConfig.IMMO_TEAM];
-                break;
             default:
                 return [ServerConfig.IMMO_DEVS];
         }
