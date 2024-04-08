@@ -356,7 +356,7 @@ export class Issue extends Command {
             if (fields[priorityIndex].value === 'Nicht vergeben')
                 fields[priorityIndex].value = 'Niedrig';
             const description = [];
-            const acceptorName = `${user.username} | ${user.id}`;
+            const acceptorName = `${user.displayName} | ${user.id}`;
             description.push(`### Eintragung für:`);
             description.push(`${Embed.author?.name ?? '[API ERROR WHILE CREATING ISSUE]'}`);
             description.push(`### Freigegeben durch:`);
