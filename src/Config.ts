@@ -42,6 +42,15 @@ const envConfig = cleanEnv(process.env, {
     SENTRY_DSN: url(),
 });
 
+function envBased<T>(opt: { prod: T; dev: T }): T {
+    switch (envConfig.NODE_ENV) {
+        case 'production':
+            return opt.prod;
+        default:
+            return opt.dev;
+    }
+}
+
 const UserConfig = {
     // Inhaber
     RIGU: '548588225455849483',
@@ -116,17 +125,18 @@ const ServerConfig = {
 };
 
 const BotConfig = {
-    ServerID: (() => {
-        switch (envConfig.NODE_ENV) {
-            case 'production':
-                return [ServerConfig.IMMO_LOGS, ServerConfig.IMMO_TEAM];
-            default:
-                return [ServerConfig.IMMO_DEVS];
-        }
-    })(),
+    ServerID: envBased({
+        prod: [ServerConfig.IMMO_LOGS, ServerConfig.IMMO_TEAM],
+        dev: [ServerConfig.IMMO_DEVS],
+    }),
     Emotes: ['pbot_beta', 'pbot_banned'],
-    BOT_NAME: 'PRISM | Immortal V',
-    BOT_LOGO: 'https://s3.immortaldev.eu/prism-static/bot_logo.png',
+    BOT_NAME: envBased({ prod: '𝗣𝗥𝗜𝗦𝗠 | Immortal V', dev: '𝗣𝗥𝗜𝗦𝗠 𝗗𝗘𝗩 | Immortal V' }),
+    BOT_USERNAME: 'PRISM',
+    BOT_NICKNAME: envBased({ prod: '𝗣𝗥𝗜𝗦𝗠', dev: '𝗣𝗥𝗜𝗦𝗠 𝗗𝗘𝗩' }),
+    BOT_LOGO: envBased({
+        prod: 'https://s3.immortaldev.eu/prism-static/bot_logo.png',
+        dev: 'https://s3.immortaldev.eu/prism-static/bot_logo_dev.png',
+    }),
     WHITESPACE: 'https://s3.immortaldev.eu/prism-static/bot_whitespace.png',
     GlobalBlockedUsers: [''],
     GlobalWhitelistUsers: [

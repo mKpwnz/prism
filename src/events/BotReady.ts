@@ -2,6 +2,7 @@ import { BotClient, Sentry } from '@prism/Bot';
 import Config from '@prism/Config';
 import { RconClient } from '@prism/class/RconClient';
 import TxAdminClient from '@prism/clients/TxAdminClient';
+import { botStatusUpdate } from '@prism/cronjobs/BotStatusUpdate.cron';
 import { checkDeadImages } from '@prism/cronjobs/CheckDeadImages.cron';
 import { doFinancialAnalytics } from '@prism/cronjobs/FinancialAnalytics.cron';
 import { logPlayerCount } from '@prism/cronjobs/LogPlayerCount.cron';
@@ -13,16 +14,44 @@ import LogManager from '@prism/manager/LogManager';
 import { CronJobService } from '@prism/services/CronJobService';
 import { ExpressApp } from '@prism/web/ExpressApp';
 import { CronJob } from 'cron';
-import { Events } from 'discord.js';
+import { ActivityType, Events } from 'discord.js';
 
 export class BotReady {
     @RegisterEvent(Events.ClientReady)
     async onReady() {
+        if (BotClient.user) {
+            const botUserId = BotClient.user.id;
+            BotClient.guilds.cache.forEach(async (guild) => {
+                const members = await guild.members.fetch();
+                members.get(botUserId)?.setNickname(Config.Bot.BOT_NICKNAME);
+            });
+            BotClient.user.setStatus('dnd');
+            BotClient.user.setActivity({
+                name: 'Bot is starting...',
+                type: ActivityType.Custom,
+            });
+
+            try {
+                if (BotClient.user.avatar !== Config.Bot.BOT_LOGO)
+                    await BotClient.user.setAvatar(Config.Bot.BOT_LOGO);
+            } catch (error) {
+                LogManager.warn(error);
+            }
+            try {
+                if (BotClient.user.username !== Config.Bot.BOT_USERNAME)
+                    await BotClient.user.setUsername(Config.Bot.BOT_USERNAME);
+            } catch (error) {
+                LogManager.warn(error);
+            }
+
+            BotClient.user.setStatus('online');
+        }
         CommandManager.loadCommands(BotClient);
         new RconClient();
         Config.Bot.ServerID.forEach(async (id) => {
             await EmoteManager.updateBotEmotes(BotClient, id);
         });
+        await botStatusUpdate();
         LogManager.info('Discord ready!');
     }
 
@@ -31,6 +60,15 @@ export class BotReady {
         try {
             new ExpressApp();
             CronManager.initCronManager({
+                'bot.updateStatus': new CronJob(
+                    '0 */1 * * * *',
+                    () => botStatusUpdate(),
+                    null,
+                    null,
+                    null,
+                    null,
+                    true,
+                ),
                 'server.playercount': new CronJob(
                     '0 */10 * * * *',
                     () => logPlayerCount(),
@@ -86,3 +124,4 @@ export class BotReady {
         }
     }
 }
+

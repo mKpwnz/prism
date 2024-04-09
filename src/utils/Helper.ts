@@ -49,4 +49,29 @@ export class Helper {
             setTimeout(resolve, ms);
         });
     }
+
+    static formatUptime(uptimeInSeconds: number): string {
+        const hours = Math.floor(uptimeInSeconds / 3600);
+        const minutes = Math.floor((uptimeInSeconds % 3600) / 60);
+        const seconds = Math.floor(uptimeInSeconds % 60);
+
+        const formattedTime = [];
+        if (hours > 0) {
+            formattedTime.push(`${hours} hour${hours !== 1 ? 's' : ''}`);
+        }
+        if (minutes > 0) {
+            formattedTime.push(`${minutes} minute${minutes !== 1 ? 's' : ''}`);
+        }
+        if (seconds > 0) {
+            formattedTime.push(`${seconds} second${seconds !== 1 ? 's' : ''}`);
+        }
+
+        return formattedTime.join(', ');
+    }
+
+    static getStartDate(): Date {
+        const startTimeStamp = Date.now() - process.uptime() * 1000;
+        return new Date(startTimeStamp);
+    }
 }
+
