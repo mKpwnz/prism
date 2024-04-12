@@ -61,4 +61,4 @@ Deploy Portainer:
     script:
         - apk update
         - apk add curl
-        - curl -X POST https://docker01.immortaldev.eu/api/stacks/webhooks/cd4e71fc-3f08-40bb-8683-7320c8299bc0
+        - curl -X POST https://cm1.immortaldev.eu/api/stacks/webhooks/cd4e71fc-3f08-40bb-8683-7320c8299bc0
