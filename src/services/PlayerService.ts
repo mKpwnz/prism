@@ -6,6 +6,7 @@ import { IValidatedPlayerResponse } from '@prism/sql/gameSchema/Player.schema';
 import { Cache } from '@prism/class/Cache';
 import LogManager from '@prism/manager/LogManager';
 import axios from 'axios';
+import Config from '@prism/Config';
 
 /**
  * @author mKpwnz
@@ -25,7 +26,9 @@ export class PlayerService {
     public static async getAllLivePlayers(): Promise<ILivePlayer[]> {
         const livePlayers = await Cache.get<ILivePlayer[]>('livePlayers');
         if (!livePlayers) {
-            const data = await axios.get('http://gs01.immortaldev.eu:30120/players.json');
+            const data = await axios.get(
+                `http://${Config.ENV.RCON_HOST}:${Config.ENV.RCON_PORT}/players.json`,
+            );
             if (data.status === 200) {
                 await Cache.set('livePlayers', data.data, 5 * 60 * 1000);
                 return data.data;

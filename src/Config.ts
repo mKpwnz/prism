@@ -1,4 +1,4 @@
-import { bool, cleanEnv, email, host, port, str, url } from 'envalid';
+import { bool, cleanEnv, host, port, str, url } from 'envalid';
 
 // envalid Documentation für Types: https://www.npmjs.com/package/envalid
 const envConfig = cleanEnv(process.env, {
@@ -19,8 +19,9 @@ const envConfig = cleanEnv(process.env, {
     TEBEX_ENDPOINT: url(),
     GITLAB_HOST: url(),
     GITLAB_TOKEN: str(),
-    ACTIVEDIRECTORY_USER: email(),
-    ACTIVEDIRECTORY_PASS: str(),
+    LDAP_BINDDN: str(),
+    LDAP_PASSWORD: str(),
+    LDAP_SERVER: str(),
     POSTGRES_HOST: host(),
     POSTGRES_PORT: port(),
     POSTGRES_USER: str(),
