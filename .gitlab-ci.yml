@@ -46,8 +46,7 @@ Push latest release:
         GIT_STRATEGY: none
     stage: push
     only:
-        refs:
-         - dev
+        - dev
     script:
         - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
         - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:latest
@@ -72,3 +71,12 @@ Deploy Portainer:
         - apk update
         - apk add curl
         - curl -X POST https://cm1.immortaldev.eu/api/stacks/webhooks/cd4e71fc-3f08-40bb-8683-7320c8299bc0
+
+Deploy latest to Portainer2:
+    stage: deploy
+    only:
+        - dev
+    script:
+        - apk update
+        - apk add curl
+        - curl -X POST https://cm1.immortaldev.eu/api/stacks/webhooks/1ca788e6-7ddf-49fa-98a5-b10d0627b9de
