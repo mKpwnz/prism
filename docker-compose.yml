@@ -1,6 +1,6 @@
 services:
     bot:
-        image: registry.immortaldev.eu/bots/prism:latest
+        image: registry.immortaldev.eu/bots/prism:master
         ports:
             - '51333:3000'
         env_file:
