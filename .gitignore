@@ -1,6 +1,6 @@
 node_modules/
 pictures/
 dist/
-.env
+.env*
 .idea
 .vscode

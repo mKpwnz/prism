@@ -10,8 +10,6 @@ before_script:
 
 Build:
     stage: build
-    only:
-        - release
     script:
         # fetches the latest image (not failing if image is not found)
         - docker pull $CI_REGISTRY_IMAGE:latest || true
@@ -32,12 +30,23 @@ Build:
             .
         - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
 
-Push release:
+Push main release:
     variables:
         GIT_STRATEGY: none
     stage: push
     only:
         - release
+    script:
+        - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+        - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:master
+        - docker push $CI_REGISTRY_IMAGE:master
+
+Push latest release:
+    variables:
+        GIT_STRATEGY: none
+    stage: push
+    only:
+        - dev
     script:
         - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
         - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:latest
@@ -61,4 +70,13 @@ Deploy Portainer:
     script:
         - apk update
         - apk add curl
-        - curl -X POST https://docker01.immortaldev.eu/api/stacks/webhooks/cd4e71fc-3f08-40bb-8683-7320c8299bc0
+        - curl -X POST https://cm1.immortaldev.eu/api/stacks/webhooks/cd4e71fc-3f08-40bb-8683-7320c8299bc0
+
+Deploy latest to Portainer2:
+    stage: deploy
+    only:
+        - dev
+    script:
+        - apk update
+        - apk add curl
+        - curl -X POST https://cm1.immortaldev.eu/api/stacks/webhooks/1ca788e6-7ddf-49fa-98a5-b10d0627b9de

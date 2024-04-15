@@ -356,14 +356,13 @@ export class Issue extends Command {
             if (fields[priorityIndex].value === 'Nicht vergeben')
                 fields[priorityIndex].value = 'Niedrig';
             const description = [];
+            const acceptorName = `${user.displayName} | ${user.id}`;
             description.push(`### Eintragung für:`);
             description.push(`${Embed.author?.name ?? '[API ERROR WHILE CREATING ISSUE]'}`);
+            description.push(`### Freigegeben durch:`);
+            description.push(`${acceptorName ?? '[API ERROR WHILE CREATING ISSUE]'}`);
             description.push(`### Beschreibung:`);
-            description.push(
-                `\`\`\` \n${
-                    fields[descIndex].value ?? '[API ERROR WHILE CREATING ISSUE]'
-                }\n \`\`\``,
-            );
+            description.push(`${fields[descIndex].value ?? '[API ERROR WHILE CREATING ISSUE]'}`);
             description.push(`### Anhänge:`);
             description.push(`${fields[attachmentsIndex].value ?? 'Keine'}`);
             description.push(`### Thread Link:`);
@@ -416,3 +415,4 @@ export class Issue extends Command {
         }
     }
 }
+

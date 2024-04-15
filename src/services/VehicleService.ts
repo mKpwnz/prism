@@ -86,7 +86,7 @@ export class VehicleService {
         const newplatefmt = formatPlate(newplate);
         const [res] = await GameDB.execute<ResultSetHeader>(
             `UPDATE owned_vehicles SET plate = ?, vehicle = JSON_SET(vehicle, '$.plate', ?) WHERE plate = ?`,
-            [newplatefmt, newplatefmt, oldplate],
+            [newplatefmt, newplatefmt, formatPlate(oldplate)],
         );
 
         if (res.affectedRows === 0) {

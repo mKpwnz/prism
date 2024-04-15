@@ -36,7 +36,7 @@ export class ChangeHouseOwner extends Command {
             Config.Groups.DEV.BOTTEST,
             Config.Groups.PROD.BOT_DEV,
         ];
-        this.AllowedUsers = [Config.Users.FABI, Config.Users.KREAAMZY];
+        this.AllowedUsers = [Config.Users.FABI, Config.Users.KREAAMZY, Config.Users.SKY];
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

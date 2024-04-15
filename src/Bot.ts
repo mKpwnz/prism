@@ -36,8 +36,9 @@ const client = new Client({
 });
 
 Cache.init();
-EventManager.init(client);
 client.login(Config.ENV.DISCORD_TOKEN);
+EventManager.init(client);
 
 export const BotClient = client;
 export const Sentry = SentryNode;
+

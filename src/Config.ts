@@ -1,4 +1,4 @@
-import { bool, cleanEnv, email, host, port, str, url } from 'envalid';
+import { bool, cleanEnv, host, port, str, url } from 'envalid';
 
 // envalid Documentation für Types: https://www.npmjs.com/package/envalid
 const envConfig = cleanEnv(process.env, {
@@ -19,8 +19,9 @@ const envConfig = cleanEnv(process.env, {
     TEBEX_ENDPOINT: url(),
     GITLAB_HOST: url(),
     GITLAB_TOKEN: str(),
-    ACTIVEDIRECTORY_USER: email(),
-    ACTIVEDIRECTORY_PASS: str(),
+    LDAP_BINDDN: str(),
+    LDAP_PASSWORD: str(),
+    LDAP_SERVER: str(),
     POSTGRES_HOST: host(),
     POSTGRES_PORT: port(),
     POSTGRES_USER: str(),
@@ -42,6 +43,15 @@ const envConfig = cleanEnv(process.env, {
     SENTRY_DSN: url(),
 });
 
+function envBased<T>(opt: { prod: T; dev: T }): T {
+    switch (envConfig.NODE_ENV) {
+        case 'production':
+            return opt.prod;
+        default:
+            return opt.dev;
+    }
+}
+
 const UserConfig = {
     // Inhaber
     RIGU: '548588225455849483',
@@ -60,11 +70,12 @@ const UserConfig = {
     JUNGLEJANIS: '917031374890876938',
     TES4: '372395897071468545',
     EFORCE: '418762151881211907',
+    SKY: '806975734521921606',
     // Admin
     MIKA: '530485414453051402',
+    LIZ: '167525544932409344',
     // Senior Moderator
     ANNY: '288084816363126786',
-    LIZ: '167525544932409344',
     // Moderator
     REALYEET: '344263375938912257',
     AMBERLICE: '596792325511053312',
@@ -92,6 +103,7 @@ const UserConfig = {
     // Server Engineer
     ELSINAR: '153507094933274624',
     SIRJXSH: '257564404428701697',
+    RIKZ: '625243313548558347',
     // Developer
     SQUEEZLEX: '319783009018707970',
     MANU: '219123072295370754',
@@ -114,18 +126,18 @@ const ServerConfig = {
 };
 
 const BotConfig = {
-    ServerID: (() => {
-        switch (envConfig.NODE_ENV) {
-            case 'production':
-                return [ServerConfig.IMMO_LOGS, ServerConfig.IMMO_TEAM];
-                break;
-            default:
-                return [ServerConfig.IMMO_DEVS];
-        }
-    })(),
+    ServerID: envBased({
+        prod: [ServerConfig.IMMO_LOGS, ServerConfig.IMMO_TEAM],
+        dev: [ServerConfig.IMMO_DEVS],
+    }),
     Emotes: ['pbot_beta', 'pbot_banned'],
-    BOT_NAME: 'PRISM | Immortal V',
-    BOT_LOGO: 'https://s3.immortaldev.eu/prism-static/bot_logo.png',
+    BOT_NAME: envBased({ prod: '𝗣𝗥𝗜𝗦𝗠 | Immortal V', dev: '𝗣𝗥𝗜𝗦𝗠 𝗗𝗘𝗩 | Immortal V' }),
+    BOT_USERNAME: 'PRISM',
+    BOT_NICKNAME: envBased({ prod: '𝗣𝗥𝗜𝗦𝗠', dev: '𝗣𝗥𝗜𝗦𝗠 𝗗𝗘𝗩' }),
+    BOT_LOGO: envBased({
+        prod: 'https://s3.immortaldev.eu/prism-static/bot_logo.png',
+        dev: 'https://s3.immortaldev.eu/prism-static/bot_logo_dev.png',
+    }),
     WHITESPACE: 'https://s3.immortaldev.eu/prism-static/bot_whitespace.png',
     GlobalBlockedUsers: [''],
     GlobalWhitelistUsers: [

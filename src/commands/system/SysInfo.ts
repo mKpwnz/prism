@@ -2,6 +2,7 @@ import Config from '@prism/Config';
 import Command from '@prism/class/Command';
 import { RegisterCommand } from '@prism/decorators';
 import { EENV } from '@prism/enums/EENV';
+import { Helper } from '@prism/utils/Helper';
 import { SlashCommandBuilder } from 'discord.js';
 
 @RegisterCommand(
@@ -30,7 +31,7 @@ export class SysInfo extends Command {
                     name: 'Memory Usage',
                     value: `${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB`,
                 },
-                { name: 'Uptime', value: `${process.uptime()} seconds` },
+                { name: 'Uptime', value: `${Helper.formatUptime(process.uptime())}` },
             ],
             title: 'System Information',
             description: 'Current Hostsystem:',
