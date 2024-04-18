@@ -136,9 +136,9 @@ const BotConfig = {
     }),
     Emotes: ['pbot_beta', 'pbot_banned'],
     BOT_NAME: envBased({
-        prod: `𝗣𝗥𝗜𝗦𝗠 | Immortal V | ${version}`,
-        staging: `𝗣𝗥𝗜𝗦𝗠 𝗦𝗧𝗔𝗚𝗜𝗡𝗚 | Immortal V | ${version}`,
-        dev: `𝗣𝗥𝗜𝗦𝗠 𝗗𝗘𝗩 | Immortal V | ${version}`,
+        prod: `PRISM | ${version}`,
+        staging: `PRISM STAGING | ${version}`,
+        dev: `PRISM DEV | ${version}`,
     }),
     BOT_USERNAME: envBased({ prod: 'PRISM', staging: 'PRISM_STAGING', dev: 'PRISM_DEV' }),
     BOT_NICKNAME: envBased({ prod: '𝗣𝗥𝗜𝗦𝗠', staging: '𝗣𝗥𝗜𝗦𝗠 𝗦𝗧𝗔𝗚𝗜𝗡𝗚', dev: '𝗣𝗥𝗜𝗦𝗠 𝗗𝗘𝗩' }),
