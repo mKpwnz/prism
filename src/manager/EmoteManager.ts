@@ -39,7 +39,7 @@ export class EmoteManager {
 
     static async updateBotEmotes(client: Client, serverid: string): Promise<void> {
         LogManager.info('Checking emotes...');
-        if (Config.ENV.NODE_ENV === 'development') {
+        if (Config.ENV.NODE_ENV === 'development' || Config.ENV.NODE_ENV === 'staging') {
             await this.initEmotes();
             LogManager.info('Emotes Initialised!');
             return;

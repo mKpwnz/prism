@@ -2,7 +2,7 @@ import { bool, cleanEnv, host, port, str, url } from 'envalid';
 
 // envalid Documentation für Types: https://www.npmjs.com/package/envalid
 const envConfig = cleanEnv(process.env, {
-    NODE_ENV: str({ choices: ['development', 'production'] }),
+    NODE_ENV: str({ choices: ['development', 'production', 'staging'] }),
     DISCORD_APPID: str(),
     DISCORD_PUBLICKEY: str(),
     DISCORD_TOKEN: str(),
@@ -43,10 +43,12 @@ const envConfig = cleanEnv(process.env, {
     SENTRY_DSN: url(),
 });
 
-function envBased<T>(opt: { prod: T; dev: T }): T {
+function envBased<T>(opt: { prod: T; dev: T; staging: T }): T {
     switch (envConfig.NODE_ENV) {
         case 'production':
             return opt.prod;
+        case 'staging':
+            return opt.staging;
         default:
             return opt.dev;
     }
@@ -128,15 +130,26 @@ const ServerConfig = {
 const BotConfig = {
     ServerID: envBased({
         prod: [ServerConfig.IMMO_LOGS, ServerConfig.IMMO_TEAM],
+        staging: [ServerConfig.IMMO_DEVS],
         dev: [ServerConfig.IMMO_DEVS],
     }),
     Emotes: ['pbot_beta', 'pbot_banned'],
-    BOT_NAME: envBased({ prod: '𝗣𝗥𝗜𝗦𝗠 | Immortal V', dev: '𝗣𝗥𝗜𝗦𝗠 𝗗𝗘𝗩 | Immortal V' }),
-    BOT_USERNAME: 'PRISM',
-    BOT_NICKNAME: envBased({ prod: '𝗣𝗥𝗜𝗦𝗠', dev: '𝗣𝗥𝗜𝗦𝗠 𝗗𝗘𝗩' }),
+    BOT_NAME: envBased({
+        prod: '𝗣𝗥𝗜𝗦𝗠 | Immortal V',
+        staging: '𝗣𝗥𝗜𝗦𝗠 𝗦𝗧𝗔𝗚𝗜𝗡𝗚 | Immortal V',
+        dev: '𝗣𝗥𝗜𝗦𝗠 𝗗𝗘𝗩 | Immortal V',
+    }),
+    BOT_USERNAME: envBased({ prod: 'PRISM', staging: 'PRISM_STAGING', dev: 'PRISM_DEV' }),
+    BOT_NICKNAME: envBased({ prod: '𝗣𝗥𝗜𝗦𝗠', staging: '𝗣𝗥𝗜𝗦𝗠 𝗦𝗧𝗔𝗚𝗜𝗡𝗚', dev: '𝗣𝗥𝗜𝗦𝗠 𝗗𝗘𝗩' }),
     BOT_LOGO: envBased({
-        prod: 'https://s3.immortaldev.eu/prism-static/bot_logo.png',
-        dev: 'https://s3.immortaldev.eu/prism-static/bot_logo_dev.png',
+        prod: 'https://s3.immortaldev.eu/prism-static/dc_icon_production.png',
+        staging: 'https://s3.immortaldev.eu/prism-static/dc_icon_staging.png',
+        dev: 'https://s3.immortaldev.eu/prism-static/dc_icon_development.png',
+    }),
+    BOT_HEADER: envBased({
+        prod: 'https://s3.immortaldev.eu/prism-static/dc_header_production.png',
+        staging: 'https://s3.immortaldev.eu/prism-static/dc_header_staging.png',
+        dev: 'https://s3.immortaldev.eu/prism-static/dc_header_development.png',
     }),
     WHITESPACE: 'https://s3.immortaldev.eu/prism-static/bot_whitespace.png',
     GlobalBlockedUsers: [''],

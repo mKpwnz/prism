@@ -2,6 +2,7 @@ import Config from '@prism/Config';
 import chalk from 'chalk';
 import colorize from 'json-colorizer';
 import winston, { createLogger, format, transports } from 'winston';
+import LokiTransport from 'winston-loki';
 
 /**
  * @description Logger class for logging to console and loki
@@ -65,18 +66,18 @@ export default class LogManager {
         const logTransports: winston.transport[] = [new transports.Console()];
 
         // INFO: Disabled Loki Transport for now cuz of missing Loki instance
-        // if (process.env.NODE_ENV === 'production') {
-        //     logTransports.push(
-        //         new LokiTransport({
-        //             host: 'https://logs.immortaldev.eu',
-        //             labels: { app: 'prism_bot', env: process.env.NODE_ENV },
-        //             replaceTimestamp: true,
-        //             json: true,
-        //             format: format.json(),
-        //             onConnectionError: (err) => this.error(err),
-        //         }),
-        //     );
-        // }
+        if (process.env.NODE_ENV === 'production') {
+            logTransports.push(
+                new LokiTransport({
+                    host: 'https://logs.immortaldev.eu',
+                    labels: { app: 'prism_bot', env: process.env.NODE_ENV },
+                    replaceTimestamp: true,
+                    json: true,
+                    format: format.json(),
+                    onConnectionError: (err) => this.error(err),
+                }),
+            );
+        }
 
         this.logger = createLogger({
             level: Config.ENV.NODE_ENV === 'production' ? 'info' : 'debug',

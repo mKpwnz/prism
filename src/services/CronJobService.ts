@@ -14,12 +14,12 @@ export class CronJobService {
     // TODO: Die Bilder werden nicht automatisch gelöscht => sollten gelöscht werden
     // TODO: Wenn eine Person Mehrere Bilder hochgeladen hat, wird sie mehrfach gebannt => Sollte nur 1x
     public static async banPlayersWithIllegalPhoto() {
-        // if (Config.ENV.NODE_ENV !== 'production') {
-        //     LogManager.debug(
-        //         'CronJobs: banPlayersWithIllegalPhoto() will only execute in production.',
-        //     );
-        //     return;
-        // }
+        if (Config.ENV.NODE_ENV !== 'production') {
+            LogManager.debug(
+                'CronJobs: banPlayersWithIllegalPhoto() will only execute in production.',
+            );
+            return;
+        }
 
         const startDate = new Date();
         startDate.setDate(startDate.getDate() - 1);

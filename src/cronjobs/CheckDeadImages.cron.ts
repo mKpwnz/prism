@@ -43,6 +43,10 @@ async function checkLinks(links: string[]): Promise<{ link: string; available: b
     return availableLinks;
 }
 export async function checkDeadImages() {
+    if (process.env.NODE_ENV !== 'production') {
+        LogManager.debug('checkDeadImages() can only be run in production mode');
+        return;
+    }
     const [pictures] = await GameDB.query<IPhonePhotos[]>('SELECT * FROM phone_photos');
     const res = await checkLinks(
         pictures
