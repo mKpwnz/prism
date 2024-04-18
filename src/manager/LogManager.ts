@@ -65,19 +65,16 @@ export default class LogManager {
     public static async configure() {
         const logTransports: winston.transport[] = [new transports.Console()];
 
-        // INFO: Disabled Loki Transport for now cuz of missing Loki instance
-        if (process.env.NODE_ENV === 'production') {
-            logTransports.push(
-                new LokiTransport({
-                    host: 'https://logs.immortaldev.eu',
-                    labels: { app: 'prism_bot', env: process.env.NODE_ENV },
-                    replaceTimestamp: true,
-                    json: true,
-                    format: format.json(),
-                    onConnectionError: (err) => this.error(err),
-                }),
-            );
-        }
+        logTransports.push(
+            new LokiTransport({
+                host: 'https://logs.immortaldev.eu',
+                labels: { app: 'prism_bot', env: process.env.NODE_ENV },
+                replaceTimestamp: true,
+                json: true,
+                format: format.json(),
+                onConnectionError: (err) => this.error(err),
+            }),
+        );
 
         this.logger = createLogger({
             level: Config.ENV.NODE_ENV === 'production' ? 'info' : 'debug',
@@ -160,4 +157,3 @@ export default class LogManager {
         args.forEach((arg) => this.logger.debug(arg));
     }
 }
-
