@@ -1,4 +1,5 @@
 import { bool, cleanEnv, host, port, str, url } from 'envalid';
+import { version } from '../package.json';
 
 // envalid Documentation für Types: https://www.npmjs.com/package/envalid
 const envConfig = cleanEnv(process.env, {
@@ -135,9 +136,9 @@ const BotConfig = {
     }),
     Emotes: ['pbot_beta', 'pbot_banned'],
     BOT_NAME: envBased({
-        prod: '𝗣𝗥𝗜𝗦𝗠 | Immortal V',
-        staging: '𝗣𝗥𝗜𝗦𝗠 𝗦𝗧𝗔𝗚𝗜𝗡𝗚 | Immortal V',
-        dev: '𝗣𝗥𝗜𝗦𝗠 𝗗𝗘𝗩 | Immortal V',
+        prod: `𝗣𝗥𝗜𝗦𝗠 | Immortal V | ${version}`,
+        staging: `𝗣𝗥𝗜𝗦𝗠 𝗦𝗧𝗔𝗚𝗜𝗡𝗚 | Immortal V | ${version}`,
+        dev: `𝗣𝗥𝗜𝗦𝗠 𝗗𝗘𝗩 | Immortal V | ${version}`,
     }),
     BOT_USERNAME: envBased({ prod: 'PRISM', staging: 'PRISM_STAGING', dev: 'PRISM_DEV' }),
     BOT_NICKNAME: envBased({ prod: '𝗣𝗥𝗜𝗦𝗠', staging: '𝗣𝗥𝗜𝗦𝗠 𝗦𝗧𝗔𝗚𝗜𝗡𝗚', dev: '𝗣𝗥𝗜𝗦𝗠 𝗗𝗘𝗩' }),
