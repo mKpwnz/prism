@@ -109,7 +109,7 @@ export class BotReady {
                     true,
                 ),
                 'server.doFinancialAnalytics': new CronJob(
-                    '0 */20 * * * *',
+                    '0 */60 * * * *',
                     () => doFinancialAnalytics(),
                     null,
                     null,
