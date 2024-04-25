@@ -33,7 +33,7 @@ export class PhoneService {
      */
     public static async deletePhoneByIdentifier(identifier: string): Promise<boolean> {
         const [result] = await GameDB.query<ResultSetHeader>(
-            'DELETE FROM phone_phones WHERE identifier = ?',
+            'DELETE FROM phone_phones WHERE id = ?',
             [identifier],
         );
         return result.affectedRows > 0;

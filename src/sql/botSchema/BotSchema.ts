@@ -1,5 +1,4 @@
 import {
-    boolean,
     integer,
     json,
     jsonb,
@@ -13,17 +12,6 @@ import {
 export const playerCount = pgTable('player_count', {
     id: serial('id').primaryKey().notNull(),
     count: integer('count').notNull(),
-    createdAt: timestamp('created_at', { precision: 3, mode: 'date' }).defaultNow().notNull(),
-    updatedAt: timestamp('updated_at', { precision: 3, mode: 'date' }).defaultNow().notNull(),
-});
-
-export const teamNotes = pgTable('team_notes', {
-    id: serial('id').primaryKey().notNull(),
-    user: text('user').notNull(),
-    noterId: integer('noterId').notNull(),
-    noterName: text('noterName').notNull(),
-    note: text('note').notNull(),
-    display: boolean('display').default(true).notNull(),
     createdAt: timestamp('created_at', { precision: 3, mode: 'date' }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { precision: 3, mode: 'date' }).defaultNow().notNull(),
 });
@@ -115,4 +103,3 @@ export const faImmobay = pgTable('fa_immobay', {
     createdAt: timestamp('created_at', { precision: 3, mode: 'date' }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { precision: 3, mode: 'date' }).defaultNow().notNull(),
 });
-

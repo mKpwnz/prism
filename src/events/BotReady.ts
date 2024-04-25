@@ -27,7 +27,7 @@ export class BotReady {
             });
             BotClient.user.setStatus('dnd');
             BotClient.user.setActivity({
-                name: 'Bot is starting...',
+                name: `${Config.Bot.CurrentVersion} | Bot is starting...`,
                 type: ActivityType.Custom,
             });
 
@@ -70,7 +70,7 @@ export class BotReady {
                     true,
                 ),
                 'server.playercount': new CronJob(
-                    '0 */10 * * * *',
+                    '0 */1 * * * *',
                     () => logPlayerCount(),
                     null,
                     null,

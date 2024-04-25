@@ -7,3 +7,4 @@ export * from './SysInfo';
 export * from './Issue';
 export * from './Clear';
 export * from './FaInfo';
+export * from './ActiveDirectory';

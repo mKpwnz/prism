@@ -129,6 +129,7 @@ const ServerConfig = {
 };
 
 const BotConfig = {
+    CurrentVersion: `${version}-${envConfig.NODE_ENV.toUpperCase().substring(0, 1)}`,
     ServerID: envBased({
         prod: [ServerConfig.IMMO_LOGS, ServerConfig.IMMO_TEAM],
         staging: [ServerConfig.IMMO_DEVS],

@@ -11,6 +11,5 @@ export * from './RequestToSupport';
 export * from './Resetpos';
 export * from './Revive';
 export * from './Setjob';
-export * from './TeamNote';
 export * from './WhoIs';
 export * from './SchufaAuskunft';

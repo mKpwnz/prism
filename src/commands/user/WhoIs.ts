@@ -9,7 +9,7 @@ import { EmoteManager } from '@prism/manager/EmoteManager';
 import LogManager from '@prism/manager/LogManager';
 import { NvhxService } from '@prism/services/NvhxService';
 import { PlayerService } from '@prism/services/PlayerService';
-import { BotDB, GameDB } from '@prism/sql/Database';
+import { GameDB } from '@prism/sql/Database';
 import { IFindUser } from '@prism/sql/gameSchema/User.schema';
 import { Helper } from '@prism/utils/Helper';
 import {
@@ -18,8 +18,6 @@ import {
     GuildEmoji,
     SlashCommandBuilder,
 } from 'discord.js';
-import { count, eq } from 'drizzle-orm';
-import { teamNotes } from '@prism/sql/botSchema/BotSchema';
 
 @RegisterCommand(
     new SlashCommandBuilder()
@@ -123,11 +121,6 @@ export class WhoIs extends Command {
             const fraksperreString = this.getFraksperreByUser(findUsers[i]);
             const levelString = this.getLevelByUser(findUsers[i]);
 
-            const teamNoteCount = await BotDB.select({ count: count() })
-                .from(teamNotes)
-                .where(eq(teamNotes.user, findUsers[i].identifier))
-                .then((res) => res[0]);
-
             const nvhxBanned = await NvhxService.CheckIfUserIsBanned([
                 findUsers[i].identifier,
                 findUsers[i].discord,
@@ -145,7 +138,6 @@ export class WhoIs extends Command {
                     steamId,
                     fraksperreString,
                     levelString,
-                    teamNoteCount.count,
                     pageSize,
                     embedFields.length,
                 ),
@@ -197,7 +189,6 @@ export class WhoIs extends Command {
         steamId: bigint,
         fraksperreString: string,
         levelString: string,
-        teamNoteCount: number,
         pageSize: number,
         embedFieldLength: number,
     ) {
@@ -229,9 +220,7 @@ export class WhoIs extends Command {
                     'de-DE',
                 )}€\nSchwarzgeld: ${user.black_money.toLocaleString('de-DE')}€\nNummer: ${
                     user.phone_number
-                }${fraksperreString}${levelString}${
-                    teamNoteCount > 0 ? '\n**Es ist eine Teamnote vorhanden**' : ''
-                }` +
+                }${fraksperreString}${levelString}` +
                 `\n${embedFieldLength < pageSize - 1 ? '-----' : ''}`,
             inline: false,
         };
