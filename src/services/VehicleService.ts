@@ -47,7 +47,7 @@ export class VehicleService {
 
         const [res] = await GameDB.execute<ResultSetHeader>(
             `UPDATE owned_vehicles SET garage = ?, type = ? WHERE plate = ?`,
-            [newlocation, type, plate],
+            [newlocation, type, vehicle.plate],
         );
         if (res.affectedRows === 0) {
             return new Error(
