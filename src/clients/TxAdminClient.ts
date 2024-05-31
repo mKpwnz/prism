@@ -69,6 +69,20 @@ class TxAdminClient {
         return response.data;
     }
 
+    public static async getPlayerInfoFromLicense(
+        license: string,
+    ): Promise<TxAdminPlayerResponse | TxAdminError> {
+        const response = await axios.get(
+            `${Config.ENV.TX_ADMIN_ENDPOINT}player?license=${license.split(':')[1]}`,
+            TxAdminClient.getTxAdminRequestConfig(),
+        );
+
+        if (!isTxAdminPlayerResponse(response.data)) {
+            return new TxAdminError(response.data.error);
+        }
+        return response.data;
+    }
+
     public static async getWhitelistRequestById(
         requestid: string,
     ): Promise<TxAdminDatabaseWhitelistRequestsType | null> {
@@ -194,3 +208,4 @@ class TxAdminClient {
 }
 
 export default TxAdminClient;
+
