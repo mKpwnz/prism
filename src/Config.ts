@@ -46,9 +46,9 @@ const envConfig = cleanEnv(process.env, {
 
 export function envBasedVariable<T>(opt: { production: T; development: T; staging: T }): T {
     switch (envConfig.NODE_ENV) {
-        case 'production' && opt.production:
+        case 'production':
             return opt.production;
-        case 'staging' && opt.staging:
+        case 'staging':
             return opt.staging;
         default:
             return opt.development;
