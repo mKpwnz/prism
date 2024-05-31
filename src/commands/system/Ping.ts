@@ -22,6 +22,6 @@ export class Ping extends Command {
         profiler.addStep('pre pong');
         await this.replyWithEmbed({ description: 'Pong!' });
         profiler.addStep('post pong');
-        await profiler.sendEmbed(Config.Channels.DEV.TESTING, interaction.user);
+        await profiler.sendEmbed(interaction.channel?.id ?? '', interaction.user);
     }
 }
