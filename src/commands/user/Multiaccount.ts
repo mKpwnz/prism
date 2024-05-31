@@ -2,7 +2,6 @@ import Config from '@prism/Config';
 import Command from '@prism/class/Command';
 import { RegisterCommand } from '@prism/decorators';
 import { EENV } from '@prism/enums/EENV';
-import { PlayerService } from '@prism/services/PlayerService';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 @RegisterCommand(
@@ -31,6 +30,7 @@ export class Multiaccount extends Command {
         ];
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         await this.replyError('Dieser Befehl ist noch nicht implementiert');
     }

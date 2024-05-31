@@ -128,6 +128,7 @@ export class CustomImageUpload {
             embed.setDescription('Es wurde keine Datei angehängt.').setColor(EEmbedColors.ALERT);
             await message.reply({ embeds: [embed] });
             await message.delete();
+            return;
         }
         if (attachments.size > 1) {
             embed
@@ -135,23 +136,26 @@ export class CustomImageUpload {
                 .setColor(EEmbedColors.ALERT);
             await message.reply({ embeds: [embed] });
             await message.delete();
+            return;
         }
         const checkingMsg = await message.reply({
             content: 'Bild wird überprüft und Hochgeladen ...',
         });
         const image = attachments.first();
-        await message.delete();
+
         const { success, messages } = await CustomImageUpload.validateImage(image);
         if (!success) {
             embed
                 .setDescription(`Es sind Fehler aufgetreten: \`\`\`${messages.join('\n')}\`\`\``)
                 .setColor(EEmbedColors.ALERT);
             await channel.send({ embeds: [embed] });
+            await message.delete();
             await checkingMsg.delete();
             return;
         }
         try {
             const data = await CustomImageUpload.uploadToS3(image!);
+            await message.delete();
             embed.setDescription('Bild erfolgreich hochgeladen.').setColor(EEmbedColors.SUCCESS);
             const fields = [
                 {
