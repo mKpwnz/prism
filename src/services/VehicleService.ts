@@ -14,12 +14,11 @@ export class VehicleService {
             [formatPlate(plate)],
         );
 
-        if (!vehicles) {
+        if (!vehicles || vehicles.length === 0) {
             return new Error(
                 `Es konnte kein Fahrzeug mit dem Kennzeichen ${plate} gefunden werden.`,
             );
         }
-
         return vehicles[0];
     }
 
@@ -47,7 +46,7 @@ export class VehicleService {
 
         const [res] = await GameDB.execute<ResultSetHeader>(
             `UPDATE owned_vehicles SET garage = ?, type = ? WHERE plate = ?`,
-            [newlocation, type, plate],
+            [newlocation, type, vehicle.plate],
         );
         if (res.affectedRows === 0) {
             return new Error(
