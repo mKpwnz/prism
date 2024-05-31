@@ -1,4 +1,3 @@
-import Config from '@prism/Config';
 import Command from '@prism/class/Command';
 import { RegisterCommand } from '@prism/decorators';
 import { EENV } from '@prism/enums/EENV';
@@ -19,14 +18,7 @@ import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 export class Clear extends Command {
     constructor() {
         super();
-        this.RunEnvironment = EENV.DEVELOPMENT;
-        this.AllowedChannels = [
-            Config.Channels.DEV.PRISM_TESTING_2,
-            Config.Channels.DEV.PRISM_TESTING,
-            Config.Channels.DEV.PRISM_IMAGE_UPLOAD,
-        ];
-        this.AllowedGroups = [Config.Groups.DEV.BOTTEST];
-        this.DoNotLog = true;
+        this.RunEnvironment = EENV.STAGING;
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
@@ -45,3 +37,4 @@ export class Clear extends Command {
         }
     }
 }
+

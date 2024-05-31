@@ -46,7 +46,7 @@ export class Issue extends Command {
         this.AllowedChannels = [
             Config.Channels.PROD.TEAM_DEV_TODO,
 
-            Config.Channels.DEV.PRISM_TESTING_2,
+            Config.Channels.STAGING.TESTING_2,
         ];
         this.AllowedGroups = [
             Config.Groups.PROD.TEAM_INHABER,

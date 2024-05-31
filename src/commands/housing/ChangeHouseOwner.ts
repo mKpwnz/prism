@@ -26,16 +26,9 @@ export class ChangeHouseOwner extends Command {
         this.AllowedChannels = [
             Config.Channels.PROD.PRISM_BOT,
             Config.Channels.PROD.PRISM_HIGHTEAM,
-
             Config.Channels.PROD.PRISM_TESTING,
-            Config.Channels.DEV.PRISM_TESTING,
         ];
-        this.AllowedGroups = [
-            Config.Groups.PROD.SERVERENGINEER,
-
-            Config.Groups.DEV.BOTTEST,
-            Config.Groups.PROD.BOT_DEV,
-        ];
+        this.AllowedGroups = [Config.Groups.PROD.SERVERENGINEER, Config.Groups.PROD.BOT_DEV];
         this.AllowedUsers = [Config.Users.FABI, Config.Users.KREAAMZY, Config.Users.SKY];
     }
 

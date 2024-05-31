@@ -1,8 +1,9 @@
 import Config from '@prism/Config';
 import Command from '@prism/class/Command';
+import { PerformanceProfiler } from '@prism/class/PerformanceProfiler';
 import { RegisterCommand } from '@prism/decorators';
 import { EENV } from '@prism/enums/EENV';
-import { SlashCommandBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 @RegisterCommand(new SlashCommandBuilder().setName('ping').setDescription('Pong!'))
 export class Ping extends Command {
@@ -12,13 +13,15 @@ export class Ping extends Command {
         this.AllowedChannels = [
             Config.Channels.PROD.PRISM_BOT,
             Config.Channels.PROD.PRISM_HIGHTEAM,
-
             Config.Channels.PROD.PRISM_TESTING,
-            Config.Channels.DEV.PRISM_TESTING,
         ];
     }
 
-    async execute(): Promise<void> {
+    async execute(interaction: ChatInputCommandInteraction): Promise<void> {
+        const profiler = new PerformanceProfiler('ping');
+        profiler.addStep('pre pong');
         await this.replyWithEmbed({ description: 'Pong!' });
+        profiler.addStep('post pong');
+        await profiler.sendEmbed(Config.Channels.DEV.TESTING, interaction.user);
     }
 }

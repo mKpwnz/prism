@@ -191,4 +191,13 @@ export class PlayerService {
         const livePlayer = await this.validatePlayer(livePlayerSteamID, EUniqueIdentifier.STEAMID);
         return livePlayer;
     }
+
+    public static async getMutliaccounts(): Promise<
+        {
+            license: string;
+            multiaccounts: string[];
+        }[]
+    > {
+        return [];
+    }
 }

@@ -1,5 +1,5 @@
 import { Sentry } from '@prism/Bot';
-import Config from '@prism/Config';
+import Config, { envBasedVariable } from '@prism/Config';
 import S3Client from '@prism/clients/S3Client';
 import { RegisterEvent } from '@prism/decorators';
 import { EUniqueIdentifier } from '@prism/enums/ESearchType';
@@ -29,10 +29,11 @@ export class CustomImageUpload {
         size: 1024 * 800,
     };
 
-    private static channel =
-        Config.ENV.NODE_ENV === 'production'
-            ? Config.Channels.PROD.PRISM_IMAGE_UPLOAD
-            : Config.Channels.DEV.PRISM_IMAGE_UPLOAD;
+    private static channel = envBasedVariable({
+        production: Config.Channels.PROD.PRISM_IMAGE_UPLOAD,
+        staging: Config.Channels.STAGING.IMAGE_UPLOAD,
+        development: Config.Channels.DEV.IMAGE_UPLOAD,
+    });
 
     static async validateImage(image: Attachment | undefined) {
         const response: { success: boolean; messages: string[] } = {
@@ -127,6 +128,7 @@ export class CustomImageUpload {
             embed.setDescription('Es wurde keine Datei angehängt.').setColor(EEmbedColors.ALERT);
             await message.reply({ embeds: [embed] });
             await message.delete();
+            return;
         }
         if (attachments.size > 1) {
             embed
@@ -134,23 +136,26 @@ export class CustomImageUpload {
                 .setColor(EEmbedColors.ALERT);
             await message.reply({ embeds: [embed] });
             await message.delete();
+            return;
         }
         const checkingMsg = await message.reply({
             content: 'Bild wird überprüft und Hochgeladen ...',
         });
         const image = attachments.first();
-        await message.delete();
+
         const { success, messages } = await CustomImageUpload.validateImage(image);
         if (!success) {
             embed
                 .setDescription(`Es sind Fehler aufgetreten: \`\`\`${messages.join('\n')}\`\`\``)
                 .setColor(EEmbedColors.ALERT);
             await channel.send({ embeds: [embed] });
+            await message.delete();
             await checkingMsg.delete();
             return;
         }
         try {
             const data = await CustomImageUpload.uploadToS3(image!);
+            await message.delete();
             embed.setDescription('Bild erfolgreich hochgeladen.').setColor(EEmbedColors.SUCCESS);
             const fields = [
                 {

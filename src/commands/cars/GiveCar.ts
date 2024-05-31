@@ -31,11 +31,9 @@ export class GiveCar extends Command {
         this.AllowedChannels = [
             Config.Channels.PROD.PRISM_BOT,
             Config.Channels.PROD.PRISM_HIGHTEAM,
-
             Config.Channels.PROD.PRISM_TESTING,
-            Config.Channels.DEV.PRISM_TESTING,
         ];
-        this.AllowedGroups = [Config.Groups.PROD.BOT_DEV, Config.Groups.DEV.BOTTEST];
+        this.AllowedGroups = [Config.Groups.PROD.BOT_DEV];
         this.AllowedUsers = [Config.Users.SCHLAUCHI];
     }
 
@@ -64,3 +62,4 @@ export class GiveCar extends Command {
         });
     }
 }
+

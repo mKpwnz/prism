@@ -32,14 +32,12 @@ export class Rename extends Command {
             Config.Channels.PROD.PRISM_HIGHTEAM,
 
             Config.Channels.PROD.PRISM_TESTING,
-            Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
             Config.Groups.PROD.SERVERENGINEER,
             Config.Groups.PROD.IC_SUPERADMIN,
 
             Config.Groups.PROD.BOT_DEV,
-            Config.Groups.DEV.BOTTEST,
         ];
         this.AllowedUsers = [Config.Users.L33V33N, Config.Users.ZMASTER, Config.Users.MANU];
     }

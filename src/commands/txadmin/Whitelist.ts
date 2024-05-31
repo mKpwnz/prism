@@ -60,7 +60,6 @@ export class Whitelist extends Command {
             Config.Channels.PROD.TEAM_WHITELIST_REQUEST,
 
             Config.Channels.PROD.PRISM_TESTING,
-            Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
             Config.Groups.PROD.SERVERENGINEER,
@@ -78,7 +77,6 @@ export class Whitelist extends Command {
             Config.Groups.PROD.TEAM_WHITELIST_HELFER,
 
             Config.Groups.PROD.BOT_DEV,
-            Config.Groups.DEV.BOTTEST,
         ];
     }
 
@@ -179,3 +177,4 @@ export class Whitelist extends Command {
         });
     }
 }
+

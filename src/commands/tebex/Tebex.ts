@@ -40,7 +40,6 @@ export class Tebex extends Command {
             Config.Channels.PROD.PRISM_HIGHTEAM,
 
             Config.Channels.PROD.PRISM_TESTING,
-            Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
             Config.Groups.PROD.SERVERENGINEER,
@@ -50,7 +49,6 @@ export class Tebex extends Command {
             Config.Groups.PROD.IC_MOD,
 
             Config.Groups.PROD.BOT_DEV,
-            Config.Groups.DEV.BOTTEST,
         ];
     }
 
