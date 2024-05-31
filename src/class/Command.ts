@@ -41,15 +41,25 @@ export default abstract class Command {
         const { options, user } = interaction;
 
         // Override Channel in Devmode
-        if (Config.ENV.NODE_ENV !== 'production') {
+        if (Config.ENV.NODE_ENV === 'staging') {
             this.DoNotLog = true;
             this.AllowedChannels = [
-                Config.Channels.DEV.PRISM_TESTING,
-                Config.Channels.DEV.PRISM_TESTING_2,
-                Config.Channels.DEV.PRISM_IMAGE_UPLOAD,
+                Config.Channels.STAGING.TESTING,
+                Config.Channels.STAGING.TESTING_2,
+                Config.Channels.STAGING.IMAGE_UPLOAD,
             ];
             this.AllowedGroups = [Config.Groups.DEV.BOTTEST];
         }
+        if (Config.ENV.NODE_ENV === 'development') {
+            this.DoNotLog = true;
+            this.AllowedChannels = [
+                Config.Channels.DEV.TESTING,
+                Config.Channels.DEV.TESTING_2,
+                Config.Channels.DEV.IMAGE_UPLOAD,
+            ];
+            this.AllowedGroups = [Config.Groups.DEV.BOTTEST];
+        }
+
         if (this.CheckPermissions) {
             // Check Permissions
             if (
@@ -163,3 +173,4 @@ export default abstract class Command {
         });
     }
 }
+

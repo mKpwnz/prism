@@ -44,14 +44,14 @@ const envConfig = cleanEnv(process.env, {
     SENTRY_DSN: url(),
 });
 
-function envBased<T>(opt: { prod: T; dev: T; staging: T }): T {
+export function envBasedVariable<T>(opt: { production: T; development: T; staging: T }): T {
     switch (envConfig.NODE_ENV) {
-        case 'production':
-            return opt.prod;
-        case 'staging':
+        case 'production' && opt.production:
+            return opt.production;
+        case 'staging' && opt.staging:
             return opt.staging;
         default:
-            return opt.dev;
+            return opt.development;
     }
 }
 
@@ -130,28 +130,36 @@ const ServerConfig = {
 
 const BotConfig = {
     CurrentVersion: `${version}-${envConfig.NODE_ENV.toUpperCase().substring(0, 1)}`,
-    ServerID: envBased({
-        prod: [ServerConfig.IMMO_LOGS, ServerConfig.IMMO_TEAM],
+    ServerID: envBasedVariable({
+        production: [ServerConfig.IMMO_LOGS, ServerConfig.IMMO_TEAM],
         staging: [ServerConfig.IMMO_DEVS],
-        dev: [ServerConfig.IMMO_DEVS],
+        development: [ServerConfig.IMMO_DEVS],
     }),
     Emotes: ['pbot_beta', 'pbot_banned'],
-    BOT_NAME: envBased({
-        prod: `PRISM | ${version}`,
+    BOT_NAME: envBasedVariable({
+        production: `PRISM | ${version}`,
         staging: `PRISM STAGING | ${version}`,
-        dev: `PRISM DEV | ${version}`,
+        development: `PRISM DEV | ${version}`,
     }),
-    BOT_USERNAME: envBased({ prod: 'PRISM', staging: 'PRISM_STAGING', dev: 'PRISM_DEV' }),
-    BOT_NICKNAME: envBased({ prod: '𝗣𝗥𝗜𝗦𝗠', staging: '𝗣𝗥𝗜𝗦𝗠 𝗦𝗧𝗔𝗚𝗜𝗡𝗚', dev: '𝗣𝗥𝗜𝗦𝗠 𝗗𝗘𝗩' }),
-    BOT_LOGO: envBased({
-        prod: 'https://s3.immortaldev.eu/prism-static/dc_icon_production.png',
+    BOT_USERNAME: envBasedVariable({
+        production: 'PRISM',
+        staging: 'PRISM_STAGING',
+        development: 'PRISM_DEV',
+    }),
+    BOT_NICKNAME: envBasedVariable({
+        production: '𝗣𝗥𝗜𝗦𝗠',
+        staging: '𝗣𝗥𝗜𝗦𝗠 𝗦𝗧𝗔𝗚𝗜𝗡𝗚',
+        development: '𝗣𝗥𝗜𝗦𝗠 𝗗𝗘𝗩',
+    }),
+    BOT_LOGO: envBasedVariable({
+        production: 'https://s3.immortaldev.eu/prism-static/dc_icon_production.png',
         staging: 'https://s3.immortaldev.eu/prism-static/dc_icon_staging.png',
-        dev: 'https://s3.immortaldev.eu/prism-static/dc_icon_development.png',
+        development: 'https://s3.immortaldev.eu/prism-static/dc_icon_development.png',
     }),
-    BOT_HEADER: envBased({
-        prod: 'https://s3.immortaldev.eu/prism-static/dc_header_production.png',
+    BOT_HEADER: envBasedVariable({
+        production: 'https://s3.immortaldev.eu/prism-static/dc_header_production.png',
         staging: 'https://s3.immortaldev.eu/prism-static/dc_header_staging.png',
-        dev: 'https://s3.immortaldev.eu/prism-static/dc_header_development.png',
+        development: 'https://s3.immortaldev.eu/prism-static/dc_header_development.png',
     }),
     WHITESPACE: 'https://s3.immortaldev.eu/prism-static/bot_whitespace.png',
     GlobalBlockedUsers: [''],
@@ -211,11 +219,17 @@ const ChannelConfig = {
         S1_NVHX_BANS: '1004288134831415456',
         S1_CUSTOM_IMAGE_BANLIST: '1202965967567847444',
     },
+    STAGING: {
+        IMAGE_UPLOAD: '1214172693553750136',
+        TESTING: '1193147826641842266',
+        TESTING_2: '1209556376859189269',
+        TEST_LOG: '1204133095586926622',
+    },
     DEV: {
-        PRISM_IMAGE_UPLOAD: '1214172693553750136',
-        PRISM_TESTING: '1193147826641842266',
-        PRISM_TESTING_2: '1209556376859189269',
-        PRISM_TEST_LOG: '1204133095586926622',
+        IMAGE_UPLOAD: '1246155741262254211',
+        TESTING: '1246155772430254190',
+        TESTING_2: '1246155795167711294',
+        TEST_LOG: '1246155819578560533',
     },
 };
 

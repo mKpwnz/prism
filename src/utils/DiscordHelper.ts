@@ -1,7 +1,7 @@
 import { IEmbedOptions } from '@prism/interfaces/IEmbed';
 import { AttachmentBuilder, CommandInteraction, EmbedBuilder, TextChannel } from 'discord.js';
 import { EEmbedColors } from '@prism/enums/EmbedColors';
-import Config from '@prism/Config';
+import Config, { envBasedVariable } from '@prism/Config';
 import LogManager from '@prism/manager/LogManager';
 import { BotClient } from '@prism/Bot';
 
@@ -75,7 +75,11 @@ export function getEmbedBase(opt: IEmbedOptions): EmbedBuilder {
 
 export async function sendToChannel(embed: EmbedBuilder, logChannel: string) {
     const channel = await BotClient.channels.fetch(
-        Config.ENV.NODE_ENV === 'production' ? logChannel : Config.Channels.DEV.PRISM_TEST_LOG,
+        envBasedVariable({
+            production: logChannel,
+            staging: Config.Channels.STAGING.TEST_LOG,
+            development: Config.Channels.DEV.TEST_LOG,
+        }),
     );
     if (channel?.isTextBased()) {
         await channel.send({ embeds: [embed] });
@@ -126,3 +130,4 @@ export function paginateApiResponse<T>(
 
     return pages;
 }
+

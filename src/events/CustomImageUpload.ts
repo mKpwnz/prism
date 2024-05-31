@@ -1,5 +1,5 @@
 import { Sentry } from '@prism/Bot';
-import Config from '@prism/Config';
+import Config, { envBasedVariable } from '@prism/Config';
 import S3Client from '@prism/clients/S3Client';
 import { RegisterEvent } from '@prism/decorators';
 import { EUniqueIdentifier } from '@prism/enums/ESearchType';
@@ -29,10 +29,11 @@ export class CustomImageUpload {
         size: 1024 * 800,
     };
 
-    private static channel =
-        Config.ENV.NODE_ENV === 'production'
-            ? Config.Channels.PROD.PRISM_IMAGE_UPLOAD
-            : Config.Channels.DEV.PRISM_IMAGE_UPLOAD;
+    private static channel = envBasedVariable({
+        production: Config.Channels.PROD.PRISM_IMAGE_UPLOAD,
+        staging: Config.Channels.STAGING.IMAGE_UPLOAD,
+        development: Config.Channels.DEV.IMAGE_UPLOAD,
+    });
 
     static async validateImage(image: Attachment | undefined) {
         const response: { success: boolean; messages: string[] } = {

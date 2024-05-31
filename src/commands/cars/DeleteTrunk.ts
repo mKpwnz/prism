@@ -22,18 +22,14 @@ export class DeleteTrunk extends Command {
         this.AllowedChannels = [
             Config.Channels.PROD.PRISM_BOT,
             Config.Channels.PROD.PRISM_HIGHTEAM,
-
             Config.Channels.PROD.PRISM_TESTING,
-            Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
             Config.Groups.PROD.SERVERENGINEER,
             Config.Groups.PROD.IC_SUPERADMIN,
             Config.Groups.PROD.IC_HADMIN,
             Config.Groups.PROD.IC_FRAKTIONSVERWALTUNG,
-
             Config.Groups.PROD.BOT_DEV,
-            Config.Groups.DEV.BOTTEST,
         ];
     }
 
@@ -53,3 +49,4 @@ export class DeleteTrunk extends Command {
         });
     }
 }
+

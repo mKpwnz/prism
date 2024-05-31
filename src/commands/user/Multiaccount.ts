@@ -19,7 +19,6 @@ export class Multiaccount extends Command {
             Config.Channels.PROD.PRISM_HIGHTEAM,
 
             Config.Channels.PROD.PRISM_TESTING,
-            Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
             Config.Groups.PROD.SERVERENGINEER,
@@ -28,7 +27,6 @@ export class Multiaccount extends Command {
             Config.Groups.PROD.IC_ADMIN,
             Config.Groups.PROD.IC_MOD,
 
-            Config.Groups.DEV.BOTTEST,
             Config.Groups.PROD.BOT_DEV,
         ];
     }

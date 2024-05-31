@@ -12,9 +12,7 @@ export class Ping extends Command {
         this.AllowedChannels = [
             Config.Channels.PROD.PRISM_BOT,
             Config.Channels.PROD.PRISM_HIGHTEAM,
-
             Config.Channels.PROD.PRISM_TESTING,
-            Config.Channels.DEV.PRISM_TESTING,
         ];
     }
 

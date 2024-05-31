@@ -24,9 +24,7 @@ export class Vehicle extends Command {
         this.AllowedChannels = [
             Config.Channels.PROD.PRISM_BOT,
             Config.Channels.PROD.PRISM_HIGHTEAM,
-
             Config.Channels.PROD.PRISM_TESTING,
-            Config.Channels.DEV.PRISM_TESTING,
         ];
         this.AllowedGroups = [
             Config.Groups.PROD.SERVERENGINEER,
@@ -34,9 +32,7 @@ export class Vehicle extends Command {
             Config.Groups.PROD.IC_HADMIN,
             Config.Groups.PROD.IC_ADMIN,
             Config.Groups.PROD.IC_MOD,
-
             Config.Groups.PROD.BOT_DEV,
-            Config.Groups.DEV.BOTTEST,
         ];
     }
 

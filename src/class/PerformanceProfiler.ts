@@ -27,7 +27,8 @@ export class PerformanceProfiler {
     }
 
     async sendEmbed(channelid: string, user: User) {
-        if (channelid !== Config.Channels.DEV.PRISM_TESTING) return;
+        if (![Config.Channels.DEV.TESTING, Config.Channels.STAGING.TESTING].includes(channelid))
+            return;
 
         this.ProfilerData.push({ profilerStep: 'Profiler End', timestamp: new Date().getTime() });
         const table = new AsciiTable3('Performance Profiler')

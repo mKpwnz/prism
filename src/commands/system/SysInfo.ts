@@ -17,7 +17,6 @@ export class SysInfo extends Command {
             Config.Channels.PROD.PRISM_HIGHTEAM,
 
             Config.Channels.PROD.PRISM_TESTING,
-            Config.Channels.DEV.PRISM_TESTING,
         ];
     }
 
