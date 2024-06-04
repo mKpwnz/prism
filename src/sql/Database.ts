@@ -33,6 +33,7 @@ export async function InitDatabase() {
         await migrate(BotDB, { migrationsFolder: resolve(__dirname, '../drizzle') });
     } catch (e) {
         LogManager.error('Error connecting to BotDB or migrating last changes. Exiting...');
+        LogManager.error(e);
         process.exit(1);
     } finally {
         LogManager.info('BotDB connected and migrated.');

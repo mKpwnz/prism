@@ -1,0 +1,1 @@
+ALTER TABLE "fa_users" ADD COLUMN "usergroup" text DEFAULT 'user';

@@ -38,6 +38,7 @@ export const faUsers = pgTable('fa_users', {
         .notNull()
         .references(() => faScans.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
     identifier: text('identifier').notNull(),
+    usergroup: text('usergroup').default('user'),
     icname: text('icname').notNull(),
     discordid: text('discordid').notNull(),
     bank: numeric('bank'),
@@ -53,6 +54,7 @@ export const faResult = pgTable('fa_result', {
         .notNull()
         .references(() => faScans.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
     identifier: text('identifier').notNull(),
+    usergroup: text('usergroup').default('user'),
     icname: text('icname').notNull(),
     discordid: text('discordid').notNull(),
     bank: numeric('bank'),

@@ -1,5 +1,6 @@
 import { Sentry } from '@prism/Bot';
 import Config from '@prism/Config';
+import { EEmbedColors } from '@prism/enums/EmbedColors';
 import LogManager from '@prism/manager/LogManager';
 import { BotDB, GameDB } from '@prism/sql/Database';
 import {
@@ -11,7 +12,7 @@ import {
     faVehicles,
 } from '@prism/sql/botSchema/BotSchema';
 import { getEmbedBase, sendToChannel } from '@prism/utils/DiscordHelper';
-import { InferSelectModel, desc, eq, lt } from 'drizzle-orm';
+import { InferSelectModel, and, desc, eq, isNull, lt, ne, or } from 'drizzle-orm';
 import { RowDataPacket } from 'mysql2';
 
 type TActiveUser = Omit<InferSelectModel<typeof faUsers>, 'id' | 'createdAt' | 'updatedAt'>;
@@ -54,38 +55,35 @@ function parseValidJson(str: string) {
     }
 }
 
-const TeamGroups = ['superadmin', 'hadmin', 'eventvw', 'frakvw', 'mod'];
-
 async function logUserTable(scanid: number): Promise<TActiveUser[]> {
     const [activeUsers] = await GameDB.query<IFAUser[]>(
         'SELECT u.identifier as identifier, u.accounts as accounts, u.firstname as firstname, u.lastname as lastname, u.`group` as usergroup, u.updated as updated, b.discord as discordid FROM users u JOIN baninfo b ON u.identifier = b.identifier WHERE u.updated > DATE_SUB(NOW(), INTERVAL 14 DAY)',
     );
     const pgDBdata: TActiveUser[] = [];
     for (const user of activeUsers) {
-        if (!TeamGroups.includes(user.usergroup)) {
-            const accounts = JSON.parse(user.accounts);
-            let bank: string | null = null;
-            let black: string | null = null;
-            let cash: string | null = null;
-            if (accounts.bank) {
-                bank = Number(accounts.bank).toFixed(2);
-            }
-            if (accounts.black_money) {
-                black = Number(accounts.black_money).toFixed(2);
-            }
-            if (accounts.money) {
-                cash = Number(accounts.money).toFixed(2);
-            }
-            pgDBdata.push({
-                identifier: user.identifier,
-                icname: `${user.firstname} ${user.lastname}`,
-                discordid: user.discordid,
-                scanid,
-                bank,
-                black,
-                cash,
-            });
+        const accounts = JSON.parse(user.accounts);
+        let bank: string | null = null;
+        let black: string | null = null;
+        let cash: string | null = null;
+        if (accounts.bank) {
+            bank = Number(accounts.bank).toFixed(2);
         }
+        if (accounts.black_money) {
+            black = Number(accounts.black_money).toFixed(2);
+        }
+        if (accounts.money) {
+            cash = Number(accounts.money).toFixed(2);
+        }
+        pgDBdata.push({
+            identifier: user.identifier,
+            icname: `${user.firstname} ${user.lastname}`,
+            discordid: user.discordid,
+            usergroup: user.usergroup,
+            scanid,
+            bank,
+            black,
+            cash,
+        });
     }
     if (pgDBdata.length === 0) return [];
     await BotDB.insert(faUsers).values(pgDBdata);
@@ -206,6 +204,7 @@ async function analyzeUsers(
             scanid,
             identifier: user.identifier,
             icname: user.icname,
+            usergroup: user.usergroup,
             discordid: user.discordid,
             bank: user.bank,
             black: user.black,
@@ -234,10 +233,13 @@ async function analyzeUsers(
         };
     });
     if (pgDBdata.length === 0) return;
-    await BotDB.insert(faResult).values(pgDBdata);
+
+    for (let i = 0; i < pgDBdata.length; i += 100) {
+        await BotDB.insert(faResult).values(pgDBdata.slice(i, i + 100));
+    }
 }
 
-async function sendDiscordNotice() {
+async function sendTeamDiscordNotice() {
     const lastScan = await BotDB.select()
         .from(faScans)
         .orderBy(desc(faScans.id))
@@ -246,7 +248,52 @@ async function sendDiscordNotice() {
 
     const lastScanResult = await BotDB.select()
         .from(faResult)
-        .where(eq(faResult.scanid, lastScan.id))
+        .where(and(eq(faResult.scanid, lastScan.id), ne(faResult.usergroup, 'user')))
+        .orderBy(desc(faResult.totalMoney));
+
+    let sumGreenMoney = 0;
+    let subBlackMoney = 0;
+    for (const entry of lastScanResult) {
+        const numGreen = Number(entry.totalMoney);
+        const numBlack = Number(entry.totalBlack);
+        if (!Number.isNaN(numGreen)) sumGreenMoney += numGreen;
+        if (!Number.isNaN(numBlack)) subBlackMoney += numBlack;
+    }
+
+    const content = [];
+    for (const entry of lastScanResult.slice(0, 10)) {
+        content.push(`Spieler: **${entry.icname}** (${entry.identifier})`);
+        content.push('```');
+        content.push(`Gesamt Grüngeld: ${Number(entry.totalGreen).toLocaleString('de-DE')}€`);
+        content.push(`Gesamt Schwarzgeld: ${Number(entry.totalBlack).toLocaleString('de-DE')}€`);
+        content.push('---');
+        content.push(`Gesamt Geld: ${Number(entry.totalMoney).toLocaleString('de-DE')}€`);
+        content.push('```');
+    }
+
+    const embed = getEmbedBase({
+        title: 'Financial Analytics (top10) Teamler',
+        description: `Letzter Scan: **${lastScan.createdAt.toLocaleString('de-DE')}**\nGesamt Grüngeld im Umlauf: **${sumGreenMoney.toLocaleString('de-DE')}€**\nGesamt Schwarzgeld im Umlauf: **${subBlackMoney.toLocaleString('de-DE')}€**\n\n${content.join('\n')}`,
+        color: EEmbedColors.ALERT,
+    });
+    await sendToChannel(embed, Config.Channels.PROD.PRISM_MONEY_LOG);
+}
+
+async function sendUserDiscordNotice() {
+    const lastScan = await BotDB.select()
+        .from(faScans)
+        .orderBy(desc(faScans.id))
+        .limit(1)
+        .then((res) => res[0]);
+
+    const lastScanResult = await BotDB.select()
+        .from(faResult)
+        .where(
+            and(
+                eq(faResult.scanid, lastScan.id),
+                or(eq(faResult.usergroup, 'user'), isNull(faResult.usergroup)),
+            ),
+        )
         .orderBy(desc(faResult.totalMoney));
 
     let sumGreenMoney = 0;
@@ -277,10 +324,10 @@ async function sendDiscordNotice() {
 }
 
 export async function doFinancialAnalytics() {
-    if (Config.ENV.NODE_ENV !== 'production') {
-        LogManager.debug('CronJobs: doFinancialAnalytics() will only execute in production.');
-        return;
-    }
+    // if (Config.ENV.NODE_ENV !== 'production') {
+    //     LogManager.debug('CronJobs: doFinancialAnalytics() will only execute in production.');
+    //     return;
+    // }
     LogManager.info('Starting Financial Analytics');
     const deleteOldScans = await BotDB.delete(faScans).where(
         lt(faScans.createdAt, new Date(Date.now() - 8 * 60 * 60 * 1000)),
@@ -303,5 +350,6 @@ export async function doFinancialAnalytics() {
     LogManager.info('Logged Immobay Money');
     await analyzeUsers(scan.id, activeUsers, vehicleData, housingData, immobayData);
     LogManager.info('Finished Financial Analytics');
-    await sendDiscordNotice();
+    await sendUserDiscordNotice();
+    await sendTeamDiscordNotice();
 }
