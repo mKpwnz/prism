@@ -324,10 +324,10 @@ async function sendUserDiscordNotice() {
 }
 
 export async function doFinancialAnalytics() {
-    // if (Config.ENV.NODE_ENV !== 'production') {
-    //     LogManager.debug('CronJobs: doFinancialAnalytics() will only execute in production.');
-    //     return;
-    // }
+    if (Config.ENV.NODE_ENV !== 'production') {
+        LogManager.debug('CronJobs: doFinancialAnalytics() will only execute in production.');
+        return;
+    }
     LogManager.info('Starting Financial Analytics');
     const deleteOldScans = await BotDB.delete(faScans).where(
         lt(faScans.createdAt, new Date(Date.now() - 8 * 60 * 60 * 1000)),
