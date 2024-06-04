@@ -9,6 +9,7 @@ import { ResultSetHeader } from 'mysql2';
 
 export class VehicleService {
     public static async getVehicleByPlate(plate: string): Promise<IVehicle | Error> {
+        console.log('plate', `+${plate}+`);
         const [vehicles] = await GameDB.query<IVehicle[]>(
             `SELECT * FROM owned_vehicles WHERE plate = ?`,
             [formatPlate(plate)],
@@ -46,7 +47,7 @@ export class VehicleService {
 
         const [res] = await GameDB.execute<ResultSetHeader>(
             `UPDATE owned_vehicles SET garage = ?, type = ? WHERE plate = ?`,
-            [newlocation, type, vehicle.plate],
+            [newlocation, type, formatPlate(plate)],
         );
         if (res.affectedRows === 0) {
             return new Error(
@@ -78,8 +79,11 @@ export class VehicleService {
         }
 
         const newplatevehicle = await VehicleService.getVehicleByPlate(newplate);
-        if (newplatevehicle) {
-            return new Error(`Es existiert bereits ein Fahrzeug mit dem Kennzeichen ${newplate}.`);
+
+        if (!(newplatevehicle instanceof Error)) {
+            return new Error(
+                `Das Kennzeichen **${newplate}** ist bereits vergeben. Bitte wähle ein anderes Kennzeichen.`,
+            );
         }
 
         const newplatefmt = formatPlate(newplate);
