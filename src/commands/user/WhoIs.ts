@@ -319,7 +319,7 @@ export class WhoIs extends Command {
             `users.updated ` +
             `FROM users ` +
             `LEFT JOIN baninfo ON users.identifier = baninfo.identifier ` +
-            `JOIN phone_phones ON users.identifier = phone_phones.id ` +
+            `LEFT JOIN phone_phones ON users.identifier = phone_phones.id ` +
             `WHERE ${columns.get(column)}`;
         try {
             const [rows] = await GameDB.execute(query); // Verwenden Sie await und die execute-Funktion
