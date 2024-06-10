@@ -22,7 +22,6 @@ export class CronJobService {
         const endDate = new Date();
 
         const illegalPhotos = await PhonePhotosService.checkPhotos(startDate, endDate);
-        LogManager.debug(illegalPhotos);
         const illegalPhoneImageOwnerMap = new Map<string, string[]>();
 
         await Promise.all(
@@ -42,7 +41,6 @@ export class CronJobService {
                 }
             }),
         );
-        LogManager.debug(illegalPhoneImageOwnerMap);
         if (illegalPhoneImageOwnerMap.size === 0) {
             LogManager.debug(
                 'CronJobs: banPlayersWithIllegalPhoto() done. No illegal photos found.',
