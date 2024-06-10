@@ -10,19 +10,19 @@ import { PlayerService } from './PlayerService';
 
 export class CronJobService {
     public static async banPlayersWithIllegalPhoto() {
-        // if (Config.ENV.NODE_ENV !== 'production') {
-        //     LogManager.debug(
-        //         'CronJobs: banPlayersWithIllegalPhoto() will only execute in production.',
-        //     );
-        //     return;
-        // }
+        if (Config.ENV.NODE_ENV === 'development') {
+            LogManager.debug(
+                'CronJobs: banPlayersWithIllegalPhoto() will only execute in production & staging.',
+            );
+            return;
+        }
 
         const startDate = new Date();
         startDate.setDate(startDate.getDate() - 1000);
         const endDate = new Date();
 
         const illegalPhotos = await PhonePhotosService.checkPhotos(startDate, endDate);
-
+        LogManager.debug(illegalPhotos);
         const illegalPhoneImageOwnerMap = new Map<string, string[]>();
 
         await Promise.all(
@@ -42,7 +42,7 @@ export class CronJobService {
                 }
             }),
         );
-
+        LogManager.debug(illegalPhoneImageOwnerMap);
         if (illegalPhoneImageOwnerMap.size === 0) {
             LogManager.debug(
                 'CronJobs: banPlayersWithIllegalPhoto() done. No illegal photos found.',

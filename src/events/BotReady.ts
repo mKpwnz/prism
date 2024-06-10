@@ -91,7 +91,11 @@ export class BotReady {
                 ),
                 'txadmin.banpillegalphoto': new CronJob(
                     '0 */30 * * * *',
-                    () => CronJobService.banPlayersWithIllegalPhoto(),
+                    async () => {
+                        setTimeout(async () => {
+                            await CronJobService.banPlayersWithIllegalPhoto();
+                        }, 10000);
+                    },
                     null,
                     null,
                     null,
