@@ -5,59 +5,58 @@ import TxAdminError from '@prism/error/TxAdmin.error';
 import LogManager from '@prism/manager/LogManager';
 import { PhonePhotosService } from '@prism/services/PhonePhotosService';
 import { PhoneService } from '@prism/services/PhoneService';
-import { IPhoneOwnerResponse } from '@prism/sql/gameSchema/Phone.schema';
 import { getEmbedBase, sendToChannel } from '@prism/utils/DiscordHelper';
 import { PlayerService } from './PlayerService';
 
 export class CronJobService {
-    // TODO: Die Bans werden alle 30 Minuten wiederholt => Kommt durch das nicht löschen der Bilder
-    // TODO: Die Bilder werden nicht automatisch gelöscht => sollten gelöscht werden
-    // TODO: Wenn eine Person Mehrere Bilder hochgeladen hat, wird sie mehrfach gebannt => Sollte nur 1x
     public static async banPlayersWithIllegalPhoto() {
-        if (Config.ENV.NODE_ENV !== 'production') {
-            LogManager.debug(
-                'CronJobs: banPlayersWithIllegalPhoto() will only execute in production.',
-            );
-            return;
-        }
+        // if (Config.ENV.NODE_ENV !== 'production') {
+        //     LogManager.debug(
+        //         'CronJobs: banPlayersWithIllegalPhoto() will only execute in production.',
+        //     );
+        //     return;
+        // }
 
         const startDate = new Date();
-        startDate.setDate(startDate.getDate() - 1);
+        startDate.setDate(startDate.getDate() - 1000);
         const endDate = new Date();
 
         const illegalPhotos = await PhonePhotosService.checkPhotos(startDate, endDate);
 
-        const phoneOwners = (
-            await Promise.all(
-                illegalPhotos.map(async (photo) => {
-                    const phoneOwner = await PhoneService.getPhoneOwnerByImageLink(photo.link);
-                    if (!phoneOwner) {
-                        LogManager.error(
-                            `Could not find the owner of the photo with the link ${photo.link}!`,
-                        );
-                        return null;
-                    }
-                    return phoneOwner;
-                }),
-            )
-        ).filter((owner) => owner !== null) as IPhoneOwnerResponse[];
+        const illegalPhoneImageOwnerMap = new Map<string, string[]>();
 
-        if (phoneOwners.length === 0) {
+        await Promise.all(
+            illegalPhotos.map(async (photo) => {
+                const phoneOwner = await PhoneService.getPhoneOwnerByImageLink(photo.link);
+                if (!phoneOwner) {
+                    LogManager.error(
+                        `Could not find the owner of the photo with the link ${photo.link}!`,
+                    );
+                    return;
+                }
+
+                if (!illegalPhoneImageOwnerMap.has(phoneOwner.steamID)) {
+                    illegalPhoneImageOwnerMap.set(phoneOwner.steamID, [photo.link]);
+                } else {
+                    illegalPhoneImageOwnerMap.get(phoneOwner.steamID)?.push(photo.link);
+                }
+            }),
+        );
+
+        if (illegalPhoneImageOwnerMap.size === 0) {
             LogManager.debug(
                 'CronJobs: banPlayersWithIllegalPhoto() done. No illegal photos found.',
             );
             return;
         }
 
-        await phoneOwners.reduce(async (previousWork, owner) => {
-            await previousWork;
-            const banReason = 'Bug Abuse (Custom Image Upload)';
-
-            const vPlayer = await PlayerService.validatePlayer(owner.steamID);
+        const banReason = 'Bug Abuse (Custom Image Upload)';
+        for (const [steamID, links] of illegalPhoneImageOwnerMap) {
+            const vPlayer = await PlayerService.validatePlayer(steamID);
 
             if (!vPlayer) {
                 LogManager.error(
-                    `CronJobs: banPlayersWithIllegalPhoto() failed to find the player with the identifier ${owner.steamID}.`,
+                    `CronJobs: banPlayersWithIllegalPhoto() failed to find the player with the identifier ${steamID}.`,
                 );
                 return;
             }
@@ -66,7 +65,7 @@ export class CronJobService {
                 LogManager.error(playerInfo);
                 return;
             }
-
+            await PhonePhotosService.deletePictures(links);
             const ban = await TxAdminClient.playerBan(vPlayer, banReason, 'permanent');
 
             if (ban instanceof TxAdminError) {
@@ -110,6 +109,10 @@ export class CronJobService {
                         value: `\`\`\`${banReason}\`\`\``,
                     },
                     {
+                        name: 'Anzahl verbotene Bilder',
+                        value: `\`\`\`${links.length}\`\`\``,
+                    },
+                    {
                         name: 'Identifier',
                         value: `\`\`\`${playerInfo.player.ids.join('\n')}\`\`\``,
                     },
@@ -118,6 +121,6 @@ export class CronJobService {
 
             await sendToChannel(embed, Config.Channels.PROD.S1_CUSTOM_IMAGE_BANLIST);
             await sendToChannel(embed, Config.Channels.PROD.S1_NVHX_BANS);
-        }, Promise.resolve());
+        }
     }
 }

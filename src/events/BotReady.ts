@@ -3,7 +3,6 @@ import Config from '@prism/Config';
 import { RconClient } from '@prism/class/RconClient';
 import TxAdminClient from '@prism/clients/TxAdminClient';
 import { botStatusUpdate } from '@prism/cronjobs/BotStatusUpdate.cron';
-import { checkDeadImages } from '@prism/cronjobs/CheckDeadImages.cron';
 import { doFinancialAnalytics } from '@prism/cronjobs/FinancialAnalytics.cron';
 import { logPlayerCount } from '@prism/cronjobs/LogPlayerCount.cron';
 import { RegisterEvent } from '@prism/decorators';
@@ -93,15 +92,6 @@ export class BotReady {
                 'txadmin.banpillegalphoto': new CronJob(
                     '0 */30 * * * *',
                     () => CronJobService.banPlayersWithIllegalPhoto(),
-                    null,
-                    null,
-                    null,
-                    null,
-                    true,
-                ),
-                'server.checkDeadImages': new CronJob(
-                    '0 */60 * * * *',
-                    () => checkDeadImages(),
                     null,
                     null,
                     null,

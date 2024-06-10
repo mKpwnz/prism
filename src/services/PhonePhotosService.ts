@@ -24,6 +24,7 @@ export class PhonePhotosService {
         }
         query += ` AND timestamp BETWEEN '${start.toISOString()}' AND '${end.toISOString()}'`;
         // LogManager.debug(query)
+        console.log(query);
         const [pictures] = await GameDB.query<IPhonePhotos[]>(query);
         LogManager.log('PhonePhotosController', `Found ${pictures.length} pictures in photos`);
         return pictures;
@@ -292,6 +293,18 @@ export class PhonePhotosService {
             `DELETE FROM phone_tinder_messages WHERE attachments LIKE '%${picture}%' or content LIKE '%${picture}%'`,
         );
         affectedRows += ret7.affectedRows;
+        const [ret8] = await GameDB.execute<ResultSetHeader>(
+            `UPDATE phone_instagram_accounts SET profile_image = NULL WHERE profile_image LIKE '%${picture}%'`,
+        );
+        affectedRows += ret8.affectedRows;
+        const [ret9] = await GameDB.execute<ResultSetHeader>(
+            `UPDATE phone_tiktok_accounts SET avatar = NULL WHERE avatar LIKE '%${picture}%'`,
+        );
+        affectedRows += ret9.affectedRows;
+        const [ret10] = await GameDB.execute<ResultSetHeader>(
+            `UPDATE phone_twitter_accounts SET profile_image = NULL WHERE profile_image LIKE '%${picture}%'`,
+        );
+        affectedRows += ret10.affectedRows;
         return affectedRows;
     }
 
