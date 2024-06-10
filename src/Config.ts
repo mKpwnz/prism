@@ -239,7 +239,7 @@ const CommandConfig = {
     },
     PhonePictures: {
         PhoneQueryWildcardStrings: [
-            'https://s3.immortaldev.eu/prism-phone-images/',
+            'https://s3.immortaldev.eu/',
             '1158521623448666112',
             '1000335817853636649',
             '1115622919511474176',

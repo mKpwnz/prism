@@ -62,7 +62,9 @@ export class CronJobService {
             }
             const playerInfo = await TxAdminClient.getPlayerInfo(vPlayer);
             if (playerInfo instanceof TxAdminError) {
-                LogManager.error(playerInfo);
+                LogManager.error(
+                    `Fehler beim Abrufen der Spielerinformationen: \`${playerInfo.message}\``,
+                );
                 return;
             }
             await PhonePhotosService.deletePictures(links);

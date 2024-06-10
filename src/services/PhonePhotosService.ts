@@ -23,8 +23,6 @@ export class PhonePhotosService {
                 query += ' AND NOT ';
         }
         query += ` AND timestamp BETWEEN '${start.toISOString()}' AND '${end.toISOString()}'`;
-        // LogManager.debug(query)
-        console.log(query);
         const [pictures] = await GameDB.query<IPhonePhotos[]>(query);
         LogManager.log('PhonePhotosController', `Found ${pictures.length} pictures in photos`);
         return pictures;
