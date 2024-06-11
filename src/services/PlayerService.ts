@@ -125,7 +125,7 @@ export class PlayerService {
 
             FROM users
                 LEFT JOIN baninfo ON users.identifier = baninfo.identifier
-                JOIN phone_phones ON users.identifier = phone_phones.id
+                LEFT JOIN phone_phones ON users.identifier = phone_phones.id
             WHERE ${filterMap.get(type)}
         `);
 
