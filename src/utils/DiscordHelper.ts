@@ -130,4 +130,3 @@ export function paginateApiResponse<T>(
 
     return pages;
 }
-

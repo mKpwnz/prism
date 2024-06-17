@@ -90,10 +90,10 @@ export interface IPhoneInstagramPosts extends RowDataPacket {
  * @author mKpwnz
  * @date 19.10.2023
  * @export
- * @interface IPhoneOwnerResponse
+ * @interface IPhoneMediaCreatorResponse
  * @extends {RowDataPacket}
  */
-export interface IPhoneOwnerResponse extends RowDataPacket {
+export interface IPhoneMediaCreatorResponse extends RowDataPacket {
     firstname: string;
     lastname: string;
     steamID: string;

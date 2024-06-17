@@ -1,12 +1,12 @@
-import { IPhoneOwnerResponse } from '@prism/sql/gameSchema/Phone.schema';
+import { IPhoneMediaCreatorResponse } from '@prism/sql/gameSchema/Phone.schema';
 import { GameDB } from '@prism/sql/Database';
 import { ResultSetHeader } from 'mysql2';
 
 export class PhoneService {
-    public static async getPhoneOwnerByImageLink(
+    public static async getMediaCreatorByLink(
         link: string,
-    ): Promise<IPhoneOwnerResponse | undefined> {
-        const [response] = await GameDB.query<IPhoneOwnerResponse[]>(
+    ): Promise<IPhoneMediaCreatorResponse | undefined> {
+        const [response] = await GameDB.query<IPhoneMediaCreatorResponse[]>(
             `
                 SELECT u.firstname,
                        u.lastname,

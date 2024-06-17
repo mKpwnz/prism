@@ -56,10 +56,14 @@ export class GarageList extends Command {
             2000,
         );
 
+        if (page > pages.length || page < 1) {
+            await this.replyError(`Seite ${page} existiert nicht.`);
+            return;
+        }
+
         await this.replyWithEmbed({
             title: `Garagenliste ( Seite ${page} von ${pages.length} )`,
             description: pages[page - 1],
         });
     }
 }
-

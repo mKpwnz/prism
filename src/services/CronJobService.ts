@@ -26,7 +26,7 @@ export class CronJobService {
 
         await Promise.all(
             illegalPhotos.map(async (photo) => {
-                const phoneOwner = await PhoneService.getPhoneOwnerByImageLink(photo.link);
+                const phoneOwner = await PhoneService.getMediaCreatorByLink(photo.link);
                 if (!phoneOwner) {
                     LogManager.error(
                         `Could not find the owner of the photo with the link ${photo.link}!`,
