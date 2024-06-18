@@ -1,8 +1,14 @@
-import { ClientEvents, SlashCommandBuilder, SlashCommandSubcommandsOnlyBuilder } from 'discord.js';
+import {
+    ClientEvents,
+    SlashCommandBuilder,
+    SlashCommandOptionsOnlyBuilder,
+    SlashCommandSubcommandsOnlyBuilder,
+} from 'discord.js';
 
 export type PrismSCB =
     | SlashCommandBuilder
     | SlashCommandSubcommandsOnlyBuilder
+    | SlashCommandOptionsOnlyBuilder
     | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'>;
 
 export type DiscordEvents = keyof ClientEvents;

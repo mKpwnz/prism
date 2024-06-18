@@ -147,3 +147,13 @@ export function generateOAAThash(inputText: string): number {
     hash += hash << 15;
     return (hash >>> 0) >> 0;
 }
+
+export function validatePhoneMediaUrl(url: string): string | null {
+    const REGEX =
+        /^(https?:\/\/[^\s?#]+\/[^\s?#]+)\.(jpg|jpeg|png|gif|bmp|svg|webp|tiff|ico|mp4|mkv|webm|avi|mov|wmv|flv|m4v|mpeg|mpg)(?:\?.*)?$/;
+    const match = url.match(REGEX);
+    if (match) {
+        return match[1];
+    }
+    return null;
+}

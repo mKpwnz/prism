@@ -7,6 +7,7 @@ import { PlayerService } from '@prism/services/PlayerService';
 import { GameDB } from '@prism/sql/Database';
 import { IBilling } from '@prism/sql/gameSchema/Billing.schema';
 import { IJob } from '@prism/sql/gameSchema/Job.schema';
+import { executeCommandFromMap } from '@prism/utils/DiscordCommandHelper';
 import { sendToChannel } from '@prism/utils/DiscordHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
@@ -120,26 +121,13 @@ export class Rechnung extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        switch (interaction.options.getSubcommand()) {
-            case 'suchen':
-                await this.searchInvoice(interaction);
-                break;
-            case 'anzeigen':
-                await this.showInvoice(interaction);
-                break;
-            case 'bezahlen':
-                await this.payInvoice(interaction);
-                break;
-            case 'löschen':
-                await this.deleteInvoice(interaction);
-                break;
-            case 'erstellen':
-                await this.createInvoice(interaction);
-                break;
-            default:
-                await this.replyError('Command nicht gefunden.');
-                break;
-        }
+        await executeCommandFromMap(interaction, {
+            suchen: () => this.searchInvoice(interaction),
+            anzeigen: () => this.showInvoice(interaction),
+            bezahlen: () => this.payInvoice(interaction),
+            löschen: () => this.deleteInvoice(interaction),
+            erstellen: () => this.createInvoice(interaction),
+        });
     }
 
     private async searchInvoice(interaction: ChatInputCommandInteraction): Promise<void> {

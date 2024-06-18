@@ -63,13 +63,12 @@ export default abstract class Command {
         if (this.CheckPermissions) {
             // Check Permissions
             if (
-                !(await isUserAllowed(
-                    interaction,
-                    this.AllowedChannels,
-                    this.AllowedGroups,
-                    this.AllowedUsers,
-                    this.BlockedUsers,
-                ))
+                (await isUserAllowed(interaction, {
+                    allowedChannels: this.AllowedChannels,
+                    allowedGroups: this.AllowedGroups,
+                    allowedUsers: this.AllowedUsers,
+                    blockedUsers: this.BlockedUsers,
+                })) === false
             )
                 return;
         }

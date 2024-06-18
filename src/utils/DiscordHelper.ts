@@ -5,26 +5,38 @@ import Config, { envBasedVariable } from '@prism/Config';
 import LogManager from '@prism/manager/LogManager';
 import { BotClient } from '@prism/Bot';
 
+export interface IPermissionOptions {
+    allowedChannels?: string[];
+    allowedGroups?: string[];
+    allowedUsers?: string[];
+    blockedUsers?: string[];
+}
+
 export async function isUserAllowed(
     interaction: CommandInteraction,
-    allowedChannels: string[] = [],
-    allowedGroups: string[] = [],
-    allowedUsers: string[] = [],
-    blockedUsers: string[] = [],
+    options: IPermissionOptions,
 ): Promise<boolean> {
     const { channel, user, guild } = interaction;
+    const {
+        allowedChannels = [],
+        allowedGroups = [],
+        allowedUsers = [],
+        blockedUsers = [],
+    } = options;
+
     if (!guild) return false;
 
     const userRoleCache = guild.members.cache.get(user.id);
     let userIsAllowed = false;
 
-    if (allowedUsers.length === 0) {
+    if (allowedUsers.length === 0 && allowedGroups.length === 0) {
         userIsAllowed = true;
     } else if (allowedGroups.some((roleID) => userRoleCache?.roles.cache.has(roleID))) {
         userIsAllowed = true;
     } else if (allowedUsers.includes(user.id)) {
         userIsAllowed = true;
     }
+
     if (blockedUsers.includes(user.id)) {
         userIsAllowed = false;
     }
@@ -113,21 +125,17 @@ export function paginateApiResponse<T>(
     }
 
     for (const action of response) {
-        // Überprüfe, ob die nächste Zeile hinzugefügt werden kann, ohne das Zeichenlimit zu überschreiten
         if (currentPage.length + action.length + 1 <= pageSize) {
             currentPage += `${action}\n`;
         } else {
-            // Füge die aktuelle Seite zu den Seiten hinzu und beginne eine neue Seite
             pages.push(currentPage);
             currentPage = `${action}\n`;
         }
     }
 
-    // Füge die letzte Seite hinzu, wenn vorhanden
     if (currentPage.length > 0) {
         pages.push(currentPage);
     }
 
     return pages;
 }
-

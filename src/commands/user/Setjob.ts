@@ -6,6 +6,7 @@ import { EENV } from '@prism/enums/EENV';
 import { PlayerService } from '@prism/services/PlayerService';
 import { GameDB } from '@prism/sql/Database';
 import { IJob } from '@prism/sql/gameSchema/Job.schema';
+import { executeCommandFromMap } from '@prism/utils/DiscordCommandHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
 
@@ -72,17 +73,10 @@ export class Setjob extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        switch (interaction.options.getSubcommand()) {
-            case 'online':
-                await this.setOnline(interaction);
-                break;
-            case 'offline':
-                await this.setOffline(interaction);
-                break;
-            default:
-                await this.replyError('Command nicht gefunden.');
-                break;
-        }
+        await executeCommandFromMap(interaction, {
+            online: () => this.setOnline(interaction),
+            offline: () => this.setOffline(interaction),
+        });
     }
 
     private async setOnline(interaction: ChatInputCommandInteraction): Promise<void> {

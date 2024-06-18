@@ -3,6 +3,7 @@ import Command from '@prism/class/Command';
 import ActiveDirectoryClient from '@prism/clients/ActiveDirectoryClient';
 import { RegisterCommand } from '@prism/decorators';
 import { EENV } from '@prism/enums/EENV';
+import { executeCommandFromMap } from '@prism/utils/DiscordCommandHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 @RegisterCommand(
@@ -37,16 +38,15 @@ export class ActiveDirectory extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        switch (interaction.options.getSubcommand()) {
-            case 'myperms': {
+        await executeCommandFromMap(interaction, {
+            myperms: async () => {
                 const { user } = interaction;
                 const permissions = await this.getPermissionsFromUser(user.id);
                 await this.replyWithEmbed({
                     description: `**User: ${interaction.user.displayName}\n\n**Gruppen:\n${permissions.join('\n')}`,
                 });
-                break;
-            }
-            case 'userperms': {
+            },
+            userperms: async () => {
                 const optUser = interaction.options.getUser('user');
                 if (!optUser) {
                     await this.replyError('User not found');
@@ -56,13 +56,8 @@ export class ActiveDirectory extends Command {
                 await this.replyWithEmbed({
                     description: `**User: ${optUser.displayName}\n\n**Gruppen:\n${permissions.join('\n')}`,
                 });
-                break;
-            }
-            default: {
-                await interaction.reply({ content: 'Command nicht gefunden.', ephemeral: true });
-                break;
-            }
-        }
+            },
+        });
     }
 
     async getPermissionsFromUser(user: string): Promise<string[]> {
@@ -92,4 +87,3 @@ export class ActiveDirectory extends Command {
         return reponseList;
     }
 }
-

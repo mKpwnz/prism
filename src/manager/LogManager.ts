@@ -1,8 +1,8 @@
 import Config from '@prism/Config';
 import chalk from 'chalk';
-import colorize from 'json-colorizer';
 import winston, { createLogger, format, transports } from 'winston';
 import LokiTransport from 'winston-loki';
+import { colorize } from 'json-colorizer';
 
 /**
  * @description Logger class for logging to console and loki
@@ -35,20 +35,7 @@ export default class LogManager {
 
     private static formatMessage(message: any, loglevel: string): any {
         if (typeof message === 'object') {
-            return colorize(message, {
-                pretty: true,
-                colors: {
-                    BRACE: '#efeff1',
-                    BRACKET: '#efeff1',
-                    COLON: '#efeff1',
-                    COMMA: '#efeff1',
-                    STRING_KEY: '#0792f1',
-                    STRING_LITERAL: '#a1fb1a',
-                    NUMBER_LITERAL: '#ffc632',
-                    BOOLEAN_LITERAL: '#8270fa',
-                    NULL_LITERAL: '#e91916',
-                },
-            });
+            return colorize(message);
         }
         if (typeof message === 'string') {
             switch (loglevel.toLowerCase()) {

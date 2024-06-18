@@ -78,10 +78,14 @@ export class FaInfo extends Command {
             1900,
         );
 
+        if (page > pages.length || page < 1) {
+            await this.replyError(`Seite ${page} existiert nicht.`);
+            return;
+        }
+
         await this.replyWithEmbed({
             title: `Financial Analytics ( Seite ${page} von ${pages.length} )`,
             description: `Letzter Scan: **${lastScan.createdAt.toLocaleString('de-DE')}**\nGesamt Grüngeld im Umlauf: **${sumGreenMoney.toLocaleString('de-DE')}€**\nGesamt Schwarzgeld im Umlauf: **${subBlackMoney.toLocaleString('de-DE')}€**\n\n${pages[page - 1]}`,
         });
     }
 }
-

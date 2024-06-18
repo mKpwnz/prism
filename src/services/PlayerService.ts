@@ -26,15 +26,20 @@ export class PlayerService {
     public static async getAllLivePlayers(): Promise<ILivePlayer[]> {
         const livePlayers = await Cache.get<ILivePlayer[]>('livePlayers');
         if (!livePlayers) {
-            const data = await axios.get(
-                `http://${Config.ENV.RCON_HOST}:${Config.ENV.RCON_PORT}/players.json`,
-            );
-            if (data.status === 200) {
-                await Cache.set('livePlayers', data.data, 5 * 60 * 1000);
-                return data.data;
+            try {
+                const data = await axios.get(
+                    `http://${Config.ENV.RCON_HOST}:${Config.ENV.RCON_PORT}/players.json`,
+                );
+                if (data.status === 200) {
+                    await Cache.set('livePlayers', data.data, 5 * 60 * 1000);
+                    return data.data;
+                }
+                LogManager.error('Error while fetching live players from server.');
+                return [];
+            } catch (error) {
+                LogManager.error('Error while fetching live players from server.');
+                return [];
             }
-            LogManager.error('Error while fetching live players from server.');
-            return [];
         }
         return livePlayers;
     }
@@ -120,7 +125,7 @@ export class PlayerService {
 
             FROM users
                 LEFT JOIN baninfo ON users.identifier = baninfo.identifier
-                JOIN phone_phones ON users.identifier = phone_phones.id
+                LEFT JOIN phone_phones ON users.identifier = phone_phones.id
             WHERE ${filterMap.get(type)}
         `);
 

@@ -7,6 +7,7 @@ import { ILivePlayer } from '@prism/interfaces/ILivePlayer';
 import { EmoteManager } from '@prism/manager/EmoteManager';
 import { NvhxService } from '@prism/services/NvhxService';
 import { PlayerService } from '@prism/services/PlayerService';
+import { executeCommandFromMap } from '@prism/utils/DiscordCommandHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 @RegisterCommand(
@@ -55,22 +56,12 @@ export class Nvhx extends Command {
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         if (!interaction.guildId) return;
-        switch (interaction.options.getSubcommand()) {
-            case 'sc':
-                await this.captureScreenByPlayerId(interaction);
-                break;
-            case 'unban':
-                await this.unbanPlayerById(interaction);
-                break;
-            case 'checkplayerbans':
-                await this.getBannedLivePlayers(interaction);
-                break;
-            default:
-                await interaction.reply({
-                    content: 'Command nicht gefunden.',
-                    ephemeral: true,
-                });
-        }
+
+        await executeCommandFromMap(interaction, {
+            sc: () => this.captureScreenByPlayerId(interaction),
+            unban: () => this.unbanPlayerById(interaction),
+            checkplayerbans: () => this.getBannedLivePlayers(interaction),
+        });
     }
 
     private async captureScreenByPlayerId(interaction: ChatInputCommandInteraction): Promise<void> {

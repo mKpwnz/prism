@@ -4,6 +4,7 @@ import TxAdminClient from '@prism/clients/TxAdminClient';
 import { RegisterCommand } from '@prism/decorators';
 import { EENV } from '@prism/enums/EENV';
 import { EEmbedColors } from '@prism/enums/EmbedColors';
+import { executeCommandFromMap } from '@prism/utils/DiscordCommandHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 @RegisterCommand(
@@ -82,20 +83,11 @@ export class Whitelist extends Command {
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const requestId = interaction.options.getString('requestid', true);
-
-        switch (interaction.options.getSubcommand()) {
-            case 'accept':
-                await this.processRequest(requestId, 'approve');
-                break;
-            case 'deny':
-                await this.processRequest(requestId, 'deny');
-                break;
-            case 'info':
-                await this.getWhitelistInfo(requestId);
-                break;
-            default:
-                await this.replyError('Ungültiger Command');
-        }
+        await executeCommandFromMap(interaction, {
+            accept: () => this.processRequest(requestId, 'approve'),
+            deny: () => this.processRequest(requestId, 'deny'),
+            info: () => this.getWhitelistInfo(requestId),
+        });
     }
 
     async getWhitelistInfo(requestId: string): Promise<void> {
@@ -177,4 +169,3 @@ export class Whitelist extends Command {
         });
     }
 }
-
