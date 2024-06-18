@@ -63,12 +63,12 @@ export default abstract class Command {
         if (this.CheckPermissions) {
             // Check Permissions
             if (
-                (await isUserAllowed(interaction, {
+                !(await isUserAllowed(interaction, {
                     allowedChannels: this.AllowedChannels,
                     allowedGroups: this.AllowedGroups,
                     allowedUsers: this.AllowedUsers,
                     blockedUsers: this.BlockedUsers,
-                })) === false
+                }))
             )
                 return;
         }
@@ -172,4 +172,3 @@ export default abstract class Command {
         });
     }
 }
-
