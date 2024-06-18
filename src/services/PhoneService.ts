@@ -1,6 +1,7 @@
-import { IPhoneMediaCreatorResponse } from '@prism/sql/gameSchema/Phone.schema';
+import { IPhone, IPhoneMediaCreatorResponse } from '@prism/sql/gameSchema/Phone.schema';
 import { GameDB } from '@prism/sql/Database';
 import { ResultSetHeader } from 'mysql2';
+import { IValidatedPlayer } from '@prism/interfaces/IValidatedPlayer';
 
 export class PhoneService {
     public static async getMediaCreatorByLink(
@@ -22,6 +23,20 @@ export class PhoneService {
             [`%${link}%`],
         );
         return response[0];
+    }
+
+    public static async getCurrentPhonePin(
+        player: IValidatedPlayer,
+    ): Promise<string | null | Error> {
+        const [phones] = await GameDB.query<IPhone[]>('SELECT * FROM phone_phones WHERE id = ?', [
+            player.identifiers.steam,
+        ]);
+        if (!phones || phones.length === 0) {
+            return new Error(
+                `Es konnte kein Handy für den Spieler ${player.playerdata.fullname} gefunden werden.`,
+            );
+        }
+        return phones[0].pin;
     }
 
     /**

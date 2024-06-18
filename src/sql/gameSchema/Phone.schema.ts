@@ -10,6 +10,7 @@ import { RowDataPacket } from 'mysql2';
  */
 export interface IPhone extends RowDataPacket {
     id: string;
+    owner_id: string;
     phone_number: string;
     name: string | null;
     pin: string | null;

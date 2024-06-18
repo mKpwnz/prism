@@ -165,10 +165,10 @@ const BotConfig = {
     GlobalBlockedUsers: [''],
     GlobalWhitelistUsers: [
         UserConfig.SPARTA,
-        UserConfig.RIGU,
-        UserConfig.DRGRUSELIG,
-        UserConfig.KRAUTERBART,
-        UserConfig.MKMICHA,
+        // UserConfig.RIGU,
+        // UserConfig.DRGRUSELIG,
+        // UserConfig.KRAUTERBART,
+        // UserConfig.MKMICHA,
     ],
 };
 

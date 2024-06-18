@@ -4,6 +4,7 @@ import { RegisterCommand } from '@prism/decorators';
 import { EENV } from '@prism/enums/EENV';
 import { PhoneDarkchatService } from '@prism/services/PhoneDarkchatService';
 import { PhoneService } from '@prism/services/PhoneService';
+import { PlayerService } from '@prism/services/PlayerService';
 import { executeCommandFromMap } from '@prism/utils/DiscordCommandHelper';
 import { paginateApiResponse } from '@prism/utils/DiscordHelper';
 import { validatePhoneMediaUrl } from '@prism/utils/FiveMHelper';
@@ -19,6 +20,17 @@ import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
                 .setDescription('Check who created an Ingame image')
                 .addStringOption((option) =>
                     option.setName('mediaurl').setDescription('Image/Video URL').setRequired(true),
+                ),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('getpin')
+                .setDescription('Gibt den aktuellen Handy Pin des Spielers aus')
+                .addStringOption((option) =>
+                    option
+                        .setName('steamid')
+                        .setDescription('SteamID des Spielers')
+                        .setRequired(true),
                 ),
         )
         .addSubcommandGroup((subcommandGroup) =>
@@ -83,6 +95,7 @@ export class Phone extends Command {
 
         await executeCommandFromMap(interaction, {
             checkmedia: () => this.checkMediaCreator(interaction),
+            getpin: () => this.getPhonePin(interaction),
             darkchat: {
                 getmessages: () => this.getDarkchatMessages(interaction),
             },
@@ -107,6 +120,38 @@ export class Phone extends Command {
         }
         await this.replyWithEmbed({
             description: `\`\`\`json\n${JSON.stringify(mediaCreator, null, 4)}\`\`\``,
+        });
+    }
+
+    private async getPhonePin(interaction: ChatInputCommandInteraction): Promise<void> {
+        const steamID = interaction.options.getString('steamid', true);
+
+        const vPlayer = await PlayerService.validatePlayer(steamID);
+
+        if (!vPlayer) {
+            await interaction.reply({
+                content: `Es konnte kein Spieler mit der SteamID \`${steamID}\` gefunden werden!`,
+                ephemeral: true,
+            });
+            return;
+        }
+
+        const pin = await PhoneService.getCurrentPhonePin(vPlayer);
+
+        if (pin instanceof Error) {
+            await this.replyError(`Es ist ein Fehler aufgetreten: \`${pin.message}\``);
+            return;
+        }
+
+        if (!pin) {
+            await this.replyWithEmbed({
+                description: `Der Spieler **${vPlayer.playerdata.fullname}** (${steamID}) hat keinen Handy pin gesetzt.`,
+            });
+            return;
+        }
+
+        await this.replyWithEmbed({
+            description: `Der aktuelle Pin von **${vPlayer.playerdata.fullname}** (${steamID}) ist: **${pin}**`,
         });
     }
 

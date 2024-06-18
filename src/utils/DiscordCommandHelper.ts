@@ -1,4 +1,5 @@
 import { ChatInputCommandInteraction } from 'discord.js';
+import { IPermissionOptions, isUserAllowed } from './DiscordHelper';
 
 export type SubCommandHandler = (interaction: ChatInputCommandInteraction) => Promise<void>;
 
@@ -8,6 +9,14 @@ export interface SubCommandMap {
 
 export interface SubCommandGroupMap {
     [key: string]: SubCommandHandler;
+}
+
+export async function withPermissionCheck(
+    interaction: ChatInputCommandInteraction,
+    options: Omit<IPermissionOptions, 'allowedChannels'>,
+    callback: SubCommandHandler,
+): Promise<void> {
+    if ((await isUserAllowed(interaction, options)) === true) await callback(interaction);
 }
 
 async function defaultReply(interaction: ChatInputCommandInteraction): Promise<void> {
