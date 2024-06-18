@@ -63,13 +63,13 @@ export default abstract class Command {
         if (this.CheckPermissions) {
             // Check Permissions
             if (
-                (await isUserAllowed(
+                !(await isUserAllowed(
                     interaction,
                     this.AllowedChannels,
                     this.AllowedGroups,
                     this.AllowedUsers,
                     this.BlockedUsers,
-                )) === false
+                ))
             )
                 return;
         }
@@ -95,7 +95,7 @@ export default abstract class Command {
                 commandName = interaction.commandName;
             }
 
-            BotDB.insert(commandLog)
+            await BotDB.insert(commandLog)
                 .values({
                     command: commandName,
                     user: user.id,
