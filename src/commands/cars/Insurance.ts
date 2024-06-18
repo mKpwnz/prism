@@ -2,6 +2,7 @@ import Config from '@prism/Config';
 import Command from '@prism/class/Command';
 import { RegisterCommand } from '@prism/decorators';
 import { InsuranceService } from '@prism/services/InsuranceService';
+import { executeCommandFromMap } from '@prism/utils/DiscordCommandHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 @RegisterCommand(
@@ -77,20 +78,11 @@ export class Insurance extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        switch (interaction.options.getSubcommand()) {
-            case 'prüfen':
-                await this.checkInsurance(interaction);
-                break;
-            case 'hinzufügen':
-                await this.addInsurance(interaction);
-                break;
-            case 'entfernen':
-                await this.removeInsurance(interaction);
-                break;
-            default:
-                await interaction.reply({ content: 'Command nicht gefunden.', ephemeral: true });
-                break;
-        }
+        await executeCommandFromMap(interaction, {
+            prüfen: () => this.checkInsurance(interaction),
+            hinzufügen: () => this.addInsurance(interaction),
+            entfernen: () => this.removeInsurance(interaction),
+        });
     }
 
     private async checkInsurance(interaction: ChatInputCommandInteraction): Promise<void> {
