@@ -1,27 +1,41 @@
 import Config from '@prism/Config';
 import Command from '@prism/class/Command';
-import ActiveDirectoryClient from '@prism/clients/ActiveDirectoryClient';
 import { RegisterCommand } from '@prism/decorators';
 import { EENV } from '@prism/enums/EENV';
 import { executeCommandFromMap } from '@prism/utils/DiscordCommandHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import ActiveDirectoryClient from '@prism/clients/ActiveDirectoryClient';
 
 @RegisterCommand(
     new SlashCommandBuilder()
         .setName('activedirectory')
+
         .setDescription('Check Active Directory Information')
-        .addSubcommand((subcommand) =>
-            subcommand.setName('myperms').setDescription('Check your permissions'),
-        )
-        .addSubcommand((subcommand) =>
-            subcommand
-                .setName('userperms')
-                .setDescription('Check user permissions')
-                .addUserOption((option) =>
-                    option
+        .addSubcommandGroup((subcommandGroup) =>
+            subcommandGroup
+                .setName('groups')
+                .setDescription('Check groups from a user')
+                .addSubcommand((subcommand) =>
+                    subcommand.setName('me').setDescription('Check your permissions'),
+                )
+                .addSubcommand((subcommand) =>
+                    subcommand
                         .setName('user')
-                        .setDescription('User to get information about')
-                        .setRequired(true),
+                        .setDescription('Check user permissions')
+                        .addUserOption((option) =>
+                            option
+                                .setName('user')
+                                .setDescription('User to get information about')
+                                .setRequired(true),
+                        ),
+                ),
+        )
+        .addSubcommandGroup((subcommandGroup) =>
+            subcommandGroup
+                .setName('profile')
+                .setDescription('Check profile information')
+                .addSubcommand((subcommand) =>
+                    subcommand.setName('me').setDescription('Check your profile'),
                 ),
         ),
 )
@@ -39,51 +53,58 @@ export class ActiveDirectory extends Command {
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         await executeCommandFromMap(interaction, {
-            myperms: async () => {
-                const { user } = interaction;
-                const permissions = await this.getPermissionsFromUser(user.id);
-                await this.replyWithEmbed({
-                    description: `**User: ${interaction.user.displayName}\n\n**Gruppen:\n${permissions.join('\n')}`,
-                });
+            groups: {
+                me: () => this.getMyGroups(interaction),
+                user: () => this.getUserGroups(interaction),
             },
-            userperms: async () => {
-                const optUser = interaction.options.getUser('user');
-                if (!optUser) {
-                    await this.replyError('User not found');
-                    return;
-                }
-                const permissions = await this.getPermissionsFromUser(optUser.id);
-                await this.replyWithEmbed({
-                    description: `**User: ${optUser.displayName}\n\n**Gruppen:\n${permissions.join('\n')}`,
-                });
+            profile: {
+                me: () => this.getMyProfile(interaction),
             },
         });
     }
 
-    async getPermissionsFromUser(user: string): Promise<string[]> {
-        const { searchEntries } = await ActiveDirectoryClient.search(
-            'OU=Benutzer,DC=immortaldev,DC=eu',
-            {
-                scope: 'sub',
-                filter: `(&(objectclass=person)(userDiscordId=${user}))`,
-                attributes: [
-                    'cn',
-                    'distinguishedName',
-                    'sAMAccountName',
-                    'userPrincipalName',
-                    'mail',
-                    'userDiscordId',
-                    'userSteamId',
-                    'memberOf',
-                ],
-            },
-        );
-        const reponseList: string[] = [];
-        if (Array.isArray(searchEntries[0].memberOf)) {
-            searchEntries[0].memberOf.forEach((group) => {
-                if (typeof group === 'string') reponseList.push(group.split(',')[0].split('=')[1]);
-            });
+    private async getMyProfile(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { user } = interaction;
+        const adUser = await ActiveDirectoryClient.getUserByDiscordId(user.id);
+        if (adUser instanceof Error) {
+            await this.replyError(adUser.message);
+            return;
         }
-        return reponseList;
+
+        adUser.memberOf = [];
+        adUser.memberOfpretty = [];
+
+        await this.replyWithEmbed({
+            description: `${JSON.stringify(adUser, null, 4)}`,
+        });
+    }
+
+    private async getMyGroups(interaction: ChatInputCommandInteraction): Promise<void> {
+        const { user } = interaction;
+        const adUser = await ActiveDirectoryClient.getUserByDiscordId(user.id);
+        if (adUser instanceof Error) {
+            await this.replyError(adUser.message);
+            return;
+        }
+
+        await this.replyWithEmbed({
+            description: `**User: ${interaction.user.displayName}\n\n**Gruppen:\n${adUser.memberOfpretty.join('\n')}`,
+        });
+    }
+
+    private async getUserGroups(interaction: ChatInputCommandInteraction): Promise<void> {
+        const optUser = interaction.options.getUser('user');
+        if (!optUser) {
+            await this.replyError('User not found');
+            return;
+        }
+        const adUser = await ActiveDirectoryClient.getUserByDiscordId(optUser.id);
+        if (adUser instanceof Error) {
+            await this.replyError(adUser.message);
+            return;
+        }
+        await this.replyWithEmbed({
+            description: `**User: ${optUser.displayName}\n\n**Gruppen:\n${adUser.memberOfpretty.join('\n')}`,
+        });
     }
 }
