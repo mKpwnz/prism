@@ -86,6 +86,7 @@ export class CustomImageUpload {
             },
             image.url,
         );
+        if (!data) throw new Error('Error uploading image to S3');
         return {
             filename: newFilename,
             etag: data.etag,
@@ -443,4 +444,3 @@ export class CustomImageUpload {
         }
     }
 }
-
