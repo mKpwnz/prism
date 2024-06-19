@@ -26,11 +26,11 @@ export default abstract class Command {
 
     DoNotLog: boolean = false;
 
+    EmbedTitle: string = this.constructor.name;
+
     private CmdPerformanceStart: Date | undefined = undefined;
 
     private CmdPerformanceStop: Date | undefined = undefined;
-
-    EmbedTitle: string = this.constructor.name;
 
     private currentInteraction: ChatInputCommandInteraction | undefined;
 
@@ -40,7 +40,7 @@ export default abstract class Command {
         this.currentInteraction = interaction;
         const { options, user } = interaction;
 
-        // Override Channel in Devmode
+        // Override Channel in Development mode
         if (Config.ENV.NODE_ENV === 'staging') {
             this.DoNotLog = true;
             this.AllowedChannels = [

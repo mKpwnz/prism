@@ -139,7 +139,6 @@ export class DeletePhone extends Command {
         if (typeof notesAnswer === 'string') {
             insertCollection.push(notesAnswer);
         }
-
         try {
             await GameDB.execute('DELETE FROM phone_phones WHERE id = ?', [steamid]);
         } catch (error) {

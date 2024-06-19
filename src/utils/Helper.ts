@@ -74,4 +74,3 @@ export class Helper {
         return new Date(startTimeStamp);
     }
 }
-

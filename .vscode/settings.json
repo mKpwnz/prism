@@ -1,6 +1,0 @@
-{
-    "CodeGPT.apiKey": "CodeGPT Plus Beta",
-    "files.watcherExclude": {
-        "node_modules": true,
-    },
-}

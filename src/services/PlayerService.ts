@@ -8,21 +8,7 @@ import LogManager from '@prism/manager/LogManager';
 import axios from 'axios';
 import Config from '@prism/Config';
 
-/**
- * @author mKpwnz
- * @date 18.10.2023
- * @export
- * @class PlayerService
- */
 export class PlayerService {
-    /**
-     * @description Get all live players from the server and cache them for 5 minutes.
-     * @author mKpwnz
-     * @date 18.10.2023
-     * @static
-     * @returns {*}  {Promise<ILivePlayer[]>}
-     * @memberof Player
-     */
     public static async getAllLivePlayers(): Promise<ILivePlayer[]> {
         const livePlayers = await Cache.get<ILivePlayer[]>('livePlayers');
         if (!livePlayers) {
@@ -44,44 +30,16 @@ export class PlayerService {
         return livePlayers;
     }
 
-    /**
-     * @description Check if a player is Online
-     * @author mKpwnz
-     * @date 20.10.2023
-     * @static
-     * @param {string} identifier
-     * @returns {*}  {Promise<boolean>}
-     * @memberof Player
-     */
     public static async isPlayerOnline(identifier: string): Promise<boolean> {
         const livePlayers = await PlayerService.getAllLivePlayers();
         return livePlayers.some((p) => p.identifiers.indexOf(identifier) > -1);
     }
 
-    /**
-     * @description Check if a player is Online
-     * @author mKpwnz
-     * @date 20.10.2023
-     * @static
-     * @param {string} identifier
-     * @returns {*}  {Promise<boolean>}
-     * @memberof Player
-     */
     public static async getPlayerId(identifier: string): Promise<number> {
         const livePlayers = await PlayerService.getAllLivePlayers();
         return livePlayers.find((p) => p.identifiers.indexOf(identifier) > -1)?.id ?? -1;
     }
 
-    /**
-     * @description Validate a player by a given search string and type. Returns null if no player was found. Returns a ValidatedPlayer object if a player was found.
-     * @author mKpwnz
-     * @date 19.10.2023
-     * @static
-     * @param {string} searchString
-     * @param {EUniqueIdentifier} [type=EUniqueIdentifier.IDENTIFIER]
-     * @returns {*}  {(Promise<ValidatedPlayer | null>)}
-     * @memberof Player
-     */
     public static async validatePlayer(
         searchString: string,
         type: EUniqueIdentifier = EUniqueIdentifier.IDENTIFIER,
@@ -180,13 +138,6 @@ export class PlayerService {
         return userObject;
     }
 
-    /**
-     * @description Get a Validated Player by the current Online ID
-     * @static
-     * @param {number} id
-     * @returns {*}  {(Promise<IValidatedPlayer | null>)}
-     * @memberof PlayerService
-     */
     public static async getPlayerById(id: number): Promise<IValidatedPlayer | null> {
         const livePlayers = await PlayerService.getAllLivePlayers();
         const livePlayerSteamID = livePlayers

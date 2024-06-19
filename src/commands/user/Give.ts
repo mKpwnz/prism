@@ -1,11 +1,13 @@
 import Config from '@prism/Config';
 import Command from '@prism/class/Command';
 import { RconClient } from '@prism/class/RconClient';
-import { RegisterCommand } from '@prism/decorators';
+import { RegisterCommand, RegisterEvent } from '@prism/decorators';
 import { EENV } from '@prism/enums/EENV';
 import { ItemService } from '@prism/services/ItemService';
-import { validateWeaponName } from '@prism/utils/FiveMHelper';
-import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, Events, SlashCommandBuilder } from 'discord.js';
+import { ArgsOf } from '@prism/types/PrismTypes';
+import LogManager from '@prism/manager/LogManager';
+import { WeaponService } from '@prism/services/WeaponService';
 
 @RegisterCommand(
     new SlashCommandBuilder()
@@ -19,7 +21,11 @@ import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
                     option.setName('id').setDescription('ID des Spielers').setRequired(true),
                 )
                 .addStringOption((option) =>
-                    option.setName('item').setDescription('Itemname').setRequired(true),
+                    option
+                        .setName('item')
+                        .setDescription('Itemname')
+                        .setRequired(true)
+                        .setAutocomplete(true),
                 )
                 .addIntegerOption((option) =>
                     option.setName('anzahl').setDescription('Anzahl der Items').setRequired(true),
@@ -33,7 +39,11 @@ import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
                     option.setName('id').setDescription('ID des Spielers').setRequired(true),
                 )
                 .addStringOption((option) =>
-                    option.setName('waffe').setDescription('Waffenname').setRequired(true),
+                    option
+                        .setName('waffe')
+                        .setDescription('Waffenname')
+                        .setRequired(true)
+                        .setAutocomplete(true),
                 )
                 .addIntegerOption((option) =>
                     option.setName('munition').setDescription('Anzahl der Munition (Default: 300)'),
@@ -70,7 +80,6 @@ export class Give extends Command {
         }
     }
 
-    // TODO: Item Liste als Autocomplete mit einbauen
     private async giveItem(interaction: ChatInputCommandInteraction): Promise<void> {
         const id = interaction.options.getInteger('id', true);
         const item = interaction.options.getString('item', true);
@@ -83,7 +92,39 @@ export class Give extends Command {
         });
     }
 
-    // TODO: Waffenliste als Choose einbauen @Micha
+    @RegisterEvent(Events.InteractionCreate)
+    async autocompleteItemName([interaction]: ArgsOf<Events.InteractionCreate>): Promise<void> {
+        if (!interaction.isAutocomplete()) return;
+        const focusedValue = interaction.options.getFocused(true);
+        if (focusedValue.name !== 'item') return;
+
+        const items = await ItemService.getAllItems();
+
+        if (items instanceof Error) {
+            LogManager.error(items.message);
+            return;
+        }
+
+        let filtered;
+        if (focusedValue.value) {
+            filtered = items.filter(
+                (choice) =>
+                    choice.name.toLowerCase().includes(focusedValue.value.toLowerCase()) ||
+                    choice.label.toLowerCase().includes(focusedValue.value.toLowerCase()),
+            );
+        } else {
+            filtered = items;
+        }
+        await interaction.respond(
+            filtered
+                .map((item) => ({
+                    name: `${item.label} (${item.name})`,
+                    value: item.name,
+                }))
+                .slice(0, 25),
+        );
+    }
+
     private async giveWeapon(interaction: ChatInputCommandInteraction): Promise<void> {
         const id = interaction.options.getInteger('id', true);
         const waffe = interaction.options.getString('waffe', true);
@@ -92,7 +133,7 @@ export class Give extends Command {
         if (munition > 300) {
             munition = 300;
         }
-        const validateWeapon = validateWeaponName(waffe);
+        const validateWeapon = await WeaponService.validateWeaponName(waffe);
         if (!validateWeapon) {
             await this.replyError('Waffe nicht gefunden!');
             return;
@@ -111,5 +152,38 @@ export class Give extends Command {
         await this.replyWithEmbed({
             description: `Spieler ${id} sollte ${validateWeapon} mit ${munition} Munition erhalten haben!`,
         });
+    }
+
+    @RegisterEvent(Events.InteractionCreate)
+    async autocompleteWeaponName([interaction]: ArgsOf<Events.InteractionCreate>): Promise<void> {
+        if (!interaction.isAutocomplete()) return;
+        const focusedValue = interaction.options.getFocused(true);
+        if (focusedValue.name !== 'waffe') return;
+
+        const weapons = await WeaponService.getAllWeapons();
+
+        if (weapons instanceof Error) {
+            LogManager.error(weapons.message);
+            return;
+        }
+
+        let filtered;
+        if (focusedValue.value) {
+            filtered = weapons.filter(
+                (choice) =>
+                    choice.name.toLowerCase().includes(focusedValue.value.toLowerCase()) ||
+                    choice.label.toLowerCase().includes(focusedValue.value.toLowerCase()),
+            );
+        } else {
+            filtered = weapons;
+        }
+        await interaction.respond(
+            filtered
+                .map((weapon) => ({
+                    name: `${weapon.label} (${weapon.name})`,
+                    value: weapon.name,
+                }))
+                .slice(0, 25),
+        );
     }
 }

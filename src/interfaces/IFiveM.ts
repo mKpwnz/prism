@@ -11,3 +11,19 @@ export type TFiveMGarage = {
     ParkOutCoordinates: V3coords;
     VehicleType: TFiveMVehicleType;
 };
+
+export type TWeaponComponent = {
+    name: string;
+    hash: number;
+    label: string;
+};
+
+export type TWeapon = {
+    name: string;
+    label: string;
+    components: TWeaponComponent[];
+    ammo?: { hash: number; label: string };
+    tints?: {
+        [key: string]: string;
+    };
+};

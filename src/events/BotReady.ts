@@ -47,9 +47,9 @@ export class BotReady {
         }
         CommandManager.loadCommands(BotClient);
         new RconClient();
-        Config.Bot.ServerID.forEach(async (id) => {
+        for (const id of Config.Bot.ServerID) {
             await EmoteManager.updateBotEmotes(BotClient, id);
-        });
+        }
         await botStatusUpdate();
         LogManager.info('Discord ready!');
     }

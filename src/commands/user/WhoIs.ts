@@ -12,12 +12,8 @@ import { PlayerService } from '@prism/services/PlayerService';
 import { GameDB } from '@prism/sql/Database';
 import { IFindUser } from '@prism/sql/gameSchema/User.schema';
 import { Helper } from '@prism/utils/Helper';
-import {
-    AttachmentBuilder,
-    ChatInputCommandInteraction,
-    GuildEmoji,
-    SlashCommandBuilder,
-} from 'discord.js';
+import { ChatInputCommandInteraction, GuildEmoji, SlashCommandBuilder } from 'discord.js';
+import { attachmentFromJson } from '@prism/utils/DiscordHelper';
 
 @RegisterCommand(
     new SlashCommandBuilder()
@@ -147,10 +143,7 @@ export class WhoIs extends Command {
         if (file === true) {
             // create JSON File and send it to client
             const jsonString = JSON.stringify(findUsers, null, 4);
-            const buffer = Buffer.from(jsonString, 'utf-8');
-            const attachment = new AttachmentBuilder(buffer, {
-                name: `${identifierValue}.json`,
-            });
+            const attachment = attachmentFromJson(jsonString, identifierValue);
             channel?.send({
                 content: `${interaction.user.toString()}`,
                 files: [attachment],
