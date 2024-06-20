@@ -36,11 +36,7 @@ export default abstract class Command {
 
     abstract execute(interaction: ChatInputCommandInteraction): Promise<void>;
 
-    async run(interaction: ChatInputCommandInteraction): Promise<void> {
-        this.currentInteraction = interaction;
-        const { options, user } = interaction;
-
-        // Override Channel in Development mode
+    private envOverrides() {
         if (Config.ENV.NODE_ENV === 'staging') {
             this.DoNotLog = true;
             this.AllowedChannels = [
@@ -50,6 +46,7 @@ export default abstract class Command {
             ];
             this.AllowedGroups = [Config.Groups.DEV.BOTTEST];
         }
+
         if (Config.ENV.NODE_ENV === 'development') {
             this.DoNotLog = true;
             this.AllowedChannels = [
@@ -59,9 +56,46 @@ export default abstract class Command {
             ];
             this.AllowedGroups = [Config.Groups.DEV.BOTTEST];
         }
+    }
+
+    private async logCommand(interaction: ChatInputCommandInteraction) {
+        let { commandName } = interaction;
+        const { options, user, channelId } = interaction;
+        const inputFields: { name: string; value: string }[] = [];
+        options.data.forEach((input) => {
+            const d = JSON.parse(JSON.stringify(input));
+            inputFields.push({ name: d.name, value: d.value });
+        });
+        const cmdPrint = {
+            user: {
+                displayame: user.displayName,
+                id: user.id,
+            },
+            command: commandName,
+            options: inputFields,
+        };
+
+        if (options.getSubcommand(false)) {
+            commandName += ` ${options.getSubcommand()}`;
+        }
+
+        await BotDB.insert(commandLog)
+            .values({
+                command: commandName,
+                user: user.id,
+                channel: channelId,
+                options: cmdPrint.options,
+                jsonData: cmdPrint,
+            })
+            .execute();
+    }
+
+    async run(interaction: ChatInputCommandInteraction): Promise<void> {
+        this.currentInteraction = interaction;
+
+        this.envOverrides();
 
         if (this.CheckPermissions) {
-            // Check Permissions
             if (
                 !(await isUserAllowed(interaction, {
                     allowedChannels: this.AllowedChannels,
@@ -73,37 +107,8 @@ export default abstract class Command {
                 return;
         }
 
-        const inputFields: { name: string; value: string }[] = [];
-        options.data.forEach((input) => {
-            const d = JSON.parse(JSON.stringify(input));
-            inputFields.push({ name: d.name, value: d.value });
-        });
-        const cmdPrint = {
-            user: {
-                displayame: user.displayName,
-                id: user.id,
-            },
-            command: interaction.commandName,
-            options: inputFields,
-        };
-        let { commandName } = interaction;
-        if (!this.DoNotLog) {
-            if (interaction.options.getSubcommand(false)) {
-                commandName += ` ${interaction.options.getSubcommand()}`;
-            } else {
-                commandName = interaction.commandName;
-            }
+        if (!this.DoNotLog) this.logCommand(interaction);
 
-            await BotDB.insert(commandLog)
-                .values({
-                    command: commandName,
-                    user: user.id,
-                    channel: interaction.channelId,
-                    options: cmdPrint.options,
-                    jsonData: cmdPrint,
-                })
-                .execute();
-        }
         try {
             this.CmdPerformanceStart = new Date();
             setTimeout(async () => {
@@ -113,7 +118,24 @@ export default abstract class Command {
             await this.execute(interaction);
             this.currentInteraction = undefined;
         } catch (error) {
-            Sentry.captureException(error);
+            const inputFields: { name: string; value: string }[] = [];
+            interaction.options.data.forEach((input) => {
+                const d = JSON.parse(JSON.stringify(input));
+                inputFields.push({ name: d.name, value: d.value });
+            });
+
+            Sentry.captureException(error, {
+                user: {
+                    id: interaction.user.id,
+                    username: interaction.user.username,
+                },
+                tags: {
+                    command: interaction.commandName,
+                },
+                extra: {
+                    parameters: inputFields,
+                },
+            });
             const errobj: { [k: string]: any } = {};
             if (error instanceof Error) {
                 errobj.name = error.name;

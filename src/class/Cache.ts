@@ -1,12 +1,5 @@
-import { MemoryCache, MemoryStore, caching } from 'cache-manager';
+import { caching, MemoryCache, MemoryStore } from 'cache-manager';
 
-/**
- * @description Cache Klasse für den MemCache. (https://www.npmjs.com/package/cache-manager)
- * @author mKpwnz
- * @date 15.10.2023
- * @export
- * @class Cache
- */
 export class Cache {
     private static mc: MemoryCache;
 
