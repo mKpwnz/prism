@@ -1,10 +1,9 @@
 import Config from '@prism/Config';
 import Command from '@prism/class/Command';
-import { PerformanceProfiler } from '@prism/class/PerformanceProfiler';
-import ActiveDirectoryClient from '@prism/clients/ActiveDirectoryClient';
 import { RegisterCommand } from '@prism/decorators';
 import { EENV } from '@prism/enums/EENV';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { BackupService } from '@prism/services/BackupService';
 
 @RegisterCommand(
     new SlashCommandBuilder()
@@ -31,69 +30,9 @@ export class TestCommand extends Command {
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
-        const optUser = interaction.options.getUser('user');
-        if (!optUser) {
-            await this.replyError('User not found');
-            return;
-        }
-
-        const profiler = new PerformanceProfiler('TestCommand');
-        const { searchEntries } = await ActiveDirectoryClient.search(
-            'OU=Benutzer,DC=immortaldev,DC=eu',
-            {
-                scope: 'sub',
-                filter: `(&(objectclass=person)(userDiscordId=${optUser.id}))`,
-                attributes: [
-                    'cn',
-                    'distinguishedName',
-                    'sAMAccountName',
-                    'userPrincipalName',
-                    'mail',
-                    'userDiscordId',
-                    'userSteamId',
-                    'memberOf',
-                ],
-            },
-        );
-        const reponseList: string[] = [];
-        if (Array.isArray(searchEntries[0].memberOf)) {
-            searchEntries[0].memberOf.forEach((group) => {
-                if (typeof group === 'string') reponseList.push(group.split(',')[0].split('=')[1]);
-            });
-        }
-        // console.log(searchEntries[0].memberOf);
-
-        // const livePlayer = await PlayerService.getPlayerById(1);
-        // await this.ad.bind({
-        //     user: process.env.ACTIVEDIRECTORY_USER || '',
-        //     pass: process.env.ACTIVEDIRECTORY_PASS || '',
-        // });
-        // const result = await this.ad.query({
-        //     base: 'OU=Benutzer,DC=immortaldev,DC=eu',
-        //     options: {
-        //         filter: `(&(objectclass=person)(userDiscordId=${interaction.user.id}))`,
-        //         scope: 'sub',
-        //         paged: true,
-        //     },
-        // });
-        // const _attri: { [key: string]: string } = {};
-        // const filterAttributes: string[] = [
-        //     'cn',
-        //     'distinguishedName',
-        //     'sAMAccountName',
-        //     'userPrincipalName',
-        //     'mail',
-        //     'userDiscordId',
-        //     'userSteamId',
-        // ];
-        // result[0].attributes.forEach((attr) => {
-        //     if (filterAttributes.includes(attr.type)) {
-        //         _attri[attr.type] = attr.vals[0];
-        //     }
-        // });
+        await BackupService.backupUser('steam:1100001037c4109');
         await this.replyWithEmbed({
-            description: `**User: ${optUser.displayName}\n\n**Gruppen:\n${reponseList.join('\n')}`,
+            description: `**test**`,
         });
-        await profiler.sendEmbed(interaction.channelId, interaction.user);
     }
 }

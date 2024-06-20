@@ -4,7 +4,7 @@ import { Client, ItemBucketMetadata } from 'minio';
 import { Sentry } from '@prism/Bot';
 
 export default class S3Client {
-    private static s3client: Client = new Client({
+    public static s3client: Client = new Client({
         endPoint: Config.ENV.MINIO_ENDPOINT,
         port: Config.ENV.MINIO_PORT,
         useSSL: Config.ENV.MINIO_SSL,

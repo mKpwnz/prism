@@ -1,13 +1,5 @@
 import { RowDataPacket } from 'mysql2';
 
-/**
- * @description
- * @author mKpwnz
- * @date 15.10.2023
- * @export
- * @interface IPhone
- * @extends {RowDataPacket}
- */
 export interface IPhone extends RowDataPacket {
     id: string;
     owner_id: string;
@@ -21,14 +13,6 @@ export interface IPhone extends RowDataPacket {
     battery: number;
 }
 
-/**
- * @description
- * @author mKpwnz
- * @date 15.10.2023
- * @export
- * @interface IPhoneDarkchatAccounts
- * @extends {RowDataPacket}
- */
 export interface IPhoneDarkchatAccounts extends RowDataPacket {
     phone_number: number;
     username: string;
@@ -57,14 +41,6 @@ export interface IPhoneDarkchatSearch extends RowDataPacket {
     timestamp: Date;
 }
 
-/**
- * @description
- * @author mKpwnz
- * @date 15.10.2023
- * @export
- * @interface IPhoneInstagramAccounts
- * @extends {RowDataPacket}
- */
 export interface IPhoneInstagramAccounts extends RowDataPacket {
     displayname: string;
     username: string;
@@ -86,14 +62,6 @@ export interface IPhoneInstagramPosts extends RowDataPacket {
     timestamp: Date;
 }
 
-/**
- * @description
- * @author mKpwnz
- * @date 19.10.2023
- * @export
- * @interface IPhoneMediaCreatorResponse
- * @extends {RowDataPacket}
- */
 export interface IPhoneMediaCreatorResponse extends RowDataPacket {
     firstname: string;
     lastname: string;

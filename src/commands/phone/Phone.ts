@@ -33,6 +33,7 @@ import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
                         .setRequired(true),
                 ),
         )
+
         .addSubcommandGroup((subcommandGroup) =>
             subcommandGroup
                 .setName('darkchat')
