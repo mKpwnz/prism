@@ -6,6 +6,7 @@ import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import Config from '@prism/Config';
 import * as bodyParser from 'body-parser';
+import v2Router from '@prism/web/router/api/v2/Router';
 import handleError from './middleware/ErrorHandler';
 import v1Router from './router/api/v1/Router';
 
@@ -27,6 +28,7 @@ export class ExpressApp {
             res.redirect(301, '/api/v1/commandhelplist');
         });
         this.app.use('/api/v1', v1Router);
+        this.app.use('/api/v2', v2Router);
 
         if (Config.ENV.NODE_ENV === 'development') this.app.use(errorhandler());
         this.app.use(handleError);

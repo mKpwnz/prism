@@ -51,18 +51,20 @@ export class VehiclePop extends Command {
         if (!noexport) {
             const reponseList = [];
             for (const vehicle of vehicles) {
-                const vehData = JSON.parse(vehicle.vehicle);
-                reponseList.push({
-                    owner: vehicle.owner,
-                    plate: vehicle.plate,
-                    garage: vehicle.garage,
-                    model: vehData.model,
-                    modelName: vehData.modelName,
-                    modTurbo: vehData.modTurbo,
-                    modEngine: vehData.modEngine,
-                    modTransmission: vehData.modTransmission,
-                    modSuspension: vehData.modSuspension,
-                });
+                if (vehicle.vehicle) {
+                    const vehData = JSON.parse(vehicle.vehicle);
+                    reponseList.push({
+                        owner: vehicle.owner,
+                        plate: vehicle.plate,
+                        garage: vehicle.garage,
+                        model: vehData.model,
+                        modelName: vehData.modelName,
+                        modTurbo: vehData.modTurbo,
+                        modEngine: vehData.modEngine,
+                        modTransmission: vehData.modTransmission,
+                        modSuspension: vehData.modSuspension,
+                    });
+                }
             }
             attachments.push(attachmentFromObject(reponseList, 'VehiclePopBackup'));
         }
@@ -74,4 +76,3 @@ export class VehiclePop extends Command {
         });
     }
 }
-
