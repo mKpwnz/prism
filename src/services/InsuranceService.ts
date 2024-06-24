@@ -1,5 +1,5 @@
 import { GameDB } from '@prism/sql/Database';
-import { IInsurance } from '@prism/sql/gameSchema/Versicherung.schema';
+import { IInsurance } from '@prism/sql/gameSchema/Insurance.schema';
 import { formatPlate } from '@prism/utils/FiveMHelper';
 import { ResultSetHeader } from 'mysql2';
 

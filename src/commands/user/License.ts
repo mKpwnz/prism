@@ -8,11 +8,11 @@ import { IValidatedPlayer } from '@prism/typings/interfaces/IValidatedPlayer';
 import LogManager from '@prism/manager/LogManager';
 import { PlayerService } from '@prism/services/PlayerService';
 import { GameDB } from '@prism/sql/Database';
-import { IUserLicense } from '@prism/sql/gameSchema/UserLicense.schema';
 import { NonEmptyArray } from '@prism/typings/NonEmptyArray';
 import { Helper } from '@prism/utils/Helper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
+import { IUserLicense } from '@prism/sql/gameSchema/User.schema';
 
 @RegisterCommand(
     new SlashCommandBuilder()

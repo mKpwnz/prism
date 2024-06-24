@@ -4,14 +4,13 @@ import { RegisterCommand } from '@prism/decorators';
 import { EENV } from '@prism/typings/enums/EENV';
 import { PlayerService } from '@prism/services/PlayerService';
 import { GameDB } from '@prism/sql/Database';
-import { IElection, IVote } from '@prism/sql/gameSchema/Election.schema';
-import { IElectionParticipant } from '@prism/sql/gameSchema/ElectionParticipant.schema';
 import { sendToChannel } from '@prism/utils/DiscordHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ResultSetHeader } from 'mysql2';
 import { executeCommandFromMap } from '@prism/utils/DiscordCommandHelper';
 import S3Client from '@prism/clients/S3Client';
 import { getElectionChart } from '@prism/chats/Election.chart';
+import { IElection, IElectionParticipant, IVote } from '@prism/sql/gameSchema/Election.schema';
 
 @RegisterCommand(
     new SlashCommandBuilder()

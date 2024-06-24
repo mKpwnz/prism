@@ -9,7 +9,6 @@ import { ResultSetHeader } from 'mysql2';
 
 export class VehicleService {
     public static async getVehicleByPlate(plate: string): Promise<IVehicle | Error> {
-        console.log('plate', `+${plate}+`);
         const [vehicles] = await GameDB.query<IVehicle[]>(
             `SELECT * FROM owned_vehicles WHERE plate = ?`,
             [formatPlate(plate)],

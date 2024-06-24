@@ -1,13 +1,5 @@
 import { RowDataPacket } from 'mysql2';
 
-/**
- * @description
- * @author mKpwnz
- * @date 19.10.2023
- * @export
- * @interface IValidatedPlayerResponse
- * @extends {RowDataPacket}
- */
 export interface IValidatedPlayerResponse extends RowDataPacket {
     steamnames_current: string;
     steamnames_atFirstLogin: string;

@@ -1,4 +1,4 @@
-import { IPhone, IPhoneMediaCreatorResponse } from '@prism/sql/gameSchema/Phone.schema';
+import { IPhone, IPhone_SQL_MediaCreatorResponse } from '@prism/sql/gameSchema/Phone.schema';
 import { GameDB } from '@prism/sql/Database';
 import { ResultSetHeader } from 'mysql2';
 import { IValidatedPlayer } from '@prism/typings/interfaces/IValidatedPlayer';
@@ -6,8 +6,8 @@ import { IValidatedPlayer } from '@prism/typings/interfaces/IValidatedPlayer';
 export class PhoneService {
     public static async getMediaCreatorByLink(
         link: string,
-    ): Promise<IPhoneMediaCreatorResponse | undefined> {
-        const [response] = await GameDB.query<IPhoneMediaCreatorResponse[]>(
+    ): Promise<IPhone_SQL_MediaCreatorResponse | undefined> {
+        const [response] = await GameDB.query<IPhone_SQL_MediaCreatorResponse[]>(
             `
                 SELECT u.firstname,
                        u.lastname,
@@ -39,18 +39,15 @@ export class PhoneService {
         return phones[0].pin;
     }
 
-    /**
-     * @description Deletes a phone from the database by the identifier.
-     * @static
-     * @param {string} identifier - The identifier of the phone to be deleted.
-     * @returns {Promise<boolean>} A Promise that resolves to true if the phone was successfully deleted, or false otherwise.
-     * @memberof PhoneService
-     */
     public static async deletePhoneByIdentifier(identifier: string): Promise<boolean> {
         const [result] = await GameDB.query<ResultSetHeader>(
             'DELETE FROM phone_phones WHERE id = ?',
             [identifier],
         );
         return result.affectedRows > 0;
+    }
+
+    public static async getPhoneDataByPlayer(player: IValidatedPlayer): Promise<IPhone | Error> {
+        return new Error('Not implemented yet');
     }
 }
