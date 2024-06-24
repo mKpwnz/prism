@@ -75,6 +75,10 @@ export default abstract class Command {
             options: inputFields,
         };
 
+        if (options.getSubcommandGroup(false)) {
+            commandName += ` ${options.getSubcommandGroup()}`;
+        }
+
         if (options.getSubcommand(false)) {
             commandName += ` ${options.getSubcommand()}`;
         }

@@ -1,4 +1,8 @@
-import { IPhone, IPhone_SQL_MediaCreatorResponse } from '@prism/sql/gameSchema/Phone.schema';
+import {
+    IPhone,
+    IPhone_SQL_MediaCreatorResponse,
+    IPhoneFullData,
+} from '@prism/sql/gameSchema/Phone.schema';
 import { GameDB } from '@prism/sql/Database';
 import { ResultSetHeader } from 'mysql2';
 import { IValidatedPlayer } from '@prism/typings/interfaces/IValidatedPlayer';
@@ -47,7 +51,24 @@ export class PhoneService {
         return result.affectedRows > 0;
     }
 
-    public static async getPhoneDataByPlayer(player: IValidatedPlayer): Promise<IPhone | Error> {
+    public static async getPhoneDataByPlayer(
+        player: IValidatedPlayer,
+    ): Promise<IPhoneFullData | Error> {
         return new Error('Not implemented yet');
+    }
+
+    public static async getPhoneByNumber(phoneNumber: string): Promise<IPhone | null> {
+        const [phones] = await GameDB.query<IPhone[]>(
+            'SELECT * FROM phone_phones WHERE phone_number = ?',
+            [phoneNumber],
+        );
+        return phones[0] ?? null;
+    }
+
+    public static async getPhoneBySteamID(steamID: string): Promise<IPhone | null> {
+        const [phones] = await GameDB.query<IPhone[]>('SELECT * FROM phone_phones WHERE id = ?', [
+            steamID,
+        ]);
+        return phones[0] ?? null;
     }
 }

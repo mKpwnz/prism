@@ -397,3 +397,5 @@ export interface IPhone_SQL_MediaCreatorResponse extends RowDataPacket {
     phoneNumber: string;
     timestamp: string;
 }
+
+export interface IPhoneFullData {}

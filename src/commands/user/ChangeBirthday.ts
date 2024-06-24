@@ -37,10 +37,12 @@ export class ChangeBirthday extends Command {
         this.AllowedGroups = [
             Config.Groups.PROD.SERVERENGINEER,
             Config.Groups.PROD.IC_SUPERADMIN,
+            Config.Groups.PROD.IC_HADMIN,
+            Config.Groups.PROD.IC_ADMIN,
 
             Config.Groups.PROD.BOT_DEV,
         ];
-        this.AllowedUsers = [Config.Users.L33V33N, Config.Users.ZMASTER, Config.Users.MANU];
+        this.AllowedUsers = [Config.Users.L33V33N, Config.Users.ZMASTER];
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

@@ -36,6 +36,7 @@ export class Rename extends Command {
         this.AllowedGroups = [
             Config.Groups.PROD.SERVERENGINEER,
             Config.Groups.PROD.IC_SUPERADMIN,
+            Config.Groups.PROD.IC_HADMIN,
 
             Config.Groups.PROD.BOT_DEV,
         ];
