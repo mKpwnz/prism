@@ -5,7 +5,7 @@ import { EENV } from '@prism/typings/enums/EENV';
 import { ChatInputCommandInteraction, Events, SlashCommandBuilder } from 'discord.js';
 import { BotDB } from '@prism/sql/Database';
 import { commandLog } from '@prism/sql/botSchema/BotSchema';
-import { and, desc, eq, InferSelectModel } from 'drizzle-orm';
+import { and, desc, eq, like, sql } from 'drizzle-orm';
 import { paginateApiResponse } from '@prism/utils/DiscordHelper';
 import { ArgsOf } from '@prism/typings/PrismTypes';
 import { HelpService } from '@prism/services/HelpService';
@@ -22,6 +22,13 @@ import { HelpService } from '@prism/services/HelpService';
         )
         .addStringOption((option) =>
             option.setName('commandname').setDescription('Filter by Command').setAutocomplete(true),
+        )
+        .addStringOption((option) =>
+            option
+                .setName('optionsfilter')
+                .setDescription(
+                    'Freitext Filter für die Argumente. Bsp. eine SteamID für die ein Command ausgeführt wurde.',
+                ),
         )
         .addIntegerOption((option) => option.setName('page').setDescription('Page number')),
 )
@@ -45,21 +52,19 @@ export class History extends Command {
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {
         const user = interaction.options.getUser('user', true);
         const page = interaction.options.getInteger('page') ?? 1;
-        const commandFilter = interaction.options.getString('commandname');
+        const commandFilter = interaction.options.getString('commandname') ?? '';
+        const optionFilter = interaction.options.getString('optionsfilter') ?? '';
 
-        let history: InferSelectModel<typeof commandLog>[] = [];
-
-        if (commandFilter) {
-            history = await BotDB.select()
-                .from(commandLog)
-                .where(and(eq(commandLog.user, user.id), eq(commandLog.command, commandFilter)))
-                .orderBy(desc(commandLog.id));
-        } else {
-            history = await BotDB.select()
-                .from(commandLog)
-                .where(eq(commandLog.user, user.id))
-                .orderBy(desc(commandLog.id));
-        }
+        const history = await BotDB.select()
+            .from(commandLog)
+            .where(
+                and(
+                    eq(commandLog.user, user.id),
+                    like(commandLog.command, `%${commandFilter}%`),
+                    sql`${commandLog.options}::text ilike ${`%${optionFilter}%`}`,
+                ),
+            )
+            .orderBy(desc(commandLog.id));
 
         if (!history.length) {
             await this.replyError('No history found for this user');
