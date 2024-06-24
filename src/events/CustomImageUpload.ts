@@ -2,12 +2,12 @@ import { Sentry } from '@prism/Bot';
 import Config, { envBasedVariable } from '@prism/Config';
 import S3Client from '@prism/clients/S3Client';
 import { RegisterEvent } from '@prism/decorators';
-import { EUniqueIdentifier } from '@prism/enums/ESearchType';
-import { EEmbedColors } from '@prism/enums/EmbedColors';
+import { EUniqueIdentifier } from '@prism/typings/enums/ESearchType';
+import { EEmbedColors } from '@prism/typings/enums/EmbedColors';
 import LogManager from '@prism/manager/LogManager';
 import { PlayerService } from '@prism/services/PlayerService';
 import { GameDB } from '@prism/sql/Database';
-import { ArgsOf } from '@prism/types/PrismTypes';
+import { ArgsOf } from '@prism/typings/PrismTypes';
 import { getEmbedBase } from '@prism/utils/DiscordHelper';
 import { Helper } from '@prism/utils/Helper';
 import {

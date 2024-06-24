@@ -1,5 +1,5 @@
 import Config from '@prism/Config';
-import { EEmbedColors } from '@prism/enums/EmbedColors';
+import { EEmbedColors } from '@prism/typings/enums/EmbedColors';
 import LogManager from '@prism/manager/LogManager';
 import { getEmbedBase } from '@prism/utils/DiscordHelper';
 import { AlignmentEnum, AsciiTable3 } from 'ascii-table3';
@@ -77,4 +77,3 @@ export class PerformanceProfiler {
         LogManager.info(table.toString());
     }
 }
-

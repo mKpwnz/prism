@@ -3,10 +3,10 @@ import Config from '@prism/Config';
 import Command from '@prism/class/Command';
 import { GitlabClient } from '@prism/clients/GitlabClient';
 import { RegisterCommand, RegisterEvent } from '@prism/decorators';
-import { EENV } from '@prism/enums/EENV';
-import { EEmbedColors } from '@prism/enums/EmbedColors';
+import { EENV } from '@prism/typings/enums/EENV';
+import { EEmbedColors } from '@prism/typings/enums/EmbedColors';
 import LogManager from '@prism/manager/LogManager';
-import { ArgsOf } from '@prism/types/PrismTypes';
+import { ArgsOf } from '@prism/typings/PrismTypes';
 import { getEmbedBase } from '@prism/utils/DiscordHelper';
 import {
     ActionRowBuilder,
@@ -415,4 +415,3 @@ export class Issue extends Command {
         }
     }
 }
-

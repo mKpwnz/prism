@@ -1,5 +1,5 @@
 import Command from '@prism/class/Command';
-import { EENV } from '@prism/enums/EENV';
+import { EENV } from '@prism/typings/enums/EENV';
 import { Client, Events, REST, Routes } from 'discord.js';
 
 import '@prism/commands';
@@ -9,7 +9,7 @@ import Config from '@prism/Config';
 import { RegisterEvent } from '@prism/decorators';
 import { CommandRegistry } from '@prism/decorators/RegisterCommand';
 import BotCommandNotValidError from '@prism/error/BotCommandNotValid.error';
-import { ArgsOf, PrismSCB } from '@prism/types/PrismTypes';
+import { ArgsOf, PrismSCB } from '@prism/typings/PrismTypes';
 import LogManager from './LogManager';
 
 export default class CommandManager {

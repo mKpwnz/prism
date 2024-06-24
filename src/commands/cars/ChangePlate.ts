@@ -1,8 +1,8 @@
 import Config from '@prism/Config';
 import Command from '@prism/class/Command';
 import { RegisterCommand } from '@prism/decorators';
-import { EENV } from '@prism/enums/EENV';
-import { EEmbedColors } from '@prism/enums/EmbedColors';
+import { EENV } from '@prism/typings/enums/EENV';
+import { EEmbedColors } from '@prism/typings/enums/EmbedColors';
 import { VehicleService } from '@prism/services/VehicleService';
 import { formatPlate } from '@prism/utils/FiveMHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
@@ -62,4 +62,3 @@ export class ChangePlate extends Command {
         });
     }
 }
-

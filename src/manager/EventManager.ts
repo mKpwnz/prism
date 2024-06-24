@@ -1,6 +1,6 @@
 import { EventRegistry } from '@prism/decorators';
 import '@prism/events';
-import { ArgsOf, DiscordEvents, PrismEvent } from '@prism/types/PrismTypes';
+import { ArgsOf, DiscordEvents, PrismEvent } from '@prism/typings/PrismTypes';
 import { Client } from 'discord.js';
 import LogManager from './LogManager';
 

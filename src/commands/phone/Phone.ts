@@ -1,7 +1,7 @@
 import Command from '@prism/class/Command';
 import Config from '@prism/Config';
 import { RegisterCommand } from '@prism/decorators';
-import { EENV } from '@prism/enums/EENV';
+import { EENV } from '@prism/typings/enums/EENV';
 import { PhoneDarkchatService } from '@prism/services/PhoneDarkchatService';
 import { PhoneService } from '@prism/services/PhoneService';
 import { PlayerService } from '@prism/services/PlayerService';

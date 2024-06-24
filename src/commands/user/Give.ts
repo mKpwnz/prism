@@ -2,10 +2,10 @@ import Config from '@prism/Config';
 import Command from '@prism/class/Command';
 import { RconClient } from '@prism/class/RconClient';
 import { RegisterCommand, RegisterEvent } from '@prism/decorators';
-import { EENV } from '@prism/enums/EENV';
+import { EENV } from '@prism/typings/enums/EENV';
 import { ItemService } from '@prism/services/ItemService';
 import { ChatInputCommandInteraction, Events, SlashCommandBuilder } from 'discord.js';
-import { ArgsOf } from '@prism/types/PrismTypes';
+import { ArgsOf } from '@prism/typings/PrismTypes';
 import LogManager from '@prism/manager/LogManager';
 import { WeaponService } from '@prism/services/WeaponService';
 

@@ -4,8 +4,8 @@ import {
     TxAdminApiResponse,
     TxAdminDatabaseWhitelistRequestsType,
     TxAdminPlayerResponse,
-} from '@prism/interfaces/ITxAdmin';
-import { IValidatedPlayer } from '@prism/interfaces/IValidatedPlayer';
+} from '@prism/typings/interfaces/ITxAdmin';
+import { IValidatedPlayer } from '@prism/typings/interfaces/IValidatedPlayer';
 import LogManager from '@prism/manager/LogManager';
 import { isTxAdminPlayerResponse, isTxAdminWhitelistRequests } from '@prism/utils/TxAdminHelper';
 import axios from 'axios';
@@ -208,4 +208,3 @@ class TxAdminClient {
 }
 
 export default TxAdminClient;
-

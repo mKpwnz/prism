@@ -1,7 +1,7 @@
 import Config from '@prism/Config';
 import Command from '@prism/class/Command';
 import { RegisterCommand } from '@prism/decorators';
-import { EENV } from '@prism/enums/EENV';
+import { EENV } from '@prism/typings/enums/EENV';
 import { PlayerService } from '@prism/services/PlayerService';
 import { GameDB } from '@prism/sql/Database';
 import { IHousing } from '@prism/sql/gameSchema/Housing.schema';

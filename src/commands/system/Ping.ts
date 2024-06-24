@@ -2,7 +2,7 @@ import Config from '@prism/Config';
 import Command from '@prism/class/Command';
 import { PerformanceProfiler } from '@prism/class/PerformanceProfiler';
 import { RegisterCommand } from '@prism/decorators';
-import { EENV } from '@prism/enums/EENV';
+import { EENV } from '@prism/typings/enums/EENV';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 
 @RegisterCommand(new SlashCommandBuilder().setName('ping').setDescription('Pong!'))

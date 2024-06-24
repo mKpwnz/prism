@@ -1,9 +1,9 @@
 import { RconClient } from '@prism/class/RconClient';
 import GameserverClient from '@prism/clients/GameserverClient';
-import { TFiveMVehicleType } from '@prism/interfaces/IFiveM';
+import { TFiveMVehicleType } from '@prism/typings/interfaces/IFiveM';
 import { IVehicle } from '@prism/sql/gameSchema/Vehicle.schema';
 import { formatPlate, generateOAAThash, validatePlate } from '@prism/utils/FiveMHelper';
-import { IValidatedPlayer } from '@prism/interfaces/IValidatedPlayer';
+import { IValidatedPlayer } from '@prism/typings/interfaces/IValidatedPlayer';
 import { GameDB } from '@prism/sql/Database';
 import { ResultSetHeader } from 'mysql2';
 

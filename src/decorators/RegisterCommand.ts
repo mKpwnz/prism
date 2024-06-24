@@ -1,6 +1,6 @@
 import Command from '@prism/class/Command';
 import BotCommandNotValidError from '@prism/error/BotCommandNotValid.error';
-import { PrismSCB } from '@prism/types/PrismTypes';
+import { PrismSCB } from '@prism/typings/PrismTypes';
 
 export const CommandRegistry: { scb: PrismSCB; Cmd: any }[] = [];
 

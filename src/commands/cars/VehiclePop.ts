@@ -1,7 +1,7 @@
 import Config from '@prism/Config';
 import Command from '@prism/class/Command';
-import { EENV } from '@prism/enums/EENV';
-import { EEmbedColors } from '@prism/enums/EmbedColors';
+import { EENV } from '@prism/typings/enums/EENV';
+import { EEmbedColors } from '@prism/typings/enums/EmbedColors';
 import { attachmentFromObject } from '@prism/utils/DiscordHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { VehicleService } from '@prism/services/VehicleService';

@@ -1,6 +1,6 @@
 import Command from '@prism/class/Command';
 import { RconClient } from '@prism/class/RconClient';
-import { EENV } from '@prism/enums/EENV';
+import { EENV } from '@prism/typings/enums/EENV';
 
 import Config from '@prism/Config';
 import { RegisterCommand } from '@prism/decorators';

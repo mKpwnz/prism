@@ -1,7 +1,7 @@
 import { Sentry } from '@prism/Bot';
 import Config from '@prism/Config';
 import { Cache } from '@prism/class/Cache';
-import { TFiveMGarage, TWeapon } from '@prism/interfaces/IFiveM';
+import { TFiveMGarage, TWeapon } from '@prism/typings/interfaces/IFiveM';
 import LogManager from '@prism/manager/LogManager';
 import axios from 'axios';
 

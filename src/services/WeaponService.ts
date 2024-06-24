@@ -1,5 +1,5 @@
 import GameserverClient from '@prism/clients/GameserverClient';
-import { TWeapon } from '@prism/interfaces/IFiveM';
+import { TWeapon } from '@prism/typings/interfaces/IFiveM';
 
 export class WeaponService {
     public static async getAllWeapons(): Promise<TWeapon[]> {

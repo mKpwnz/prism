@@ -1,6 +1,6 @@
-import { IValidatedPlayer } from '@prism/interfaces/IValidatedPlayer';
-import { EUniqueIdentifier } from '@prism/enums/ESearchType';
-import { ILivePlayer } from '@prism/interfaces/ILivePlayer';
+import { IValidatedPlayer } from '@prism/typings/interfaces/IValidatedPlayer';
+import { EUniqueIdentifier } from '@prism/typings/enums/ESearchType';
+import { ILivePlayer } from '@prism/typings/interfaces/ILivePlayer';
 import { GameDB } from '@prism/sql/Database';
 import { IValidatedPlayerResponse } from '@prism/sql/gameSchema/Player.schema';
 import { Cache } from '@prism/class/Cache';

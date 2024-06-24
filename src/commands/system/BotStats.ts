@@ -1,7 +1,7 @@
 import Config from '@prism/Config';
 import Command from '@prism/class/Command';
 import { RegisterCommand } from '@prism/decorators';
-import { EENV } from '@prism/enums/EENV';
+import { EENV } from '@prism/typings/enums/EENV';
 import { BotDB } from '@prism/sql/Database';
 import { commandLog } from '@prism/sql/botSchema/BotSchema';
 import { AlignmentEnum, AsciiTable3 } from 'ascii-table3';

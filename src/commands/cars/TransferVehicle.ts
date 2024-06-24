@@ -2,10 +2,10 @@ import Config from '@prism/Config';
 import Command from '@prism/class/Command';
 import GameserverClient from '@prism/clients/GameserverClient';
 import { RegisterCommand, RegisterEvent } from '@prism/decorators';
-import { EENV } from '@prism/enums/EENV';
+import { EENV } from '@prism/typings/enums/EENV';
 import LogManager from '@prism/manager/LogManager';
 import { VehicleService } from '@prism/services/VehicleService';
-import { ArgsOf } from '@prism/types/PrismTypes';
+import { ArgsOf } from '@prism/typings/PrismTypes';
 import { ChatInputCommandInteraction, Events, SlashCommandBuilder } from 'discord.js';
 
 @RegisterCommand(
@@ -120,4 +120,3 @@ export class TransferVehicle extends Command {
         );
     }
 }
-

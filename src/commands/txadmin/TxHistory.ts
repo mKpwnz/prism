@@ -2,7 +2,7 @@ import Config from '@prism/Config';
 import Command from '@prism/class/Command';
 import TxAdminClient from '@prism/clients/TxAdminClient';
 import { RegisterCommand } from '@prism/decorators';
-import { EENV } from '@prism/enums/EENV';
+import { EENV } from '@prism/typings/enums/EENV';
 import TxAdminError from '@prism/error/TxAdmin.error';
 import LogManager from '@prism/manager/LogManager';
 import { PlayerService } from '@prism/services/PlayerService';

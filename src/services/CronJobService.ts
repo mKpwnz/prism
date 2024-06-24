@@ -1,6 +1,6 @@
 import Config from '@prism/Config';
 import TxAdminClient from '@prism/clients/TxAdminClient';
-import { EEmbedColors } from '@prism/enums/EmbedColors';
+import { EEmbedColors } from '@prism/typings/enums/EmbedColors';
 import TxAdminError from '@prism/error/TxAdmin.error';
 import LogManager from '@prism/manager/LogManager';
 import { PhonePhotosService } from '@prism/services/PhonePhotosService';

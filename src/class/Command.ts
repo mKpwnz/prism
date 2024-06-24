@@ -1,9 +1,9 @@
 import { Sentry } from '@prism/Bot';
 import Config from '@prism/Config';
 import { commandLog } from '@prism/sql/botSchema/BotSchema';
-import { EENV } from '@prism/enums/EENV';
-import { EEmbedColors } from '@prism/enums/EmbedColors';
-import { IEmbedOptions } from '@prism/interfaces/IEmbed';
+import { EENV } from '@prism/typings/enums/EENV';
+import { EEmbedColors } from '@prism/typings/enums/EmbedColors';
+import { IEmbedOptions } from '@prism/typings/interfaces/IEmbed';
 import LogManager from '@prism/manager/LogManager';
 import { BotDB } from '@prism/sql/Database';
 import { getEmbedBase, isUserAllowed } from '@prism/utils/DiscordHelper';
@@ -113,7 +113,11 @@ export default abstract class Command {
             this.CmdPerformanceStart = new Date();
             setTimeout(async () => {
                 if (interaction.replied || interaction.deferred) return;
-                await interaction.deferReply({ ephemeral: true });
+                try {
+                    await interaction.deferReply({ ephemeral: true });
+                } catch (e) {
+                    // LogManager.error(e);
+                }
             }, 2000);
             await this.execute(interaction);
             this.currentInteraction = undefined;

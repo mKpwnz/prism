@@ -1,8 +1,8 @@
 import { BotClient } from '@prism/Bot';
 import Config from '@prism/Config';
-import { EENV } from '@prism/enums/EENV';
-import { ICmdPrintInformation } from '@prism/interfaces/ICmdPrintInformation';
-import { ICmdPrintInformationOption } from '@prism/interfaces/ICmdPrintInformationOption';
+import { EENV } from '@prism/typings/enums/EENV';
+import { ICmdPrintInformation } from '@prism/typings/interfaces/ICmdPrintInformation';
+import { ICmdPrintInformationOption } from '@prism/typings/interfaces/ICmdPrintInformationOption';
 import CommandManager from '@prism/manager/CommandManager';
 import { ChannelType } from 'discord.js';
 

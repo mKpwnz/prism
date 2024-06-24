@@ -2,7 +2,7 @@ import Config from '@prism/Config';
 import Command from '@prism/class/Command';
 import { RconClient } from '@prism/class/RconClient';
 import { RegisterCommand } from '@prism/decorators';
-import { EENV } from '@prism/enums/EENV';
+import { EENV } from '@prism/typings/enums/EENV';
 import { SlashCommandBuilder } from 'discord.js';
 
 @RegisterCommand(
@@ -36,4 +36,3 @@ export class RestartDropbox extends Command {
         });
     }
 }
-

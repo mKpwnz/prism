@@ -2,7 +2,7 @@ import Config from '@prism/Config';
 import Command from '@prism/class/Command';
 import GameserverClient from '@prism/clients/GameserverClient';
 import { RegisterCommand } from '@prism/decorators';
-import { EENV } from '@prism/enums/EENV';
+import { EENV } from '@prism/typings/enums/EENV';
 import { paginateApiResponse } from '@prism/utils/DiscordHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 

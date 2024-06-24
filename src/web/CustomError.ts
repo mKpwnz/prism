@@ -1,4 +1,4 @@
-import EStatusCode from '@prism/enums/EStatusCode';
+import EStatusCode from '@prism/typings/enums/EStatusCode';
 
 /**
  * @description Custom Error Klasse für die WebAPI.

@@ -1,7 +1,7 @@
 import Config from '@prism/Config';
 import Command from '@prism/class/Command';
 import { RegisterCommand } from '@prism/decorators';
-import { EENV } from '@prism/enums/EENV';
+import { EENV } from '@prism/typings/enums/EENV';
 import { PlayerService } from '@prism/services/PlayerService';
 import { UserService } from '@prism/services/UserService';
 import { ISchufaUser } from '@prism/sql/gameSchema/User.schema';
@@ -92,4 +92,3 @@ export class SchufaAuskunft extends Command {
         return pages;
     }
 }
-

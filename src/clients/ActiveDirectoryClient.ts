@@ -1,6 +1,6 @@
 import Config from '@prism/Config';
 import { Client, Control, DN, SearchOptions, SearchResult } from 'ldapts';
-import { IADUser } from '@prism/interfaces/IActiveDirectory';
+import { IADUser } from '@prism/typings/interfaces/IActiveDirectory';
 
 export default class ActiveDirectoryClient {
     public static client: Client;

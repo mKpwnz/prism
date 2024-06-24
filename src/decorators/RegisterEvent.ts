@@ -1,4 +1,4 @@
-import { DiscordEvents, PrismEvent } from '@prism/types/PrismTypes';
+import { DiscordEvents, PrismEvent } from '@prism/typings/PrismTypes';
 
 export const EventRegistry: PrismEvent[] = [];
 

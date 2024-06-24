@@ -1,6 +1,6 @@
 import { Sentry } from '@prism/Bot';
 import Config from '@prism/Config';
-import { EEmbedColors } from '@prism/enums/EmbedColors';
+import { EEmbedColors } from '@prism/typings/enums/EmbedColors';
 import LogManager from '@prism/manager/LogManager';
 import { BotDB, GameDB } from '@prism/sql/Database';
 import {

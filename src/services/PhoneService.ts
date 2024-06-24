@@ -1,7 +1,7 @@
 import { IPhone, IPhoneMediaCreatorResponse } from '@prism/sql/gameSchema/Phone.schema';
 import { GameDB } from '@prism/sql/Database';
 import { ResultSetHeader } from 'mysql2';
-import { IValidatedPlayer } from '@prism/interfaces/IValidatedPlayer';
+import { IValidatedPlayer } from '@prism/typings/interfaces/IValidatedPlayer';
 
 export class PhoneService {
     public static async getMediaCreatorByLink(

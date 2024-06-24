@@ -1,6 +1,6 @@
-import { IEmbedOptions } from '@prism/interfaces/IEmbed';
+import { IEmbedOptions } from '@prism/typings/interfaces/IEmbed';
 import { AttachmentBuilder, CommandInteraction, EmbedBuilder, TextChannel } from 'discord.js';
-import { EEmbedColors } from '@prism/enums/EmbedColors';
+import { EEmbedColors } from '@prism/typings/enums/EmbedColors';
 import Config, { envBasedVariable } from '@prism/Config';
 import LogManager from '@prism/manager/LogManager';
 import { BotClient } from '@prism/Bot';
