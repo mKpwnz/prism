@@ -7,16 +7,12 @@ export default class DevTestEvent {
     public static async execute() {
         const profiler = new PerformanceProfiler('phoneService');
         profiler.addStep('getPhone');
-        const phone = await PhoneService.getPhoneBySteamID('steam:1100001021613f8');
+        const phone = await PhoneService.getPhoneBySteamID('steam:11000014a99d40d');
         if (!phone) {
             LogManager.error('No phone found');
             return;
         }
-        const data = await PhoneService.getAllPhoneDataByPhone(phone, {
-            phone: true,
-            backups: true,
-            currentSessions: true,
-        });
+        const data = await PhoneService.getPhoneDataByPhone(phone);
         profiler.addStep('postFetch');
         LogManager.debug('PHONE SERVICE DEBUGGING');
         if (!data) {

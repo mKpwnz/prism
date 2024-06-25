@@ -107,14 +107,3 @@ export interface IPhoneBlocked {
     numbers: string[];
     byNumbers: string[];
 }
-
-export type SelectorKeyObject<T> = {
-    [P in keyof T]?: true;
-};
-
-// export type FilteredPhoneData<T, K extends keyof T> = {
-//     [P in K]: T[P];
-// };
-export type FilteredPhoneData<T, K extends SelectorKeyObject<T>> = {
-    [P in keyof K & keyof T]: K[P] extends true ? T[P] : never;
-};

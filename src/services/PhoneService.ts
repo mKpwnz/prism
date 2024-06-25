@@ -37,7 +37,6 @@ import { GameDB } from '@prism/sql/Database';
 import { ResultSetHeader } from 'mysql2';
 import { IValidatedPlayer } from '@prism/typings/interfaces/IValidatedPlayer';
 import {
-    FilteredPhoneData,
     IAppDataDarkchat,
     IAppDataInstagram,
     IAppDataMail,
@@ -46,8 +45,8 @@ import {
     IAppDataYellowPages,
     IPhoneBlocked,
     IPhoneFullData,
-    SelectorKeyObject,
 } from '@prism/typings/interfaces/IPhone';
+import { FilteredSelectorData, SelectorKeyObject } from '@prism/typings/Selector';
 
 export class PhoneService {
     public static async getMediaCreatorByLink(
@@ -108,12 +107,12 @@ export class PhoneService {
         return phones[0] || null;
     }
 
-    public static async getAllPhoneDataByPhone(phone: IPhone): Promise<IPhoneFullData>;
-    public static async getAllPhoneDataByPhone<T extends SelectorKeyObject<IPhoneFullData>>(
+    public static async getPhoneDataByPhone(phone: IPhone): Promise<IPhoneFullData>;
+    public static async getPhoneDataByPhone<T extends SelectorKeyObject<IPhoneFullData>>(
         phone: IPhone,
         selectors: T,
-    ): Promise<FilteredPhoneData<IPhoneFullData, T>>;
-    public static async getAllPhoneDataByPhone<T extends SelectorKeyObject<IPhoneFullData>>(
+    ): Promise<FilteredSelectorData<IPhoneFullData, T>>;
+    public static async getPhoneDataByPhone<T extends SelectorKeyObject<IPhoneFullData>>(
         phone: IPhone,
         selectors?: T,
     ) {
@@ -167,7 +166,7 @@ export class PhoneService {
             response.walletTransactions = await this.getWalletTransactionsByPhone(phone);
         }
 
-        return response as FilteredPhoneData<IPhoneFullData, T>;
+        return response as FilteredSelectorData<IPhoneFullData, T>;
     }
 
     private static async getClockAlarmsByPhone(phone: IPhone): Promise<IPhoneClockAlarms[]> {
