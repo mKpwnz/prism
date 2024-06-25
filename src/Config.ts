@@ -257,6 +257,11 @@ export const Config = {
     Channels: ChannelConfig,
     Commands: CommandConfig,
     ENV: envConfig,
+    $: {
+        isDevelopment: envConfig.NODE_ENV === 'development',
+        isProduction: envConfig.NODE_ENV === 'production',
+        isStaging: envConfig.NODE_ENV === 'staging',
+    },
 };
 
 export default Config;

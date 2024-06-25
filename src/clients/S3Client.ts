@@ -41,6 +41,36 @@ export default class S3Client {
         }
     }
 
+    public static async uploadObjectAsJson(filename: string, data: Object) {
+        const bucket = 'prism-temp';
+        const objectName = `${filename}.json`;
+        const metadata = {
+            'Content-Type': 'application/json',
+        };
+        try {
+            const response = await S3Client.s3client.putObject(
+                bucket,
+                objectName,
+                JSON.stringify(data),
+                undefined,
+                metadata,
+            );
+            return {
+                path: `https://s3.immortaldev.eu/prism-temp/${objectName}`,
+                response,
+            };
+        } catch (error) {
+            Sentry.captureException(error, {
+                extra: {
+                    bucket,
+                    objectName,
+                    metadata,
+                },
+            });
+            return undefined;
+        }
+    }
+
     public static async deleteFile(bucket: string, objectName: string) {
         await this.s3client.removeObject(bucket, objectName);
     }

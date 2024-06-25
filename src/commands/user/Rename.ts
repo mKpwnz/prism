@@ -40,7 +40,7 @@ export class Rename extends Command {
 
             Config.Groups.PROD.BOT_DEV,
         ];
-        this.AllowedUsers = [Config.Users.L33V33N, Config.Users.ZMASTER, Config.Users.MANU];
+        this.AllowedUsers = [Config.Users.ZMASTER];
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

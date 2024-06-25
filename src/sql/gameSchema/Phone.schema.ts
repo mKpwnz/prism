@@ -142,6 +142,7 @@ export interface IPhoneMapLocations extends RowDataPacket {
     y_pos: number;
 }
 
+// TODO: Implement Messages in FullPhoneData
 export interface IPhoneMessageChannels extends RowDataPacket {
     id: number;
     is_group: boolean;
@@ -149,7 +150,7 @@ export interface IPhoneMessageChannels extends RowDataPacket {
     last_message: string;
     last_message_timestamp: Date;
 }
-
+// TODO: Implement Messages in FullPhoneData
 export interface IPhoneMessageMembers extends RowDataPacket {
     channel_id: number;
     phone_number: string;
@@ -157,7 +158,7 @@ export interface IPhoneMessageMembers extends RowDataPacket {
     deleted: boolean;
     unread: number;
 }
-
+// TODO: Implement Messages in FullPhoneData
 export interface IPhoneMessages extends RowDataPacket {
     id: number;
     channel_id: number;
@@ -390,12 +391,10 @@ export interface IPhoneYellowPagesPosts extends RowDataPacket {
     timestamp: Date;
 }
 
-export interface IPhone_SQL_MediaCreatorResponse extends RowDataPacket {
+export interface IPhoneSqlMediaCreatorResponse extends RowDataPacket {
     firstname: string;
     lastname: string;
     steamID: string;
     phoneNumber: string;
     timestamp: string;
 }
-
-export interface IPhoneFullData {}

@@ -42,7 +42,7 @@ export class ChangeBirthday extends Command {
 
             Config.Groups.PROD.BOT_DEV,
         ];
-        this.AllowedUsers = [Config.Users.L33V33N, Config.Users.ZMASTER];
+        this.AllowedUsers = [Config.Users.ZMASTER];
     }
 
     async execute(interaction: ChatInputCommandInteraction): Promise<void> {

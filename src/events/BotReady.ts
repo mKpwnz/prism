@@ -14,6 +14,7 @@ import { CronJobService } from '@prism/services/CronJobService';
 import { ExpressApp } from '@prism/web/ExpressApp';
 import { CronJob } from 'cron';
 import { ActivityType, Events } from 'discord.js';
+import DevTestEvent from '@prism/events/DevTestEvent';
 
 export class BotReady {
     @RegisterEvent(Events.ClientReady)
@@ -52,6 +53,9 @@ export class BotReady {
         }
         await botStatusUpdate();
         LogManager.info('Discord ready!');
+        if (Config.$.isDevelopment) {
+            await DevTestEvent.execute();
+        }
     }
 
     @RegisterEvent(Events.ClientReady, true)
