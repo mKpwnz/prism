@@ -2,6 +2,5 @@ node_modules/
 pictures/
 dist/
 .env*
-.idea
 .vscode
 src/drizzle
