@@ -175,6 +175,7 @@ export default abstract class Command {
 
     async replyWithEmbed(opt: IEmbedOptions): Promise<void> {
         if (!this.currentInteraction) throw new Error('Unknown Interaction in Command Class');
+        if (!opt.title) opt.title = this.EmbedTitle;
         const embed = this.getEmbedTemplate(opt);
 
         if (this.currentInteraction.deferred) {

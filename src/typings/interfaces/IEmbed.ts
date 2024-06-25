@@ -7,6 +7,8 @@ export interface IEmbedField {
     inline?: boolean;
 }
 
+export const EmbedFieldSpacer: IEmbedField = { name: '\u200B', value: '\u200B', inline: true };
+
 export interface IEmbedOptions {
     title?: string;
     description: string;

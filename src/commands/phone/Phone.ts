@@ -9,6 +9,8 @@ import { executeCommandFromMap } from '@prism/utils/DiscordCommandHelper';
 import { paginateApiResponse } from '@prism/utils/DiscordHelper';
 import { validatePhoneMediaUrl } from '@prism/utils/FiveMHelper';
 import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { EmbedFieldSpacer, IEmbedField } from '@prism/typings/interfaces/IEmbed';
+import { AlignmentEnum, AsciiTable3 } from 'ascii-table3';
 
 @RegisterCommand(
     new SlashCommandBuilder()
@@ -24,8 +26,8 @@ import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
         )
         .addSubcommand((subcommand) =>
             subcommand
-                .setName('getpin')
-                .setDescription('Gibt den aktuellen Handy Pin des Spielers aus')
+                .setName('info')
+                .setDescription('Phone Info by User')
                 .addStringOption((option) =>
                     option
                         .setName('steamid')
@@ -33,7 +35,52 @@ import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
                         .setRequired(true),
                 ),
         )
-
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('currentlogins')
+                .setDescription('See Current Account Logins by Player')
+                .addStringOption((option) =>
+                    option
+                        .setName('steamid')
+                        .setDescription('SteamID des Spielers')
+                        .setRequired(true),
+                ),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('savedlocations')
+                .setDescription('Saved Locations by the User')
+                .addStringOption((option) =>
+                    option
+                        .setName('steamid')
+                        .setDescription('SteamID des Spielers')
+                        .setRequired(true),
+                ),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('notes')
+                .setDescription('Saved Locations by the User')
+                .addStringOption((option) =>
+                    option
+                        .setName('steamid')
+                        .setDescription('SteamID des Spielers')
+                        .setRequired(true),
+                )
+                .addIntegerOption((option) => option.setName('page').setDescription('Seite')),
+        )
+        .addSubcommand((subcommand) =>
+            subcommand
+                .setName('callhistory')
+                .setDescription('Call history for the User')
+                .addStringOption((option) =>
+                    option
+                        .setName('steamid')
+                        .setDescription('SteamID des Spielers')
+                        .setRequired(true),
+                )
+                .addIntegerOption((option) => option.setName('page').setDescription('Seite')),
+        )
         .addSubcommandGroup((subcommandGroup) =>
             subcommandGroup
                 .setName('darkchat')
@@ -96,7 +143,11 @@ export class Phone extends Command {
 
         await executeCommandFromMap(interaction, {
             checkmedia: () => this.checkMediaCreator(interaction),
-            getpin: () => this.getPhonePin(interaction),
+            info: () => this.getPhoneInfo(interaction),
+            currentlogins: () => this.getCurrentLogins(interaction),
+            savedlocations: () => this.getSavedLocations(interaction),
+            notes: () => this.getNotes(interaction),
+            callhistory: () => this.getCallHistory(interaction),
             darkchat: {
                 getmessages: () => this.getDarkchatMessages(interaction),
             },
@@ -124,11 +175,9 @@ export class Phone extends Command {
         });
     }
 
-    private async getPhonePin(interaction: ChatInputCommandInteraction): Promise<void> {
+    private async getPhoneInfo(interaction: ChatInputCommandInteraction): Promise<void> {
         const steamID = interaction.options.getString('steamid', true);
-
         const vPlayer = await PlayerService.validatePlayer(steamID);
-
         if (!vPlayer) {
             await interaction.reply({
                 content: `Es konnte kein Spieler mit der SteamID \`${steamID}\` gefunden werden!`,
@@ -136,23 +185,248 @@ export class Phone extends Command {
             });
             return;
         }
-
-        const pin = await PhoneService.getCurrentPhonePin(vPlayer);
-
-        if (pin instanceof Error) {
-            await this.replyError(`Es ist ein Fehler aufgetreten: \`${pin.message}\``);
+        const phone = await PhoneService.getPhoneBySteamID(vPlayer.identifiers.steam);
+        if (!phone) {
+            await interaction.reply({
+                content: `Der Spieler **${vPlayer.playerdata.fullname}** (${steamID}) hat kein Handy!`,
+                ephemeral: true,
+            });
             return;
         }
+        const fields: IEmbedField[] = [];
+        fields.push({
+            name: 'SteamID',
+            value: `${vPlayer.identifiers.steam}`,
+            inline: true,
+        });
+        fields.push(EmbedFieldSpacer);
+        fields.push({
+            name: 'Telefonnummer',
+            value: `${phone.phone_number}`,
+            inline: true,
+        });
+        fields.push({
+            name: 'Pin',
+            value: phone.pin ? phone.pin : 'Kein Pin gesetzt',
+            inline: true,
+        });
+        fields.push(EmbedFieldSpacer);
+        fields.push({
+            name: 'Einrichtung abgeschlossen',
+            value: phone.is_setup ? 'Ja' : 'Nein',
+            inline: true,
+        });
 
-        if (!pin) {
+        if (phone.settings) {
+            const settings = JSON.parse(phone.settings);
+            const installierteApps: string[] = [];
+            if (settings.apps) {
+                settings.apps.forEach((ar1: string[]) => {
+                    ar1.forEach((app: string) => {
+                        installierteApps.push(app);
+                    });
+                });
+            }
+            fields.push({
+                name: 'Installierte Apps',
+                value: `\`\`\`\n${installierteApps.sort().join('\n')}\`\`\``,
+            });
+        }
+        await this.replyWithEmbed({
+            title: `Handy Informationen: ${vPlayer.playerdata.fullname}`,
+            description: ` `,
+            fields,
+        });
+    }
+
+    private async getCurrentLogins(interaction: ChatInputCommandInteraction): Promise<void> {
+        const steamID = interaction.options.getString('steamid', true);
+        const vPlayer = await PlayerService.validatePlayer(steamID);
+        if (!vPlayer) {
+            await interaction.reply({
+                content: `Es konnte kein Spieler mit der SteamID \`${steamID}\` gefunden werden!`,
+                ephemeral: true,
+            });
+            return;
+        }
+        const phone = await PhoneService.getPhoneBySteamID(vPlayer.identifiers.steam);
+        if (!phone) {
+            await interaction.reply({
+                content: `Der Spieler **${vPlayer.playerdata.fullname}** (${steamID}) hat kein Handy!`,
+                ephemeral: true,
+            });
+            return;
+        }
+        const phoneData = await PhoneService.getPhoneDataByPhone(phone, { currentSessions: true });
+
+        let description = `Der user ist aktuell in keinen Account eingeloggt`;
+        if (phoneData.currentSessions.length > 0) {
+            const table = new AsciiTable3('Aktive Logins')
+                .setStyle('unicode-single')
+                .setHeading('App', 'Username')
+                .setAlign(1, AlignmentEnum.LEFT)
+                .setAlign(2, AlignmentEnum.LEFT);
+            phoneData.currentSessions.forEach((session) => {
+                table.addRow(session.app, session.username);
+            });
+            description = `\`\`\`\n${table.toString()}\`\`\``;
+        }
+
+        await this.replyWithEmbed({
+            title: `Aktive Logins von: ${vPlayer.playerdata.fullname}`,
+            description,
+        });
+    }
+
+    private async getSavedLocations(interaction: ChatInputCommandInteraction): Promise<void> {
+        const steamID = interaction.options.getString('steamid', true);
+        const vPlayer = await PlayerService.validatePlayer(steamID);
+        if (!vPlayer) {
+            await interaction.reply({
+                content: `Es konnte kein Spieler mit der SteamID \`${steamID}\` gefunden werden!`,
+                ephemeral: true,
+            });
+            return;
+        }
+        const phone = await PhoneService.getPhoneBySteamID(vPlayer.identifiers.steam);
+        if (!phone) {
+            await interaction.reply({
+                content: `Der Spieler **${vPlayer.playerdata.fullname}** (${steamID}) hat kein Handy!`,
+                ephemeral: true,
+            });
+            return;
+        }
+        const phoneData = await PhoneService.getPhoneDataByPhone(phone, { savedLocations: true });
+
+        let description = `Der user hat keine Positionen gespeichert.`;
+        if (phoneData.savedLocations.length > 0) {
+            const positions: string[] = [];
+            phoneData.savedLocations.forEach((location) => {
+                positions.push(
+                    `**${location.name}**\`\`\`\nX: ${location.x_pos}\nY: ${location.y_pos}\`\`\``,
+                );
+            });
+            description = positions.join('\n');
+        }
+
+        await this.replyWithEmbed({
+            title: `Gespeicherte Positionen von: ${vPlayer.playerdata.fullname}`,
+            description,
+        });
+    }
+
+    private async getNotes(interaction: ChatInputCommandInteraction): Promise<void> {
+        const steamID = interaction.options.getString('steamid', true);
+        const page = interaction.options.getInteger('page') ?? 1;
+        const vPlayer = await PlayerService.validatePlayer(steamID);
+        if (!vPlayer) {
+            await interaction.reply({
+                content: `Es konnte kein Spieler mit der SteamID \`${steamID}\` gefunden werden!`,
+                ephemeral: true,
+            });
+            return;
+        }
+        const phone = await PhoneService.getPhoneBySteamID(vPlayer.identifiers.steam);
+        if (!phone) {
+            await interaction.reply({
+                content: `Der Spieler **${vPlayer.playerdata.fullname}** (${steamID}) hat kein Handy!`,
+                ephemeral: true,
+            });
+            return;
+        }
+        const phoneData = await PhoneService.getPhoneDataByPhone(phone, { notes: true });
+
+        const pages = paginateApiResponse(
+            phoneData.notes,
+            (note) => {
+                const lines = [];
+                let content = note.content ?? 'Kein Inhalt';
+                if (content.length > 1500) {
+                    content = `${content.substring(0, 1500)}...`;
+                }
+                lines.push(`Titel: **${note.title}**`);
+                lines.push(`Datum: **${note.timestamp.toLocaleString('de-DE')}**`);
+                lines.push(`\`\`\`\n${content}\`\`\`\n`);
+                return lines.join('\n');
+            },
+            2000,
+        );
+
+        if (pages.length === 0) {
             await this.replyWithEmbed({
-                description: `Der Spieler **${vPlayer.playerdata.fullname}** (${steamID}) hat keinen Handy pin gesetzt.`,
+                description: `Der user hat keine Notizen gespeichert.`,
             });
             return;
         }
 
+        if (page > pages.length) {
+            await this.replyError(`Seite ${page} existiert nicht.`);
+            return;
+        }
+
         await this.replyWithEmbed({
-            description: `Der aktuelle Pin von **${vPlayer.playerdata.fullname}** (${steamID}) ist: **${pin}**`,
+            description: pages[page - 1],
+            title: `Notizen von: ${vPlayer.playerdata.fullname} | Seite ${page} von ${pages.length}`,
+        });
+    }
+
+    private async getCallHistory(interaction: ChatInputCommandInteraction): Promise<void> {
+        const steamID = interaction.options.getString('steamid', true);
+        const page = interaction.options.getInteger('page') ?? 1;
+        const vPlayer = await PlayerService.validatePlayer(steamID);
+        if (!vPlayer) {
+            await interaction.reply({
+                content: `Es konnte kein Spieler mit der SteamID \`${steamID}\` gefunden werden!`,
+                ephemeral: true,
+            });
+            return;
+        }
+        const phone = await PhoneService.getPhoneBySteamID(vPlayer.identifiers.steam);
+        if (!phone) {
+            await interaction.reply({
+                content: `Der Spieler **${vPlayer.playerdata.fullname}** (${steamID}) hat kein Handy!`,
+                ephemeral: true,
+            });
+            return;
+        }
+        const phoneData = await PhoneService.getPhoneDataByPhone(phone, { callHistory: true });
+
+        const pages = paginateApiResponse(
+            phoneData.callHistory.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()),
+            (call) => {
+                const lines = [];
+                const isCaller = call.caller === phone.phone_number;
+                lines.push(
+                    isCaller
+                        ? `Hat **${call.callee}** angerufen`
+                        : `Wurde von **${call.caller}** angerufen`,
+                );
+                lines.push(`\`\`\`\n`);
+                lines.push(`Datum: ${call.timestamp.toLocaleString('de-DE')}`);
+                lines.push(`Abgenommen: ${call.answered ? 'Ja' : 'Nein'}`);
+                lines.push(`Anrufer Unterdrückt: ${call.hide_caller_id ? 'Ja' : 'Nein'}`);
+                lines.push(`Dauer: ${call.duration} Sekunden`);
+                lines.push(`\`\`\`\n`);
+                return lines.join('\n');
+            },
+            2000,
+        );
+
+        if (pages.length === 0) {
+            await this.replyWithEmbed({
+                description: `Der user hat noch keine Anrufshistorie.`,
+            });
+            return;
+        }
+
+        if (page > pages.length) {
+            await this.replyError(`Seite ${page} existiert nicht.`);
+            return;
+        }
+
+        await this.replyWithEmbed({
+            description: pages[page - 1],
+            title: `Anrufhistorie von: ${vPlayer.playerdata.fullname} | Seite ${page} von ${pages.length}`,
         });
     }
 
@@ -211,6 +485,33 @@ export class Phone extends Command {
         await this.replyWithEmbed({
             description: pages[page - 1],
             title: `Darkchat Suche Seite ${page} von ${pages.length}`,
+        });
+    }
+
+    private async template(interaction: ChatInputCommandInteraction): Promise<void> {
+        const steamID = interaction.options.getString('steamid', true);
+        const vPlayer = await PlayerService.validatePlayer(steamID);
+        if (!vPlayer) {
+            await interaction.reply({
+                content: `Es konnte kein Spieler mit der SteamID \`${steamID}\` gefunden werden!`,
+                ephemeral: true,
+            });
+            return;
+        }
+        const phone = await PhoneService.getPhoneBySteamID(vPlayer.identifiers.steam);
+        if (!phone) {
+            await interaction.reply({
+                content: `Der Spieler **${vPlayer.playerdata.fullname}** (${steamID}) hat kein Handy!`,
+                ephemeral: true,
+            });
+            return;
+        }
+        const fields: IEmbedField[] = [];
+
+        await this.replyWithEmbed({
+            title: `TEXT: ${vPlayer.playerdata.fullname}`,
+            description: ` `,
+            fields,
         });
     }
 }
