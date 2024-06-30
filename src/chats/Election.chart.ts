@@ -5,6 +5,8 @@ export function getElectionChart(elections: IElection[], votes: IVote[]): string
     const height = 500;
     const backgroundColor = '#17171c';
 
+    votes = votes.filter((vote) => vote.vote_count > 0);
+
     const sendApiData = {
         type: 'doughnut',
         data: {
